@@ -13,7 +13,35 @@ public struct TodayView: View {
         store: UserDefaults(suiteName: AppStorageGroup.suiteName)
     )
     private var showsRomaji: Bool = true
+    @AppStorage(
+        LearnerPreferenceKey.levelSystem.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var levelSystemRaw: String = LevelSystem.jlpt.rawValue
+    @AppStorage(
+        LearnerPreferenceKey.selectedJLPTLevel.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var selectedJLPTLevelRaw: String = JLPTLevel.n5.rawValue
+    @AppStorage(
+        LearnerPreferenceKey.selectedJoyoGrade.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var selectedJoyoGradeRaw: String = JoyoGrade.grade1.rawValue
+    @AppStorage(
+        LearnerPreferenceKey.dailyOrder.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var dailyOrderRaw: String = DailyOrder.mostCommon.rawValue
+    @AppStorage(
+        LearnerPreferenceKey.isCustomPoolActive.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var isCustomPoolActive: Bool = false
+
     @Query private var learnerProgress: [KanjiProgress]
+    @Query private var dailyAssignments: [DailyAssignment]
+    @Query private var customSelections: [CustomKanjiSelection]
 
     @State private var assignment: DailyAssignmentSnapshot?
     @State private var kanji: KanjiEntry?
@@ -21,6 +49,16 @@ public struct TodayView: View {
     @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var reloadID = UUID()
+
+    private var poolPreferenceSignature: String {
+        "\(levelSystemRaw)-\(selectedJLPTLevelRaw)-\(selectedJoyoGradeRaw)-\(dailyOrderRaw)-\(isCustomPoolActive)-\(customSelections.count)"
+    }
+
+    private var assignmentsSignature: String {
+        dailyAssignments
+            .map { "\($0.calendarDay):\($0.kanjiID):\($0.statusRaw)" }
+            .joined(separator: "|")
+    }
 
     public init(onOpenSettings: @escaping () -> Void) {
         self.onOpenSettings = onOpenSettings
@@ -60,6 +98,12 @@ public struct TodayView: View {
             }
         }
         .onChange(of: learnerProgress.count) { _, _ in
+            reloadID = UUID()
+        }
+        .onChange(of: poolPreferenceSignature) { _, _ in
+            reloadID = UUID()
+        }
+        .onChange(of: assignmentsSignature) { _, _ in
             reloadID = UUID()
         }
     }
@@ -163,7 +207,9 @@ public struct TodayView: View {
     private func refreshAfterActivation() async {
         guard let services else { return }
         do {
-            try await services.handleTimeOrZoneChange(preferences: .standard)
+            let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
+            let preferences = LearnerPreferencesSnapshot.load(from: defaults)
+            try await services.handleTimeOrZoneChange(preferences: preferences)
         } catch {
             errorMessage = error.localizedDescription
             return

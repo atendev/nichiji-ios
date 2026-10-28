@@ -254,7 +254,13 @@ public actor SwiftDataLearnerStore: LearnerStore {
                 return makeSnapshot(from: existing)
             }
 
-            guard let replacement = pool.first(where: { $0.id != existing.kanjiID }) else {
+            guard let replacement = pool.first else {
+                modelContext.delete(existing)
+                try modelContext.save()
+                return nil
+            }
+            // Keep today's kanji when it is already first in the updated pool.
+            if replacement.id == existing.kanjiID {
                 return makeSnapshot(from: existing)
             }
             existing.kanjiID = replacement.id

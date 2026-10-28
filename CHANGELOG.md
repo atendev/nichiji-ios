@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.0
+- Implement the Settings sheet: appearance picker, level, order and custom kanji pool selection with Today reassignment, reminder settings with permission warning, widget guide, and privacy screens.
+
 ## v0.2.0
 - Implement Today tab assignment loading, kanji details, pronunciation actions, stroke-order rendering, learned state, level completion, and retry handling.
 

@@ -6,6 +6,7 @@ import Foundation
 final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     var assignments: [String: DailyAssignmentSnapshot] = [:]
     var progress: [String: StudyStage] = [:]
+    var customSelections: [LevelSystem: Set<String>] = [:]
     var shouldThrow = false
 
     func assignment(for calendarDay: String) async throws -> DailyAssignmentSnapshot? {
@@ -40,7 +41,9 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
             assignedAt: assignedAt
         )
         assignments[calendarDay] = snapshot
-        progress[kanjiID] = .new
+        if progress[kanjiID] == nil {
+            progress[kanjiID] = .new
+        }
         return snapshot
     }
 
@@ -51,7 +54,7 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
 
     func customSelectionIDs(for levelSystem: LevelSystem) async throws -> Set<String> {
         try checkForError()
-        return []
+        return customSelections[levelSystem] ?? []
     }
 
     func markLearned(day: String) async throws -> DailyAssignmentSnapshot {
@@ -76,7 +79,10 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         progress[kanjiID] = .new
     }
 
-    func setCustomSelection(_ kanjiIDs: Set<String>, levelSystem: LevelSystem) async throws {}
+    func setCustomSelection(_ kanjiIDs: Set<String>, levelSystem: LevelSystem) async throws {
+        try checkForError()
+        customSelections[levelSystem] = kanjiIDs
+    }
 
     func reassignToday(from pool: [KanjiEntry]) async throws -> DailyAssignmentSnapshot? {
         try checkForError()
@@ -85,8 +91,22 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
 
     func reassignToday(day: String, from pool: [KanjiEntry]) async throws -> DailyAssignmentSnapshot? {
         try checkForError()
-        guard let first = pool.first else { return nil }
-        return try await createAssignment(calendarDay: day, kanjiID: first.id, assignedAt: Date())
+        if let existing = assignments[day] {
+            if existing.status == .learned {
+                return existing
+            }
+            guard let replacement = pool.first else {
+                assignments.removeValue(forKey: day)
+                return nil
+            }
+            if replacement.id == existing.kanjiID {
+                return existing
+            }
+            return try await createAssignment(calendarDay: day, kanjiID: replacement.id, assignedAt: existing.assignedAt)
+        } else {
+            guard let first = pool.first else { return nil }
+            return try await createAssignment(calendarDay: day, kanjiID: first.id, assignedAt: Date())
+        }
     }
 
     private func checkForError() throws {

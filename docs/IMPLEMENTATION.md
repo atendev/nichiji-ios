@@ -39,6 +39,7 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify past unlearned assignments are marked `.missed` on day rollover, while `KanjiProgress.stage` remains `.new` so they return to the study pool.
    - Verify deterministic daily selection algorithms across `mostCommon`, `listOrder`, and date-seeded `random`.
    - Verify exhausted study pool returns `nil` to display the quiet level-complete state.
+   - Verify `refreshAssignmentAfterPreferenceChange(for:preferences:)` re-evaluates the active pool, orders candidates according to `DailyOrder`, and swaps an `.assigned` today assignment while leaving a `.learned` assignment untouched.
 4. **`PronunciationServiceTests`**:
    - Verify `speak(_:reading:)` utters kana reading when available and falls back to kanji literal.
    - Verify missing Japanese voice throws `NichijiError.speechUnavailable`.
@@ -52,3 +53,8 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify timeline provider builds `DailyKanjiWidgetSnapshot` from active assignment.
    - Verify timeline reload policy refreshes at `nextMidnight`.
    - Verify interactive "Got it" AppIntent marks assignment learned and triggers timeline reloads.
+7. **`SettingsPreferencesTests`**:
+   - Verify `LearnerPreferencesSnapshot.load(from:)` and `save(to:)` round-trip all `LearnerPreferenceKey` values and format level and reminder summaries.
+   - Verify level and order switches reassign an `.assigned` today kanji via `refreshAssignmentAfterPreferenceChange(for:preferences:)` while preserving a `.learned` assignment.
+   - Verify custom kanji selections persist per `LevelSystem` and filter `DailyKanjiService.activePool(preferences:)` when `isCustomPoolActive` is enabled.
+   - Verify `ReminderSettingsCoordinator.applyReminderPreferences(_:scheduler:)` rebuilds schedules when enabled, cancels reminders when disabled, and preserves the learner toggle when authorization is `.denied`.
