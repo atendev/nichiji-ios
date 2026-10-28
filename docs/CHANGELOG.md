@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.9
+
+- Close Slice 3 requirements and implementation tickets (013 and 014)
+- Implement `SwiftDataLearnerStore` conforming to `LearnerStore` using `@ModelActor`
+- Make `LearnerModels` public and implement `DailyAssignmentSnapshot` actor boundaries
+- Implement rollover rules marking past assigned rows as missed while keeping stage new
+- Add unit test suite in `LearnerStoreTests` with an in-memory `ModelContainer`
+- Update `docs/PROGRESS.md` marking Slice 3 done and log reports in `docs/IMPLOG.md`
+
 ## v0.0.8
 
 - Close Slice 2 requirements and implementation tickets (011 and 012)

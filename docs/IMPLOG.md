@@ -67,3 +67,21 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Deviations**: None. Store includes embedded `SeedKanjiDataset` for core N5 and Grade 1 kanji (`日`, `一`, `二`, `三`, `山`, `川`, `学`) with real stroke-order SVG paths and example words to guarantee deterministic offline execution.
 - **Unanticipated TODOs**: None.
 - **Test Results**: All 6 tests in `KanjiContentStoreTests` passing (valid entry lookup, JLPT level filtering and ordering, Joyo grade filtering and ordering, SVG stroke paths validation, typed error throwing on missing glyphs, and `TestKanjiContentStore` double verification).
+
+### Slice 3: SwiftData Learner Store
+
+#### Requirements Report
+- **Success Criteria**:
+  1. `SwiftDataLearnerStore` implementing `LearnerStore` using SwiftData's `@ModelActor` macro for background context writes.
+  2. Sendable `DailyAssignmentSnapshot` carrying assignment state across actor boundaries.
+  3. Strict adherence to rollover invariants: past unlearned assignments become `.missed` while `KanjiProgress.stage` remains `.new`.
+  4. Complete mutation methods: `markLearned`, `forgetIt`, `reassignToday`, `setCustomSelection`.
+  5. In-memory SwiftData container unit tests in `LearnerStoreTests.swift`.
+- **Scope Boundary**: Learner models, `@ModelActor` store, projections, and unit tests in scope; daily selection logic deferred to Slice 4.
+- **Anticipated TODOs**: Resolves all TODOs in `Nichiji/Services/LearnerStore.swift`.
+- **Planned Tests**: Verified in `LearnerStoreTests`.
+
+#### Deviation Report
+- **Deviations**: Added `reassignToday(day:from:)` overload so caller can supply explicit calendar day in addition to the default zero-argument day overload.
+- **Unanticipated TODOs**: None.
+- **Test Results**: All 7 tests in `LearnerStoreTests` passing (clean container setup, assignment creation and fetch, marking learned with stage advancement and logging, marking past assigned as missed while keeping stage `.new`, `forgetIt` reset, custom selection persistence, and `reassignToday` preservation of learned assignments).

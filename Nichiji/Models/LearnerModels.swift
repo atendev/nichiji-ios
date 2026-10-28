@@ -4,7 +4,7 @@ import SwiftData
 /*---------------------------------enums--------------------------------------*/
 
 /// Familiarity tier for a kanji entry across Today and Review.
-enum StudyStage: String, Codable, CaseIterable, Sendable {
+public enum StudyStage: String, Codable, CaseIterable, Sendable {
     case new
     case learning
     case familiar
@@ -12,14 +12,14 @@ enum StudyStage: String, Codable, CaseIterable, Sendable {
 }
 
 /// Lifecycle state of a single day's kanji assignment.
-enum DailyAssignmentStatus: String, Codable, CaseIterable, Sendable {
+public enum DailyAssignmentStatus: String, Codable, CaseIterable, Sendable {
     case assigned
     case learned
     case missed
 }
 
 /// Discrete learner study event recorded in the activity log.
-enum StudyAction: String, Codable, CaseIterable, Sendable {
+public enum StudyAction: String, Codable, CaseIterable, Sendable {
     case learnedDaily
     case gotItReview
     case forgotItReview
@@ -30,16 +30,21 @@ enum StudyAction: String, Codable, CaseIterable, Sendable {
 
 /// Mutable learner progress and review schedule for a single kanji character.
 @Model
-final class KanjiProgress {
-    @Attribute(.unique) var kanjiID: String
-    var stageRaw: String
-    var firstLearnedAt: Date?
-    var lastReviewedAt: Date?
-    var nextReviewAt: Date?
-    var gotItCount: Int
-    var forgotItCount: Int
+public final class KanjiProgress {
+    @Attribute(.unique) public var kanjiID: String
+    public var stageRaw: String
+    public var firstLearnedAt: Date?
+    public var lastReviewedAt: Date?
+    public var nextReviewAt: Date?
+    public var gotItCount: Int
+    public var forgotItCount: Int
 
-    init(
+    public var stage: StudyStage {
+        get { StudyStage(rawValue: stageRaw) ?? .new }
+        set { stageRaw = newValue.rawValue }
+    }
+
+    public init(
         kanjiID: String,
         stage: StudyStage = .new,
         firstLearnedAt: Date? = nil,
@@ -60,14 +65,19 @@ final class KanjiProgress {
 
 /// Record assigning one kanji entry to a local calendar day (yyyy-MM-dd).
 @Model
-final class DailyAssignment {
-    @Attribute(.unique) var calendarDay: String
-    var kanjiID: String
-    var statusRaw: String
-    var assignedAt: Date
-    var completedAt: Date?
+public final class DailyAssignment {
+    @Attribute(.unique) public var calendarDay: String
+    public var kanjiID: String
+    public var statusRaw: String
+    public var assignedAt: Date
+    public var completedAt: Date?
 
-    init(
+    public var status: DailyAssignmentStatus {
+        get { DailyAssignmentStatus(rawValue: statusRaw) ?? .assigned }
+        set { statusRaw = newValue.rawValue }
+    }
+
+    public init(
         calendarDay: String,
         kanjiID: String,
         status: DailyAssignmentStatus = .assigned,
@@ -84,12 +94,17 @@ final class DailyAssignment {
 
 /// Membership record for a kanji toggled on in the custom study pool.
 @Model
-final class CustomKanjiSelection {
-    @Attribute(.unique) var kanjiID: String
-    var levelSystemRaw: String
-    var selectedAt: Date
+public final class CustomKanjiSelection {
+    @Attribute(.unique) public var kanjiID: String
+    public var levelSystemRaw: String
+    public var selectedAt: Date
 
-    init(
+    public var levelSystem: LevelSystem {
+        get { LevelSystem(rawValue: levelSystemRaw) ?? .jlpt }
+        set { levelSystemRaw = newValue.rawValue }
+    }
+
+    public init(
         kanjiID: String,
         levelSystem: LevelSystem,
         selectedAt: Date = .now
@@ -102,14 +117,19 @@ final class CustomKanjiSelection {
 
 /// Append-only history entry for daily completions, review answers, and resets.
 @Model
-final class StudyLogEntry {
-    @Attribute(.unique) var id: UUID
-    var kanjiID: String
-    var actionRaw: String
-    var timestamp: Date
-    var calendarDay: String
+public final class StudyLogEntry {
+    @Attribute(.unique) public var id: UUID
+    public var kanjiID: String
+    public var actionRaw: String
+    public var timestamp: Date
+    public var calendarDay: String
 
-    init(
+    public var action: StudyAction {
+        get { StudyAction(rawValue: actionRaw) ?? .learnedDaily }
+        set { actionRaw = newValue.rawValue }
+    }
+
+    public init(
         id: UUID = UUID(),
         kanjiID: String,
         action: StudyAction,
