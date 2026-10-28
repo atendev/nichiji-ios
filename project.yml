@@ -1,0 +1,50 @@
+name: Nichiji
+options:
+  bundleIdPrefix: com.aten
+  deploymentTarget:
+    iOS: "27.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    DEVELOPMENT_TEAM: ""
+targets:
+  Nichiji:
+    type: application
+    platform: iOS
+    sources: [Nichiji]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Nichiji
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+  NichijiTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [NichijiTests]
+    dependencies:
+      - target: Nichiji
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji.tests
+        GENERATE_INFOPLIST_FILE: YES
+  NichijiUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [NichijiUITests]
+    dependencies:
+      - target: Nichiji
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji.uitests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Nichiji:
+    build:
+      targets:
+        Nichiji: all
+    test:
+      targets:
+        - NichijiTests
+        - NichijiUITests

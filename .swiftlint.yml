@@ -1,0 +1,4 @@
+included:
+  - Nichiji
+  - NichijiTests
+  - NichijiUITests
