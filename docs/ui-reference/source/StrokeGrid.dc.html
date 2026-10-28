@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stroke grid</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.draw{stroke-dasharray:1;animation:draw .7s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif; color: #1f1b16">
+<sc-if value="{{ hasStrokes }}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ cells }}" as="c" hint-placeholder-count="8">
+<div role="img" aria-label="{{ c.label }}" style="position: relative; box-sizing: border-box; height: 132px; display: flex; align-items: center; justify-content: center; background: #eae2d1; border-radius: 8px">
+<span style="position: absolute; top: 8px; left: 10px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #5e5548">{{ c.num }}</span>
+<svg width="100" height="100" viewBox="0 0 109 109" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<sc-for list="{{ c.paths }}" as="p" hint-placeholder-count="8">
+<path pathLength="1" d="{{ p.d }}" stroke="{{ p.color }}" stroke-width="{{ p.width }}" class="{{ p.cls }}" style="{{ p.style }}"></path>
+</sc-for>
+</svg>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ missing }}" hint-placeholder-val="{{ false }}">
+<div style="box-sizing: border-box; padding: 16px; background: #eae2d1; border-radius: 8px; font-size: 14px; line-height: 20px; color: #5e5548">Stroke diagrams for this kanji are not drawn in the mockup yet.</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kanji":{"editor":null},"$preview":{"width":342,"height":560}}'>
+class Component extends DCLogic {
+  // Hand-drawn placeholder strokes on a 109 x 109 grid. Swap in real stroke data (e.g. KanjiVG) later.
+  static strokes() {
+    return {
+      '学': ['M27 13 Q30 21 34 27', 'M54 8 Q53 17 51 28', 'M80 12 Q76 22 69 29', 'M54 35 Q55 38 56 41', 'M22 57 L22 46 L87 46 L87 56 Q87 60 82 58', 'M38 62 L70 62 Q64 70 50 78', 'M53 66 L53 96 Q53 101 45 98', 'M28 82 L80 82'],
+      '日': ['M32 18 L32 92', 'M32 18 L78 18 L78 92', 'M32 54 L78 54', 'M32 92 L78 92'],
+      '月': ['M38 14 Q36 60 22 94', 'M38 14 L84 14 L84 90 Q84 98 74 94', 'M38 42 L84 42', 'M38 68 L84 68'],
+      '山': ['M54 14 L54 76', 'M22 42 L22 88 L88 88', 'M88 42 L88 88'],
+      '川': ['M28 16 Q27 50 16 84', 'M54 10 L54 92', 'M82 14 L82 92'],
+      '人': ['M54 14 Q50 58 16 92', 'M48 48 Q66 76 94 92'],
+      '大': ['M16 44 L92 44', 'M54 12 Q50 62 14 94', 'M54 44 Q62 72 94 94'],
+      '小': ['M54 12 L54 88 Q54 94 44 90', 'M32 42 Q30 62 14 80', 'M76 42 Q78 62 94 80'],
+      '土': ['M26 40 L84 40', 'M54 12 L54 88', 'M16 90 L92 90'],
+      '木': ['M14 40 L94 40', 'M54 12 L54 94', 'M52 44 Q40 72 14 90', 'M56 44 Q68 72 94 90'],
+      '水': ['M54 12 L54 90 Q54 98 44 92', 'M18 50 Q38 56 36 70 Q30 82 14 92', 'M82 38 Q72 62 56 74', 'M62 66 Q78 82 96 94'],
+      '火': ['M30 34 Q34 42 36 50', 'M78 24 Q72 38 66 48', 'M54 18 Q50 64 14 94', 'M52 52 Q66 76 96 94'],
+      '本': ['M14 40 L94 40', 'M54 12 L54 96', 'M52 44 Q40 72 14 90', 'M56 44 Q68 72 94 90', 'M30 76 L80 76']
+    };
+  }
+  static count(ch) {
+    const s = Component.strokes()[ch];
+    return s ? s.length : 0;
+  }
+  renderVals() {
+    const ch = (this.props && this.props.kanji) || '学';
+    const strokes = Component.strokes()[ch] || null;
+    const cells = (strokes || []).map((s, n) => ({
+      num: n + 1,
+      label: 'Stroke ' + (n + 1) + ' of ' + strokes.length,
+      paths: strokes.map((d, k) => {
+        const cur = k === n;
+        const done = k < n;
+        return {
+          d: d,
+          color: cur ? '#1f1b16' : (done ? '#5e5548' : '#d3c8b2'),
+          width: cur ? 6 : 5,
+          cls: cur ? 'draw' : '',
+          style: cur ? 'animation-delay: ' + (0.25 + n * 0.12) + 's;' : ''
+        };
+      })
+    }));
+    return { hasStrokes: !!strokes, missing: !strokes, cells: cells };
+  }
+}
+</script>
+</body>
+</html>

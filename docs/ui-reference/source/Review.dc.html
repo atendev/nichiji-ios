@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Review</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+.ghost:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:none}}
+.screen{animation:enter .32s ease-out both}
+.grow{transform-origin:left;animation:grow .6s .1s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="position: relative; overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding-top: 56px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<button class="ghost" onClick="{{ openSettings }}" aria-label="Settings" aria-haspopup="dialog" style="position: absolute; top: 51px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+</button>
+<div style="padding: 0 16px; flex: none">
+<h1 style="margin: 0; display: flex; align-items: center; gap: 12px; font-size: 28px; line-height: 34px; font-weight: 500">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-weight: 500">復習</span>
+<span aria-hidden="true" style="width: 1.5px; height: 22px; background: #74695a"></span>
+<span>Review</span>
+</h1>
+<div style="margin-top: 4px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">4 DAY STREAK</div>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px 16px 24px">
+<section style="box-sizing: border-box; padding: 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: flex-end; gap: 12px">
+<span style="font-size: 64px; line-height: 64px; font-weight: 500">{{ due }}</span>
+<span style="padding-bottom: 6px; font-size: 16px; line-height: 24px; color: #5e5548">kanji due today</span>
+</div>
+<div style="margin-top: 4px; font-size: 14px; line-height: 20px; color: #74695a">About 2 minutes</div>
+<div style="margin-top: 16px; display: flex; gap: 8px" aria-hidden="true">
+<sc-for list="{{ dueKanji }}" as="k" hint-placeholder-count="5">
+<span lang="ja" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #eae2d1; border-radius: 8px; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 22px; line-height: 1; font-weight: 500">{{ k.ch }}</span>
+</sc-for>
+</div>
+<button class="cta" onClick="{{ start }}" style="margin-top: 20px; box-sizing: border-box; width: 100%; min-height: 48px; border: 0; border-radius: 8px; background: #b8321d; color: #ffffff; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer">Start review</button>
+<button class="ghost" onClick="{{ openOptions }}" style="margin-top: 8px; box-sizing: border-box; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+<span>Session options · {{ summary }}</span>
+</button>
+</section>
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Your kanji</h2>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ totalKanji }} total</span>
+</div>
+<div class="grow" role="img" aria-label="{{ stageSummary }}" style="margin-top: 12px; height: 12px; display: flex; gap: 2px; border-radius: 999px; overflow: hidden">
+<sc-for list="{{ stages }}" as="s" hint-placeholder-count="4">
+<div style="{{ s.barStyle }}"></div>
+</sc-for>
+</div>
+<div style="margin-top: 8px">
+<sc-for list="{{ stages }}" as="s" hint-placeholder-count="4">
+<div style="{{ s.rowStyle }}">
+<span aria-hidden="true" style="{{ s.swatchStyle }}"></span>
+<span style="flex: 1; font-size: 16px; line-height: 24px">{{ s.name }}</span>
+<span style="font-size: 16px; line-height: 24px; font-weight: 500">{{ s.count }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0 0 8px; font-size: 20px; line-height: 26px; font-weight: 500">Coming up</h2>
+<sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="3">
+<div style="{{ u.rowStyle }}">
+<span style="flex: 1; font-size: 16px; line-height: 24px">{{ u.when }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ u.count }} kanji</span>
+</div>
+</sc-for>
+</section>
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0 0 12px; font-size: 20px; line-height: 26px; font-weight: 500">This week</h2>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center">
+<sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">{{ d.label }}</span>
+<span role="img" aria-label="{{ d.aria }}" style="{{ d.dotStyle }}">
+<sc-if value="{{ d.done }}" hint-placeholder-val="{{ false }}">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3f6b3a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+</span>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+<nav aria-label="Main" style="box-sizing: border-box; height: 83px; flex: none; padding: 0 8px 34px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fbf7ee; border-top: 1px solid #d9cfbc">
+<button onClick="{{ goToday }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16"></path><path d="M8 3v4M16 3v4" stroke-linecap="round"></path></svg>
+<span>Today</span>
+</button>
+<button onClick="{{ goDictionary }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"></path><path d="M5 20.5A2.5 2.5 0 0 0 7.5 23H19v-5"></path><path d="M9 7.5h6"></path></svg>
+<span>Dictionary</span>
+</button>
+<button aria-current="page" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #b8321d; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#b8321d" stroke="#b8321d" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="8" width="13" height="11" rx="2.5"></rect><path d="M7.5 5h11a2 2 0 0 1 2 2v8" fill="none"></path></svg>
+<span>Review</span>
+</button>
+<button onClick="{{ goYou }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.75"></circle><path d="M4.5 20c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6"></path></svg>
+<span>You</span>
+</button>
+</nav>
+<sc-if value="{{ sessionOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="ReviewSession" settings="{{ settings }}" on-close="{{ closeSession }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startOpen":{"editor":null},"onTab":{"editor":null},"settings":{"editor":null},"summary":{"editor":null},"onOptions":{"editor":null},"onOpenSettings":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: !!(props && props.startOpen) };
+  }
+  renderVals() {
+    const st = this.state || {};
+    const row = (i, n) => 'display: flex; align-items: center; gap: 12px; padding: 12px 0; ' + (i < n - 1 ? 'border-bottom: 1px solid #d9cfbc;' : '');
+    // Sample numbers only.
+    const raw = [
+      { name: 'New', count: 4, color: '#d9cfbc' },
+      { name: 'Learning', count: 9, color: '#8c8068' },
+      { name: 'Familiar', count: 14, color: '#a9bf98' },
+      { name: 'Known', count: 22, color: '#3f6b3a' }
+    ];
+    const total = raw.reduce((a, s) => a + s.count, 0);
+    const stages = raw.map((s, i) => ({
+      name: s.name,
+      count: s.count,
+      barStyle: 'flex: ' + s.count + ' 1 0; background: ' + s.color + ';',
+      swatchStyle: 'width: 12px; height: 12px; border-radius: 3px; background: ' + s.color + ';',
+      rowStyle: 'display: flex; align-items: center; gap: 12px; padding: 8px 0;'
+    }));
+    const up = [['Tomorrow', 8], ['In 3 days', 15], ['Next week', 31]];
+    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const doneDays = [true, true, true, true, false, false, false];
+    const todayIdx = 4;
+    return {
+      due: 6,
+      dueKanji: ['学', '日', '水', '山', '本', '人'].map((ch) => ({ ch: ch })),
+      totalKanji: total,
+      stageSummary: raw.map((s) => s.count + ' ' + s.name.toLowerCase()).join(', '),
+      stages: stages,
+      upcoming: up.map((u, i) => ({ when: u[0], count: u[1], rowStyle: row(i, up.length) })),
+      week: days.map((d, i) => ({
+        label: d,
+        done: doneDays[i],
+        aria: d + (doneDays[i] ? ', reviewed' : ', not yet'),
+        dotStyle: 'width: 32px; height: 32px; box-sizing: border-box; border-radius: 999px; display: flex; align-items: center; justify-content: center; ' +
+          (doneDays[i] ? 'background: #dce5d0; border: 1px solid #3f6b3a;' : (i === todayIdx ? 'border: 1px solid #1f1b16;' : 'border: 1px solid #d9cfbc;'))
+      })),
+      summary: (this.props && this.props.summary) || '10 cards · Due first',
+      settings: (this.props && this.props.settings) || null,
+      openOptions: () => { if (this.props.onOptions) this.props.onOptions(); },
+      openSettings: () => { if (this.props.onOpenSettings) this.props.onOpenSettings(); },
+      sessionOpen: !!st.open,
+      start: () => this.setState({ open: true }),
+      closeSession: () => this.setState({ open: false }),
+      goToday: () => { if (this.props.onTab) this.props.onTab('today'); },
+      goYou: () => { if (this.props.onTab) this.props.onTab('you'); },
+      goDictionary: () => { if (this.props.onTab) this.props.onTab('dictionary'); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+/* Nichiji — generated from tokens.json */
+:root, [data-theme="light"] {
+  --surface: #f4eee2;
+  --surface-raised: #fbf7ee;
+  --surface-sunken: #eae2d1;
+  --ink: #1f1b16;
+  --ink-muted: #5e5548;
+  --ink-subtle: #74695a;
+  --hairline: #d9cfbc;
+  --border-control: #8c8068;
+  --vermilion: #b8321d;
+  --vermilion-hover: #9c2915;
+  --on-vermilion: #ffffff;
+  --vermilion-wash: #f7e6de;
+  --matcha: #3f6b3a;
+  --matcha-wash: #dce5d0;
+  --mustard: #a67300;
+  --mustard-text: #7d5600;
+  --mustard-wash: #f6e8bd;
+  --indigo: #2f4a6b;
+  --indigo-wash: #d8dfe8;
+  --focus-ring: #2f4a6b;
+  --shadow-card: 0 1px 2px rgba(31, 27, 22, 0.10);
+  --shadow-sheet: 0 8px 24px rgba(31, 27, 22, 0.16);
+}
+[data-theme="dark"] {
+  --surface: #15130f;
+  --surface-raised: #1f1c16;
+  --surface-sunken: #0f0d0a;
+  --ink: #efe8d8;
+  --ink-muted: #a89f8e;
+  --ink-subtle: #928a7a;
+  --hairline: #35302a;
+  --border-control: #7d7566;
+  --vermilion: #e8603f;
+  --vermilion-hover: #f07a5c;
+  --on-vermilion: #15130f;
+  --vermilion-wash: #321913;
+  --matcha: #8db483;
+  --matcha-wash: #202b1d;
+  --mustard: #e0b04a;
+  --mustard-text: #e0b04a;
+  --mustard-wash: #2e2410;
+  --indigo: #8faad0;
+  --indigo-wash: #1d2633;
+  --focus-ring: #8faad0;
+  --shadow-card: 0 0 0 1px rgba(239, 232, 216, 0.06);
+  --shadow-sheet: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --font-mincho: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+}
+.kanji-hero { font-family: var(--font-mincho); font-size: 120px; line-height: 1.05; font-weight: 500; }
+.kanji-large { font-family: var(--font-mincho); font-size: 64px; line-height: 1.1; font-weight: 500; }
+.kanji-widget { font-family: var(--font-mincho); font-size: 48px; line-height: 1; font-weight: 500; }
+.word { font-family: var(--font-mincho); font-size: 18px; line-height: 24px; font-weight: 400; }
+.title { font-family: var(--font-gothic); font-size: 28px; line-height: 34px; font-weight: 500; }
+.heading { font-family: var(--font-gothic); font-size: 20px; line-height: 26px; font-weight: 500; }
+.body { font-family: var(--font-gothic); font-size: 16px; line-height: 24px; font-weight: 400; }
+.callout { font-family: var(--font-gothic); font-size: 14px; line-height: 20px; font-weight: 500; }
+.caption { font-family: var(--font-gothic); font-size: 12px; line-height: 16px; font-weight: 400; }
+.label { font-family: var(--font-gothic); font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; }

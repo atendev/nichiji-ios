@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings: Widgets</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.ghost:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes pushIn{from{transform:translateX(100%)}to{transform:none}}
+@keyframes pushOut{from{transform:none}to{transform:translateX(100%)}}
+.push-in{animation:pushIn .3s cubic-bezier(.2,.8,.2,1) both}
+.push-out{animation:pushOut .24s ease-in both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="{{ rootClass }}" style="overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding-top: 56px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="padding: 0 24px; display: flex; align-items: center; height: 44px">
+<button class="ghost" onClick="{{ back }}" aria-label="Back to settings" style="height: 44px; margin-left: -12px; padding: 0 12px 0 8px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; gap: 2px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+<span>Settings</span>
+</button>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px 24px 48px">
+<h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 500">Widgets</h1>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 24px; font-weight: 400; color: #5e5548">Keep today's kanji on your home screen or lock screen.</p>
+<section style="margin-top: 24px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Medium</h2>
+<p style="margin: 4px 0 16px; font-size: 14px; line-height: 20px; color: #5e5548">Kanji, readings, meaning, an example word and Got it.</p>
+<div role="img" aria-label="Medium widget showing the kanji 学, its readings, its meaning and an example word" style="box-sizing: border-box; height: 150px; padding: 14px; display: flex; gap: 12px; background: #f4eee2; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="flex: none; width: 104px; display: flex; flex-direction: column; justify-content: space-between">
+<div lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 48px; line-height: 1; font-weight: 500">学</div>
+<div>
+<div lang="ja" style="font-size: 12px; line-height: 16px; color: #5e5548">ガク · まな-ぶ</div>
+<div style="font-size: 14px; line-height: 20px">study, learning</div>
+</div>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between">
+<div>
+<div style="font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">TODAY · N5</div>
+<div style="margin-top: 6px; display: flex; align-items: baseline; gap: 8px">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 18px; line-height: 24px">学校</span>
+<span lang="ja" style="font-size: 12px; line-height: 16px; color: #5e5548">がっこう</span>
+</div>
+</div>
+<div aria-hidden="true" style="box-sizing: border-box; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid #8c8068; border-radius: 8px; font-size: 14px; line-height: 20px; font-weight: 500">Got it</div>
+</div>
+</div>
+</section>
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Small</h2>
+<p style="margin: 4px 0 16px; font-size: 14px; line-height: 20px; color: #5e5548">The kanji and its main meaning.</p>
+<div role="img" aria-label="Small widget showing the kanji 学 and its meaning" style="box-sizing: border-box; width: 150px; height: 150px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; background: #f4eee2; border: 1px solid #d9cfbc; border-radius: 20px">
+<div lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 48px; line-height: 1; font-weight: 500">学</div>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">study, learning</div>
+</div>
+</section>
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Lock screen</h2>
+<p style="margin: 4px 0 16px; font-size: 14px; line-height: 20px; color: #5e5548">Drawn in a single ink so it follows your lock screen tint.</p>
+<div role="img" aria-label="Lock screen widget showing the kanji 学 and its meaning" style="box-sizing: border-box; height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 12px; background: #eae2d1; border-radius: 12px">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 36px; line-height: 1; font-weight: 500">学</span>
+<span style="font-size: 14px; line-height: 20px; color: #1f1b16">study, learning</span>
+</div>
+</section>
+<p style="margin: 24px 8px 0; font-size: 16px; line-height: 24px; color: #1f1b16">To add one, touch and hold your home screen, tap +, then choose Nichiji.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onBack":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { leaving: false };
+    this.timer = null;
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  renderVals() {
+    const leaving = !!(this.state && this.state.leaving);
+    return {
+      rootClass: leaving ? 'push-out' : 'push-in',
+      back: () => {
+        if (!this.props.onBack || this.state.leaving) return;
+        this.setState({ leaving: true });
+        this.timer = setTimeout(() => this.props.onBack(), 240);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

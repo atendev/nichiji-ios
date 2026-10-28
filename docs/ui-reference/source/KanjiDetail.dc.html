@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kanji detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.ghost:hover{background:#eae2d1 !important}
+.outline:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes pushIn{from{transform:translateX(100%)}to{transform:none}}
+@keyframes pushOut{from{transform:none}to{transform:translateX(100%)}}
+.push-in{animation:pushIn .3s cubic-bezier(.2,.8,.2,1) both}
+.push-out{animation:pushOut .24s ease-in both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="{{ rootClass }}" style="position: relative; overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding-top: 56px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="padding: 0 16px; display: flex; align-items: center; height: 44px; flex: none">
+<button class="ghost" onClick="{{ back }}" aria-label="Back" style="height: 44px; margin-left: -8px; padding: 0 12px 0 8px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; gap: 2px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+<span>{{ backLabel }}</span>
+</button>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: 34px">
+<div style="display: flex; flex-direction: column; align-items: center; padding: 16px 16px 24px">
+<div lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 200px; line-height: 1.05; font-weight: 500; color: #1f1b16">{{ ch }}</div>
+<div lang="ja" style="margin-top: 20px; font-size: 20px; line-height: 28px; color: #5e5548">{{ readingLine }}</div>
+<div style="font-size: 20px; line-height: 28px; font-weight: 500; color: #1f1b16">{{ meaning }}</div>
+<div style="margin-top: 4px; font-size: 12px; line-height: 16px; color: #74695a">{{ strokes }} strokes · {{ jlpt }}</div>
+</div>
+<section style="margin: 0 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0 0 8px; font-size: 20px; line-height: 26px; font-weight: 500">Details</h2>
+<sc-for list="{{ details }}" as="d" hint-placeholder-count="5">
+<div style="{{ d.rowStyle }}">
+<span style="width: 96px; flex: none; font-size: 14px; line-height: 20px; color: #5e5548">{{ d.label }}</span>
+<span lang="{{ d.lang }}" style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">{{ d.value }}</span>
+</div>
+</sc-for>
+</section>
+<section style="margin: 16px 16px 0; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0 0 8px; font-size: 20px; line-height: 26px; font-weight: 500">Example words</h2>
+<sc-for list="{{ words }}" as="w" hint-placeholder-count="2">
+<div style="{{ w.rowStyle }}">
+<span lang="ja" style="width: 80px; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 18px; line-height: 24px">{{ w.word }}</span>
+<span lang="ja" style="flex: 1; font-size: 12px; line-height: 16px; color: #5e5548">{{ w.reading }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ w.meaning }}</span>
+</div>
+</sc-for>
+</section>
+<section style="margin: 16px 16px 0; box-sizing: border-box; padding: 20px 24px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Stroke order</h2>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ strokes }} strokes</span>
+</div>
+<div style="margin-top: 12px">
+<dc-import name="StrokeGrid" kanji="{{ ch }}" hint-size="302px,560px"></dc-import>
+</div>
+<button class="outline" onClick="{{ openPractice }}" style="margin-top: 16px; box-sizing: border-box; width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; border: 1px solid #8c8068; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 19l1-4L16.5 4.5a2 2 0 0 1 3 3L9 18z"></path><path d="M14.5 6.5l3 3"></path></svg>
+<span>Practice this kanji</span>
+</button>
+</section>
+</div>
+<sc-if value="{{ practiceOpen }}" hint-placeholder-val="{{ false }}">
+<dc-import name="PracticeSheet" kanji="{{ pKanji }}" meaning="{{ pMeaning }}" strokes="{{ pStrokes }}" on-close="{{ closePractice }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kanji":{"editor":null},"onBack":{"editor":null},"backLabel":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { leaving: false };
+    this.timer = null;
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  // Sample entries only, enough to check the layout.
+  static data() {
+    return {
+      '日': { on: 'ニチ・ジツ', kun: 'ひ・か', mean: 'day, sun', n: 4, jlpt: 'N5', w: [['日本', 'にほん', 'Japan'], ['毎日', 'まいにち', 'every day']] },
+      '月': { on: 'ゲツ・ガツ', kun: 'つき', mean: 'month, moon', n: 4, jlpt: 'N5', w: [['今月', 'こんげつ', 'this month'], ['月曜日', 'げつようび', 'Monday']] },
+      '火': { on: 'カ', kun: 'ひ', mean: 'fire', n: 4, jlpt: 'N5', w: [['火曜日', 'かようび', 'Tuesday'], ['花火', 'はなび', 'fireworks']] },
+      '水': { on: 'スイ', kun: 'みず', mean: 'water', n: 4, jlpt: 'N5', w: [['水曜日', 'すいようび', 'Wednesday'], ['水道', 'すいどう', 'water supply']] },
+      '木': { on: 'モク・ボク', kun: 'き', mean: 'tree, wood', n: 4, jlpt: 'N5', w: [['木曜日', 'もくようび', 'Thursday'], ['木々', 'きぎ', 'trees']] },
+      '金': { on: 'キン・コン', kun: 'かね', mean: 'gold, money', n: 8, jlpt: 'N5', w: [['金曜日', 'きんようび', 'Friday'], ['お金', 'おかね', 'money']] },
+      '土': { on: 'ド・ト', kun: 'つち', mean: 'earth, soil', n: 3, jlpt: 'N5', w: [['土曜日', 'どようび', 'Saturday'], ['土地', 'とち', 'land']] },
+      '山': { on: 'サン', kun: 'やま', mean: 'mountain', n: 3, jlpt: 'N5', w: [['富士山', 'ふじさん', 'Mt. Fuji'], ['山登り', 'やまのぼり', 'hiking']] },
+      '川': { on: 'セン', kun: 'かわ', mean: 'river', n: 3, jlpt: 'N5', w: [['小川', 'おがわ', 'stream'], ['川下', 'かわしも', 'downstream']] },
+      '人': { on: 'ジン・ニン', kun: 'ひと', mean: 'person', n: 2, jlpt: 'N5', w: [['日本人', 'にほんじん', 'Japanese person'], ['人気', 'にんき', 'popularity']] },
+      '大': { on: 'ダイ・タイ', kun: 'おお-きい', mean: 'big', n: 3, jlpt: 'N5', w: [['大学', 'だいがく', 'university'], ['大切', 'たいせつ', 'important']] },
+      '小': { on: 'ショウ', kun: 'ちい-さい', mean: 'small', n: 3, jlpt: 'N5', w: [['小学校', 'しょうがっこう', 'elementary school'], ['小さい', 'ちいさい', 'small']] },
+      '学': { on: 'ガク', kun: 'まな-ぶ', mean: 'study, learning', n: 8, jlpt: 'N5', w: [['学校', 'がっこう', 'school'], ['学生', 'がくせい', 'student']] },
+      '校': { on: 'コウ', kun: '—', mean: 'school', n: 10, jlpt: 'N5', w: [['学校', 'がっこう', 'school'], ['校長', 'こうちょう', 'principal']] },
+      '本': { on: 'ホン', kun: 'もと', mean: 'book, origin', n: 5, jlpt: 'N5', w: [['日本', 'にほん', 'Japan'], ['本', 'ほん', 'book']] },
+      '楽': { on: 'ガク・ラク', kun: 'たの-しい', mean: 'music, comfort', n: 13, jlpt: 'N4', w: [['音楽', 'おんがく', 'music'], ['楽しい', 'たのしい', 'fun']] }
+    };
+  }
+  renderVals() {
+    const ch = (this.props && this.props.kanji) || '学';
+    const e = Component.data()[ch] || Component.data()['学'];
+    const rows = [
+      { label: 'Meaning', value: e.mean, lang: 'en' },
+      { label: 'Onyomi', value: e.on, lang: 'ja' },
+      { label: 'Kunyomi', value: e.kun, lang: 'ja' },
+      { label: 'Strokes', value: String(e.n), lang: 'en' },
+      { label: 'JLPT', value: e.jlpt, lang: 'en' }
+    ];
+    const line = (i, n) => 'display: flex; align-items: baseline; gap: 8px; padding: 12px 0; ' + (i < n - 1 ? 'border-bottom: 1px solid #d9cfbc;' : '');
+    const leaving = !!(this.state && this.state.leaving);
+    return {
+      ch: ch,
+      backLabel: (this.props && this.props.backLabel) || 'Dictionary',
+      practiceOpen: !!(this.state && this.state.practiceOpen),
+      pKanji: ch, pMeaning: e.mean, pStrokes: e.n,
+      openPractice: () => this.setState({ practiceOpen: true }),
+      closePractice: () => this.setState({ practiceOpen: false }),
+      readingLine: e.on.split('・')[0] + ' · ' + e.kun.split('・')[0],
+      meaning: e.mean,
+      strokes: e.n,
+      jlpt: e.jlpt,
+      details: rows.map((r, i) => Object.assign({}, r, { rowStyle: line(i, rows.length) })),
+      words: e.w.map((w, i) => ({ word: w[0], reading: w[1], meaning: w[2], rowStyle: line(i, e.w.length) })),
+      rootClass: this.props.onBack ? (leaving ? 'push-out' : 'push-in') : '',
+      back: () => {
+        if (!this.props.onBack || this.state.leaving) return;
+        this.setState({ leaving: true });
+        this.timer = setTimeout(() => this.props.onBack(), 240);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

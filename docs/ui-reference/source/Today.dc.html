@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+.ghost:hover{background:#eae2d1 !important}
+.outline:hover{background:#eae2d1 !important}
+.row:hover{background:#eae2d1 !important}
+.row:active{transform:none}
+.scrimbtn:active{transform:none}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes press{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:none}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.pop{animation:pop .2s ease-out both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sheetOut{from{transform:none}to{transform:translateY(100%)}}
+.screen{animation:enter .32s ease-out both}
+.stamp{animation:press .26s ease-out both}
+.draw{stroke-dasharray:1;animation:draw .7s ease-out both}
+.scrim-in{animation:fadeIn .25s ease-out both}
+.scrim-out{animation:fadeOut .22s ease-in both}
+.sheet-in{animation:sheetIn .32s cubic-bezier(.2,.8,.2,1) both}
+.sheet-out{animation:sheetOut .22s ease-in both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="position: relative; overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding-top: 56px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="padding: 0 16px; display: flex; align-items: flex-start; justify-content: space-between">
+<div>
+<h1 style="margin: 0; display: flex; align-items: center; gap: 12px; font-size: 28px; line-height: 34px; font-weight: 500">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-weight: 500">今日</span>
+<span aria-hidden="true" style="width: 1.5px; height: 22px; background: #74695a"></span>
+<span>Today</span>
+</h1>
+<div style="margin-top: 4px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">{{ headerLabel }}</div>
+</div>
+<button class="ghost" onClick="{{ openSettings }}" aria-label="Settings" aria-haspopup="dialog" style="width: 44px; height: 44px; margin-right: -8px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+</button>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px">
+<div style="box-sizing: border-box; height: 580px; display: flex; flex-direction: column">
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center">
+<div style="position: relative">
+<div lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 260px; line-height: 1.05; font-weight: 500; color: #1f1b16">学</div>
+<sc-if value="{{ learned }}" hint-placeholder-val="{{ false }}">
+<img class="stamp" src="/_blob/0486ce41d8aaf6f98585de7490c5df7d" alt="Learned seal" style="position: absolute; top: 24px; right: -28px; width: 44px; height: 44px">
+</sc-if>
+</div>
+<div lang="ja" style="margin-top: 32px; font-size: 20px; line-height: 28px; color: #5e5548">ガク · まな-ぶ</div>
+<sc-if value="{{ romaji }}" hint-placeholder-val="{{ false }}">
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">gaku · mana-bu</div>
+</sc-if>
+<div style="font-size: 20px; line-height: 28px; font-weight: 500; color: #1f1b16">study, learning</div>
+<div style="margin-top: 4px; font-size: 12px; line-height: 16px; color: #74695a">8 strokes</div>
+</div>
+<div style="margin: 0 16px 16px">
+<button class="{{ btnClass }}" onClick="{{ toggle }}" aria-pressed="{{ learned }}" style="{{ btnStyle }}">
+<sc-if value="{{ learned }}" hint-placeholder-val="{{ false }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8321d" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+<span>{{ btnLabel }}</span>
+</button>
+</div>
+</div>
+<section style="margin: 0 16px; box-sizing: border-box; padding: 8px 24px 20px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div aria-hidden="true" style="width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 999px; background: #d9cfbc"></div>
+<h2 style="margin: 0 0 8px; font-size: 20px; line-height: 26px; font-weight: 500">Details</h2>
+<sc-for list="{{ details }}" as="d" hint-placeholder-count="7">
+<div style="{{ d.rowStyle }}">
+<span style="width: 96px; flex: none; font-size: 14px; line-height: 20px; color: #5e5548">{{ d.label }}</span>
+<span lang="{{ d.lang }}" style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">{{ d.value }}</span>
+</div>
+</sc-for>
+</section>
+<section style="margin: 16px 16px 0; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0 0 8px; font-size: 20px; line-height: 26px; font-weight: 500">Example words</h2>
+<sc-for list="{{ words }}" as="w" hint-placeholder-count="4">
+<div style="{{ w.rowStyle }}">
+<span lang="ja" style="width: 64px; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 18px; line-height: 24px">{{ w.word }}</span>
+<span lang="ja" style="flex: 1; font-size: 12px; line-height: 16px; color: #5e5548">{{ w.reading }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ w.meaning }}</span>
+</div>
+</sc-for>
+</section>
+<section style="margin: 16px 16px 0; box-sizing: border-box; padding: 20px 24px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Stroke order</h2>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">8 strokes</span>
+</div>
+<div style="margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ cells }}" as="c" hint-placeholder-count="8">
+<div role="img" aria-label="{{ c.label }}" style="position: relative; box-sizing: border-box; height: 132px; display: flex; align-items: center; justify-content: center; background: #eae2d1; border-radius: 8px">
+<span style="position: absolute; top: 8px; left: 10px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #5e5548">{{ c.num }}</span>
+<svg width="100" height="100" viewBox="0 0 109 109" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<sc-for list="{{ c.paths }}" as="p" hint-placeholder-count="8">
+<path pathLength="1" d="{{ p.d }}" stroke="{{ p.color }}" stroke-width="{{ p.width }}" class="{{ p.cls }}" style="{{ p.style }}"></path>
+</sc-for>
+</svg>
+</div>
+</sc-for>
+</div>
+<button class="outline" onClick="{{ openPractice }}" style="margin-top: 16px; box-sizing: border-box; width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; border: 1px solid #8c8068; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 19l1-4L16.5 4.5a2 2 0 0 1 3 3L9 18z"></path><path d="M14.5 6.5l3 3"></path></svg>
+<span>Practice this kanji</span>
+</button>
+</section>
+</div>
+<nav aria-label="Main" style="box-sizing: border-box; height: 83px; flex: none; padding: 0 8px 34px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fbf7ee; border-top: 1px solid #d9cfbc">
+<button aria-current="page" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #b8321d; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#b8321d" stroke="#b8321d" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16" stroke="#fbf7ee"></path><path d="M8 3v4M16 3v4" stroke-linecap="round"></path></svg>
+<span>Today</span>
+</button>
+<button onClick="{{ goDictionary }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"></path><path d="M5 20.5A2.5 2.5 0 0 0 7.5 23H19v-5"></path><path d="M9 7.5h6"></path></svg>
+<span>Dictionary</span>
+</button>
+<button onClick="{{ goReview }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="8" width="13" height="11" rx="2.5"></rect><path d="M7.5 5h11a2 2 0 0 1 2 2v8"></path></svg>
+<span>Review</span>
+</button>
+<button onClick="{{ goYou }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.75"></circle><path d="M4.5 20c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6"></path></svg>
+<span>You</span>
+</button>
+</nav>
+<sc-if value="{{ practiceOpen }}" hint-placeholder-val="{{ false }}">
+<dc-import name="PracticeSheet" kanji="{{ pKanji }}" meaning="{{ pMeaning }}" strokes="{{ pStrokes }}" on-close="{{ closePractice }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ settingsVisible }}" hint-placeholder-val="{{ false }}">
+<dc-import name="SettingsSheet" level="{{ sheetLevel }}" reminder-on="{{ sheetReminderOn }}" reminder-time="{{ sheetReminderTime }}" custom-active="{{ sheetCustomActive }}" custom-count="{{ sheetCustomCount }}" romaji="{{ romaji }}" theme="{{ sheetTheme }}" review-summary="{{ sheetReview }}" on-navigate="{{ sheetNavigate }}" on-close="{{ closeSettings }}" on-romaji="{{ setRomaji }}" on-theme="{{ setTheme }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"settingsOpen":{"editor":"boolean","default":false},"practiceOpen":{"editor":"boolean","default":false},"level":{"editor":null},"reminderOn":{"editor":null},"reminderTime":{"editor":null},"customActive":{"editor":null},"customCount":{"editor":null},"onNavigate":{"editor":null},"onOpenSettings":{"editor":null},"romaji":{"editor":null},"theme":{"editor":null},"reviewSummary":{"editor":null},"onRomaji":{"editor":null},"onTheme":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { learned: false, settingsOpen: !!(props && props.settingsOpen), practiceOpen: !!(props && props.practiceOpen), closing: false, reminderOn: true, romaji: false, theme: 'System' };
+    this.timer = null;
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const learned = !!st.learned;
+    const pr = this.props || {};
+    const level = pr.level || 'N5';
+    const levelNames = { N5: 'Beginner', N4: 'Elementary', N3: 'Intermediate', N2: 'Upper intermediate', N1: 'Advanced' };
+    const reminderOn = (pr.reminderOn === undefined || pr.reminderOn === null) ? true : !!pr.reminderOn;
+    const reminderTime = pr.reminderTime || '8:00 am';
+    const nav = (r) => () => { if (this.props.onNavigate) this.props.onNavigate(r); };
+    const romaji = (pr.romaji !== undefined && pr.romaji !== null) ? !!pr.romaji : !!st.romaji;
+    const theme = pr.theme || st.theme || 'System';
+
+    const wordRows = [
+      { word: '学校', reading: 'がっこう', meaning: 'school' },
+      { word: '学生', reading: 'がくせい', meaning: 'student' },
+      { word: '大学', reading: 'だいがく', meaning: 'university' },
+      { word: '留学', reading: 'りゅうがく', meaning: 'study abroad' }
+    ];
+    const words = wordRows.map((r, i) => ({
+      word: r.word,
+      reading: r.reading,
+      meaning: r.meaning,
+      rowStyle: 'display: flex; align-items: baseline; gap: 12px; padding: 10px 0; ' + (i > 0 ? 'border-top: 1px solid #d9cfbc;' : '')
+    }));
+
+    const detailRows = [
+      { label: 'Meaning', value: 'study, learning', lang: 'en' },
+      { label: 'Onyomi', value: 'ガク', lang: 'ja' },
+      { label: 'Kunyomi', value: 'まな-ぶ', lang: 'ja' },
+      { label: 'Strokes', value: '8', lang: 'en' },
+      { label: 'Radical', value: '子 · child', lang: 'ja' },
+      { label: 'JLPT', value: 'N5', lang: 'en' },
+      { label: 'Grade', value: '1', lang: 'en' }
+    ];
+    const details = detailRows.map((r, i) => ({
+      label: r.label,
+      value: r.value,
+      lang: r.lang,
+      rowStyle: 'display: flex; align-items: baseline; gap: 12px; padding: 10px 0; ' + (i > 0 ? 'border-top: 1px solid #d9cfbc;' : '')
+    }));
+
+    // Hand-drawn stroke paths for 学 on a 109 x 109 grid. Placeholder geometry: swap in real stroke data (e.g. KanjiVG) later.
+    const strokes = [
+      'M27 13 Q30 21 34 27',
+      'M54 8 Q53 17 51 28',
+      'M80 12 Q76 22 69 29',
+      'M54 35 Q55 38 56 41',
+      'M22 57 L22 46 L87 46 L87 56 Q87 60 82 58',
+      'M38 62 L70 62 Q64 70 50 78',
+      'M53 66 L53 96 Q53 101 45 98',
+      'M28 82 L80 82'
+    ];
+    const cells = strokes.map((s, n) => ({
+      num: n + 1,
+      label: 'Stroke ' + (n + 1) + ' of 8',
+      paths: strokes.map((d, k) => {
+        const cur = k === n;
+        const done = k < n;
+        return {
+          d: d,
+          color: cur ? '#1f1b16' : (done ? '#5e5548' : '#d3c8b2'),
+          width: cur ? 6 : 5,
+          cls: cur ? 'draw' : '',
+          style: cur ? 'animation-delay: ' + (0.25 + n * 0.12) + 's;' : ''
+        };
+      })
+    }));
+
+    const base = 'box-sizing: border-box; width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer; ';
+    return {
+      learned: learned,
+      romaji: romaji,
+      words: words,
+      details: details,
+      cells: cells,
+      btnClass: learned ? '' : 'cta',
+      btnLabel: learned ? 'Learned' : 'Got it',
+      btnStyle: base + (learned ? 'background: #f7e6de; color: #b8321d; border: 1px solid #b8321d;' : 'background: #b8321d; color: #ffffff; border: 1px solid #b8321d;'),
+      toggle: () => this.setState({ learned: !learned }),
+      practiceOpen: !!st.practiceOpen,
+      pKanji: '学', pMeaning: 'study, learning', pStrokes: 8,
+      openPractice: () => this.setState({ practiceOpen: true }),
+      closePractice: () => this.setState({ practiceOpen: false }),
+      settingsVisible: !!st.settingsOpen,
+      openSettings: () => { if (this.props.onOpenSettings) this.props.onOpenSettings(); else this.setState({ settingsOpen: true }); },
+      closeSettings: () => this.setState({ settingsOpen: false }),
+      sheetLevel: level,
+      sheetReminderOn: reminderOn,
+      sheetReminderTime: reminderTime,
+      sheetCustomActive: !!pr.customActive,
+      sheetCustomCount: pr.customCount || 0,
+      sheetTheme: theme,
+      sheetReview: pr.reviewSummary || '10 cards',
+      sheetNavigate: (r) => { if (this.props.onNavigate) this.props.onNavigate(r); },
+      setRomaji: (v) => { if (this.props.onRomaji) this.props.onRomaji(v); else this.setState({ romaji: !!v }); },
+      setTheme: (t) => { if (this.props.onTheme) this.props.onTheme(t); else this.setState({ theme: t }); },
+      reminderOn: reminderOn,
+      reminderValue: reminderOn ? 'On · ' + reminderTime : 'Off',
+      levelValue: pr.customActive ? 'Custom · ' + (pr.customCount || 0) + ' kanji' : level + ' · ' + (levelNames[level] || ''),
+      headerLabel: 'TUE, OCT 27 · ' + (pr.customActive ? 'CUSTOM' : (level.charAt(0) === 'G' ? (level === 'GS' ? 'SECONDARY' : 'GRADE ' + level.charAt(1)) : level)),
+      goDictionary: nav('dictionary'),
+      goReview: nav('review'),
+      goYou: nav('you')
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!-- @dsCard group="Widgets" height=390 subtitle="Medium widget Got it works; switch themes to see all three" -->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Widget</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"></head>
+<body><div class="nj-stage"><div class="nj-row">
+<div class="nj-wg nj-wg--s"><p class="kanji-widget">学</p><p class="caption muted">study, learning</p></div>
+<div class="nj-wg nj-wg--lock"><p class="kanji-widget">学</p><p class="caption muted">study</p></div>
+</div>
+<div class="nj-wg nj-wg--m">
+<p class="kanji-widget">学</p>
+<div class="col"><p class="caption muted">ガク · まな-ぶ</p><p class="callout">study, learning</p><p class="word">学校</p></div>
+<button class="nj-btn nj-btn--primary" id="got" style="height:36px;padding:0 var(--space-4)">Got it</button>
+</div>
+</div>
+<script>
+var got=document.getElementById("got");
+got.addEventListener("click",function(){var d=got.classList.toggle("nj-btn--done");got.classList.toggle("nj-btn--primary",!d);got.innerHTML=d?"&#10003; Learned":"Got it"});
+</script></body></html>

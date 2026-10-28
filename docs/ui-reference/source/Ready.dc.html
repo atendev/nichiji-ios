@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>You're all set</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+.ghost:hover{background:#eae2d1 !important}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes segfill{from{background-size:0% 100%,auto}to{background-size:100% 100%,auto}}
+.screen{animation:enter .32s ease-out both}
+.seg-now{background:linear-gradient(#1f1b16,#1f1b16) left/100% 100% no-repeat,#d9cfbc;animation:segfill .45s .1s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding: 56px 24px 48px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="display: flex; align-items: center; gap: 12px; height: 44px">
+<button class="ghost" onClick="{{ back }}" aria-label="Back" style="width: 44px; height: 44px; margin-left: -12px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+</button>
+<div role="img" aria-label="Step 6 of 6" style="flex: 1; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px">
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div class="seg-now" style="height: 4px; border-radius: 999px"></div>
+</div>
+<div style="width: 44px; height: 44px; margin-right: -8px"></div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center">
+<div lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 120px; line-height: 1.05; font-weight: 500; color: #1f1b16">始</div>
+<div lang="ja" style="margin-top: 8px; font-size: 16px; line-height: 24px; color: #5e5548">シ · はじ-める</div>
+<div style="font-size: 16px; line-height: 24px; color: #1f1b16">begin, start</div>
+<h1 style="margin: 48px 0 0; font-size: 28px; line-height: 34px; font-weight: 500">You're all set</h1>
+<p style="margin: 8px 0 0; max-width: 280px; font-size: 16px; line-height: 24px; font-weight: 400; color: #5e5548">Your first kanji is ready whenever you are.</p>
+</div>
+<button class="cta" onClick="{{ next }}" style="width: 100%; min-height: 52px; border: 0; border-radius: 8px; background: #b8321d; color: #ffffff; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer">Show today's kanji</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onNext":{"editor":null},"onBack":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      next: () => { if (this.props.onNext) this.props.onNext(); },
+      back: () => { if (this.props.onBack) this.props.onBack(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

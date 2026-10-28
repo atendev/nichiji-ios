@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Practice sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.ghost:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+.scrimbtn:active{transform:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sheetOut{from{transform:translateY(var(--from,0px))}to{transform:translateY(100%)}}
+.scrim-in{animation:fadeIn .25s ease-out both}
+.scrim-out{animation:fadeOut .22s ease-in both}
+.sheet-in{animation:sheetIn .32s cubic-bezier(.2,.8,.2,1) both}
+.sheet-out{animation:sheetOut .22s ease-in both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px; overflow: hidden; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<button class="{{ scrimClass }}" onClick="{{ close }}" aria-label="Close practice" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(31, 27, 22, 0.4); cursor: default"></button>
+<div role="dialog" aria-modal="true" aria-label="Practice" class="{{ sheetClass }}" style="{{ sheetStyle }}">
+<div onPointerDown="{{ down }}" onPointerMove="{{ move }}" onPointerUp="{{ up }}" onPointerCancel="{{ up }}" style="touch-action: none; cursor: grab">
+<div aria-hidden="true" style="width: 36px; height: 4px; margin: 8px auto 0; border-radius: 999px; background: #d9cfbc"></div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 8px 0 24px">
+<div style="flex: 1; display: flex; align-items: baseline; gap: 12px; min-width: 0">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Practice</h2>
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 20px; line-height: 26px; font-weight: 500">{{ ch }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ meaning }}</span>
+</div>
+<button data-noswipe="1" class="ghost" onClick="{{ close }}" style="min-width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0 12px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">Done</button>
+</div>
+</div>
+<div class="scroll" onScroll="{{ onScroll }}" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden">
+<div style="padding: 8px 24px 0">
+<div style="position: relative; width: 342px; height: 342px; box-sizing: border-box; background: #f4eee2; border: 1px solid #8c8068; border-radius: 8px; overflow: hidden">
+<div lang="ja" aria-hidden="true" style="{{ ghostStyle }}">{{ ch }}</div>
+<svg viewBox="0 0 342 342" width="340" height="340" onPointerDown="{{ padDown }}" onPointerMove="{{ padMove }}" onPointerUp="{{ padUp }}" onPointerCancel="{{ padUp }}" role="img" aria-label="Writing pad. Draw the kanji with your finger." style="position: absolute; top: 0; left: 0; display: block; touch-action: none; cursor: crosshair">
+<path d="M171 6V336M6 171H336" stroke="#d9cfbc" stroke-width="1" stroke-dasharray="4 4" fill="none"></path>
+<sc-for list="{{ paths }}" as="p" hint-placeholder-count="3">
+<path d="{{ p.d }}" fill="none" stroke="#1f1b16" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+</sc-for>
+</svg>
+</div>
+<div style="margin-top: 8px; font-size: 12px; line-height: 16px; color: #74695a">{{ countLabel }}</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px 40px 24px">
+<button class="ghost" onClick="{{ undo }}" aria-disabled="{{ empty }}" style="{{ undoStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10a6 6 0 0 1 0 12h-3"></path></svg>
+<span>Undo</span>
+</button>
+<button class="ghost" onClick="{{ clear }}" aria-disabled="{{ empty }}" style="{{ undoStyle }}">Clear</button>
+<span style="flex: 1"></span>
+<span style="font-size: 14px; line-height: 20px; color: #1f1b16">Guide</span>
+<button role="switch" aria-checked="{{ guide }}" aria-label="Show guide" onClick="{{ toggleGuide }}" style="{{ track }}"><span style="{{ knob }}"></span></button>
+</div>
+<div style="padding: 16px 24px 48px">
+<div style="box-sizing: border-box; padding: 20px 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h3 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Stroke order</h3>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ strokeTotal }}</span>
+</div>
+<div style="margin-top: 12px">
+<dc-import name="StrokeGrid" kanji="{{ ch }}" hint-size="302px,560px"></dc-import>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kanji":{"editor":null},"meaning":{"editor":null},"strokes":{"editor":null},"onClose":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { expanded: false, done: [], cur: null, guide: true, dragY: 0, dragging: false, closing: false };
+    this.drag = null;
+    this.timer = null;
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  dismiss() {
+    if (this.state.closing) return;
+    this.setState({ closing: true, dragging: false });
+    this.timer = setTimeout(() => { if (this.props.onClose) this.props.onClose(); }, 220);
+  }
+  pt(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    const k = 342 / (r.width || 342);
+    return [Math.round((e.clientX - r.left) * k), Math.round((e.clientY - r.top) * k)];
+  }
+  renderVals() {
+    const st = this.state || {};
+    const pr = this.props || {};
+    const done = st.done || [];
+    const all = st.cur ? done.concat([st.cur]) : done;
+    const toD = (pts) => pts.length === 1 ? 'M' + pts[0][0] + ' ' + pts[0][1] + ' l0.1 0' : 'M' + pts.map((p) => p[0] + ' ' + p[1]).join(' L');
+    const guide = !!st.guide;
+    const closing = !!st.closing;
+    const n = pr.strokes || 8;
+    const empty = all.length === 0;
+    const track = 'position: relative; flex: none; width: 51px; height: 31px; padding: 0; border-radius: 999px; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; ' +
+      (guide ? 'background: #1f1b16; border: 1px solid #1f1b16;' : 'background: #eae2d1; border: 1px solid #8c8068;');
+    const knob = 'position: absolute; top: 2px; left: 2px; width: 25px; height: 25px; border-radius: 50%; transition: transform 0.2s ease, background-color 0.2s ease; transform: translateX(' + (guide ? 20 : 0) + 'px); ' +
+      (guide ? 'background: #f4eee2;' : 'background: #fbf7ee; box-shadow: 0 0 0 1px #8c8068;');
+    const dy = st.dragY || 0;
+    const dyDown = Math.max(0, dy);
+    return {
+      ch: pr.kanji || '学',
+      meaning: pr.meaning || '',
+      paths: all.map((pts) => ({ d: toD(pts) })),
+      empty: empty,
+      countLabel: all.length + (all.length === 1 ? ' stroke' : ' strokes') + ' drawn · ' + n + ' in the kanji',
+      strokeTotal: n + ' strokes',
+      onScroll: (e) => { if (!this.state.expanded && e.target && e.target.scrollTop > 6) this.setState({ expanded: true }); },
+      ghostStyle: "position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 270px; line-height: 1; font-weight: 500; color: #d3c8b2; pointer-events: none; transition: opacity .2s ease; opacity: " + (guide ? 1 : 0) + ';',
+      guide: guide,
+      track: track,
+      knob: knob,
+      toggleGuide: () => this.setState({ guide: !guide }),
+      undoStyle: 'box-sizing: border-box; min-height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 6px; border: 0; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer; ' + (empty ? 'opacity: 0.4;' : ''),
+      undo: () => this.setState({ done: done.slice(0, -1) }),
+      clear: () => this.setState({ done: [], cur: null }),
+      padDown: (e) => {
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+        this.setState({ cur: [this.pt(e)] });
+      },
+      padMove: (e) => {
+        if (!this.state.cur) return;
+        const p = this.pt(e);
+        this.setState({ cur: this.state.cur.concat([p]) });
+      },
+      padUp: () => {
+        if (!this.state.cur) return;
+        this.setState({ done: this.state.done.concat([this.state.cur]), cur: null });
+      },
+      scrimClass: 'scrimbtn ' + (closing ? 'scrim-out' : 'scrim-in'),
+      sheetClass: closing ? 'sheet-out' : (st.dragging || dyDown ? '' : 'sheet-in'),
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; height: ' + (st.expanded ? 788 : 590) + 'px; overflow: hidden; display: flex; flex-direction: column; transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); background: #fbf7ee; border-radius: 20px 20px 0 0; box-shadow: 0 8px 24px rgba(31, 27, 22, 0.16); --from: ' + dyDown + 'px; ' +
+        (closing ? '' : 'transform: translateY(' + Math.max(0, dy) + 'px); ' + (st.dragging ? '' : 'transition: transform 0.2s ease-out;')),
+      close: () => this.dismiss(),
+      down: (e) => {
+        if (e.target && e.target.closest && e.target.closest('[data-noswipe]')) return;
+        this.drag = { y: e.clientY };
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      },
+      move: (e) => {
+        if (!this.drag) return;
+        this.setState({ dragY: e.clientY - this.drag.y, dragging: true });
+      },
+      up: () => {
+        if (!this.drag) return;
+        this.drag = null;
+        const d = this.state.dragY;
+        if (d < -50) this.setState({ expanded: true, dragY: 0, dragging: false });
+        else if (this.state.expanded && d > 70) this.setState({ expanded: false, dragY: 0, dragging: false });
+        else if (!this.state.expanded && d > 110) this.dismiss();
+        else this.setState({ dragY: 0, dragging: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>You</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.ghost:hover{background:#eae2d1 !important}
+.tile:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.pop{animation:pop .2s ease-out both}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:none}}
+.screen{animation:enter .32s ease-out both}
+.fade{animation:fadeIn .2s ease-out both}
+.grow{transform-origin:left;animation:grow .6s .1s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="position: relative; overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding-top: 56px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<button class="ghost" onClick="{{ openSettings }}" aria-label="Settings" aria-haspopup="dialog" style="position: absolute; top: 51px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+</button>
+<div style="padding: 0 16px; flex: none">
+<h1 style="margin: 0; display: flex; align-items: center; gap: 12px; font-size: 28px; line-height: 34px; font-weight: 500">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-weight: 500">私</span>
+<span aria-hidden="true" style="width: 1.5px; height: 22px; background: #74695a"></span>
+<span>You</span>
+</h1>
+<div style="margin-top: 4px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">LEARNING SINCE SEP 2026</div>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px 16px 24px">
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ stats }}" as="s" hint-placeholder-count="6">
+<div style="box-sizing: border-box; padding: 16px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 8px">
+<div style="font-size: 32px; line-height: 38px; font-weight: 500">{{ s.value }}</div>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">{{ s.label }}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top: 8px; box-sizing: border-box; padding: 12px 16px; display: flex; align-items: center; gap: 12px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 8px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ freezeColor }}" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"></path></svg>
+<span style="flex: 1">
+<span style="display: block; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16">{{ freezeTitle }}</span>
+<span style="display: block; font-size: 12px; line-height: 16px; color: #5e5548">{{ freezeNote }}</span>
+</span>
+</div>
+
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Activity</h2>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">Last 12 weeks</span>
+</div>
+<div role="img" aria-label="Review activity for the last 12 weeks. Darker squares are busier days." style="margin-top: 12px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{ weeks }}" as="w" hint-placeholder-count="12">
+<div style="display: grid; grid-template-rows: repeat(7, auto); gap: 4px">
+<sc-for list="{{ w.days }}" as="d" hint-placeholder-count="7">
+<div style="{{ d.style }}"></div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div style="margin-top: 12px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 11px; line-height: 14px; color: #74695a">
+<span>Less</span>
+<sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+<span aria-hidden="true" style="{{ l.style }}"></span>
+</sc-for>
+<span>More</span>
+</div>
+</section>
+
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0 0 4px; font-size: 20px; line-height: 26px; font-weight: 500">By level</h2>
+<sc-for list="{{ levels }}" as="l" hint-placeholder-count="5">
+<div style="padding: 10px 0">
+<div style="display: flex; align-items: baseline; gap: 8px">
+<span style="width: 36px; font-size: 14px; line-height: 20px; font-weight: 500">{{ l.code }}</span>
+<span style="flex: 1; font-size: 14px; line-height: 20px; color: #5e5548">{{ l.name }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #1f1b16">{{ l.count }}</span>
+</div>
+<div style="margin-top: 6px; height: 8px; border-radius: 999px; background: #eae2d1; overflow: hidden">
+<div class="grow" style="{{ l.barStyle }}"></div>
+</div>
+</div>
+</sc-for>
+</section>
+
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Milestones</h2>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ milestoneCount }}</span>
+</div>
+<sc-for list="{{ milestones }}" as="m" hint-placeholder-count="6">
+<div style="{{ m.rowStyle }}">
+<sc-if value="{{ m.earned }}" hint-placeholder-val="{{ true }}">
+<img src="/_blob/0486ce41d8aaf6f98585de7490c5df7d" alt="Earned" width="40" height="40" style="flex: none; width: 40px; height: 40px">
+</sc-if>
+<sc-if value="{{ m.locked }}" hint-placeholder-val="{{ false }}">
+<span aria-label="Locked" role="img" style="flex: none; width: 40px; height: 40px; border-radius: 10px; background: #eae2d1; display: flex; align-items: center; justify-content: center">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+</span>
+</sc-if>
+<span style="flex: 1; min-width: 0">
+<span style="display: flex; align-items: baseline; gap: 8px">
+<span style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">{{ m.title }}</span>
+<span style="font-size: 12px; line-height: 16px; color: #5e5548">{{ m.note }}</span>
+</span>
+<sc-if value="{{ m.locked }}" hint-placeholder-val="{{ false }}">
+<span style="display: block; margin-top: 6px; height: 6px; border-radius: 999px; background: #eae2d1; overflow: hidden"><span style="{{ m.barStyle }}"></span></span>
+</sc-if>
+</span>
+</div>
+</sc-for>
+</section>
+
+<section style="margin-top: 16px; box-sizing: border-box; padding: 20px 24px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Needs attention</h2>
+<p style="margin: 4px 0 12px; font-size: 14px; line-height: 20px; color: #5e5548">Kanji you forget most often.</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ trouble }}" as="t" hint-placeholder-count="3">
+<button class="tile" onClick="{{ t.open }}" aria-label="{{ t.label }}" style="box-sizing: border-box; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; background: #f4eee2; border: 1px solid #8c8068; border-radius: 8px; font-family: inherit; color: #1f1b16; cursor: pointer">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 40px; line-height: 1.1; font-weight: 500">{{ t.ch }}</span>
+<span style="font-size: 12px; line-height: 16px; color: #5e5548">{{ t.note }}</span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<div style="margin-top: 24px; display: flex; align-items: baseline; justify-content: space-between; padding: 0 8px">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Your kanji</h2>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ learnedCount }} learned</span>
+</div>
+<div role="tablist" aria-label="Kanji view" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: #eae2d1; border-radius: 12px">
+<button role="tab" aria-selected="{{ showLearned }}" onClick="{{ pickLearned }}" style="{{ learnedTab }}">Learned</button>
+<button role="tab" aria-selected="{{ showHistory }}" onClick="{{ pickHistory }}" style="{{ historyTab }}">History</button>
+</div>
+
+<sc-if value="{{ showLearned }}" hint-placeholder-val="{{ true }}">
+<div class="fade" style="margin-top: 12px">
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ learned }}" as="c" hint-placeholder-count="16">
+<button class="tile" onClick="{{ c.open }}" aria-label="{{ c.label }}" style="box-sizing: border-box; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 8px; background: #fbf7ee; border: 1px solid #8c8068; cursor: pointer">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 28px; line-height: 1; font-weight: 500; color: #1f1b16">{{ c.ch }}</span>
+</button>
+</sc-for>
+</div>
+<p style="margin: 12px 8px 0; font-size: 12px; line-height: 16px; color: #74695a">Tap a kanji to see its details.</p>
+</div>
+</sc-if>
+<sc-if value="{{ showHistory }}" hint-placeholder-val="{{ false }}">
+<div class="fade" style="margin-top: 12px">
+<sc-for list="{{ history }}" as="g" hint-placeholder-count="3">
+<div style="margin-top: 12px; padding: 0 8px 8px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">{{ g.day }}</div>
+<section style="box-sizing: border-box; padding: 4px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+<button class="tile" onClick="{{ r.open }}" style="{{ r.style }}">
+<span lang="ja" style="width: 36px; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 24px; line-height: 32px; text-align: left; color: #1f1b16">{{ r.ch }}</span>
+<span style="flex: 1; text-align: left; font-size: 16px; line-height: 24px; color: #1f1b16">{{ r.what }}</span>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ r.time }}</span>
+</button>
+</sc-for>
+</section>
+</sc-for>
+<button class="tile" onClick="{{ exportHistory }}" style="margin-top: 16px; box-sizing: border-box; width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; border: 1px solid #8c8068; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<sc-if value="{{ exported }}" hint-placeholder-val="{{ false }}">
+<svg class="pop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3f6b3a" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+<sc-if value="{{ notExported }}" hint-placeholder-val="{{ true }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>
+</sc-if>
+<span>{{ exportLabel }}</span>
+</button>
+<p style="margin: 8px 8px 0; font-size: 12px; line-height: 16px; color: #74695a">Saves a CSV of your history. Nothing leaves your phone unless you share the file.</p>
+</div>
+</sc-if>
+</div>
+<nav aria-label="Main" style="box-sizing: border-box; height: 83px; flex: none; padding: 0 8px 34px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fbf7ee; border-top: 1px solid #d9cfbc">
+<button onClick="{{ goToday }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16"></path><path d="M8 3v4M16 3v4" stroke-linecap="round"></path></svg>
+<span>Today</span>
+</button>
+<button onClick="{{ goDictionary }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"></path><path d="M5 20.5A2.5 2.5 0 0 0 7.5 23H19v-5"></path><path d="M9 7.5h6"></path></svg>
+<span>Dictionary</span>
+</button>
+<button onClick="{{ goReview }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="8" width="13" height="11" rx="2.5"></rect><path d="M7.5 5h11a2 2 0 0 1 2 2v8"></path></svg>
+<span>Review</span>
+</button>
+<button aria-current="page" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #b8321d; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b8321d" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.75" fill="#b8321d"></circle><path d="M4.5 20c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6" fill="#b8321d"></path></svg>
+<span>You</span>
+</button>
+</nav>
+<sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="KanjiDetail" kanji="{{ openCh }}" back-label="You" on-back="{{ closeDetail }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onTab":{"editor":null},"onOpenSettings":{"editor":null},"startTab":{"editor":null},"freeze":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  componentWillUnmount() { if (this.timer) clearTimeout(this.timer); }
+  constructor(props) {
+    super(props);
+    this.timer = null;
+    this.state = { view: (props && props.startTab) || 'learned', open: null, exported: false };
+  }
+  renderVals() {
+    const st = this.state || {};
+    const view = st.view || 'learned';
+    const open = (ch) => () => this.setState({ open: ch });
+
+    // Sample numbers only.
+    const stats = [
+      { value: '4', label: 'Day streak' },
+      { value: '12', label: 'Longest streak' },
+      { value: '16', label: 'Kanji learned' },
+      { value: '312', label: 'Reviews done' },
+      { value: '86%', label: 'Got it rate' },
+      { value: '3h 20m', label: 'Time studying' }
+    ];
+
+    const shades = ['#eae2d1', '#dce5d0', '#a9bf98', '#6f9468', '#3f6b3a'];
+    const cell = (v) => 'aspect-ratio: 1 / 1; border-radius: 3px; background: ' + shades[v] + ';';
+    // Deterministic pattern: busier toward the present, a few gaps.
+    const weeks = [];
+    for (let w = 0; w < 12; w++) {
+      const days = [];
+      for (let d = 0; d < 7; d++) {
+        const k = w * 7 + d;
+        let v = ((k * 7 + (k >> 2) * 3) % 5);
+        if (w < 3 && v > 1) v -= 2;
+        if (w === 11 && d > 3) v = 0;
+        if (k % 11 === 0) v = 0;
+        days.push({ style: cell(Math.max(0, Math.min(4, v))) });
+      }
+      weeks.push({ days: days });
+    }
+
+    const lv = [
+      { code: 'N5', name: 'Beginner', have: 14, all: 103 },
+      { code: 'N4', name: 'Elementary', have: 2, all: 181 },
+      { code: 'N3', name: 'Intermediate', have: 0, all: 361 },
+      { code: 'N2', name: 'Upper intermediate', have: 0, all: 415 },
+      { code: 'N1', name: 'Advanced', have: 0, all: 1232 }
+    ];
+    const levels = lv.map((l) => ({
+      code: l.code, name: l.name, count: l.have + ' of ' + l.all,
+      barStyle: 'height: 100%; width: ' + Math.max(l.have ? 2 : 0, Math.round((l.have / l.all) * 100)) + '%; background: #3f6b3a; border-radius: 999px;'
+    }));
+
+    const trouble = [['水', 3], ['本', 2], ['学', 1]].map((t) => ({
+      ch: t[0], note: 'Forgot ' + t[1] + (t[1] === 1 ? ' time' : ' times'), label: 'Kanji ' + t[0] + ', forgot ' + t[1] + ' times', open: open(t[0])
+    }));
+
+    const learnedList = ['学', '日', '月', '火', '水', '木', '金', '土', '山', '川', '人', '大', '小', '本', '校', '楽'];
+    const learned = learnedList.map((ch) => ({ ch: ch, label: 'Kanji ' + ch, open: open(ch) }));
+
+    const hist = [
+      { day: 'TODAY', rows: [['学', 'Learned', '8:02 am'], ['日', 'Reviewed, got it', '8:04 am'], ['水', 'Reviewed, forgot', '8:05 am']] },
+      { day: 'YESTERDAY', rows: [['小', 'Learned', '8:10 am'], ['山', 'Reviewed, got it', '8:12 am'], ['本', 'Reviewed, forgot', '8:13 am'], ['人', 'Reviewed, got it', '8:13 am']] },
+      { day: 'MON, OCT 26', rows: [['大', 'Learned', '7:58 am'], ['木', 'Reviewed, got it', '8:00 am']] }
+    ];
+    const history = hist.map((g) => ({
+      day: g.day,
+      rows: g.rows.map((r, i) => ({
+        ch: r[0], what: r[1], time: r[2], open: open(r[0]),
+        style: 'box-sizing: border-box; width: 100%; min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0; border: 0; border-radius: 0; background: transparent; font-family: inherit; cursor: pointer; ' + (i < g.rows.length - 1 ? 'border-bottom: 1px solid #d9cfbc;' : '')
+      }))
+    }));
+
+    const freezeOn = !(this.props.freeze === false);
+    const miles = [
+      { title: 'First kanji', have: 1, need: 1 },
+      { title: '10 kanji learned', have: 16, need: 10 },
+      { title: '100 reviews', have: 312, need: 100 },
+      { title: '7-day streak', have: 12, need: 7 },
+      { title: '25 kanji learned', have: 16, need: 25 },
+      { title: '30-day streak', have: 12, need: 30 },
+      { title: 'Finish N5', have: 14, need: 103 }
+    ];
+    const earnedCount = miles.filter((m) => m.have >= m.need).length;
+    const milestones = miles.map((m, i) => {
+      const earned = m.have >= m.need;
+      return {
+        title: m.title, earned: earned, locked: !earned,
+        note: earned ? 'Earned' : m.have + ' / ' + m.need,
+        barStyle: 'display: block; height: 100%; width: ' + Math.round((m.have / m.need) * 100) + '%; background: #8c8068; border-radius: 999px;',
+        rowStyle: 'display: flex; align-items: center; gap: 12px; padding: 10px 0; ' + (i < miles.length - 1 ? 'border-bottom: 1px solid #d9cfbc;' : '')
+      };
+    });
+    const seg = (on) => 'min-height: 40px; border: 0; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; cursor: pointer; ' +
+      (on ? 'background: #fbf7ee; color: #1f1b16; font-weight: 500; box-shadow: 0 0 0 1px #8c8068;' : 'background: transparent; color: #5e5548; font-weight: 400;');
+    return {
+      stats: stats, weeks: weeks,
+      legend: shades.map((c) => ({ style: 'width: 12px; height: 12px; border-radius: 3px; background: ' + c + ';' })),
+      levels: levels, trouble: trouble, learned: learned, history: history,
+      learnedCount: learnedList.length,
+      showLearned: view === 'learned', showHistory: view === 'history',
+      learnedTab: seg(view === 'learned'), historyTab: seg(view === 'history'),
+      pickLearned: () => this.setState({ view: 'learned' }),
+      pickHistory: () => this.setState({ view: 'history' }),
+      freezeColor: freezeOn ? '#3f6b3a' : '#74695a',
+      freezeTitle: freezeOn ? 'Streak freeze ready' : 'Streak freeze is off',
+      freezeNote: freezeOn ? 'Miss one day this week and keep your streak.' : 'Turn it on in Settings under Learning.',
+      milestones: milestones,
+      milestoneCount: earnedCount + ' of ' + miles.length,
+      exported: !!st.exported,
+      notExported: !st.exported,
+      exportLabel: st.exported ? 'Saved nichiji-history.csv' : 'Export history',
+      exportHistory: () => { this.setState({ exported: true }); if (this.timer) clearTimeout(this.timer); this.timer = setTimeout(() => this.setState({ exported: false }), 2500); },
+      detailOpen: !!st.open, openCh: st.open || '学',
+      closeDetail: () => this.setState({ open: null }),
+      openSettings: () => { if (this.props.onOpenSettings) this.props.onOpenSettings(); },
+      goToday: () => { if (this.props.onTab) this.props.onTab('today'); },
+      goDictionary: () => { if (this.props.onTab) this.props.onTab('dictionary'); },
+      goReview: () => { if (this.props.onTab) this.props.onTab('review'); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Review session</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+.ghost:hover{background:#eae2d1 !important}
+@keyframes pushUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes cardInA{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes cardInB{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes wave{0%,100%{opacity:.25}50%{opacity:1}}
+.sheet{animation:pushUp .32s cubic-bezier(.2,.8,.2,1) both}
+.card-in-a{animation:cardInA .38s ease-out both}
+.card-in-b{animation:cardInB .38s ease-out both}
+.pop{animation:pop .24s ease-out both}
+.enter{animation:enter .32s ease-out both}
+.wave1{animation:wave .7s ease-in-out infinite}
+.wave2{animation:wave .7s .15s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="sheet" style="position: relative; overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding: 56px 24px 48px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<sc-if value="{{ inProgress }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: center; gap: 12px; height: 44px; flex: none">
+<button class="ghost" onClick="{{ close }}" aria-label="End review" style="width: 44px; height: 44px; margin-left: -12px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+<div role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ done }}" aria-label="Review progress" style="flex: 1; height: 4px; border-radius: 999px; background: #d9cfbc; overflow: hidden">
+<div style="{{ barStyle }}"></div>
+</div>
+<span style="width: 40px; text-align: right; font-size: 12px; line-height: 16px; font-weight: 500; color: #5e5548">{{ counter }}</span>
+</div>
+<div style="flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center">
+<div style="position: relative; width: 100%; height: 440px">
+<div class="{{ enterClass }}" style="{{ dragStyle }}" onPointerDown="{{ down }}" onPointerMove="{{ move }}" onPointerUp="{{ up }}" onPointerCancel="{{ cancel }}">
+<button onClick="{{ flip }}" aria-label="Flashcard. Tap to flip, or flip then swipe." style="{{ flipStyle }}">
+<span style="{{ faceFront }}">
+<span lang="{{ frontLang }}" style="{{ frontMainStyle }}">{{ frontMain }}</span>
+<span style="margin-top: 16px; font-size: 12px; line-height: 16px; color: #74695a">{{ frontHint }}</span>
+</span>
+<span style="{{ faceBack }}">
+<span lang="ja" style="{{ backKanjiStyle }}">{{ ch }}</span>
+<span lang="{{ line1Lang }}" style="{{ line1Style }}">{{ line1 }}</span>
+<span lang="{{ line2Lang }}" style="{{ line2Style }}">{{ line2 }}</span>
+<sc-if value="{{ showWord }}" hint-placeholder-val="{{ true }}">
+<span style="margin-top: 20px; width: 100%; box-sizing: border-box; padding-top: 16px; border-top: 1px solid #d9cfbc; display: flex; align-items: baseline; justify-content: center; gap: 12px">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 18px; line-height: 24px">{{ word }}</span>
+<span lang="ja" style="font-size: 12px; line-height: 16px; color: #5e5548">{{ wordReading }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ wordMeaning }}</span>
+</span>
+</sc-if>
+</span>
+</button>
+<button data-noswipe="1" class="ghost" onClick="{{ playAudio }}" aria-label="Play pronunciation" style="position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"></path><path class="{{ wave1 }}" d="M15.5 9.5a3.5 3.5 0 0 1 0 5"></path><path class="{{ wave2 }}" d="M18 7a7 7 0 0 1 0 10"></path></svg>
+</button>
+<button data-noswipe="1" onClick="{{ openPractice }}" aria-label="Practice this kanji" aria-hidden="{{ practiceHidden }}" tabindex="{{ practiceTab }}" style="{{ practiceStyle }}">
+<svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none"><rect x="1" y="1" rx="8" ry="8" fill="none" stroke="#8c8068" stroke-width="2" stroke-dasharray="9 6" style="width: calc(100% - 2px); height: calc(100% - 2px)"></rect></svg>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" style="position: relative"><path d="M5 19l1-4L16.5 4.5a2 2 0 0 1 3 3L9 18z"></path><path d="M14.5 6.5l3 3"></path></svg>
+<span style="position: relative">Practice this kanji</span>
+</button>
+<div aria-hidden="true" style="{{ goodBadgeStyle }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3f6b3a" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+<span>Got it</span>
+</div>
+<div aria-hidden="true" style="{{ forgotBadgeStyle }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a67300" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path><path d="M3.5 4.5v5h5"></path></svg>
+<span>Forgot it</span>
+</div>
+</div>
+</div>
+</div>
+<div style="height: 20px; flex: none; text-align: center; font-size: 12px; line-height: 16px; color: #74695a">{{ swipeHint }}</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: none">
+<button onClick="{{ forgot }}" aria-disabled="{{ locked }}" style="{{ forgotBtnStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a67300" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path><path d="M3.5 4.5v5h5"></path></svg>
+<span>Forgot it</span>
+</button>
+<button onClick="{{ gotIt }}" aria-disabled="{{ locked }}" style="{{ gotBtnStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3f6b3a" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+<span>Got it</span>
+</button>
+</div>
+</sc-if>
+<sc-if value="{{ finished }}" hint-placeholder-val="{{ false }}">
+<div class="enter" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center">
+<div class="pop" style="width: 72px; height: 72px; border-radius: 999px; background: #dce5d0; display: flex; align-items: center; justify-content: center">
+<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3f6b3a" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</div>
+<h1 style="margin: 24px 0 0; font-size: 28px; line-height: 34px; font-weight: 500">Review complete</h1>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 24px; color: #5e5548">{{ total }} reviewed · {{ gotCount }} got it · {{ forgotCount }} forgot</p>
+<p style="margin: 8px 0 0; max-width: 280px; font-size: 14px; line-height: 20px; color: #74695a">Kanji you forgot will come back tomorrow.</p>
+</div>
+<button class="cta" onClick="{{ close }}" style="flex: none; box-sizing: border-box; width: 100%; min-height: 48px; border: 0; border-radius: 8px; background: #b8321d; color: #ffffff; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer">Done</button>
+</sc-if>
+<sc-if value="{{ practiceOpen }}" hint-placeholder-val="{{ false }}">
+<dc-import name="PracticeSheet" kanji="{{ ch }}" meaning="{{ meaning }}" strokes="{{ pStrokes }}" on-close="{{ closePractice }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"settings":{"editor":null},"onClose":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.drag = null;
+    this.moved = false;
+    this.timer = null;
+    this.audioTimer = null;
+    this.state = { i: 0, flipped: false, dx: 0, dragging: false, exit: null, alt: false, entered: false, got: 0, forgot: 0, playing: false, queue: Component.buildQueue(props && props.settings) };
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+    if (this.audioTimer) clearTimeout(this.audioTimer);
+  }
+  static defaults() {
+    return { types: { meaning: true, reading: true, kanji: false }, order: 'due', size: 10, autoplay: false, exampleWord: true, requeue: true };
+  }
+  // Sample cards only. forgets and added stand in for review history.
+  static deck() {
+    return [
+      { ch: '学', reading: 'ガク · まな-ぶ', meaning: 'study, learning', w: ['学校', 'がっこう', 'school'], forgets: 1, added: 3 },
+      { ch: '日', reading: 'ニチ · ひ', meaning: 'day, sun', w: ['日本', 'にほん', 'Japan'], forgets: 0, added: 10 },
+      { ch: '水', reading: 'スイ · みず', meaning: 'water', w: ['水曜日', 'すいようび', 'Wednesday'], forgets: 3, added: 7 },
+      { ch: '山', reading: 'サン · やま', meaning: 'mountain', w: ['富士山', 'ふじさん', 'Mt. Fuji'], forgets: 0, added: 5 },
+      { ch: '本', reading: 'ホン · もと', meaning: 'book, origin', w: ['日本', 'にほん', 'Japan'], forgets: 2, added: 9 },
+      { ch: '人', reading: 'ジン · ひと', meaning: 'person', w: ['日本人', 'にほんじん', 'Japanese person'], forgets: 0, added: 1 },
+      { ch: '木', reading: 'モク · き', meaning: 'tree, wood', w: ['木曜日', 'もくようび', 'Thursday'], forgets: 1, added: 8 },
+      { ch: '火', reading: 'カ · ひ', meaning: 'fire', w: ['火曜日', 'かようび', 'Tuesday'], forgets: 0, added: 6 },
+      { ch: '大', reading: 'ダイ · おお-きい', meaning: 'big', w: ['大学', 'だいがく', 'university'], forgets: 1, added: 2 },
+      { ch: '小', reading: 'ショウ · ちい-さい', meaning: 'small', w: ['小学校', 'しょうがっこう', 'elementary school'], forgets: 0, added: 4 }
+    ];
+  }
+  static buildQueue(settings) {
+    const rs = Object.assign({}, Component.defaults(), settings || {});
+    const deck = Component.deck().map((c, n) => Object.assign({ n: n }, c));
+    if (rs.order === 'hard') deck.sort((a, b) => b.forgets - a.forgets || a.n - b.n);
+    else if (rs.order === 'newest') deck.sort((a, b) => a.added - b.added);
+    else if (rs.order === 'random') deck.sort(() => Math.random() - 0.5);
+    const size = rs.size === 'all' ? deck.length : Math.min(rs.size, deck.length);
+    let types = ['meaning', 'reading', 'kanji'].filter((t) => rs.types && rs.types[t]);
+    if (!types.length) types = ['meaning'];
+    return deck.slice(0, size).map((c, k) => ({ n: c.n, type: types[k % types.length] }));
+  }
+  settings() {
+    return Object.assign({}, Component.defaults(), (this.props && this.props.settings) || {});
+  }
+  play() {
+    if (this.audioTimer) clearTimeout(this.audioTimer);
+    this.setState({ playing: true });
+    this.audioTimer = setTimeout(() => this.setState({ playing: false }), 1400);
+  }
+  flip() {
+    if (this.state.exit) return;
+    const next = !this.state.flipped;
+    this.setState({ flipped: next });
+    if (next && this.settings().autoplay) this.play();
+  }
+  swipe(dir) {
+    const st = this.state;
+    if (st.exit || !st.flipped) return;
+    this.setState({ exit: dir, dragging: false });
+    this.timer = setTimeout(() => {
+      this.setState((s) => {
+        const queue = s.queue.slice();
+        if (dir === 'left' && this.settings().requeue) queue.push(queue[s.i]);
+        return {
+          queue: queue,
+          i: s.i + 1,
+          flipped: false,
+          exit: null,
+          dx: 0,
+          alt: !s.alt,
+          entered: true,
+          playing: false,
+          got: s.got + (dir === 'right' ? 1 : 0),
+          forgot: s.forgot + (dir === 'left' ? 1 : 0)
+        };
+      });
+    }, 420);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const deck = Component.deck();
+    const queue = st.queue || [];
+    const total = queue.length;
+    const i = Math.min(st.i || 0, total);
+    const finished = i >= total;
+    const q = queue[Math.min(i, total - 1)] || { n: 0, type: 'meaning' };
+    const c = deck[q.n];
+    const type = q.type;
+    const flipped = !!st.flipped;
+    const exit = st.exit || null;
+    const dx = st.dx || 0;
+    const rs = this.settings();
+
+    // Faces by card type
+    const serif = "font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; ";
+    let frontMain = c.ch, frontLang = 'ja', frontHint = 'What does it mean?';
+    let frontMainStyle = serif + 'font-size: 150px; line-height: 1.05; font-weight: 500; color: #1f1b16;';
+    let backKanjiStyle = serif + 'font-size: 56px; line-height: 1.1; font-weight: 500; color: #1f1b16;';
+    const first = (s) => s.split(' · ');
+    let line1 = c.reading, line1Lang = 'ja', line2 = c.meaning, line2Lang = 'en';
+    let line1Style = 'margin-top: 16px; font-size: 20px; line-height: 28px; color: #5e5548;';
+    let line2Style = 'font-size: 20px; line-height: 28px; font-weight: 500; color: #1f1b16;';
+    if (type === 'reading') {
+      frontHint = 'How do you read it?';
+      line1 = c.meaning; line1Lang = 'en'; line2 = c.reading; line2Lang = 'ja';
+      line2Style = 'font-size: 24px; line-height: 32px; font-weight: 500; color: #1f1b16;';
+    } else if (type === 'kanji') {
+      frontMain = c.meaning; frontLang = 'en'; frontHint = 'Which kanji is it?';
+      frontMainStyle = 'font-size: 32px; line-height: 40px; font-weight: 500; color: #1f1b16; text-align: center;';
+      backKanjiStyle = serif + 'font-size: 120px; line-height: 1.1; font-weight: 500; color: #1f1b16;';
+    }
+
+    // Motion
+    const base = 'position: absolute; inset: 0; perspective: 1000px; touch-action: pan-y; user-select: none; -webkit-user-select: none; ';
+    let dragStyle;
+    if (exit === 'right') dragStyle = base + 'transform: translateX(400px) rotate(16deg); opacity: 0; transition: transform 0.42s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.42s ease-in;';
+    else if (exit === 'left') dragStyle = base + 'transform: translateX(-400px) rotate(-16deg); opacity: 0; transition: transform 0.42s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.42s ease-in;';
+    else if (st.dragging) dragStyle = base + 'transform: translateX(' + dx + 'px) rotate(' + (dx / 14) + 'deg); cursor: grabbing;';
+    else dragStyle = base + 'transform: none; transition: transform 0.25s ease-out; cursor: grab;';
+    const enterClass = st.entered && !exit && !st.dragging && !dx ? (st.alt ? 'card-in-a' : 'card-in-b') : '';
+    const lean = exit || (flipped && Math.abs(dx) > 40 ? (dx > 0 ? 'right' : 'left') : null);
+    const border = lean === 'right' ? '#3f6b3a' : (lean === 'left' ? '#a67300' : '#8c8068');
+    const face = 'position: absolute; inset: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fbf7ee; border-radius: 20px; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: border-color 0.2s ease; border: 1px solid ' + border + '; ';
+    const badge = (on, bg, bd, fg, side) => 'position: absolute; top: 20px; ' + side + ': 20px; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: ' + bg + '; border: 1px solid ' + bd + '; color: ' + fg + '; font-size: 14px; line-height: 20px; font-weight: 500; pointer-events: none; transition: opacity 0.2s ease, transform 0.3s ease; opacity: ' + (on ? 1 : 0) + '; transform: scale(' + (on ? 1 : 0.7) + ');';
+    const btn = (on, bg, bd) => 'box-sizing: border-box; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer; ' + (flipped ? '' : 'opacity: 0.4; ') + (on ? 'background: ' + bg + '; border: 1px solid ' + bd + ';' : 'background: transparent; border: 1px solid #8c8068;');
+
+    const dragRight = flipped && dx > 40 && !exit;
+    const dragLeft = flipped && dx < -40 && !exit;
+    const playing = !!st.playing;
+
+    return {
+      inProgress: !finished,
+      finished: finished,
+      total: total,
+      done: i,
+      counter: Math.min(i + 1, total) + ' / ' + total,
+      barStyle: 'height: 100%; width: ' + Math.round((i / Math.max(total, 1)) * 100) + '%; background: #1f1b16; border-radius: 999px; transition: width .35s ease;',
+      enterClass: enterClass,
+      dragStyle: dragStyle,
+      flipStyle: 'position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; font-family: inherit; color: #1f1b16; cursor: inherit; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.3, 0.1, 0.2, 1); transform: rotateY(' + (flipped ? 180 : 0) + 'deg);',
+      faceFront: face,
+      faceBack: face + 'transform: rotateY(180deg);',
+      ch: c.ch,
+      meaning: c.meaning,
+      pStrokes: ({ '学': 8, '日': 4, '水': 4, '山': 3, '本': 5, '人': 2, '木': 4, '火': 4, '大': 3, '小': 3 })[c.ch] || 8,
+      practiceOpen: !!st.practiceOpen,
+      openPractice: () => this.setState({ practiceOpen: true }),
+      practiceHidden: !flipped,
+      practiceTab: flipped ? '0' : '-1',
+      practiceStyle: 'position: absolute; left: 0; right: 0; margin: 0 auto; width: fit-content; bottom: 20px; box-sizing: border-box; min-height: 40px; padding: 0 16px; display: flex; align-items: center; gap: 8px; border-radius: 8px; background: transparent; border: 0; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer; transition: opacity .25s ease .3s; ' + (flipped && !exit ? 'opacity: 1;' : 'opacity: 0; pointer-events: none;'),
+      closePractice: () => this.setState({ practiceOpen: false }),
+      frontMain: frontMain, frontLang: frontLang, frontHint: frontHint, frontMainStyle: frontMainStyle,
+      backKanjiStyle: backKanjiStyle,
+      line1: line1, line1Lang: line1Lang, line1Style: line1Style,
+      line2: line2, line2Lang: line2Lang, line2Style: line2Style,
+      showWord: !!rs.exampleWord,
+      word: c.w[0], wordReading: c.w[1], wordMeaning: c.w[2],
+      wave1: playing ? 'wave1' : '',
+      wave2: playing ? 'wave2' : '',
+      playAudio: () => this.play(),
+      swipeHint: flipped ? 'Swipe right if you got it, left if you forgot' : 'Flip the card, then swipe or tap a button',
+      goodBadgeStyle: badge(exit === 'right' || dragRight, '#dce5d0', '#3f6b3a', '#3f6b3a', 'left'),
+      forgotBadgeStyle: badge(exit === 'left' || dragLeft, '#f6e8bd', '#a67300', '#6b4a00', 'right'),
+      forgotBtnStyle: btn(lean === 'left', '#f6e8bd', '#a67300'),
+      gotBtnStyle: btn(lean === 'right', '#dce5d0', '#3f6b3a'),
+      locked: !flipped,
+      flip: () => { if (this.moved) { this.moved = false; return; } this.flip(); },
+      forgot: () => this.swipe('left'),
+      gotIt: () => this.swipe('right'),
+      down: (e) => {
+        if (this.state.exit) return;
+        if (e.target && e.target.closest && e.target.closest('[data-noswipe]')) return;
+        this.drag = { x: e.clientX };
+        this.moved = false;
+      },
+      move: (e) => {
+        if (!this.drag) return;
+        const d = e.clientX - this.drag.x;
+        if (Math.abs(d) > 6 && !this.moved) {
+          this.moved = true;
+          try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+        if (this.moved) this.setState({ dx: this.state.flipped ? d : d / 4, dragging: true });
+      },
+      up: () => {
+        if (!this.drag) return;
+        this.drag = null;
+        const d = this.state.dx;
+        if (this.state.flipped && Math.abs(d) > 90) this.swipe(d > 0 ? 'right' : 'left');
+        else this.setState({ dx: 0, dragging: false });
+        if (!this.moved) return;
+        // Let the click that follows a drag pass without flipping.
+        setTimeout(() => { this.moved = false; }, 0);
+      },
+      cancel: () => { this.drag = null; this.setState({ dx: 0, dragging: false }); },
+      gotCount: st.got || 0,
+      forgotCount: st.forgot || 0,
+      close: () => { if (this.props.onClose) this.props.onClose(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

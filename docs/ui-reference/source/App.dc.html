@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>App live preview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #f4eee2">
+<dc-import name="Today" custom-active="{{ customActive }}" custom-count="{{ customCount }}" level="{{ level }}" reminder-on="{{ reminderOn }}" reminder-time="{{ time }}" romaji="{{ romaji }}" theme="{{ theme }}" review-summary="{{ reviewSummary }}" on-navigate="{{ navigate }}" on-open-settings="{{ openSheet }}" on-romaji="{{ setRomaji }}" on-theme="{{ setTheme }}" hint-size="390px,844px"></dc-import>
+<sc-if value="{{ atDictionary }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="Dictionary" on-tab="{{ switchTab }}" on-open-settings="{{ openSheet }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atReview }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="Review" settings="{{ rs }}" summary="{{ reviewSummary }}" on-options="{{ openReviewSettings }}" on-tab="{{ switchTab }}" on-open-settings="{{ openSheet }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atYou }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="You" freeze="{{ freeze }}" on-tab="{{ switchTab }}" on-open-settings="{{ openSheet }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsSheet" level="{{ level }}" reminder-on="{{ reminderOn }}" reminder-time="{{ time }}" custom-active="{{ customActive }}" custom-count="{{ customCount }}" romaji="{{ romaji }}" freeze="{{ freeze }}" theme="{{ theme }}" review-summary="{{ reviewSummary }}" on-navigate="{{ navigate }}" on-close="{{ closeSheet }}" on-freeze="{{ setFreeze }}" on-romaji="{{ setRomaji }}" on-theme="{{ setTheme }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atLevel }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsLevel" level="{{ level }}" order="{{ order }}" on-order="{{ setOrder }}" custom-count="{{ customCount }}" custom-active="{{ customActive }}" on-customize="{{ openCustom }}" on-level="{{ setLevel }}" on-back="{{ closeSub }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atCustom }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsCustomKanji" scheme="{{ customScheme }}" selected="{{ customSel }}" on-change="{{ setCustom }}" on-back="{{ closeCustom }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atReminder }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsReminder" on="{{ reminderOn }}" time="{{ time }}" on-toggle="{{ setReminderOn }}" on-time="{{ setTime }}" on-back="{{ closeSub }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atReviewSettings }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsReview" settings="{{ rs }}" on-change="{{ setRs }}" on-back="{{ closeSub }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atWidget }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsWidget" on-back="{{ closeSub }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ atPrivacy }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="SettingsPrivacy" on-back="{{ closeSub }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'today', sub: null, sheetOpen: false,
+      level: 'N5', order: 'common', reminderOn: true, time: '8:00 am', customSel: null, customActive: false,
+      romaji: false, freeze: true, theme: 'System',
+      rs: { types: { meaning: true, reading: true, kanji: false }, order: 'due', size: 10, autoplay: false, audioScope: 'reading', exampleWord: true, requeue: true }
+    };
+  }
+  renderVals() {
+    const st = this.state || {};
+    const sub = st.sub || null;
+    const tab = st.tab || 'today';
+    const rs = st.rs;
+    const orderNames = { due: 'Due first', hard: 'Hardest first', newest: 'Newest first', random: 'Random' };
+    const reviewSummary = (rs.size === 'all' ? 'All due' : rs.size + ' cards') + ' · ' + (orderNames[rs.order] || 'Due first');
+    return {
+      level: st.level || 'N5',
+      order: st.order || 'common',
+      setOrder: (o) => this.setState({ order: o }),
+      reminderOn: st.reminderOn !== false,
+      time: st.time || '8:00 am',
+      romaji: !!st.romaji,
+      freeze: st.freeze !== false,
+      setFreeze: (v) => this.setState({ freeze: !!v }),
+      theme: st.theme || 'System',
+      rs: rs,
+      reviewSummary: reviewSummary,
+      atDictionary: tab === 'dictionary',
+      atReview: tab === 'review',
+      atYou: tab === 'you',
+      sheetOpen: !!st.sheetOpen,
+      atLevel: sub === 'level' || sub === 'custom',
+      atCustom: sub === 'custom',
+      atReminder: sub === 'reminder',
+      atReviewSettings: sub === 'reviewSettings',
+      atWidget: sub === 'widget',
+      atPrivacy: sub === 'privacy',
+      customSel: st.customSel || null,
+      customScheme: (st.level || 'N5').charAt(0) === 'G' ? 'joyo' : 'jlpt',
+      customCount: st.customSel ? st.customSel.length : 0,
+      customActive: !!st.customActive,
+      switchTab: (t) => this.setState({ tab: t, sheetOpen: false }),
+      openSheet: () => this.setState({ sheetOpen: true }),
+      closeSheet: () => this.setState({ sheetOpen: false }),
+      openReviewSettings: () => this.setState({ sub: 'reviewSettings' }),
+      navigate: (r) => {
+        if (r === 'dictionary' || r === 'review' || r === 'you') this.setState({ tab: r });
+        else if (r === 'level' || r === 'reminder' || r === 'widget' || r === 'privacy' || r === 'reviewSettings') this.setState({ sub: r });
+      },
+      closeSub: () => this.setState({ sub: null }),
+      openCustom: () => this.setState({ sub: 'custom' }),
+      closeCustom: () => this.setState({ sub: 'level' }),
+      setCustom: (arr) => this.setState({ customSel: arr, customActive: true }),
+      setLevel: (l) => this.setState({ level: l, customActive: false }),
+      setReminderOn: (v) => this.setState({ reminderOn: !!v }),
+      setTime: (t) => this.setState({ time: t }),
+      setRomaji: (v) => this.setState({ romaji: !!v }),
+      setTheme: (t) => this.setState({ theme: t }),
+      setRs: (next) => this.setState({ rs: next })
+    };
+  }
+}
+</script>
+</body>
+</html>

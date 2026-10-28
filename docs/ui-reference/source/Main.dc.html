@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Onboarding live preview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+.ghost:hover{background:#eae2d1 !important}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes segfill{from{background-size:0% 100%,auto}to{background-size:100% 100%,auto}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes cardInA{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes cardInB{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+.screen{animation:enter .32s ease-out both}
+.seg-now{background:linear-gradient(#1f1b16,#1f1b16) left/100% 100% no-repeat,#d9cfbc;animation:segfill .45s .1s ease-out both}
+.pop{animation:pop .2s ease-out both}
+.card-in-a{animation:cardInA .38s ease-out both}
+.card-in-b{animation:cardInB .38s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #f4eee2">
+<sc-if value="{{ atWelcome }}" hint-placeholder-val="{{ true }}">
+<dc-import name="Welcome" on-next="{{ next }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atDaily }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Daily" on-next="{{ next }}" on-back="{{ back }}" on-skip="{{ skip }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atFlashcards }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Flashcards" on-next="{{ next }}" on-back="{{ back }}" on-skip="{{ skip }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atLevel }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Level" on-next="{{ next }}" on-back="{{ back }}" on-skip="{{ skip }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atReminder }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Reminder" on-next="{{ next }}" on-back="{{ back }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atWidget }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Widget" on-next="{{ next }}" on-back="{{ back }}" on-skip="{{ skip }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atReady }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Ready" on-next="{{ next }}" on-back="{{ back }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+<sc-if value="{{ atToday }}" hint-placeholder-val="{{ false }}">
+<dc-import name="Today" hint-size="390px,844px"></dc-import>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 0 };
+  }
+  renderVals() {
+    const step = (this.state && this.state.step) || 0;
+    return {
+      atWelcome: step === 0,
+      atDaily: step === 1,
+      atFlashcards: step === 2,
+      atLevel: step === 3,
+      atReminder: step === 4,
+      atWidget: step === 5,
+      atReady: step === 6,
+      atToday: step === 7,
+      next: () => this.setState({ step: Math.min(step + 1, 7) }),
+      back: () => this.setState({ step: Math.max(step - 1, 0) }),
+      skip: () => this.setState({ step: 6 }),
+      restart: () => this.setState({ step: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>

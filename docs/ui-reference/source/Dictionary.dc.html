@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dictionary</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.95)}
+input{font-family:inherit}
+input:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+input::placeholder{color:#74695a;opacity:1}
+.tile:hover{background:#eae2d1 !important}
+.ghost:hover{background:#eae2d1 !important}
+.drawbtn:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.screen{animation:enter .32s ease-out both}
+.fade{animation:fadeIn .2s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="position: relative; overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding-top: 56px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<button class="ghost" onClick="{{ openSettings }}" aria-label="Settings" aria-haspopup="dialog" style="position: absolute; top: 51px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+</button>
+<div style="padding: 0 16px; flex: none">
+<h1 style="margin: 0; display: flex; align-items: center; gap: 12px; font-size: 28px; line-height: 34px; font-weight: 500">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-weight: 500">辞書</span>
+<span aria-hidden="true" style="width: 1.5px; height: 22px; background: #74695a"></span>
+<span>Dictionary</span>
+</h1>
+<div style="position: relative; margin-top: 16px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 14px; top: 14px"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>
+<input type="text" value="{{ query }}" onInput="{{ onInput }}" placeholder="Search kanji, words, readings" aria-label="Search the dictionary" autocomplete="off" style="box-sizing: border-box; width: 100%; height: 48px; padding: 0 48px 0 44px; border: 1px solid #8c8068; border-radius: 8px; background: #fbf7ee; font-size: 16px; line-height: 24px; color: #1f1b16">
+<sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+<button class="ghost" onClick="{{ clear }}" aria-label="Clear search" style="position: absolute; right: 2px; top: 2px; width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+</sc-if>
+</div>
+<button class="drawbtn" onClick="{{ openDraw }}" aria-haspopup="dialog" style="box-sizing: border-box; width: 100%; min-height: 44px; margin-top: 8px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #8c8068; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M13 14l-1 3.5 3.5-1L21 11a1.8 1.8 0 0 0-2.5-2.5z"></path><path d="M17 10.5l1.5 1.5"></path><path d="M3 20c1.8-2.6 3.2-2.6 5 0s3.2 2.6 4.5.5"></path></svg>
+<span>Draw a kanji to search</span>
+</button>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px 24px">
+<sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+<div class="fade">
+<div style="margin: 8px 0 0; font-size: 12px; line-height: 16px; color: #5e5548">Closest matches for “{{ query }}”</div>
+<div style="margin-top: 16px; padding: 8px 0 8px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">KANJI</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ foundKanji }}" as="c" hint-placeholder-count="2">
+<button class="tile" onClick="{{ c.open }}" aria-label="{{ c.label }}" style="{{ tileStyle }}">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 28px; line-height: 1; font-weight: 500; color: #1f1b16">{{ c.ch }}</span>
+</button>
+</sc-for>
+</div>
+<div style="margin-top: 24px; padding: 8px 0; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">WORDS</div>
+<section style="box-sizing: border-box; padding: 4px 24px; background: #fbf7ee; border: 1px solid #d9cfbc; border-radius: 20px">
+<sc-for list="{{ foundWords }}" as="w" hint-placeholder-count="4">
+<div style="{{ w.rowStyle }}">
+<span lang="ja" style="width: 72px; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 18px; line-height: 24px">{{ w.word }}</span>
+<span lang="ja" style="flex: 1; font-size: 12px; line-height: 16px; color: #5e5548">{{ w.reading }}</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ w.meaning }}</span>
+</div>
+</sc-for>
+</section>
+</div>
+</sc-if>
+<sc-if value="{{ browsing }}" hint-placeholder-val="{{ true }}">
+<div class="fade">
+<sc-for list="{{ sections }}" as="s" hint-placeholder-count="2">
+<section style="margin-top: 8px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 8px 0">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">{{ s.code }}</h2>
+<span style="font-size: 12px; line-height: 16px; color: #5e5548">{{ s.count }}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ s.cells }}" as="c" hint-placeholder-count="15">
+<button class="tile" onClick="{{ c.open }}" aria-label="{{ c.label }}" style="{{ tileStyle }}">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 28px; line-height: 1; font-weight: 500; color: #1f1b16">{{ c.ch }}</span>
+</button>
+</sc-for>
+</div>
+</section>
+</sc-for>
+<p style="margin: 16px 0 0; font-size: 12px; line-height: 16px; color: #74695a">Sample kanji only.</p>
+</div>
+</sc-if>
+</div>
+<nav aria-label="Main" style="box-sizing: border-box; height: 83px; flex: none; padding: 0 8px 34px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fbf7ee; border-top: 1px solid #d9cfbc">
+<button onClick="{{ goToday }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16"></path><path d="M8 3v4M16 3v4" stroke-linecap="round"></path></svg>
+<span>Today</span>
+</button>
+<button aria-current="page" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #b8321d; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#b8321d" stroke="#b8321d" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"></path><path d="M5 20.5A2.5 2.5 0 0 0 7.5 23H19v-5" stroke="#b8321d" fill="none"></path><path d="M9 7.5h6" stroke="#fbf7ee"></path></svg>
+<span>Dictionary</span>
+</button>
+<button onClick="{{ goReview }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="8" width="13" height="11" rx="2.5"></rect><path d="M7.5 5h11a2 2 0 0 1 2 2v8"></path></svg>
+<span>Review</span>
+</button>
+<button onClick="{{ goYou }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.75"></circle><path d="M4.5 20c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6"></path></svg>
+<span>You</span>
+</button>
+</nav>
+<sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="KanjiDetail" kanji="{{ openCh }}" on-back="{{ closeDetail }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ drawOpen }}" hint-placeholder-val="{{ false }}">
+<dc-import name="DrawSearchSheet" demo="{{ drawDemo }}" on-pick="{{ pickDrawn }}" on-close="{{ closeDraw }}" hint-size="390px,844px"></dc-import>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startQuery":{"editor":null},"onTab":{"editor":null},"startDraw":{"editor":null},"onOpenSettings":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { query: (props && props.startQuery) || '', open: null, drawOpen: !!(props && props.startDraw) };
+  }
+  renderVals() {
+    const st = this.state || {};
+    const query = st.query || '';
+    const hasQuery = query.trim().length > 0;
+    const open = (ch) => () => this.setState({ open: ch });
+    const cell = (ch) => ({ ch: ch, label: 'Kanji ' + ch, open: open(ch) });
+    const n5 = ['日','月','火','水','木','金','土','山','川','人','大','小','学','校','本'];
+    const n4 = ['楽'];
+    const words = [
+      ['学校', 'がっこう', 'school'],
+      ['学生', 'がくせい', 'student'],
+      ['大学', 'だいがく', 'university'],
+      ['音楽', 'おんがく', 'music']
+    ];
+    return {
+      query: query,
+      hasQuery: hasQuery,
+      browsing: !hasQuery,
+      onInput: (e) => this.setState({ query: e && e.target ? e.target.value : '' }),
+      clear: () => this.setState({ query: '' }),
+      tileStyle: 'position: relative; box-sizing: border-box; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 8px; cursor: pointer; background: #fbf7ee; border: 1px solid #8c8068;',
+      sections: [
+        { code: 'N5', count: n5.length + ' kanji', cells: n5.map(cell) },
+        { code: 'N4', count: n4.length + ' kanji', cells: n4.map(cell) }
+      ],
+      // Static examples: the real search will fuzzy match kanji, words and readings.
+      foundKanji: ['学', '楽'].map(cell),
+      foundWords: words.map((w, i) => ({
+        word: w[0], reading: w[1], meaning: w[2],
+        rowStyle: 'display: flex; align-items: baseline; gap: 8px; padding: 12px 0; ' + (i < words.length - 1 ? 'border-bottom: 1px solid #d9cfbc;' : '')
+      })),
+      drawOpen: !!st.drawOpen,
+      drawDemo: !!(this.props && this.props.startDraw),
+      openDraw: () => this.setState({ drawOpen: true }),
+      closeDraw: () => this.setState({ drawOpen: false }),
+      pickDrawn: (ch) => this.setState({ query: ch, drawOpen: false }),
+      detailOpen: !!st.open,
+      openCh: st.open || '学',
+      closeDetail: () => this.setState({ open: null }),
+      openSettings: () => { if (this.props.onOpenSettings) this.props.onOpenSettings(); },
+      goToday: () => { if (this.props.onTab) this.props.onTab('today'); },
+      goYou: () => { if (this.props.onTab) this.props.onTab('you'); },
+      goReview: () => { if (this.props.onTab) this.props.onTab('review'); }
+    };
+  }
+}
+</script>
+</body>
+</html>

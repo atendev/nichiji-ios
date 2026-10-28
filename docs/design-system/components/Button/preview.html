@@ -1,0 +1,21 @@
+<!-- @dsCard group="Actions" height=290 subtitle="Primary, review answers, and practice" -->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Button</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"></head>
+<body><div class="nj-stage"><div class="nj-row">
+<button class="nj-btn nj-btn--primary" id="got">Got it</button>
+<button class="nj-btn nj-btn--secondary" id="known" aria-pressed="false">Mark as known</button>
+<button class="nj-btn nj-btn--quiet">Forget it</button>
+</div>
+<div class="nj-row">
+<button class="nj-btn nj-btn--got">&#10003; Got it</button>
+<button class="nj-btn nj-btn--forgot">Forgot it</button>
+<button class="nj-btn nj-btn--practice">Practice this kanji</button>
+</div>
+<div class="nj-row"><button class="nj-btn nj-btn--done">&#10003; Learned</button><span class="caption" style="color:var(--ink-muted)">Learned state</span></div>
+</div>
+<script>
+var got=document.getElementById("got");
+got.addEventListener("click",function(){var d=got.classList.toggle("nj-btn--done");got.classList.toggle("nj-btn--primary",!d);got.innerHTML=d?"&#10003; Learned":"Got it"});
+var kn=document.getElementById("known");
+kn.addEventListener("click",function(){var on=kn.getAttribute("aria-pressed")!=="true";kn.setAttribute("aria-pressed",String(on));kn.innerHTML=on?"&#10003; Known":"Mark as known"});
+</script></body></html>

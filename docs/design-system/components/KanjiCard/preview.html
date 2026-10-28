@@ -1,0 +1,22 @@
+<!-- @dsCard group="Learning" height=550 subtitle="Kanji of the day with Got it and a romaji switch" -->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>KanjiCard</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"></head>
+<body><div class="nj-stage"><div class="nj-row"><label class="nj-switch"><input type="checkbox" id="rm"> Show romaji</label></div>
+<div class="nj-card" id="card">
+<p class="label caption">TODAY · N5 · 8 strokes</p>
+<p class="kanji-hero">学</p>
+<p class="meaning body">study, learning</p>
+<div class="nj-read body"><span>音 <b>ガク</b><span class="rom caption">gaku</span></span><span>訓 <b>まな-ぶ</b><span class="rom caption">mana-bu</span></span></div>
+<ul class="nj-words">
+<li><span class="word">学生</span><span class="caption">がくせい · student<span class="rom">gakusei</span></span></li>
+<li><span class="word">大学</span><span class="caption">だいがく · university<span class="rom">daigaku</span></span></li>
+<li><span class="word">学校</span><span class="caption">がっこう · school<span class="rom">gakkou</span></span></li>
+</ul>
+<button class="nj-btn nj-btn--primary nj-btn--block" id="got">Got it</button>
+</div>
+</div>
+<script>
+var got=document.getElementById("got");
+got.addEventListener("click",function(){var d=got.classList.toggle("nj-btn--done");got.classList.toggle("nj-btn--primary",!d);got.innerHTML=d?"&#10003; Learned":"Got it"});
+document.getElementById("rm").addEventListener("change",function(e){document.getElementById("card").classList.toggle("show-rom",e.target.checked)});
+</script></body></html>

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Draw to search</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.ghost:hover{background:#eae2d1 !important}
+.tile:hover{background:#eae2d1 !important}
+.scrimbtn:active{transform:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sheetOut{from{transform:translateY(var(--from,0px))}to{transform:translateY(100%)}}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.scrim-in{animation:fadeIn .25s ease-out both}
+.scrim-out{animation:fadeOut .22s ease-in both}
+.sheet-in{animation:sheetIn .32s cubic-bezier(.2,.8,.2,1) both}
+.sheet-out{animation:sheetOut .22s ease-in both}
+.pop{animation:pop .2s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px; overflow: hidden; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<button class="{{ scrimClass }}" onClick="{{ close }}" aria-label="Close drawing search" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(31, 27, 22, 0.4); cursor: default"></button>
+<div role="dialog" aria-modal="true" aria-label="Draw to search" class="{{ sheetClass }}" style="{{ sheetStyle }}">
+<div onPointerDown="{{ down }}" onPointerMove="{{ move }}" onPointerUp="{{ up }}" onPointerCancel="{{ up }}" style="touch-action: none; cursor: grab">
+<div aria-hidden="true" style="width: 36px; height: 4px; margin: 8px auto 0; border-radius: 999px; background: #d9cfbc"></div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 8px 0 24px">
+<h2 style="flex: 1; margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Draw to search</h2>
+<button data-noswipe="1" class="ghost" onClick="{{ close }}" style="min-width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0 12px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">Done</button>
+</div>
+</div>
+<div style="padding: 8px 24px 0">
+<div style="position: relative; width: 342px; height: 342px; box-sizing: border-box; background: #f4eee2; border: 1px solid #8c8068; border-radius: 8px; overflow: hidden">
+<sc-if value="{{ blank }}" hint-placeholder-val="{{ true }}">
+<div aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 24px; color: #74695a; pointer-events: none">Draw a kanji here</div>
+</sc-if>
+<svg viewBox="0 0 342 342" width="340" height="340" onPointerDown="{{ padDown }}" onPointerMove="{{ padMove }}" onPointerUp="{{ padUp }}" onPointerCancel="{{ padUp }}" role="img" aria-label="Drawing pad. Draw a kanji with your finger." style="position: absolute; top: 0; left: 0; display: block; touch-action: none; cursor: crosshair">
+<path d="M171 6V336M6 171H336" stroke="#d9cfbc" stroke-width="1" stroke-dasharray="4 4" fill="none"></path>
+<g transform="scale(3.1376)" fill="none" stroke="#1f1b16" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+<sc-for list="{{ demoPaths }}" as="p" hint-placeholder-count="1">
+<path d="{{ p.d }}"></path>
+</sc-for>
+</g>
+<sc-for list="{{ paths }}" as="p" hint-placeholder-count="2">
+<path d="{{ p.d }}" fill="none" stroke="#1f1b16" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+</sc-for>
+</svg>
+</div>
+</div>
+<div style="padding: 16px 24px 0">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">MATCHES</span>
+<span style="font-size: 12px; line-height: 16px; color: #74695a">{{ note }}</span>
+</div>
+<div style="margin-top: 8px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; min-height: 56px">
+<sc-for list="{{ candidates }}" as="c" hint-placeholder-count="5">
+<button class="tile pop" onClick="{{ c.pick }}" aria-label="{{ c.label }}" style="box-sizing: border-box; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 8px; background: #fbf7ee; border: 1px solid #8c8068; cursor: pointer">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 28px; line-height: 1; font-weight: 500; color: #1f1b16">{{ c.ch }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px 40px 24px">
+<button class="ghost" onClick="{{ undo }}" aria-disabled="{{ empty }}" style="{{ ctlStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10a6 6 0 0 1 0 12h-3"></path></svg>
+<span>Undo</span>
+</button>
+<button class="ghost" onClick="{{ clear }}" aria-disabled="{{ empty }}" style="{{ ctlStyle }}">Clear</button>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"demo":{"editor":"boolean","default":false},"onPick":{"editor":null},"onClose":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { done: [], cur: null, dragY: 0, dragging: false, closing: false, cleared: false };
+    this.drag = null;
+    this.timer = null;
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  dismiss() {
+    if (this.state.closing) return;
+    this.setState({ closing: true, dragging: false });
+    this.timer = setTimeout(() => { if (this.props.onClose) this.props.onClose(); }, 220);
+  }
+  pt(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    const k = 342 / (r.width || 342);
+    return [Math.round((e.clientX - r.left) * k), Math.round((e.clientY - r.top) * k)];
+  }
+  renderVals() {
+    const st = this.state || {};
+    const pr = this.props || {};
+    // Static example for the artboard: the first five strokes of 学, in a 109 x 109 grid.
+    const demoOn = !!pr.demo && !st.cleared;
+    const demo = demoOn ? ['M27 13 Q30 21 34 27', 'M54 8 Q53 17 51 28', 'M80 12 Q76 22 69 29', 'M54 35 Q55 38 56 41', 'M22 57 L22 46 L87 46 L87 56 Q87 60 82 58'] : [];
+    const done = st.done || [];
+    const all = st.cur ? done.concat([st.cur]) : done;
+    const toD = (pts) => pts.length === 1 ? 'M' + pts[0][0] + ' ' + pts[0][1] + ' l0.1 0' : 'M' + pts.map((p) => p[0] + ' ' + p[1]).join(' L');
+    const total = all.length + demo.length;
+    // Sample matches only: the real recognizer ranks kanji by shape as strokes are drawn.
+    const sets = [[], ['一', '二', '人', '入', '十'], ['一', '二', '人', '入', '十'], ['山', '川', '大', '小', '土'], ['山', '川', '大', '小', '土'], ['学', '字', '孝', '党', '覚']];
+    const list = sets[Math.min(total, sets.length - 1)];
+    const empty = total === 0;
+    const dyDown = Math.max(0, st.dragY || 0);
+    const closing = !!st.closing;
+    return {
+      blank: empty,
+      paths: all.map((pts) => ({ d: toD(pts) })),
+      demoPaths: demo.map((d) => ({ d: d })),
+      candidates: list.map((ch) => ({ ch: ch, label: 'Search for ' + ch, pick: () => { if (this.props.onPick) this.props.onPick(ch); } })),
+      note: empty ? 'Matches appear as you draw' : total + (total === 1 ? ' stroke' : ' strokes') + ' drawn',
+      empty: empty,
+      ctlStyle: 'box-sizing: border-box; min-height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 6px; border: 0; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer; ' + (empty ? 'opacity: 0.4;' : ''),
+      undo: () => this.setState({ done: done.slice(0, -1) }),
+      clear: () => this.setState({ done: [], cur: null, cleared: true }),
+      padDown: (e) => {
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+        this.setState({ cur: [this.pt(e)] });
+      },
+      padMove: (e) => {
+        if (!this.state.cur) return;
+        this.setState({ cur: this.state.cur.concat([this.pt(e)]) });
+      },
+      padUp: () => {
+        if (!this.state.cur) return;
+        this.setState({ done: this.state.done.concat([this.state.cur]), cur: null });
+      },
+      scrimClass: 'scrimbtn ' + (closing ? 'scrim-out' : 'scrim-in'),
+      sheetClass: closing ? 'sheet-out' : (st.dragging || dyDown ? '' : 'sheet-in'),
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; background: #fbf7ee; border-radius: 20px 20px 0 0; box-shadow: 0 8px 24px rgba(31, 27, 22, 0.16); --from: ' + dyDown + 'px; ' +
+        (closing ? '' : 'transform: translateY(' + dyDown + 'px); ' + (st.dragging ? '' : 'transition: transform 0.2s ease-out;')),
+      close: () => this.dismiss(),
+      down: (e) => {
+        if (e.target && e.target.closest && e.target.closest('[data-noswipe]')) return;
+        this.drag = { y: e.clientY };
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      },
+      move: (e) => {
+        if (!this.drag) return;
+        this.setState({ dragY: e.clientY - this.drag.y, dragging: true });
+      },
+      up: () => {
+        if (!this.drag) return;
+        this.drag = null;
+        if (this.state.dragY > 110) this.dismiss();
+        else this.setState({ dragY: 0, dragging: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

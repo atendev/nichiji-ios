@@ -1,0 +1,406 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "App.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "App live preview",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "Daily.dc.html": {
+      "h": 844,
+      "page": "onboarding",
+      "title": "2 One kanji a day",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "Dictionary.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Dictionary",
+      "w": 390,
+      "x": 0,
+      "y": 1063
+    },
+    "DictionaryDetail.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "Dictionary: kanji detail",
+      "w": 390,
+      "x": 940,
+      "y": 1063
+    },
+    "DictionarySearch.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "Dictionary: searching",
+      "w": 390,
+      "x": 470,
+      "y": 1063
+    },
+    "Flashcards.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "onboarding",
+      "title": "3 Flashcards",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "Level.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "onboarding",
+      "title": "4 Choose your level",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "onboarding",
+      "title": "Live preview",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "Ready.dc.html": {
+      "h": 844,
+      "page": "onboarding",
+      "title": "7 You're all set",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "Reminder.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "onboarding",
+      "title": "5 Daily reminder",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "Review.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Review",
+      "w": 390,
+      "x": 0,
+      "y": 2115
+    },
+    "ReviewSession.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Review: session",
+      "w": 390,
+      "x": 470,
+      "y": 2115
+    },
+    "SettingsCustomFull.dc.html": {
+      "h": 2080,
+      "page": "app",
+      "title": "Customize your kanji, full length",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "SettingsCustomKanji.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Settings: Customize your kanji",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "SettingsLevel.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Settings: Level",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "SettingsPrivacy.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "Settings: Privacy",
+      "w": 390,
+      "x": 3760,
+      "y": 0
+    },
+    "SettingsReminder.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Settings: Daily reminder",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "SettingsReview.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Settings: Review",
+      "w": 390,
+      "x": 940,
+      "y": 2115
+    },
+    "SettingsWidget.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "Settings: Widgets",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "Today.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "Today (main screen)",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "TodayPractice.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "Practice sheet",
+      "w": 390,
+      "x": 1410,
+      "y": 2115
+    },
+    "TodaySettings.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "Settings menu",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "Welcome.dc.html": {
+      "h": 844,
+      "page": "onboarding",
+      "title": "1 Welcome",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Widget.dc.html": {
+      "h": 844,
+      "page": "onboarding",
+      "title": "6 Home screen widget",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "You.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "app",
+      "title": "You",
+      "w": 390,
+      "x": 0,
+      "y": 3167
+    },
+    "YouHistory.dc.html": {
+      "h": 844,
+      "page": "app",
+      "title": "You: history",
+      "w": 390,
+      "x": 470,
+      "y": 3167
+    },
+    "DictionaryDraw.dc.html": {
+      "x": 1410,
+      "y": 1063,
+      "w": 390,
+      "h": 844,
+      "title": "Dictionary: draw to search",
+      "page": "app"
+    },
+    "SettingsLevelJoyo.dc.html": {
+      "x": 4230,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Settings: Level, Jōyō grades",
+      "page": "app"
+    },
+    "SettingsCustomJoyo.dc.html": {
+      "x": 4700,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Settings: Customize your kanji, Jōyō",
+      "page": "app"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-28T02:25:00Z",
+    "v": 1
+  },
+  "designSystems": [
+    {
+      "artifact": "https://claude.ai/code/artifact/e5ce2be9-a6c3-4f03-bb1c-46985588d45f",
+      "copiedAt": "2026-10-28T02:25:00Z",
+      "namespace": "nichiji",
+      "title": "Nichiji",
+      "version": "1793152503-2615"
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "title",
+    "previewNote",
+    "flowNote",
+    "appTitle",
+    "dictNote",
+    "appPreviewNote",
+    "appMainNote",
+    "appSubNote",
+    "reviewNote",
+    "youNote"
+  ],
+  "notes": {
+    "appMainNote": {
+      "fill": "gray",
+      "page": "app",
+      "text": "Main screen and its settings menu, shown open.",
+      "w": 360,
+      "x": 470,
+      "y": -150
+    },
+    "appPreviewNote": {
+      "fill": "gray",
+      "page": "app",
+      "text": "Live preview. Open the settings button on Today, then Level, then Customize your kanji.",
+      "w": 300,
+      "x": 0,
+      "y": -150
+    },
+    "appSubNote": {
+      "fill": "gray",
+      "page": "app",
+      "text": "Settings sub-screens. The tall artboard shows the whole kanji picker without scrolling. It uses sample kanji only.",
+      "w": 560,
+      "x": 1410,
+      "y": -150
+    },
+    "appTitle": {
+      "kind": "title1",
+      "maxW": 6040,
+      "page": "app",
+      "text": "App",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "dictNote": {
+      "fill": "gray",
+      "page": "app",
+      "text": "Dictionary: browse grid, a static search example, draw to search, and the kanji detail screen. Search and drawing matches are mocked; the live preview shows the same static results for any text.",
+      "w": 700,
+      "x": 0,
+      "y": 913
+    },
+    "flowNote": {
+      "fill": "gray",
+      "page": "onboarding",
+      "text": "The flow, screen by screen: welcome, daily kanji, flashcards, level, reminder, widget, ready.",
+      "w": 520,
+      "x": 470,
+      "y": -150
+    },
+    "previewNote": {
+      "fill": "gray",
+      "page": "onboarding",
+      "text": "Live preview. Tap through the whole flow, ending on the main screen.",
+      "w": 300,
+      "x": 0,
+      "y": -150
+    },
+    "reviewNote": {
+      "fill": "gray",
+      "page": "app",
+      "text": "Review: due today, progress by stage, what's coming, and the weekly streak. Start review opens the flashcard session. Numbers are sample data.",
+      "w": 560,
+      "x": 0,
+      "y": 1965
+    },
+    "title": {
+      "kind": "title1",
+      "maxW": 3680,
+      "page": "onboarding",
+      "text": "Onboarding",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "youNote": {
+      "fill": "gray",
+      "page": "app",
+      "text": "You: stats, 12-week activity, progress by level, trouble kanji, and the learned list or history. All numbers are sample data.",
+      "w": 560,
+      "x": 0,
+      "y": 3017
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Welcome.dc.html",
+    "Daily.dc.html",
+    "Flashcards.dc.html",
+    "Level.dc.html",
+    "Reminder.dc.html",
+    "Widget.dc.html",
+    "Ready.dc.html",
+    "App.dc.html",
+    "Today.dc.html",
+    "TodaySettings.dc.html",
+    "SettingsLevel.dc.html",
+    "SettingsCustomKanji.dc.html",
+    "SettingsCustomFull.dc.html",
+    "SettingsReminder.dc.html",
+    "SettingsWidget.dc.html",
+    "SettingsPrivacy.dc.html",
+    "Dictionary.dc.html",
+    "DictionarySearch.dc.html",
+    "DictionaryDetail.dc.html",
+    "Review.dc.html",
+    "ReviewSession.dc.html",
+    "SettingsReview.dc.html",
+    "TodayPractice.dc.html",
+    "You.dc.html",
+    "YouHistory.dc.html",
+    "DictionaryDraw.dc.html",
+    "SettingsLevelJoyo.dc.html",
+    "SettingsCustomJoyo.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "onboarding",
+      "name": "Onboarding"
+    },
+    {
+      "id": "app",
+      "name": "App"
+    }
+  ],
+  "title": "Nichiji"
+}

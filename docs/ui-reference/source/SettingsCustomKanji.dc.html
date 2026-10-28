@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings: Customize your kanji</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.95)}
+.cta:hover{background:#9c2915 !important}
+.ghost:hover{background:#eae2d1 !important}
+.outline:hover{background:#eae2d1 !important}
+.small{position:relative}
+.small::after{content:"";position:absolute;top:-6px;bottom:-6px;left:-6px;right:-6px}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes pushIn{from{transform:translateX(100%)}to{transform:none}}
+@keyframes pushOut{from{transform:none}to{transform:translateX(100%)}}
+@keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
+.push-in{animation:pushIn .3s cubic-bezier(.2,.8,.2,1) both}
+.push-out{animation:pushOut .24s ease-in both}
+.pop{animation:pop .18s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="{{ rootClass }}" style="{{ rootStyle }}">
+<div style="padding: 0 16px; display: flex; align-items: center; height: 44px; flex: none">
+<button class="ghost" onClick="{{ back }}" aria-label="Back to level" style="height: 44px; margin-left: -8px; padding: 0 12px 0 8px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; gap: 2px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+<span>Level</span>
+</button>
+</div>
+<div class="scroll" style="{{ scrollStyle }}">
+<div style="padding: 16px 16px 8px">
+<h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 500">Customize your kanji</h1>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 24px; color: #5e5548">Turn on the kanji you want to study. Your daily kanji come from the ones that are on.</p>
+</div>
+<sc-for list="{{ sections }}" as="s" hint-placeholder-count="5">
+<section style="padding: 0 16px; margin-top: 16px">
+<div style="{{ s.headStyle }}">
+<div>
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">{{ s.code }}</h2>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">{{ s.summary }}</div>
+</div>
+<button class="outline small" onClick="{{ s.toggleAll }}" style="box-sizing: border-box; min-height: 32px; padding: 0 12px; border: 1px solid #8c8068; border-radius: 8px; background: transparent; font-family: inherit; font-size: 12px; line-height: 16px; font-weight: 500; color: #1f1b16; cursor: pointer">{{ s.toggleLabel }}</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ s.cells }}" as="c" hint-placeholder-count="20">
+<button onClick="{{ c.toggle }}" aria-pressed="{{ c.on }}" aria-label="{{ c.label }}" style="{{ c.style }}">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 28px; line-height: 1; font-weight: 500; color: #1f1b16">{{ c.ch }}</span>
+<sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}">
+<svg class="pop" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8321d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 5px; right: 5px" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+</button>
+</sc-for>
+</div>
+</section>
+</sc-for>
+<div style="height: 24px"></div>
+</div>
+<div style="flex: none; box-sizing: border-box; padding: 12px 16px 34px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #fbf7ee; border-top: 1px solid #d9cfbc">
+<div>
+<div style="font-size: 16px; line-height: 24px; color: #1f1b16">{{ total }} on</div>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">of {{ allCount }} kanji</div>
+</div>
+<button class="cta" onClick="{{ back }}" style="min-width: 120px; min-height: 48px; padding: 0 24px; border: 0; border-radius: 8px; background: #b8321d; color: #ffffff; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer">Done</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"selected":{"editor":null},"scheme":{"editor":"select","options":["jlpt","joyo"],"default":"jlpt"},"onChange":{"editor":null},"onBack":{"editor":null},"expanded":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const levels = Component.levels(props && props.scheme);
+    const sel = {};
+    if (props && props.selected && props.selected.length !== undefined) {
+      for (let i = 0; i < props.selected.length; i++) sel[props.selected[i]] = true;
+    } else {
+      levels[0].kanji.forEach((k) => { sel[k] = true; });
+    }
+    this.state = { sel: sel, leaving: false };
+    this.timer = null;
+  }
+  // Sample kanji only: enough to check the layout, not the full lists.
+  // Groups follow the level system chosen on the Level screen.
+  static levels(scheme) {
+    if (scheme === 'joyo') {
+      return [
+        { code: '1st grade', kanji: ['日','月','火','水','木','金','土','山','川','人','大','小','中','上','下','本','学','校','先','生','車','気','雨','花'] },
+        { code: '2nd grade', kanji: ['会','社','家','楽','魚','春','夏','秋','冬','朝','夜','道','店','電','国','読','話'] },
+        { code: '3rd grade', kanji: ['駅','医','院','運','館','橋','銀','港','実','世','送','対','度','部','島','区','研'] },
+        { code: '4th grade', kanji: ['議','協','軍','県','民','連','府','改','各','関','覚','選','続','的','約','結'] },
+        { code: '5th grade', kanji: ['査','総','設','政','領','団','営','義','基','規','技','経','現','構','句'] },
+        { code: '6th grade', kanji: ['党','権','憲','私','宗','従','熟','暖','難','認','論','優','乱','覧'] },
+        { code: 'Secondary school', kanji: ['亜','哀','挨','握','扱','宛','嵐','依','威','為','偉','椅','維','慰','緯'] }
+      ];
+    }
+    return [
+      { code: 'N5', kanji: ['日','月','火','水','木','金','土','山','川','人','大','小','中','上','下','本','学','校','先','生','車','電','気','雨'] },
+      { code: 'N4', kanji: ['会','社','家','手','目','口','足','駅','店','道','町','春','夏','秋','冬','朝','夜','魚','犬','花'] },
+      { code: 'N3', kanji: ['政','議','民','連','対','部','合','市','内','相','定','回','選','実','関'] },
+      { code: 'N2', kanji: ['党','協','総','区','領','県','設','改','府','査','委','軍','団','各','島'] },
+      { code: 'N1', kanji: ['亜','哀','挨','握','扱','宛','嵐','依','威','為','偉','椅','維','慰','緯'] }
+    ];
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  commit(sel) {
+    this.setState({ sel: sel });
+    const shown = {};
+    Component.levels(this.props.scheme).forEach((lv) => lv.kanji.forEach((k) => { shown[k] = true; }));
+    if (this.props.onChange) this.props.onChange(Object.keys(sel).filter((k) => sel[k] && shown[k]));
+  }
+  renderVals() {
+    const st = this.state || {};
+    const sel = st.sel || {};
+    const ex = !!this.props.expanded;
+    const levels = Component.levels(this.props.scheme);
+    let total = 0;
+    let allCount = 0;
+    const sections = levels.map((lv) => {
+      const onCount = lv.kanji.filter((k) => sel[k]).length;
+      const all = onCount === lv.kanji.length;
+      total += onCount;
+      allCount += lv.kanji.length;
+      return {
+        code: lv.code,
+        summary: lv.kanji.length + ' kanji · ' + onCount + ' on',
+        toggleLabel: all ? 'Clear all' : 'Select all',
+        headStyle: (ex ? '' : 'position: sticky; top: 0; z-index: 2; ') + 'display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; background: #f4eee2;',
+        toggleAll: () => {
+          const next = Object.assign({}, sel);
+          lv.kanji.forEach((k) => { next[k] = !all; });
+          this.commit(next);
+        },
+        cells: lv.kanji.map((k) => {
+          const on = !!sel[k];
+          return {
+            ch: k,
+            on: on,
+            label: 'Kanji ' + k,
+            toggle: () => {
+              const next = Object.assign({}, sel);
+              next[k] = !on;
+              this.commit(next);
+            },
+            style: 'position: relative; box-sizing: border-box; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 8px; cursor: pointer; ' +
+              (on ? 'background: #f7e6de; border: 1px solid #b8321d;' : 'background: #fbf7ee; border: 1px solid #8c8068;')
+          };
+        })
+      };
+    });
+    const leaving = !!st.leaving;
+    const base = "box-sizing: border-box; width: 390px; display: flex; flex-direction: column; padding-top: 56px; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif; ";
+    return {
+      sections: sections,
+      total: total,
+      allCount: allCount,
+      rootClass: ex ? '' : (leaving ? 'push-out' : 'push-in'),
+      rootStyle: base + (ex ? 'min-height: 844px;' : 'height: 844px; overflow: hidden;'),
+      scrollStyle: ex ? '' : 'flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;',
+      back: () => {
+        if (!this.props.onBack || this.state.leaving) return;
+        this.setState({ leaving: true });
+        this.timer = setTimeout(() => this.props.onBack(), 240);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

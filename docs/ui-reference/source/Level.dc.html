@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Choose your level</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+.ghost:hover{background:#eae2d1 !important}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes segfill{from{background-size:0% 100%,auto}to{background-size:100% 100%,auto}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.screen{animation:enter .32s ease-out both}
+.seg-now{background:linear-gradient(#1f1b16,#1f1b16) left/100% 100% no-repeat,#d9cfbc;animation:segfill .45s .1s ease-out both}
+.pop{animation:pop .2s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding: 56px 24px 48px; display: flex; flex-direction: column; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="display: flex; align-items: center; gap: 12px; height: 44px">
+<button class="ghost" onClick="{{ back }}" aria-label="Back" style="width: 44px; height: 44px; margin-left: -12px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+</button>
+<div role="img" aria-label="Step 3 of 6" style="flex: 1; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px">
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div style="height: 4px; border-radius: 999px; background: #1f1b16"></div>
+<div class="seg-now" style="height: 4px; border-radius: 999px"></div>
+<div style="height: 4px; border-radius: 999px; background: #d9cfbc"></div>
+<div style="height: 4px; border-radius: 999px; background: #d9cfbc"></div>
+<div style="height: 4px; border-radius: 999px; background: #d9cfbc"></div>
+</div>
+<button class="ghost" onClick="{{ skip }}" style="min-width: 44px; height: 44px; margin-right: -8px; border: 0; border-radius: 8px; background: transparent; padding: 0 8px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #5e5548; cursor: pointer">Skip</button>
+</div>
+<div style="margin-top: 24px">
+<h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 500">Choose your level</h1>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 24px; font-weight: 400; color: #5e5548">Your daily kanji match your level. You can change it any time in Settings.</p>
+</div>
+<div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin-top: 16px; padding-bottom: 8px">
+<div role="tablist" aria-label="Level system" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: #eae2d1; border-radius: 12px">
+<button role="tab" aria-selected="{{ isJlpt }}" onClick="{{ pickJlpt }}" style="{{ jlptTab }}">JLPT</button>
+<button role="tab" aria-selected="{{ isJoyo }}" onClick="{{ pickJoyo }}" style="{{ joyoTab }}">Jōyō grade</button>
+</div>
+<div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{ levels }}" as="item" hint-placeholder-count="5">
+<button onClick="{{ item.pick }}" aria-pressed="{{ item.selected }}" style="{{ item.rowStyle }}">
+<span style="width: 36px; text-align: left; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.02em; color: #1f1b16">{{ item.code }}</span>
+<span style="flex: 1; text-align: left; font-size: 16px; line-height: 24px; font-weight: 400; color: #1f1b16">{{ item.name }}</span>
+<span style="font-size: 12px; line-height: 16px; color: #5e5548">{{ item.count }}</span>
+<sc-if value="{{ item.selected }}" hint-placeholder-val="{{ false }}">
+<svg class="pop" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8321d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Selected"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+</button>
+</sc-for>
+</div>
+<p style="margin: 16px 0 0; font-size: 12px; line-height: 16px; font-weight: 400; color: #74695a">{{ footNote }}</p>
+</div>
+<button class="cta" onClick="{{ next }}" style="width: 100%; min-height: 52px; border: 0; border-radius: 8px; background: #b8321d; color: #ffffff; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer">Continue</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onNext":{"editor":null},"onBack":{"editor":null},"onSkip":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { level: 'N5', scheme: 'jlpt' };
+  }
+  renderVals() {
+    const current = (this.state && this.state.level) || 'N5';
+    const scheme = (this.state && this.state.scheme) || 'jlpt';
+    const jlpt = [
+      { code: 'N5', name: 'Beginner', count: '' },
+      { code: 'N4', name: 'Elementary', count: '' },
+      { code: 'N3', name: 'Intermediate', count: '' },
+      { code: 'N2', name: 'Upper intermediate', count: '' },
+      { code: 'N1', name: 'Advanced', count: '' }
+    ];
+    const joyo = [
+      { code: 'G1', name: '1st grade', count: '80 kanji' },
+      { code: 'G2', name: '2nd grade', count: '160 kanji' },
+      { code: 'G3', name: '3rd grade', count: '200 kanji' },
+      { code: 'G4', name: '4th grade', count: '202 kanji' },
+      { code: 'G5', name: '5th grade', count: '193 kanji' },
+      { code: 'G6', name: '6th grade', count: '191 kanji' },
+      { code: 'GS', name: 'Secondary school', count: '1,110 kanji' }
+    ];
+    const base = scheme === 'joyo' ? joyo : jlpt;
+    const seg = (on) => 'min-height: 40px; border: 0; border-radius: 8px; font-family: inherit; font-size: 14px; line-height: 20px; cursor: pointer; ' +
+      (on ? 'background: #fbf7ee; color: #1f1b16; font-weight: 500; box-shadow: 0 0 0 1px #8c8068;' : 'background: transparent; color: #5e5548; font-weight: 400;');
+    const levels = base.map((l) => {
+      const selected = l.code === current;
+      return {
+        code: scheme === 'joyo' ? (l.code === 'GS' ? 'S' : l.code.charAt(1)) : l.code,
+        name: l.name,
+        count: l.count,
+        selected: selected,
+        pick: () => this.setState({ level: l.code }),
+        rowStyle: 'box-sizing: border-box; width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-radius: 8px; font-family: inherit; cursor: pointer; ' +
+          (selected ? 'background: #f7e6de; border: 1px solid #b8321d;' : 'background: #fbf7ee; border: 1px solid #8c8068;')
+      };
+    });
+    return {
+      levels: levels,
+      isJlpt: scheme === 'jlpt', isJoyo: scheme === 'joyo',
+      jlptTab: seg(scheme === 'jlpt'), joyoTab: seg(scheme === 'joyo'),
+      pickJlpt: () => this.setState({ scheme: 'jlpt', level: 'N5' }),
+      pickJoyo: () => this.setState({ scheme: 'joyo', level: 'G1' }),
+      footNote: scheme === 'joyo' ? 'Not sure? Choose 1st grade. You can also pick the daily order in Settings.' : 'Not sure which level? Choose N5. You can also pick the daily order in Settings.',
+      next: () => { if (this.props.onNext) this.props.onNext(); },
+      back: () => { if (this.props.onBack) this.props.onBack(); },
+      skip: () => { if (this.props.onSkip) this.props.onSkip(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

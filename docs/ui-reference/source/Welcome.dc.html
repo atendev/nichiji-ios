@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Welcome</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.cta:hover{background:#9c2915 !important}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.screen{animation:enter .32s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="screen" style="overflow: hidden; width: 390px; height: 844px; box-sizing: border-box; padding: 140px 24px 48px; display: flex; flex-direction: column; justify-content: space-between; background: #f4eee2; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
+<img src="/_blob/0486ce41d8aaf6f98585de7490c5df7d" alt="Nichiji seal" style="width: 72px; height: 72px; display: block">
+<div style="margin-top: 24px; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 120px; line-height: 1.05; font-weight: 500; color: #1f1b16" lang="ja">日字</div>
+<h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 500; color: #1f1b16">Nichiji</h1>
+<p style="margin: 0; max-width: 280px; font-size: 16px; line-height: 24px; font-weight: 400; color: #5e5548">One Kanji. One Day. Every Day.</p>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px">
+<button class="cta" onClick="{{ next }}" style="width: 100%; min-height: 52px; border: 0; border-radius: 8px; background: #b8321d; color: #ffffff; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer">Get started</button>
+<p style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 400; color: #74695a; text-align: center">No account needed. Nichiji does not collect any data.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onNext":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      next: () => { if (this.props.onNext) this.props.onNext(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

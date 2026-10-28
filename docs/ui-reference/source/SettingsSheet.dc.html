@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #2f4a6b;outline-offset:2px}
+button:active{transform:scale(.97)}
+.ghost:hover{background:#eae2d1 !important}
+.row:hover{background:#eae2d1 !important}
+.row:active{transform:none}
+.scrimbtn:active{transform:none}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.pop{animation:pop .2s ease-out both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sheetOut{from{transform:none}to{transform:translateY(100%)}}
+.scrim-in{animation:fadeIn .25s ease-out both}
+.scrim-out{animation:fadeOut .22s ease-in both}
+.sheet-in{animation:sheetIn .32s cubic-bezier(.2,.8,.2,1) both}
+.sheet-out{animation:sheetOut .22s ease-in both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px; overflow: hidden; color: #1f1b16; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<button class="{{ scrimClass }}" onClick="{{ closeSettings }}" aria-label="Close settings" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(31, 27, 22, 0.4); cursor: default"></button>
+<div role="dialog" aria-modal="true" aria-label="Settings" class="{{ sheetClass }}" style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 780px; display: flex; flex-direction: column; background: #fbf7ee; border-radius: 20px 20px 0 0; box-shadow: 0 8px 24px rgba(31, 27, 22, 0.16)">
+<div aria-hidden="true" style="align-self: center; margin-top: 8px; width: 36px; height: 4px; border-radius: 999px; background: #d9cfbc"></div>
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 0 24px">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500">Settings</h2>
+<button class="ghost" onClick="{{ closeSettings }}" style="min-width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0 12px; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">Done</button>
+</div>
+<div class="scroll" style="overflow-y: auto; padding: 4px 16px 40px">
+<div style="margin: 12px 8px 8px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">APPEARANCE</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ themes }}" as="t" hint-placeholder-count="3">
+<button onClick="{{ t.pick }}" aria-pressed="{{ t.selected }}" aria-label="{{ t.label }}" style="display: flex; flex-direction: column; gap: 8px; padding: 0; border: 0; background: transparent; font-family: inherit; cursor: pointer">
+<span style="{{ t.cardStyle }}">
+<sc-for list="{{ t.layers }}" as="l" hint-placeholder-count="1">
+<span style="{{ l.layer }}">
+<span style="{{ l.topBar }}"></span>
+<span lang="ja" style="{{ l.kanji }}">学</span>
+<span style="{{ l.bar1 }}"></span>
+<span style="{{ l.bar2 }}"></span>
+<span style="{{ l.tab }}">
+<span style="{{ l.dotActive }}"></span>
+<span style="{{ l.dot }}"></span>
+<span style="{{ l.dot }}"></span>
+<span style="{{ l.dot }}"></span>
+</span>
+</span>
+</sc-for>
+<sc-if value="{{ t.selected }}" hint-placeholder-val="{{ false }}">
+<span class="pop" style="position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #1f1b16; border: 2px solid #fbf7ee">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbf7ee" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</span>
+</sc-if>
+</span>
+<span style="{{ t.labelStyle }}">{{ t.label }}</span>
+</button>
+</sc-for>
+</div>
+<p style="margin: 12px 8px 0; font-size: 14px; line-height: 20px; color: #5e5548">{{ themeNote }}</p>
+<div style="margin: 24px 8px 8px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">LEARNING</div>
+<div style="background: #f4eee2; border: 1px solid #d9cfbc; border-radius: 8px; overflow: hidden">
+<button class="row" onClick="{{ goLevel }}" style="box-sizing: border-box; width: 100%; min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border: 0; background: transparent; font-family: inherit; text-align: left; cursor: pointer">
+<span style="flex: 1">
+<span style="display: block; font-size: 16px; line-height: 24px; color: #1f1b16">Level</span>
+<span style="display: block; font-size: 12px; line-height: 16px; color: #5e5548">Daily kanji match this level.</span>
+</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ levelValue }}</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+<button class="row" onClick="{{ goReminder }}" style="box-sizing: border-box; width: 100%; min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border: 0; border-top: 1px solid #d9cfbc; background: transparent; font-family: inherit; text-align: left; cursor: pointer">
+<span style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">Daily reminder</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ reminderValue }}</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+<button class="row" onClick="{{ goReview }}" style="box-sizing: border-box; width: 100%; min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border: 0; border-top: 1px solid #d9cfbc; background: transparent; font-family: inherit; text-align: left; cursor: pointer">
+<span style="flex: 1">
+<span style="display: block; font-size: 16px; line-height: 24px; color: #1f1b16">Review</span>
+<span style="display: block; font-size: 12px; line-height: 16px; color: #5e5548">Card types, order, audio.</span>
+</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">{{ reviewValue }}</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-top: 1px solid #d9cfbc">
+<span style="flex: 1">
+<span style="display: block; font-size: 16px; line-height: 24px; color: #1f1b16">Show romaji</span>
+<span style="display: block; font-size: 12px; line-height: 16px; color: #5e5548">Readings stay in kana unless this is on.</span>
+</span>
+<button role="switch" aria-checked="{{ romaji }}" aria-label="Show romaji" onClick="{{ toggleRomaji }}" style="{{ romajiTrack }}"><span style="{{ romajiKnob }}"></span></button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-top: 1px solid #d9cfbc">
+<span style="flex: 1">
+<span style="display: block; font-size: 16px; line-height: 24px; color: #1f1b16">Streak freeze</span>
+<span style="display: block; font-size: 12px; line-height: 16px; color: #5e5548">Miss one day a week and keep your streak.</span>
+</span>
+<button role="switch" aria-checked="{{ freeze }}" aria-label="Streak freeze" onClick="{{ toggleFreeze }}" style="{{ freezeTrack }}"><span style="{{ freezeKnob }}"></span></button>
+</div>
+</div>
+<div style="margin: 24px 8px 8px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">HELP</div>
+<div style="background: #f4eee2; border: 1px solid #d9cfbc; border-radius: 8px; overflow: hidden">
+<button class="row" onClick="{{ goWidget }}" style="box-sizing: border-box; width: 100%; min-height: 52px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border: 0; background: transparent; font-family: inherit; text-align: left; cursor: pointer">
+<span style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">Add a widget</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+<button class="row" onClick="{{ goReplay }}" style="box-sizing: border-box; width: 100%; min-height: 52px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border: 0; border-top: 1px solid #d9cfbc; background: transparent; font-family: inherit; text-align: left; cursor: pointer">
+<span style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">Replay introduction</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+</div>
+<div style="margin: 24px 8px 8px; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #74695a">ABOUT</div>
+<div style="background: #f4eee2; border: 1px solid #d9cfbc; border-radius: 8px; overflow: hidden">
+<button class="row" onClick="{{ goPrivacy }}" style="box-sizing: border-box; width: 100%; min-height: 52px; padding: 0 16px; display: flex; align-items: center; gap: 12px; border: 0; background: transparent; font-family: inherit; text-align: left; cursor: pointer">
+<span style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">Privacy</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">Data not collected</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; border-top: 1px solid #d9cfbc">
+<span style="flex: 1; font-size: 16px; line-height: 24px; color: #1f1b16">Version</span>
+<span style="font-size: 14px; line-height: 20px; color: #5e5548">1.0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"level":{"editor":null},"reminderOn":{"editor":null},"reminderTime":{"editor":null},"customActive":{"editor":null},"customCount":{"editor":null},"romaji":{"editor":null},"freeze":{"editor":null},"onFreeze":{"editor":null},"theme":{"editor":null},"reviewSummary":{"editor":null},"onNavigate":{"editor":null},"onClose":{"editor":null},"onRomaji":{"editor":null},"onTheme":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { closing: false, romaji: false, freeze: true, theme: 'System' };
+    this.timer = null;
+  }
+  componentWillUnmount() {
+    if (this.timer) clearTimeout(this.timer);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const pr = this.props || {};
+    const has = (v) => v !== undefined && v !== null;
+    const level = pr.level || 'N5';
+    const levelNames = { N5: 'Beginner', N4: 'Elementary', N3: 'Intermediate', N2: 'Upper intermediate', N1: 'Advanced', G1: '1st grade', G2: '2nd grade', G3: '3rd grade', G4: '4th grade', G5: '5th grade', G6: '6th grade', GS: 'Secondary school' };
+    const levelText = level.charAt(0) === 'G' ? levelNames[level] + ' · Jōyō' : level + ' · ' + (levelNames[level] || '');
+    const reminderOn = has(pr.reminderOn) ? !!pr.reminderOn : true;
+    const reminderTime = pr.reminderTime || '8:00 am';
+    const romaji = has(pr.romaji) ? !!pr.romaji : !!st.romaji;
+    const freeze = has(pr.freeze) ? !!pr.freeze : !!st.freeze;
+    const theme = pr.theme || st.theme || 'System';
+    const nav = (r) => () => { if (this.props.onNavigate) this.props.onNavigate(r); };
+    const track = (on) => 'position: relative; flex: none; width: 51px; height: 31px; padding: 0; border-radius: 999px; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; ' +
+      (on ? 'background: #1f1b16; border: 1px solid #1f1b16;' : 'background: #eae2d1; border: 1px solid #8c8068;');
+    const knob = (on) => 'position: absolute; top: 2px; left: 2px; width: 25px; height: 25px; border-radius: 50%; transition: transform 0.2s ease, background-color 0.2s ease; transform: translateX(' + (on ? 20 : 0) + 'px); ' +
+      (on ? 'background: #f4eee2;' : 'background: #fbf7ee; box-shadow: 0 0 0 1px #8c8068;');
+
+    const palLight = { bg: '#f4eee2', fg: '#1f1b16', bar: '#cdbfa6', tab: '#fbf7ee', act: '#b8321d', line: '#d9cfbc' };
+    const palDark = { bg: '#15130f', fg: '#efe8d8', bar: '#4a443a', tab: '#1f1c16', act: '#e8603f', line: '#35302a' };
+    const layerOf = (p, clip) => ({
+      layer: 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: ' + p.bg + ';' + (clip ? ' clip-path: polygon(100% 0, 100% 100%, 0 100%);' : ''),
+      topBar: 'position: absolute; top: 12px; left: 12px; width: 36px; height: 5px; border-radius: 999px; background: ' + p.bar + ';',
+      kanji: "position: absolute; top: 28px; left: 0; right: 0; text-align: center; font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 44px; line-height: 1; font-weight: 500; color: " + p.fg + ';',
+      bar1: 'position: absolute; top: 88px; left: 35px; width: 44px; height: 4px; border-radius: 999px; background: ' + p.bar + ';',
+      bar2: 'position: absolute; top: 98px; left: 42px; width: 30px; height: 4px; border-radius: 999px; background: ' + p.bar + ';',
+      tab: 'position: absolute; left: 0; right: 0; bottom: 0; height: 28px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-around; padding: 0 10px; background: ' + p.tab + '; border-top: 1px solid ' + p.line + ';',
+      dotActive: 'width: 7px; height: 7px; border-radius: 50%; background: ' + p.act + ';',
+      dot: 'width: 7px; height: 7px; border-radius: 50%; background: ' + p.bar + ';'
+    });
+    const layerSets = { System: [layerOf(palLight, false), layerOf(palDark, true)], Light: [layerOf(palLight, false)], Dark: [layerOf(palDark, false)] };
+    const themes = ['System', 'Light', 'Dark'].map((t) => {
+      const selected = t === theme;
+      return {
+        label: t,
+        selected: selected,
+        layers: layerSets[t],
+        pick: () => { this.setState({ theme: t }); if (this.props.onTheme) this.props.onTheme(t); },
+        cardStyle: 'display: block; position: relative; overflow: hidden; box-sizing: border-box; height: 150px; border-radius: 14px; transition: border-color 0.18s ease; ' +
+          (selected ? 'border: 2px solid #1f1b16;' : 'border: 1px solid #8c8068;'),
+        labelStyle: 'text-align: center; font-size: 14px; line-height: 20px; transition: color 0.18s ease; ' +
+          (selected ? 'font-weight: 500; color: #1f1b16;' : 'font-weight: 400; color: #5e5548;')
+      };
+    });
+    const themeNote = theme === 'System' ? 'Matches your phone. Light by day, dark at night.' : (theme === 'Light' ? 'Always light, like washi paper.' : 'Always dark, like sumi ink at night.');
+    const closing = !!st.closing;
+    return {
+      themes: themes,
+      themeNote: themeNote,
+      romaji: romaji,
+      romajiTrack: track(romaji),
+      romajiKnob: knob(romaji),
+      toggleRomaji: () => { this.setState({ romaji: !romaji }); if (this.props.onRomaji) this.props.onRomaji(!romaji); },
+      freeze: freeze,
+      freezeTrack: track(freeze),
+      freezeKnob: knob(freeze),
+      toggleFreeze: () => { this.setState({ freeze: !freeze }); if (this.props.onFreeze) this.props.onFreeze(!freeze); },
+      scrimClass: 'scrimbtn ' + (closing ? 'scrim-out' : 'scrim-in'),
+      sheetClass: closing ? 'sheet-out' : 'sheet-in',
+      closeSettings: () => {
+        if (this.state.closing) return;
+        this.setState({ closing: true });
+        this.timer = setTimeout(() => { if (this.props.onClose) this.props.onClose(); }, 220);
+      },
+      levelValue: pr.customActive ? 'Custom · ' + (pr.customCount || 0) + ' kanji' : levelText,
+      reminderValue: reminderOn ? 'On · ' + reminderTime : 'Off',
+      reviewValue: pr.reviewSummary || '10 cards',
+      goLevel: nav('level'),
+      goReminder: nav('reminder'),
+      goReview: nav('reviewSettings'),
+      goWidget: nav('widget'),
+      goPrivacy: nav('privacy'),
+      goReplay: nav('replay')
+    };
+  }
+}
+</script>
+</body>
+</html>
