@@ -21,10 +21,12 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Write Phase 3 file skeletons, in-code TODO map, and PROGRESS.md](closed/006-write-phase-3-skeletons-and-todos.md): Added design system tokens and components, view skeletons for Onboarding, Today, Settings, and tab shell, populated specific in-code TODO comments across views and widgets, and initialized `docs/PROGRESS.md` with 11 vertical slices.
 - [Phase 4 verification and testing suite definition](closed/007-phase-4-verification-and-testing-suite.md): Standardized on Swift Testing (`import Testing`) with in-memory SwiftData containers, four test doubles, and six feature test suites.
 - [Write Phase 4 testing suite specification and test doubles](closed/008-write-phase-4-testing-suite.md): Documented Phase 4 verification architecture and invariants in `docs/IMPLEMENTATION.md` and created test doubles and test suite stubs under `NichijiTests/`.
+- [Slice 1 Requirements Report: Design Tokens & Typography](closed/009-slice-1-design-tokens-and-typography-requirements.md): Defined success criteria, scope boundary, and test plan for semantic color, typography with fallback, and layout tokens.
+- [Implement Slice 1: Design Tokens & Typography](closed/010-slice-1-implement-design-tokens-and-typography.md): Implemented dynamic Washi/Sumi palette, font styling with system fallback, Apple HIG layout modifiers, and `DesignTokensTests`.
 
 ## Not yet specified
 
-_None. Phases 0 through 4 complete. Vertical slice implementation begins in Phase 5._
+_None. Phase 5 vertical slice loop is in progress._
 
 ## Out of scope
 
@@ -32,4 +34,4 @@ _None. Phases 0 through 4 complete. Vertical slice implementation begins in Phas
 
 ## Frontier
 
-- [Slice 1 Requirements Report: Design Tokens & Typography](tickets/009-slice-1-design-tokens-and-typography-requirements.md) (grilling)
+- [Slice 2 Requirements Report: Content Dataset & Bundled JSON Store](tickets/011-slice-2-content-dataset-and-bundled-json-store-requirements.md) (grilling)

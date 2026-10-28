@@ -30,3 +30,22 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - Standardized on Apple Swift Testing framework (`import Testing`) with in-memory SwiftData containers (`isStoredInMemoryOnly: true`) for deterministic local execution under Swift 6 strict concurrency.
 - Created test doubles under `NichijiTests/TestDoubles/` (`TestDayProvider`, `TestKanjiContentStore`, `TestPronunciationService`, `TestReminderScheduler`).
 - Documented testing suite architecture and invariants across 6 feature areas in `docs/IMPLEMENTATION.md` and established test suite stubs under `NichijiTests/Suites/`.
+
+## Phase 5: Slices
+
+### Slice 1: Design Tokens & Typography
+
+#### Requirements Report
+- **Success Criteria**:
+  1. Full semantic color token palette matching `tokens.json` in Washi and Sumi modes with accessible contrast.
+  2. Dynamic Type typography scale using Shippori Mincho and Zen Kaku Gothic New with system `.serif` and `.default` fallbacks, adhering to weight <= 500.
+  3. Layout tokens establishing 8pt grid metrics, continuous corner radii, and a reusable `.minTouchTarget()` modifier enforcing Apple HIG 44x44 pt minimums.
+  4. Swift Testing suite `DesignTokensTests` in `NichijiTests/Suites/` verifying tokens and invariants.
+- **Scope Boundary**: Tokens, layout metrics, and unit tests in scope; custom view components (`HeaderBar`, `PrimaryButton`, `KanjiCard`, `SealStamp`) deferred to Slice 6.
+- **Anticipated TODOs**: Resolves Slice 1 font fallback and layout modifier TODOs.
+- **Planned Tests**: Verified in `DesignTokensTests`.
+
+#### Deviation Report
+- **Deviations**: None. Implemented self-contained dynamic UIKit color resolution for light/dark traits to support offline preview and test execution without asset catalogs.
+- **Unanticipated TODOs**: None.
+- **Test Results**: All 4 tests in `DesignTokensTests` passing (layout targets, typography instantiation, hex color parsing, dynamic trait resolution).

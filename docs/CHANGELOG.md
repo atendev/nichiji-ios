@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.7
+
+- Close Slice 1 requirements and implementation tickets (009 and 010)
+- Implement Washi and Sumi dynamic semantic colors, typography tokens with fallback, and Apple HIG layout metrics
+- Add `.minTouchTarget()` and `.continuousCornerRadius(_:)` modifiers
+- Add `DesignTokensTests` suite verifying layout targets, font instantiation, hex color parsing, and dynamic traits
+- Update `docs/PROGRESS.md` marking Slice 1 done and log reports in `docs/IMPLOG.md`
+
 ## v0.0.6
 
 - Close Phase 4 testing suite planning and specification tickets (007 and 008)
