@@ -4,40 +4,39 @@ import Foundation
 /*----------------------------test-content--------------------------------*/
 
 final class TestKanjiContentStore: KanjiContentStore, @unchecked Sendable {
-    var entries: [String: KanjiEntry] = [:]
-    var strokeSVGs: [String: String] = [:]
+    var entriesDict: [String: KanjiEntry] = [:]
+    var strokePathDict: [String: [String]] = [:]
 
     init(entries: [KanjiEntry] = []) {
         for entry in entries {
-            self.entries[entry.id] = entry
+            self.entriesDict[entry.id] = entry
+            self.strokePathDict[entry.id] = entry.strokePaths
         }
     }
 
-    func loadIndex() async throws -> [KanjiIndexEntry] {
-        entries.values.map { entry in
-            KanjiIndexEntry(
-                id: entry.id,
-                primaryMeaning: entry.meanings.first ?? "",
-                primaryReading: entry.onyomi.first?.kana ?? entry.kunyomi.first?.kana ?? "",
-                strokeCount: entry.strokeCount,
-                jlptLevel: entry.jlptLevel,
-                joyoGrade: entry.joyoGrade,
-                canonicalIndex: entry.canonicalIndex
-            )
-        }
-    }
-
-    func loadEntry(id: String) async throws -> KanjiEntry {
-        guard let entry = entries[id] else {
-            throw NichijiError.contentMissing(kanjiID: id)
+    func entry(for kanjiID: String) throws -> KanjiEntry {
+        guard let entry = entriesDict[kanjiID] else {
+            throw NichijiError.contentMissing(kanjiID: kanjiID)
         }
         return entry
     }
 
-    func strokeSVG(id: String) async throws -> String {
-        guard let svg = strokeSVGs[id] else {
-            throw NichijiError.contentMissing(kanjiID: id)
+    func entries(for jlptLevel: JLPTLevel) throws -> [KanjiEntry] {
+        entriesDict.values
+            .filter { $0.jlptLevel == jlptLevel }
+            .sorted { $0.canonicalIndex < $1.canonicalIndex }
+    }
+
+    func entries(for joyoGrade: JoyoGrade) throws -> [KanjiEntry] {
+        entriesDict.values
+            .filter { $0.joyoGrade == joyoGrade }
+            .sorted { $0.canonicalIndex < $1.canonicalIndex }
+    }
+
+    func strokePaths(for kanjiID: String) throws -> [String] {
+        guard let paths = strokePathDict[kanjiID] else {
+            throw NichijiError.contentMissing(kanjiID: kanjiID)
         }
-        return svg
+        return paths
     }
 }

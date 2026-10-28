@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.8
+
+- Close Slice 2 requirements and implementation tickets (011 and 012)
+- Implement `BundledKanjiContentStore` with thread-safe caching and offline `SeedKanjiDataset`
+- Add `KanjiIndexEntry` summary model to `KanjiContent.swift`
+- Align `TestKanjiContentStore` double with `KanjiContentStore` protocol contracts
+- Add test coverage in `KanjiContentStoreTests` validating lookups, filtering, stroke paths, and typed errors
+- Update `docs/PROGRESS.md` marking Slice 2 done and log reports in `docs/IMPLOG.md`
+
 ## v0.0.7
 
 - Close Slice 1 requirements and implementation tickets (009 and 010)

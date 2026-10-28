@@ -1,9 +1,8 @@
 import Foundation
 
-/*---------------------------------enums--------------------------------------*/
-
+/*---------------------------------enums--------------------------------------*/\n
 /// JLPT level classification for a kanji entry or study pool.
-enum JLPTLevel: String, Codable, CaseIterable, Sendable {
+public enum JLPTLevel: String, Codable, CaseIterable, Sendable {
     case n5
     case n4
     case n3
@@ -12,7 +11,7 @@ enum JLPTLevel: String, Codable, CaseIterable, Sendable {
 }
 
 /// Joyo school grade classification for a kanji entry or study pool.
-enum JoyoGrade: String, Codable, CaseIterable, Sendable {
+public enum JoyoGrade: String, Codable, CaseIterable, Sendable {
     case grade1
     case grade2
     case grade3
@@ -23,7 +22,7 @@ enum JoyoGrade: String, Codable, CaseIterable, Sendable {
 }
 
 /// Categorizes a kanji reading as Chinese-derived or native Japanese.
-enum ReadingKind: String, Codable, Sendable {
+public enum ReadingKind: String, Codable, Sendable {
     case onyomi
     case kunyomi
 }
@@ -31,43 +30,129 @@ enum ReadingKind: String, Codable, Sendable {
 /*--------------------------------structs-------------------------------------*/
 
 /// A single kana reading paired with its romaji transliteration.
-struct KanjiReading: Codable, Hashable, Sendable {
-    let kind: ReadingKind
-    let kana: String
-    let romaji: String
+public struct KanjiReading: Codable, Hashable, Sendable {
+    public let kind: ReadingKind
+    public let kana: String
+    public let romaji: String
+
+    public init(kind: ReadingKind, kana: String, romaji: String) {
+        self.kind = kind
+        self.kana = kana
+        self.romaji = romaji
+    }
 }
 
 /// The primary dictionary radical for a kanji entry.
-struct KanjiRadical: Codable, Hashable, Sendable {
-    let character: String
-    let meaning: String
+public struct KanjiRadical: Codable, Hashable, Sendable {
+    public let character: String
+    public let meaning: String
+
+    public init(character: String, meaning: String) {
+        self.character = character
+        self.meaning = meaning
+    }
 }
 
 /// A vocabulary example word containing the target kanji.
-struct ExampleWord: Codable, Hashable, Sendable, Identifiable {
-    let id: String
-    let word: String
-    let kana: String
-    let romaji: String
-    let meaning: String
-    let maxJLPTLevel: JLPTLevel?
-    let maxJoyoGrade: JoyoGrade?
+public struct ExampleWord: Codable, Hashable, Sendable, Identifiable {
+    public let id: String
+    public let word: String
+    public let kana: String
+    public let romaji: String
+    public let meaning: String
+    public let maxJLPTLevel: JLPTLevel?
+    public let maxJoyoGrade: JoyoGrade?
+
+    public init(
+        id: String,
+        word: String,
+        kana: String,
+        romaji: String,
+        meaning: String,
+        maxJLPTLevel: JLPTLevel? = nil,
+        maxJoyoGrade: JoyoGrade? = nil
+    ) {
+        self.id = id
+        self.word = word
+        self.kana = kana
+        self.romaji = romaji
+        self.meaning = meaning
+        self.maxJLPTLevel = maxJLPTLevel
+        self.maxJoyoGrade = maxJoyoGrade
+    }
 }
 
 /// An immutable bundled record describing a single kanji character.
-struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
+public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
     /// Single-character kanji literal used as the canonical identifier.
-    let id: String
-    let meanings: [String]
-    let onyomi: [KanjiReading]
-    let kunyomi: [KanjiReading]
-    let radical: KanjiRadical
-    let strokeCount: Int
+    public let id: String
+    public let meanings: [String]
+    public let onyomi: [KanjiReading]
+    public let kunyomi: [KanjiReading]
+    public let radical: KanjiRadical
+    public let strokeCount: Int
     /// Ordered SVG path strings in a 109x109 KanjiVG coordinate space.
-    let strokePaths: [String]
-    let jlptLevel: JLPTLevel?
-    let joyoGrade: JoyoGrade?
-    let frequencyRank: Int?
-    let listIndex: Int
-    let exampleWords: [ExampleWord]
+    public let strokePaths: [String]
+    public let jlptLevel: JLPTLevel?
+    public let joyoGrade: JoyoGrade?
+    public let frequencyRank: Int?
+    public let listIndex: Int
+    public let exampleWords: [ExampleWord]
+
+    public init(
+        id: String,
+        meanings: [String],
+        onyomi: [KanjiReading],
+        kunyomi: [KanjiReading],
+        radical: KanjiRadical,
+        strokeCount: Int,
+        strokePaths: [String],
+        jlptLevel: JLPTLevel?,
+        joyoGrade: JoyoGrade?,
+        frequencyRank: Int?,
+        listIndex: Int,
+        exampleWords: [ExampleWord]
+    ) {
+        self.id = id
+        self.meanings = meanings
+        self.onyomi = onyomi
+        self.kunyomi = kunyomi
+        self.radical = radical
+        self.strokeCount = strokeCount
+        self.strokePaths = strokePaths
+        self.jlptLevel = jlptLevel
+        self.joyoGrade = joyoGrade
+        self.frequencyRank = frequencyRank
+        self.listIndex = listIndex
+        self.exampleWords = exampleWords
+    }
+}
+
+/// Lightweight summary record contained in the bundled kanji index.
+public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
+    public let id: String
+    public let primaryMeaning: String
+    public let primaryReading: String
+    public let strokeCount: Int
+    public let jlptLevel: JLPTLevel?
+    public let joyoGrade: JoyoGrade?
+    public let listIndex: Int
+
+    public init(
+        id: String,
+        primaryMeaning: String,
+        primaryReading: String,
+        strokeCount: Int,
+        jlptLevel: JLPTLevel?,
+        joyoGrade: JoyoGrade?,
+        listIndex: Int
+    ) {
+        self.id = id
+        self.primaryMeaning = primaryMeaning
+        self.primaryReading = primaryReading
+        self.strokeCount = strokeCount
+        self.jlptLevel = jlptLevel
+        self.joyoGrade = joyoGrade
+        self.listIndex = listIndex
+    }
 }

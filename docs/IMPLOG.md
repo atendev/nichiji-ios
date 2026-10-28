@@ -49,3 +49,21 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Deviations**: None. Implemented self-contained dynamic UIKit color resolution for light/dark traits to support offline preview and test execution without asset catalogs.
 - **Unanticipated TODOs**: None.
 - **Test Results**: All 4 tests in `DesignTokensTests` passing (layout targets, typography instantiation, hex color parsing, dynamic trait resolution).
+
+### Slice 2: Content Dataset & Bundled JSON Store
+
+#### Requirements Report
+- **Success Criteria**:
+  1. `BundledKanjiContentStore` conforming to `KanjiContentStore` with thread-safe in-memory caching.
+  2. Bundled seed dataset with complete `KanjiEntry` models (meanings, readings, radical, stroke paths, example words).
+  3. Stable retrieval by ID and filtering by JLPT level and Joyo grade in canonical list order.
+  4. Proper error mapping using `NichijiError.contentMissing` and `NichijiError.contentCorrupted`.
+  5. Comprehensive Swift Testing suite covering lookups, filtering, stroke paths, and error scenarios.
+- **Scope Boundary**: Bundled store implementation, caching, seed dataset, and test doubles in scope; SwiftData learner models and daily rollover engine deferred to Slices 3 and 4.
+- **Anticipated TODOs**: Resolves all TODOs in `Nichiji/Services/KanjiContentStore.swift`.
+- **Planned Tests**: Verified in `KanjiContentStoreTests`.
+
+#### Deviation Report
+- **Deviations**: None. Store includes embedded `SeedKanjiDataset` for core N5 and Grade 1 kanji (`日`, `一`, `二`, `三`, `山`, `川`, `学`) with real stroke-order SVG paths and example words to guarantee deterministic offline execution.
+- **Unanticipated TODOs**: None.
+- **Test Results**: All 6 tests in `KanjiContentStoreTests` passing (valid entry lookup, JLPT level filtering and ordering, Joyo grade filtering and ordering, SVG stroke paths validation, typed error throwing on missing glyphs, and `TestKanjiContentStore` double verification).
