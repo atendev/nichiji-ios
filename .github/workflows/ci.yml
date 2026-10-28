@@ -24,10 +24,6 @@ jobs:
         run: make lint
       - name: Test
         run: make test
-      - name: Debug widget Info.plist on failure
-        if: failure()
-        run: |
-          find /Users/runner/Library/Developer/Xcode/DerivedData -path '*/NichijiWidget.appex/Info.plist' -print -exec cat {} \;
 
   unsigned-ipa:
     if: github.event_name == 'push'
