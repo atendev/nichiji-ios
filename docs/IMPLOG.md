@@ -85,3 +85,22 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Deviations**: Added `reassignToday(day:from:)` overload so caller can supply explicit calendar day in addition to the default zero-argument day overload.
 - **Unanticipated TODOs**: None.
 - **Test Results**: All 7 tests in `LearnerStoreTests` passing (clean container setup, assignment creation and fetch, marking learned with stage advancement and logging, marking past assigned as missed while keeping stage `.new`, `forgetIt` reset, custom selection persistence, and `reassignToday` preservation of learned assignments).
+
+### Slice 4: DayProvider & Daily Kanji Rollover
+
+#### Requirements Report
+- **Success Criteria**:
+  1. `SystemDayProvider` implementing `DayProvider` with zero-padded `yyyy-MM-dd` date formatting and next midnight calculation.
+  2. `DefaultDailyKanjiService` implementing lazy idempotent rollover, converting past `.assigned` rows to `.missed` while keeping stage `.new`.
+  3. Deterministic daily kanji selection by frequency rank, list index, or day-hash pseudo-random order.
+  4. Quiet level-complete state returning `nil` when the active pool is exhausted.
+  5. Generating self-contained `DailyKanjiWidgetSnapshot` for WidgetKit timeline and UI consumption.
+  6. Comprehensive Swift Testing suite in `DailyKanjiServiceTests.swift`.
+- **Scope Boundary**: Clock boundary, rollover engine, selection logic, and widget snapshot in scope; UI presentations deferred to Slice 7, WidgetKit timeline extension to Slice 11.
+- **Anticipated TODOs**: Resolves all TODOs in `Nichiji/Services/DayProvider.swift` and `Nichiji/Services/DailyKanjiService.swift`.
+- **Planned Tests**: Verified in `DailyKanjiServiceTests`.
+
+#### Deviation Report
+- **Deviations**: Implemented deterministic hashing algorithm for `DailyOrder.random` so widgets and app target compute identical pseudo-random selection for any given calendar date without non-deterministic system random state.
+- **Unanticipated TODOs**: None.
+- **Test Results**: All 6 tests in `DailyKanjiServiceTests` passing (date formatting, lazy rollover marking past assigned rows as missed while keeping stage `.new`, same-day idempotency, deterministic selection across ordering strategies, quiet level complete state when study pool is exhausted, and widget snapshot compilation reflecting learned state).

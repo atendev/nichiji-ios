@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.10
+
+- Close Slice 4 requirements and implementation tickets (015 and 016)
+- Implement `SystemDayProvider` with date formatting and next-midnight computation
+- Implement `DefaultDailyKanjiService` with lazy rollover, pool filtering, and deterministic daily selection
+- Make `LearnerPreferencesSnapshot` and `DailyKanjiWidgetSnapshot` public across modules
+- Add unit test coverage in `DailyKanjiServiceTests` verifying rollover, idempotency, deterministic ordering, and widget snapshots
+- Update `docs/PROGRESS.md` marking Slice 4 done and log reports in `docs/IMPLOG.md`
+
 ## v0.0.9
 
 - Close Slice 3 requirements and implementation tickets (013 and 014)
