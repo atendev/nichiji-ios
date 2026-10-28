@@ -6,6 +6,7 @@ public struct KanjiHeroView: View {
     public let kanji: String
     public let primaryMeaning: String
     public let onPlayAudio: () -> Void
+    @Environment(\.sizeCategory) private var sizeCategory
 
     public init(kanji: String, primaryMeaning: String, onPlayAudio: @escaping () -> Void) {
         self.kanji = kanji
@@ -16,7 +17,7 @@ public struct KanjiHeroView: View {
     public var body: some View {
         VStack(spacing: LayoutTokens.space16) {
             Text(kanji)
-                .font(.kanjiHero)
+                .font(sizeCategory.isAccessibilityCategory ? .kanjiHeroCompact : .kanjiHero)
                 .foregroundColor(.nichijiInk)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -31,13 +32,12 @@ public struct KanjiHeroView: View {
                         .foregroundColor(.nichijiInkMuted)
                         .frame(width: LayoutTokens.minHitTarget, height: LayoutTokens.minHitTarget)
                 }
+                .minTouchTarget()
+                .accessibilityLabel("Play pronunciation")
+                .accessibilityHint("Speaks the kana reading")
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, LayoutTokens.space24)
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Bind PronunciationService speech synthesis and audio button state in Slice 5 and Slice 7.

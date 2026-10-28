@@ -4,9 +4,17 @@ import SwiftUI
 
 public struct ExampleWordsCardView: View {
     public let words: [ExampleWord]
+    public let showsRomaji: Bool
+    public let onPlayAudio: (ExampleWord) -> Void
 
-    public init(words: [ExampleWord] = []) {
+    public init(
+        words: [ExampleWord] = [],
+        showsRomaji: Bool = true,
+        onPlayAudio: @escaping (ExampleWord) -> Void = { _ in }
+    ) {
         self.words = words
+        self.showsRomaji = showsRomaji
+        self.onPlayAudio = onPlayAudio
     }
 
     public var body: some View {
@@ -23,7 +31,7 @@ public struct ExampleWordsCardView: View {
                 } else {
                     ForEach(Array(words.enumerated()), id: \.offset) { index, word in
                         VStack(alignment: .leading, spacing: LayoutTokens.space4) {
-                            HStack {
+                            HStack(alignment: .top) {
                                 Text(word.word)
                                     .font(.nichijiBody.bold())
                                     .foregroundColor(.nichijiInk)
@@ -33,8 +41,25 @@ public struct ExampleWordsCardView: View {
                                     .foregroundColor(.nichijiInkMuted)
 
                                 Spacer()
+
+                                Button {
+                                    onPlayAudio(word)
+                                } label: {
+                                    Image(systemName: "speaker.wave.2")
+                                        .foregroundColor(.nichijiInkMuted)
+                                        .frame(width: LayoutTokens.minHitTarget, height: LayoutTokens.minHitTarget)
+                                }
+                                .minTouchTarget()
+                                .disabled(word.kana.isEmpty)
+                                .accessibilityLabel("Play \(word.word)")
+                                .accessibilityHint("Speaks the kana reading")
                             }
 
+                            if showsRomaji, !word.romaji.isEmpty {
+                                Text(word.romaji)
+                                    .font(.nichijiCaption)
+                                    .foregroundColor(.nichijiInkMuted)
+                            }
                             Text(word.meaning)
                                 .font(.nichijiCallout)
                                 .foregroundColor(.nichijiInkSubtle)
@@ -51,7 +76,3 @@ public struct ExampleWordsCardView: View {
         .padding(.horizontal, LayoutTokens.space16)
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Format kana, romaji transliteration, and audio pronunciation actions for example words in Slice 7.

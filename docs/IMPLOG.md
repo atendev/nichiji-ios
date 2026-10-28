@@ -136,3 +136,27 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Deviations**: None. The missing hanko asset was handled with a native circular SwiftUI checkmark seal treatment.
 - **Unanticipated TODOs**: None.
 - **Test Results**: Static validation passed with `git diff --check`. Xcode build/test tools are unavailable in this environment, so the Apple test suite could not be executed.
+
+### Slice 7: Today Tab & Detail Flow
+
+#### Requirements Report
+- **Success Criteria**: Bind Today to the shared App Group SwiftData container,
+  production services, bundled kanji content, pronunciation, learner mutations,
+  level completion, retry handling, romaji preferences, and stroke-order paths
+  while preserving Apple HIG sizing and Dynamic Type behavior.
+- **Scope Boundary**: Today and its detail cards only; reminders, WidgetKit
+  rebuilds, onboarding handoff, settings UI, and handwriting practice remain
+  deferred.
+- **Anticipated TODOs**: Keep practice disabled, use a test learner double,
+  and leave reminder/widget refresh work for later slices.
+- **Planned Tests**: Today assignment resolution, learned transition, exhausted
+  pool, retry path, romaji data, stroke paths, and accessibility configuration.
+
+#### Deviation Report
+- **Deviations**: The app uses a no-op reminder scheduler until the reminder
+  slice supplies notification scheduling. Stroke SVG paths are rendered by a
+  local KanjiVG path parser.
+- **Unanticipated TODOs**: Foreground refresh re-runs Today assignment
+  resolution; reminder and WidgetKit rebuilds remain deferred.
+- **Test Results**: `git diff --check` passes. Xcode build and test tools are
+  unavailable in this environment, so Apple validation remains pending.

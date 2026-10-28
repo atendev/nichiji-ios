@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.0
+- Implement Today tab assignment loading, kanji details, pronunciation actions, stroke-order rendering, learned state, level completion, and retry handling.
+
 ## v0.1.0
 - Add reusable core design-system components with Apple HIG sizing, accessibility, and motion-aware button feedback.
 

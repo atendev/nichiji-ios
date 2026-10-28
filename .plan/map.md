@@ -32,6 +32,7 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Slice 5 Requirements Report: Japanese Pronunciation Audio](closed/017-slice-5-japanese-pronunciation-audio-requirements.md): Defined success criteria, scope boundary, and test plan for `@MainActor` speech synthesis, voice detection, and utterance handling.
 - [Implement Slice 5: Japanese Pronunciation Audio](closed/018-slice-5-implement-japanese-pronunciation-audio.md): Implemented `AVSpeechPronunciationService` with `AVSpeechSynthesizerDelegate` and `PronunciationServiceTests`.
 - [Slice 6 Core Design System Components](closed/019-slice-6-core-design-system-components-requirements.md): Implemented reusable header, primary button, kanji card, and learned-state seal components with HIG sizing, accessibility, and Reduce Motion support.
+- [Slice 7 Requirements Report: Today Tab & Detail Flow](closed/020-slice-7-today-tab-and-detail-flow-requirements.md): Defined success criteria, scope boundary, test plan, and deferred ServiceContainer/ModelContainer wiring for binding Today to real services, learner state, bundled content, audio, and stroke-order data.
 
 ## Not yet specified
 
@@ -43,4 +44,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- [Slice 7 Requirements Report: Today Tab & Detail Flow](tickets/020-slice-7-today-tab-and-detail-flow-requirements.md) (grilling)
+- Implement Slice 7: Today Tab & Detail Flow
