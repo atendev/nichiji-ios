@@ -2,7 +2,7 @@
 
 Living document. Updated in Phase 0 and whenever the design changes.
 
-Status: **Phase 0 draft, awaiting approval**
+Status: **Phase 0 approved**
 
 ---
 
@@ -49,33 +49,44 @@ The app may later use an API only if a required dataset cannot be bundled
 legally and completely. Runtime network access is not part of the initial
 design.
 
-SwiftData stores learner-owned records such as learned kanji, review history
-and settings that need structured queries. AppStorage or UserDefaults stores
-small presentation preferences such as the selected appearance and romaji
-visibility. The exact model split belongs in Phase 1.
+A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
+`UserDefaults` so the main app and WidgetKit extension operate on the same
+local store. SwiftData stores learner-owned records (`KanjiProgress`,
+`DailyAssignment`, `CustomKanjiSelection` and `StudyLogEntry`). `AppStorage`
+and `UserDefaults` store scalar learner preferences (`hasCompletedOnboarding`,
+`appearanceMode`, `showsRomaji`, `streakFreezeEnabled`, `reminderEnabled`,
+`reminderHour`, `reminderMinute`, `levelSystem`, `selectedLevel` and
+`dailyOrder`).
 
-Reminder scheduling uses the system notification framework. Widgets use
-WidgetKit and read the local content and learner state available to them.
-Audio uses the system Japanese speech synthesizer. Handwriting recognition is
-deferred.
+Reminder scheduling uses the system notification framework. When today's kanji
+is ready on a normal day, the notification leads with the kanji (`"学 · Today's
+kanji is ready"`). If yesterday's assigned kanji was not marked "Got it", the
+kanji stays in the `new` unlearned study pool so the learner still gets to see
+it on Today later, and the reminder uses the missed-day copy (`"You missed
+yesterday's kanji. That's okay, check it now."`). Widgets use WidgetKit and
+read and mutate the shared App Group store directly. Audio uses the system
+Japanese speech synthesizer. Handwriting recognition is deferred.
 
 The data and navigation model leaves room for an iPhone Duo or iPad two-pane
 layout. The first pass implements the standard single-column phone layout.
 
 ## Data models
 
-At a high level, the app needs:
+The app separates immutable bundled content from mutable learner state:
 
-- A verified kanji content record with the character, readings, meanings,
-  example words, stroke count and stroke data, JLPT level and Jōyō grade.
-- A learner configuration with the selected level system, selected level,
-  daily order, custom selections, reminder settings, appearance and romaji
-  preference.
-- A daily assignment and learner status for whether the kanji is learned.
-- Review history and activity records for later Review and You features.
-
-Phase 1 will define concrete Swift types and identify which records are
-immutable bundled content versus mutable learner data.
+- `KanjiEntry`: an immutable, `Codable`, `Sendable` record decoded from the app
+  bundle and keyed by the single-character kanji literal (`id: String`), with
+  readings, meanings, example words, radical, stroke count, SVG stroke paths,
+  JLPT level, Joyo grade, frequency rank and canonical list index.
+- `LearnerPreferences`: scalar preferences persisted in shared App Group
+  `UserDefaults` for level system, selected level, daily order, reminder
+  schedule, streak freeze, appearance and romaji visibility.
+- `DailyAssignment`: the SwiftData record assigning one kanji per local
+  calendar day (`yyyy-MM-dd`) with status `assigned`, `learned` or `missed`.
+- `KanjiProgress`: the SwiftData record tracking a kanji's study stage (`new`,
+  `learning`, `familiar`, `known`), review timestamps and answer counts.
+- `CustomKanjiSelection` and `StudyLogEntry`: SwiftData records for custom
+  study-pool picks and day-by-day study activity.
 
 ## UI/UX
 
@@ -133,8 +144,6 @@ the architecture must leave room for it.
 
 - Which verified, redistributable sources will provide the final kanji,
   readings, meanings, example words and stroke data?
-- Which exact SwiftData schema best supports future review scheduling without
-  adding fields that the first slice does not need?
 - Which widget sizes and update schedule should the first WidgetKit slice
   support?
 - Which daily reminder behavior should apply when notification permission is
