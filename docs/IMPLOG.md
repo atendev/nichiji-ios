@@ -24,3 +24,9 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - Populated specific in-code TODO comments across views, design tokens, components, app lifecycle, and widget extension stubs.
 - Added `NichijiWidget` target skeleton to `project.yml` with shared App Group container setup.
 - Structured `docs/PROGRESS.md` with 11 ordered vertical slices mapping the roadmap to MVP release.
+
+## Phase 4: Verification/Testing
+
+- Standardized on Apple Swift Testing framework (`import Testing`) with in-memory SwiftData containers (`isStoredInMemoryOnly: true`) for deterministic local execution under Swift 6 strict concurrency.
+- Created test doubles under `NichijiTests/TestDoubles/` (`TestDayProvider`, `TestKanjiContentStore`, `TestPronunciationService`, `TestReminderScheduler`).
+- Documented testing suite architecture and invariants across 6 feature areas in `docs/IMPLEMENTATION.md` and established test suite stubs under `NichijiTests/Suites/`.

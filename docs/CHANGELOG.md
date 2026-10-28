@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.6
+
+- Close Phase 4 testing suite planning and specification tickets (007 and 008)
+- Document Phase 4 verification architecture and test invariants in `docs/IMPLEMENTATION.md`
+- Create test doubles (`TestDayProvider`, `TestKanjiContentStore`, `TestPronunciationService`, `TestReminderScheduler`) under `NichijiTests/TestDoubles/`
+- Add Swift Testing test suite stubs under `NichijiTests/Suites/` and update `docs/IMPLOG.md`
+- Advance Wayfinder map to Phase 5 Slice 1 (Design Tokens & Typography)
+
 ## v0.0.5
 
 - Close Phase 3 planning and implementation tickets (005 and 006)
