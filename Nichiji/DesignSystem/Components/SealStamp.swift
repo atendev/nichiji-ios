@@ -11,8 +11,13 @@ public struct SealStamp: View {
 
     public var body: some View {
         HStack(spacing: LayoutTokens.space4) {
-            Image(systemName: "checkmark")
-                .font(.nichijiCaption.bold())
+            ZStack {
+                Circle()
+                    .stroke(Color.nichijiMatcha, lineWidth: 1.5)
+                Image(systemName: "checkmark")
+                    .font(.nichijiCaption.weight(.semibold))
+            }
+            .frame(width: LayoutTokens.space16, height: LayoutTokens.space16)
             Text(text)
                 .font(.nichijiCallout)
         }
@@ -21,9 +26,8 @@ public struct SealStamp: View {
         .padding(.vertical, LayoutTokens.space8)
         .background(Color.nichijiMatchaWash)
         .clipShape(Capsule())
+        .frame(minHeight: LayoutTokens.minHitTarget)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(text)
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Render the authentic hanko seal SVG asset alongside the matcha status badge in Slice 6.

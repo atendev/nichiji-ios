@@ -18,11 +18,8 @@ public struct KanjiCard<Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusMedium, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusMedium, style: .continuous)
-                .stroke(Color.nichijiHairline, lineWidth: 1.0)
+                .stroke(Color.nichijiHairline, lineWidth: 0.5)
         )
+        .accessibilityElement(children: .contain)
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Refine card inner row divider styling and peek offset positioning in Slice 6.

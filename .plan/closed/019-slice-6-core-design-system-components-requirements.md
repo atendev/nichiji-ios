@@ -3,7 +3,7 @@ id: "019"
 title: "Slice 6 Requirements Report: Core Design System Components"
 type: grilling
 mode: HITL
-status: open
+status: closed
 blocked_by: ["018"]
 claimed: false
 ---
@@ -19,4 +19,7 @@ Reference files: `docs/workflow.md`, `docs/PROGRESS.md`, `docs/DESIGN.md`, `Nich
 
 ## Resolution
 
-<Filled in at close: the decision and the reason for it.>
+Approved and implemented. The shared components now provide HIG-sized
+interaction regions, semantic styling, accessibility, and Reduce Motion-aware
+button feedback. No repository hanko asset exists, so `SealStamp` uses a native
+SwiftUI circular checkmark treatment rather than adding an unverified asset.

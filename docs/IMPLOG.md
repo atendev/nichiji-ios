@@ -123,3 +123,16 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Deviations**: None.
 - **Unanticipated TODOs**: None.
 - **Test Results**: All 5 tests in `PronunciationServiceTests` passing (utterance playback recording, fallback to text when reading is absent, typed exception throwing when `ja-JP` voice is missing, immediate stopping and state reset, and live service initialization/inspection).
+
+### Slice 6: Core Design System Components
+
+#### Requirements Report
+- **Success Criteria**: Reusable `HeaderBar`, `PrimaryButton`, `KanjiCard`, and `SealStamp` components with Apple HIG hit targets, Dynamic Type-compatible typography, semantic colors, continuous corners, accessibility, Reduce Motion support, and focused tests.
+- **Scope Boundary**: Shared components and component tests only; Today detail behavior, learned-state persistence, and navigation wiring remain deferred.
+- **Anticipated TODOs**: Resolve the component TODOs in `Nichiji/DesignSystem/Components/`; use a native SwiftUI seal treatment because no hanko asset is present.
+- **Planned Tests**: Component configuration, minimum hit-target constants, and primary-button action behavior.
+
+#### Deviation Report
+- **Deviations**: None. The missing hanko asset was handled with a native circular SwiftUI checkmark seal treatment.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Static validation passed with `git diff --check`. Xcode build/test tools are unavailable in this environment, so the Apple test suite could not be executed.

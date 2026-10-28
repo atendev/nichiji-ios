@@ -31,6 +31,7 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Implement Slice 4: DayProvider & Daily Kanji Rollover](closed/016-slice-4-implement-dayprovider-and-daily-kanji-rollover.md): Implemented `SystemDayProvider`, `DefaultDailyKanjiService`, public snapshots, and `DailyKanjiServiceTests`.
 - [Slice 5 Requirements Report: Japanese Pronunciation Audio](closed/017-slice-5-japanese-pronunciation-audio-requirements.md): Defined success criteria, scope boundary, and test plan for `@MainActor` speech synthesis, voice detection, and utterance handling.
 - [Implement Slice 5: Japanese Pronunciation Audio](closed/018-slice-5-implement-japanese-pronunciation-audio.md): Implemented `AVSpeechPronunciationService` with `AVSpeechSynthesizerDelegate` and `PronunciationServiceTests`.
+- [Slice 6 Core Design System Components](closed/019-slice-6-core-design-system-components-requirements.md): Implemented reusable header, primary button, kanji card, and learned-state seal components with HIG sizing, accessibility, and Reduce Motion support.
 
 ## Not yet specified
 
@@ -42,4 +43,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- [Slice 6 Requirements Report: Core Design System Components](tickets/019-slice-6-core-design-system-components-requirements.md) (grilling)
+- [Slice 7 Requirements Report: Today Tab & Detail Flow](tickets/020-slice-7-today-tab-and-detail-flow-requirements.md) (grilling)

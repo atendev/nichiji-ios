@@ -36,9 +36,6 @@ public struct HeaderBar<TrailingContent: View>: View {
         }
         .padding(.horizontal, LayoutTokens.space16)
         .frame(minHeight: LayoutTokens.minHitTarget)
+        .accessibilityElement(children: .contain)
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Connect the standard header bar across Today, Dictionary, Review, and You views in Slice 6.
