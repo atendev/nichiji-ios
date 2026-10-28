@@ -24,6 +24,7 @@ struct DesignSystemComponentTests {
     }
 
     @Test("Primary button action remains callable")
+    @MainActor
     func primaryButtonAction() {
         var didRun = false
         let button = PrimaryButton(title: "Continue") {
