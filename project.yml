@@ -13,6 +13,11 @@ targets:
     type: application
     platform: iOS
     sources: [Nichiji]
+    entitlements:
+      path: Config/Nichiji.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.aten.nichiji
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji

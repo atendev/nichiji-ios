@@ -33,11 +33,7 @@ struct NichijiApp: App {
             CustomKanjiSelection.self,
             StudyLogEntry.self
         ])
-        let configuration = ModelConfiguration(
-            schema: schema,
-            groupContainer: .identifier(AppStorageGroup.suiteName),
-            cloudKitDatabase: .none
-        )
+        let configuration = Self.modelConfiguration(for: schema)
 
         do {
             let container = try ModelContainer(for: schema, configurations: configuration)
@@ -62,6 +58,18 @@ struct NichijiApp: App {
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")
         }
+    }
+
+    private static func modelConfiguration(for schema: Schema) -> ModelConfiguration {
+        // Hosted unit tests launch the app unsigned, so the App Group container is unavailable.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            return ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        }
+        return ModelConfiguration(
+            schema: schema,
+            groupContainer: .identifier(AppStorageGroup.suiteName),
+            cloudKitDatabase: .none
+        )
     }
 
     private nonisolated static func preferences(from defaults: UserDefaults) -> LearnerPreferencesSnapshot {
