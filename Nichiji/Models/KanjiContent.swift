@@ -1,6 +1,6 @@
 import Foundation
 
-/*---------------------------------enums--------------------------------------*/\n
+/*---------------------------------enums--------------------------------------*/
 /// JLPT level classification for a kanji entry or study pool.
 public enum JLPTLevel: String, Codable, CaseIterable, Sendable {
     case n5
