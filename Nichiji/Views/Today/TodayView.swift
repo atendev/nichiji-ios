@@ -68,8 +68,24 @@ public struct TodayView: View {
                         )
 
                         ExampleWordsCardView(words: [
-                            ExampleWord(written: "今日", kana: "きょう", romaji: "kyou", gloss: "today"),
-                            ExampleWord(written: "毎日", kana: "まいにち", romaji: "mainichi", gloss: "every day")
+                            ExampleWord(
+                                id: "today-1",
+                                word: "今日",
+                                kana: "きょう",
+                                romaji: "kyou",
+                                meaning: "today",
+                                maxJLPTLevel: .n5,
+                                maxJoyoGrade: .grade1
+                            ),
+                            ExampleWord(
+                                id: "today-2",
+                                word: "毎日",
+                                kana: "まいにち",
+                                romaji: "mainichi",
+                                meaning: "every day",
+                                maxJLPTLevel: .n5,
+                                maxJoyoGrade: .grade1
+                            )
                         ])
 
                         StrokeOrderCardView(strokeCount: 4)

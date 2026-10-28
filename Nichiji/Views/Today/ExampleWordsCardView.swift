@@ -24,7 +24,7 @@ public struct ExampleWordsCardView: View {
                     ForEach(Array(words.enumerated()), id: \.offset) { index, word in
                         VStack(alignment: .leading, spacing: LayoutTokens.space4) {
                             HStack {
-                                Text(word.written)
+                                Text(word.word)
                                     .font(.nichijiBody.bold())
                                     .foregroundColor(.nichijiInk)
 
@@ -35,7 +35,7 @@ public struct ExampleWordsCardView: View {
                                 Spacer()
                             }
 
-                            Text(word.gloss)
+                            Text(word.meaning)
                                 .font(.nichijiCallout)
                                 .foregroundColor(.nichijiInkSubtle)
                         }
