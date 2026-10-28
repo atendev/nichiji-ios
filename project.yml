@@ -30,6 +30,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji.widget
+        GENERATE_INFOPLIST_FILE: NO
   NichijiTests:
     type: bundle.unit-test
     platform: iOS
