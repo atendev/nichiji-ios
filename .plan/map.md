@@ -14,6 +14,7 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 
 - [Phase 0 initial scope and architecture boundaries](closed/000-phase-0-scope-and-boundaries.md): Target Onboarding plus Today first with bundled verified offline data, SwiftData plus AppStorage persistence, functional Washi/Sumi themes, local reminders, and initial WidgetKit support.
 - [Phase 1 data model and persistence split](closed/001-phase-1-data-model-and-persistence.md): Decode `KanjiEntry` value types from the bundle keyed by character literal; store scalar preferences in App Group `UserDefaults` and `KanjiProgress`, `DailyAssignment`, `CustomKanjiSelection`, and `StudyLogEntry` in App Group SwiftData; return missed daily kanji to the `.new` unlearned pool with the `"You missed yesterday's kanji. That's okay, check it now."` reminder.
+- [Verified kanji and stroke dataset sources](closed/002-verified-kanji-dataset-sources.md): Generate a version-pinned bundle from KANJIDIC2, JMdict, and KanjiVG, preserving source caveats, checksums, attribution, and lazy stroke SVG loading.
 
 ## Not yet specified
 
@@ -26,5 +27,4 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 
 ## Frontier
 
-- [Verified kanji and stroke dataset sources](tickets/002-verified-kanji-dataset-sources.md) (research)
 - [Phase 2 service interfaces and reminder-widget contracts](tickets/003-phase-2-service-interfaces.md) (grilling)
