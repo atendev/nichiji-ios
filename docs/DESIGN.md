@@ -2,42 +2,140 @@
 
 Living document. Updated in Phase 0 and whenever the design changes.
 
-Status: **draft, awaiting Phase 0 braindump**
+Status: **Phase 0 draft, awaiting approval**
 
 ---
 
 ## Purpose
 
-_TBD_
+Nichiji is a local-first iOS app for learning kanji. It gives the learner one
+kanji each day, with readings, meanings, example words, stroke information and
+optional review. The app uses a quiet, book-like interface built around the
+kanji rather than gamification.
 
-## Feature Overview
+The app does not require an account and does not collect analytics or personal
+data. The initial implementation targets onboarding and the Today tab.
 
-_TBD_
+## Feature overview
+
+The first implementation includes:
+
+- Seven-screen onboarding: welcome, daily kanji, flashcards, level selection,
+  reminder, widget introduction and ready.
+- Today: the daily kanji, readings, meaning, details, example words, stroke
+  order and the "Got it" action.
+- Local learner settings for level, daily order, reminder time, appearance and
+  romaji.
+- Daily reminder notifications and the initial widget experience.
+- Light, dark and system appearance modes.
+
+The app is planned to grow with four main destinations: Today, Dictionary,
+Review and You. Settings is a shared sheet available from the tab screens.
+Practice opens as a sheet from a kanji and is not a tab.
+
+The tagline is "One Kanji. One Day. Every Day."
 
 ## Architecture
 
-_TBD (if applicable)_
+The app uses SwiftUI with feature-oriented views and shared design-system
+components. The first pass implements onboarding and Today without locking
+future Dictionary, Review or You screens out of the navigation model.
 
-## Data Models
+Kanji content is bundled with the app so the core learning flow works without
+network access. We will gather verified kanji, reading, meaning, level,
+example-word and stroke data before implementation uses those records. Each
+source must have a compatible license and a recorded version or release date.
+The app may later use an API only if a required dataset cannot be bundled
+legally and completely. Runtime network access is not part of the initial
+design.
 
-_TBD (high level only; concrete types go in IMPLEMENTATION.md in Phase 1)_
+SwiftData stores learner-owned records such as learned kanji, review history
+and settings that need structured queries. AppStorage or UserDefaults stores
+small presentation preferences such as the selected appearance and romaji
+visibility. The exact model split belongs in Phase 1.
+
+Reminder scheduling uses the system notification framework. Widgets use
+WidgetKit and read the local content and learner state available to them.
+Audio uses the system Japanese speech synthesizer. Handwriting recognition is
+deferred.
+
+The data and navigation model leaves room for an iPhone Duo or iPad two-pane
+layout. The first pass implements the standard single-column phone layout.
+
+## Data models
+
+At a high level, the app needs:
+
+- A verified kanji content record with the character, readings, meanings,
+  example words, stroke count and stroke data, JLPT level and Jōyō grade.
+- A learner configuration with the selected level system, selected level,
+  daily order, custom selections, reminder settings, appearance and romaji
+  preference.
+- A daily assignment and learner status for whether the kanji is learned.
+- Review history and activity records for later Review and You features.
+
+Phase 1 will define concrete Swift types and identify which records are
+immutable bundled content versus mutable learner data.
 
 ## UI/UX
 
-_TBD_
+The visual source of truth is the exported design system and the UI reference
+bundle in `docs/design-system` and `docs/ui-reference`. The reference screens
+use sample content, but their layout, copy, navigation and interaction notes
+define the intended first-pass experience.
+
+The interface uses sentence case, no emoji and no celebratory effects. Kanji
+use Shippori Mincho. Interface text uses Zen Kaku Gothic New. SF Symbols
+provide navigation and action icons.
+
+Onboarding leads into Today. Today places the daily kanji first, followed by
+readings, the details card, example words and stroke order. The primary action
+marks the kanji as learned. Practice and handwriting feedback are not part of
+the first implementation.
+
+The settings sheet is shared across tabs in the planned navigation. Its
+appearance control is functional from the first implementation. Reminder
+settings schedule or cancel the daily notification. The widget introduction
+must describe the widget without making the learner create an account.
 
 ## Themes
 
-_TBD_
+The app supports System, Light and Dark appearance choices. Light uses the
+Washi paper palette and dark uses the Sumi night palette from the design
+tokens. Screens use semantic color tokens rather than branching on theme.
+
+The design keeps vermilion as the primary accent, matcha for learned and
+progress states, and mustard for forgotten states in later review flows. The
+first implementation must keep sufficient contrast in both themes and must
+respect Reduce Motion.
 
 ## Constraints
 
-_TBD_
+- Minimum deployment target is iOS 27.0.
+- Duo-specific APIs require the iOS 27.1 SDK and must be guarded with
+  availability checks.
+- The core onboarding and Today experience must work offline.
+- Bundled data must be verified and legally redistributable.
+- The app must not require authentication, analytics, or a backend.
+- Dynamic Type and accessibility labels are required for interface controls.
+- The app must respect the system Reduce Motion setting.
+- The generated Xcode project remains uncommitted and is created with
+  XcodeGen.
 
-## Non-Goals
+## Non-goals
 
-_TBD_
+The first implementation does not include Dictionary, Review, You, real
+handwriting recognition, stroke-order checking, fuzzy search, account sync or
+backend services. It also does not implement the Duo split-pane layout, but
+the architecture must leave room for it.
 
-## Open Questions
+## Open questions
 
-_TBD_
+- Which verified, redistributable sources will provide the final kanji,
+  readings, meanings, example words and stroke data?
+- Which exact SwiftData schema best supports future review scheduling without
+  adding fields that the first slice does not need?
+- Which widget sizes and update schedule should the first WidgetKit slice
+  support?
+- Which daily reminder behavior should apply when notification permission is
+  denied or the learner changes time zones?
