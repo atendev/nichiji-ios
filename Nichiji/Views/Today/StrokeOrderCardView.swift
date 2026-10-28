@@ -71,6 +71,10 @@ public struct StrokeOrderCardView: View {
 private struct StrokePathShape: Shape {
     let pathData: String
 
+    private func resolve(_ x: CGFloat, _ y: CGFloat, from current: CGPoint, relative: Bool) -> CGPoint {
+        relative ? CGPoint(x: current.x + x, y: current.y + y) : CGPoint(x: x, y: y)
+    }
+
     func path(in rect: CGRect) -> Path {
         let values = pathData
             .replacingOccurrences(of: ",", with: " ")
@@ -96,32 +100,23 @@ private struct StrokePathShape: Shape {
             switch command {
             case "M", "m":
                 guard let x = number(), let y = number() else { break }
-                let point = command == "m"
-                    ? CGPoint(x: current.x + x, y: current.y + y)
-                    : CGPoint(x: x, y: y)
+                let point = resolve(x, y, from: current, relative: command == "m")
                 path.move(to: point)
                 current = point
                 command = command == "m" ? "l" : "L"
             case "L", "l":
                 guard let x = number(), let y = number() else { break }
-                let point = command == "l"
-                    ? CGPoint(x: current.x + x, y: current.y + y)
-                    : CGPoint(x: x, y: y)
+                let point = resolve(x, y, from: current, relative: command == "l")
                 path.addLine(to: point)
                 current = point
             case "C", "c":
                 guard let x1 = number(), let y1 = number(),
                       let x2 = number(), let y2 = number(),
                       let x = number(), let y = number() else { break }
-                let control1 = command == "c"
-                    ? CGPoint(x: current.x + x1, y: current.y + y1)
-                    : CGPoint(x: x1, y: y1)
-                let control2 = command == "c"
-                    ? CGPoint(x: current.x + x2, y: current.y + y2)
-                    : CGPoint(x: x2, y: y2)
-                let point = command == "c"
-                    ? CGPoint(x: current.x + x, y: current.y + y)
-                    : CGPoint(x: x, y: y)
+                let isRelative = command == "c"
+                let control1 = resolve(x1, y1, from: current, relative: isRelative)
+                let control2 = resolve(x2, y2, from: current, relative: isRelative)
+                let point = resolve(x, y, from: current, relative: isRelative)
                 path.addCurve(to: point, control1: control1, control2: control2)
                 current = point
             default:

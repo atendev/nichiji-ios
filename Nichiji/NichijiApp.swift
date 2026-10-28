@@ -54,25 +54,7 @@ struct NichijiApp: App {
                     contentStore: contentStore,
                     learnerStore: learnerStore,
                     dayProvider: dayProvider,
-                    preferencesProvider: {
-                        var preferences = LearnerPreferencesSnapshot.standard
-                        preferences.levelSystem = LevelSystem(
-                            rawValue: defaults.string(forKey: LearnerPreferenceKey.levelSystem.rawValue) ?? ""
-                        ) ?? .jlpt
-                        preferences.selectedJLPTLevel = JLPTLevel(
-                            rawValue: defaults.string(forKey: LearnerPreferenceKey.selectedJLPTLevel.rawValue) ?? ""
-                        ) ?? .n5
-                        preferences.selectedJoyoGrade = JoyoGrade(
-                            rawValue: defaults.string(forKey: LearnerPreferenceKey.selectedJoyoGrade.rawValue) ?? ""
-                        ) ?? .grade1
-                        preferences.dailyOrder = DailyOrder(
-                            rawValue: defaults.string(forKey: LearnerPreferenceKey.dailyOrder.rawValue) ?? ""
-                        ) ?? .mostCommon
-                        preferences.isCustomPoolActive = defaults.bool(
-                            forKey: LearnerPreferenceKey.isCustomPoolActive.rawValue
-                        )
-                        return preferences
-                    }
+                    preferencesProvider: { Self.preferences(from: defaults) }
                 ),
                 pronunciationService: AVSpeechPronunciationService(),
                 reminderScheduler: NoopReminderScheduler()
@@ -80,6 +62,26 @@ struct NichijiApp: App {
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")
         }
+    }
+
+    private nonisolated static func preferences(from defaults: UserDefaults) -> LearnerPreferencesSnapshot {
+        var preferences = LearnerPreferencesSnapshot.standard
+        preferences.levelSystem = LevelSystem(
+            rawValue: defaults.string(forKey: LearnerPreferenceKey.levelSystem.rawValue) ?? ""
+        ) ?? .jlpt
+        preferences.selectedJLPTLevel = JLPTLevel(
+            rawValue: defaults.string(forKey: LearnerPreferenceKey.selectedJLPTLevel.rawValue) ?? ""
+        ) ?? .n5
+        preferences.selectedJoyoGrade = JoyoGrade(
+            rawValue: defaults.string(forKey: LearnerPreferenceKey.selectedJoyoGrade.rawValue) ?? ""
+        ) ?? .grade1
+        preferences.dailyOrder = DailyOrder(
+            rawValue: defaults.string(forKey: LearnerPreferenceKey.dailyOrder.rawValue) ?? ""
+        ) ?? .mostCommon
+        preferences.isCustomPoolActive = defaults.bool(
+            forKey: LearnerPreferenceKey.isCustomPoolActive.rawValue
+        )
+        return preferences
     }
 
     var body: some Scene {
