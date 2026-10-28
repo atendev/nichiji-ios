@@ -24,13 +24,13 @@ final class TestKanjiContentStore: KanjiContentStore, @unchecked Sendable {
     func entries(for jlptLevel: JLPTLevel) throws -> [KanjiEntry] {
         entriesDict.values
             .filter { $0.jlptLevel == jlptLevel }
-            .sorted { $0.canonicalIndex < $1.canonicalIndex }
+            .sorted(by: { $0.listIndex < $1.listIndex })
     }
 
     func entries(for joyoGrade: JoyoGrade) throws -> [KanjiEntry] {
         entriesDict.values
             .filter { $0.joyoGrade == joyoGrade }
-            .sorted { $0.canonicalIndex < $1.canonicalIndex }
+            .sorted(by: { $0.listIndex < $1.listIndex })
     }
 
     func strokePaths(for kanjiID: String) throws -> [String] {
