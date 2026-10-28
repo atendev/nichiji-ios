@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.11
+
+- Close Slice 5 requirements and implementation tickets (017 and 018)
+- Implement `AVSpeechPronunciationService` with `AVSpeechSynthesizerDelegate` and `@MainActor` isolation
+- Implement Japanese voice availability check and kana-preferred utterance synthesis
+- Add unit test coverage in `PronunciationServiceTests` verifying speech playback, fallbacks, stops, and error throwing
+- Update `docs/PROGRESS.md` marking Slice 5 done and log reports in `docs/IMPLOG.md`
+
 ## v0.0.10
 
 - Close Slice 4 requirements and implementation tickets (015 and 016)
