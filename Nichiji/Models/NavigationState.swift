@@ -33,15 +33,17 @@ enum SettingsDestination: Hashable, Sendable {
 
 /// Notification payload variant for the daily local reminder.
 enum ReminderNotificationKind: Equatable, Sendable {
-    /// Normal daily notification: "<kanji> · Today's kanji is ready".
+    /// Specific next-day notification when today is learned: "<kanji> · Today's kanji is ready".
     case dailyReady(kanjiID: String, dueReviewCount: Int)
-    /// Missed-day notification: "You missed yesterday's kanji. That's okay, check it now."
+    /// Specific next-day notification when today is still assigned: "You missed yesterday's kanji. That's okay, check it now."
     case missedYesterday(dueReviewCount: Int)
+    /// Generic fallback notification for days 2 through 7 of the rolling window: "Today's kanji is ready".
+    case genericReady(dueReviewCount: Int)
 }
 
 /*--------------------------------structs-------------------------------------*/
 
-/// Self-contained payload rendered by small, medium, and lock-screen widgets.
+/// Self-contained payload rendered by the small and medium home-screen widgets.
 struct DailyKanjiWidgetSnapshot: Codable, Equatable, Sendable {
     let calendarDay: String
     let kanjiID: String

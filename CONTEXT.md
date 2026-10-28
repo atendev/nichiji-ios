@@ -32,6 +32,18 @@ _Avoid_: Daily card, kanji of the day record
 A daily assignment whose local calendar day ended without the learner marking it "Got it"; its kanji entry stays in the `new` study stage so it returns to the unlearned study pool, and the next day's reminder uses the missed-day copy ("You missed yesterday's kanji. That's okay, check it now.").
 _Avoid_: Failed card, expired card
 
+**Day provider**:
+The injected clock and calendar boundary (`DayProvider`) that supplies the current instant, local calendar, `yyyy-MM-dd` day string, and next local midnight calculation.
+_Avoid_: Clock singleton, Date helper
+
+**Rollover**:
+The lazy, idempotent day-transition check run whenever the app, widget, or reminder scheduler requests a day's assignment: it marks any `.assigned` rows strictly before today as `.missed` without rewriting `.learned` or `.missed` rows, then returns or creates today's assignment.
+_Avoid_: Midnight cron, background reset
+
+**Reminder window**:
+The rolling queue of up to 7 pending daily notification requests where the next upcoming fire uses specific copy (kanji-led or missed-day) and days 2 through 7 use generic copy ("Today's kanji is ready").
+_Avoid_: Repeating notification, push campaign
+
 ### Learner progress and review
 
 **Kanji progress**:

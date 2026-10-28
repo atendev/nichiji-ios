@@ -2,7 +2,7 @@
 
 Living document. Updated in Phase 0 and whenever the design changes.
 
-Status: **Phase 0 approved**
+Status: **Phase 0 approved (updated for Phase 2 service and dataset contracts)**
 
 ---
 
@@ -37,35 +37,62 @@ The tagline is "One Kanji. One Day. Every Day."
 
 ## Architecture
 
-The app uses SwiftUI with feature-oriented views and shared design-system
-components. The first pass implements onboarding and Today without locking
-future Dictionary, Review or You screens out of the navigation model.
+The app uses SwiftUI with feature-oriented views, shared design-system
+components, and five `Sendable` service protocols (`KanjiContentStore`,
+`LearnerStore`, `DailyKanjiService`, `PronunciationService` and
+`ReminderScheduler`) plus an injected `DayProvider` passed through a
+`ServiceContainer` in the SwiftUI environment. The first pass implements
+onboarding and Today without locking future Dictionary, Review or You screens
+out of the navigation model.
 
-Kanji content is bundled with the app so the core learning flow works without
-network access. We will gather verified kanji, reading, meaning, level,
-example-word and stroke data before implementation uses those records. Each
-source must have a compatible license and a recorded version or release date.
-The app may later use an API only if a required dataset cannot be bundled
-legally and completely. Runtime network access is not part of the initial
+Kanji content is bundled with the app from a version-pinned build-time dataset
+generated from EDRDG KANJIDIC2 (CC BY-SA 4.0), EDRDG JMdict (CC BY-SA 4.0) and
+KanjiVG (CC BY-SA 3.0), with upstream attribution and license metadata included
+for the in-app Sources screen. Both the main app and widget extension bundle
+`kanji-index.json` and per-character JSON records so either process can perform
+daily rollover offline, while stroke-order SVGs are bundled only in the main
+app and loaded lazily on demand. Runtime network access is not part of the
 design.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
 local store. SwiftData stores learner-owned records (`KanjiProgress`,
-`DailyAssignment`, `CustomKanjiSelection` and `StudyLogEntry`). `AppStorage`
-and `UserDefaults` store scalar learner preferences (`hasCompletedOnboarding`,
-`appearanceMode`, `showsRomaji`, `streakFreezeEnabled`, `reminderEnabled`,
-`reminderHour`, `reminderMinute`, `levelSystem`, `selectedLevel` and
-`dailyOrder`).
+`DailyAssignment`, `CustomKanjiSelection` and `StudyLogEntry`), with all writes
+serialized through a `@ModelActor` `LearnerStore` and views reading via
+`@Query`. `AppStorage` and `UserDefaults` store scalar learner preferences
+(`hasCompletedOnboarding`, `appearanceMode`, `showsRomaji`,
+`streakFreezeEnabled`, `reminderEnabled`, `reminderHour`, `reminderMinute`,
+`levelSystem`, `selectedJLPTLevel`, `selectedJoyoGrade`, `dailyOrder` and
+`isCustomPoolActive`).
 
-Reminder scheduling uses the system notification framework. When today's kanji
-is ready on a normal day, the notification leads with the kanji (`"学 · Today's
-kanji is ready"`). If yesterday's assigned kanji was not marked "Got it", the
-kanji stays in the `new` unlearned study pool so the learner still gets to see
-it on Today later, and the reminder uses the missed-day copy (`"You missed
-yesterday's kanji. That's okay, check it now."`). Widgets use WidgetKit and
-read and mutate the shared App Group store directly. Audio uses the system
-Japanese speech synthesizer. Handwriting recognition is deferred.
+Daily rollover is lazy and idempotent: whichever process asks for today's
+assignment first marks any `.assigned` rows strictly before today as `.missed`
+(never rewriting `.learned` or `.missed` rows and keeping `KanjiProgress.stage`
+at `.new`), then returns or creates today's row from the active `.new` study
+pool. When a level's `.new` pool is exhausted, Today shows a quiet "level
+complete, pick another level" state rather than cycling automatically.
+
+Reminder scheduling uses a rolling window of up to 7 pending local notification
+requests. The next upcoming request uses specific copy: kanji-led (`"学 · Today's
+kanji is ready"`) if today's kanji is learned, or missed-day copy (`"You missed
+yesterday's kanji. That's okay, check it now."`) if today's assignment is still
+`.assigned`. Days 2 through 7 use generic copy (`"Today's kanji is ready"`).
+The window is rebuilt on launch, on foreground, after "Got it" from the app or
+widget, and after any reminder, level, pool or time-zone change. When
+notification permission is denied, the app preserves the reminder toggle state,
+shows an inline "notifications are off" row linking to system Settings, and
+cancels nothing silently. When `NSSystemTimeZoneDidChange` or
+`significantTimeChange` fires, the app reruns rollover, rebuilds the 7-day
+notification window and reloads widget timelines.
+
+Widgets use WidgetKit and support `systemSmall` (kanji and primary meaning) and
+`systemMedium` (kanji, meaning, readings and a featured word) in the first
+pass, each with an interactive "Got it" button while today's assignment is
+`.assigned`. Widget timelines emit a single entry refreshed `.after(nextMidnight)`
+and reload explicitly after "Got it" or any level, pool, order or time-zone
+change. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+kana readings when available and disabling speaker buttons with a footnote when
+no Japanese voice is installed. Handwriting recognition is deferred.
 
 The data and navigation model leaves room for an iPhone Duo or iPad two-pane
 layout. The first pass implements the standard single-column phone layout.
@@ -81,8 +108,10 @@ The app separates immutable bundled content from mutable learner state:
 - `LearnerPreferences`: scalar preferences persisted in shared App Group
   `UserDefaults` for level system, selected level, daily order, reminder
   schedule, streak freeze, appearance and romaji visibility.
-- `DailyAssignment`: the SwiftData record assigning one kanji per local
-  calendar day (`yyyy-MM-dd`) with status `assigned`, `learned` or `missed`.
+- `DailyAssignment` and `DailyAssignmentSnapshot`: the SwiftData record (and its
+  `Sendable` value projection across actor boundaries) assigning one kanji per
+  local calendar day (`yyyy-MM-dd`) with status `assigned`, `learned` or
+  `missed`.
 - `KanjiProgress`: the SwiftData record tracking a kanji's study stage (`new`,
   `learning`, `familiar`, `known`), review timestamps and answer counts.
 - `CustomKanjiSelection` and `StudyLogEntry`: SwiftData records for custom
@@ -142,9 +171,6 @@ the architecture must leave room for it.
 
 ## Open questions
 
-- Which verified, redistributable sources will provide the final kanji,
-  readings, meanings, example words and stroke data?
-- Which widget sizes and update schedule should the first WidgetKit slice
-  support?
-- Which daily reminder behavior should apply when notification permission is
-  denied or the learner changes time zones?
+_None at this stage. Dataset sources, widget families and refresh policy, and
+notification permission / time-zone behavior are resolved in `.plan/closed/002`
+and `.plan/closed/003`._
