@@ -3,7 +3,7 @@ import Foundation
 /*---------------------------------enums--------------------------------------*/
 
 /// Top-level tab destinations in the main application shell.
-enum AppTab: String, Codable, CaseIterable, Sendable {
+public enum AppTab: String, Codable, CaseIterable, Sendable {
     case today
     case dictionary
     case review
@@ -11,7 +11,7 @@ enum AppTab: String, Codable, CaseIterable, Sendable {
 }
 
 /// Ordered steps in the seven-screen onboarding flow.
-enum OnboardingStep: Int, Codable, CaseIterable, Sendable {
+public enum OnboardingStep: Int, Codable, CaseIterable, Sendable {
     case welcome = 0
     case dailyKanji = 1
     case flashcards = 2
@@ -22,7 +22,7 @@ enum OnboardingStep: Int, Codable, CaseIterable, Sendable {
 }
 
 /// Push destinations inside the shared Settings bottom sheet.
-enum SettingsDestination: Hashable, Sendable {
+public enum SettingsDestination: Hashable, Sendable {
     case level
     case customizeKanji
     case dailyReminder
@@ -32,7 +32,7 @@ enum SettingsDestination: Hashable, Sendable {
 }
 
 /// Notification payload variant for the daily local reminder.
-enum ReminderNotificationKind: Equatable, Sendable {
+public enum ReminderNotificationKind: Equatable, Sendable {
     /// Specific next-day notification when today is learned: "<kanji> · Today's kanji is ready".
     case dailyReady(kanjiID: String, dueReviewCount: Int)
     /// Specific next-day notification when today is still assigned: "You missed yesterday's kanji. That's okay, check it now."
@@ -44,12 +44,30 @@ enum ReminderNotificationKind: Equatable, Sendable {
 /*--------------------------------structs-------------------------------------*/
 
 /// Self-contained payload rendered by the small and medium home-screen widgets.
-struct DailyKanjiWidgetSnapshot: Codable, Equatable, Sendable {
-    let calendarDay: String
-    let kanjiID: String
-    let primaryMeaning: String
-    let onyomiKana: [String]
-    let kunyomiKana: [String]
-    let featuredWord: ExampleWord?
-    let isLearned: Bool
+public struct DailyKanjiWidgetSnapshot: Codable, Equatable, Sendable {
+    public let calendarDay: String
+    public let kanjiID: String
+    public let primaryMeaning: String
+    public let onyomiKana: [String]
+    public let kunyomiKana: [String]
+    public let featuredWord: ExampleWord?
+    public let isLearned: Bool
+
+    public init(
+        calendarDay: String,
+        kanjiID: String,
+        primaryMeaning: String,
+        onyomiKana: [String],
+        kunyomiKana: [String],
+        featuredWord: ExampleWord?,
+        isLearned: Bool
+    ) {
+        self.calendarDay = calendarDay
+        self.kanjiID = kanjiID
+        self.primaryMeaning = primaryMeaning
+        self.onyomiKana = onyomiKana
+        self.kunyomiKana = kunyomiKana
+        self.featuredWord = featuredWord
+        self.isLearned = isLearned
+    }
 }

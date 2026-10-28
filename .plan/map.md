@@ -27,6 +27,8 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Implement Slice 2: Content Dataset & Bundled JSON Store](closed/012-slice-2-implement-content-dataset-and-bundled-json-store.md): Implemented `BundledKanjiContentStore` with caching and offline `SeedKanjiDataset`, updated `TestKanjiContentStore`, and added `KanjiContentStoreTests`.
 - [Slice 3 Requirements Report: SwiftData Learner Store](closed/013-slice-3-swiftdata-learner-store-requirements.md): Defined success criteria, scope boundary, and test plan for `@ModelActor` learner store and mutations.
 - [Implement Slice 3: SwiftData Learner Store](closed/014-slice-3-implement-swiftdata-learner-store.md): Implemented `SwiftDataLearnerStore` with `@ModelActor`, public `LearnerModels`, and `LearnerStoreTests`.
+- [Slice 4 Requirements Report: DayProvider & Daily Kanji Rollover](closed/015-slice-4-dayprovider-and-daily-kanji-rollover-requirements.md): Defined success criteria, scope boundary, and test plan for clock boundary, rollover invariants, deterministic ordering, and widget snapshots.
+- [Implement Slice 4: DayProvider & Daily Kanji Rollover](closed/016-slice-4-implement-dayprovider-and-daily-kanji-rollover.md): Implemented `SystemDayProvider`, `DefaultDailyKanjiService`, public snapshots, and `DailyKanjiServiceTests`.
 
 ## Not yet specified
 
@@ -38,4 +40,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- [Slice 4 Requirements Report: DayProvider & Daily Kanji Rollover](tickets/015-slice-4-dayprovider-and-daily-kanji-rollover-requirements.md) (grilling)
+- [Slice 5 Requirements Report: Japanese Pronunciation Audio](tickets/017-slice-5-japanese-pronunciation-audio-requirements.md) (grilling)

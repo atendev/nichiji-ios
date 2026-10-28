@@ -9,7 +9,7 @@ Populated from the Phase 3 TODOs.
 | Slice 1: Design Tokens & Typography | done | Washi/Sumi semantic colors, Shippori Mincho & Zen Kaku Gothic New font styling, layout constants, Apple HIG targets. |
 | Slice 2: Content Dataset & Bundled JSON Store | done | `KanjiContentStore` loading offline bundled JSON dataset (`kanji-index.json` and per-kanji records) and error handling. |
 | Slice 3: SwiftData Learner Store | done | `LearnerStore` `@ModelActor` writes, queries, `DailyAssignmentSnapshot` actor projections, custom pool mutations. |
-| Slice 4: DayProvider & Daily Kanji Rollover | not started | `DailyKanjiService`, lazy idempotent rollover, missed-day state handling, deterministic daily selection, level-complete state. |
+| Slice 4: DayProvider & Daily Kanji Rollover | done | `DailyKanjiService`, lazy idempotent rollover, missed-day state handling, deterministic daily selection, level-complete state. |
 | Slice 5: Japanese Pronunciation Audio | not started | `PronunciationService` `@MainActor`, `AVSpeechSynthesizer` with `ja-JP`, kana-to-speech fallback, missing voice handling. |
 | Slice 6: Core Design System Components | not started | `HeaderBar` (`漢字 \| English`), `PrimaryButton` (vermilion), `KanjiCard`, dividers, `SealStamp`. |
 | Slice 7: Today Tab & Detail Flow | not started | 260pt hero, readings, details card, example words card, stroke order card, "Got it" action, learned state transition, inline retry state. |
