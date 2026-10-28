@@ -17,3 +17,10 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 
 - Defined `DayProvider`, `KanjiContentStore`, `LearnerStore`, `DailyKanjiService`, `PronunciationService`, `ReminderScheduler`, `ServiceContainer`, `DailyAssignmentSnapshot`, `ReminderAuthorizationStatus`, and `NichijiError` in `Nichiji/Services/` and `docs/IMPLEMENTATION.md`.
 - Updated `docs/DESIGN.md` and `CONTEXT.md` to record lazy idempotent daily rollover, `@ModelActor` write isolation, the rolling 7-day notification window, small and medium interactive widgets, and clock/time-zone change handling.
+
+## Phase 3: TODOs
+
+- Created view and design-system file skeletons under `Nichiji/DesignSystem/` and `Nichiji/Views/` covering Onboarding (7 screens), Today (hero, cards, quiet level complete, retry), Settings sheet (appearance, level, reminders), and the 4-tab app shell.
+- Populated specific in-code TODO comments across views, design tokens, components, app lifecycle, and widget extension stubs.
+- Added `NichijiWidget` target skeleton to `project.yml` with shared App Group container setup.
+- Structured `docs/PROGRESS.md` with 11 ordered vertical slices mapping the roadmap to MVP release.

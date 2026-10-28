@@ -17,10 +17,12 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Verified kanji and stroke dataset sources](closed/002-verified-kanji-dataset-sources.md): Generate a version-pinned bundle from KANJIDIC2, JMdict, and KanjiVG, preserving source caveats, checksums, attribution, and lazy stroke SVG loading.
 - [Phase 2 service interfaces and reminder-widget contracts](closed/003-phase-2-service-interfaces.md): Five protocol services in a `ServiceContainer`, writes through a `@ModelActor LearnerStore`, lazy idempotent daily rollover with an injected `DayProvider`, a rolling 7-day notification window, small and medium interactive widgets refreshed at midnight, and typed `NichijiError`.
 - [Write Phase 2 interfaces and stubs](closed/004-write-phase-2-interfaces.md): Added Phase 2 protocol stubs and `DailyAssignmentSnapshot` under `Nichiji/Services/`, documented signatures in `docs/IMPLEMENTATION.md`, and updated `docs/DESIGN.md` and `CONTEXT.md`.
+- [Phase 3 in-code TODO map and PROGRESS.md slice breakdown](closed/005-phase-3-todo-map-and-progress.md): Established view skeletons, 4-tab structure with quiet placeholders, 11 vertical slices for PROGRESS.md, and `NichijiWidget` target stub in `project.yml`.
+- [Write Phase 3 file skeletons, in-code TODO map, and PROGRESS.md](closed/006-write-phase-3-skeletons-and-todos.md): Added design system tokens and components, view skeletons for Onboarding, Today, Settings, and tab shell, populated specific in-code TODO comments across views and widgets, and initialized `docs/PROGRESS.md` with 11 vertical slices.
 
 ## Not yet specified
 
-- Phase 4 verification and testing suite definition in `docs/IMPLEMENTATION.md`.
+_None. Phase 4 verification and testing suite moved to frontier._
 
 ## Out of scope
 
@@ -28,4 +30,4 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 
 ## Frontier
 
-- [Phase 3 in-code TODO map and PROGRESS.md slice breakdown](tickets/005-phase-3-todo-map-and-progress.md) (grilling)
+- [Phase 4 verification and testing suite definition](tickets/007-phase-4-verification-and-testing-suite.md) (grilling)

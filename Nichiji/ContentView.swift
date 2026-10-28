@@ -1,10 +1,10 @@
 import SwiftUI
 
+/*---------------------------------content--------------------------------*/
+
 struct ContentView: View {
     var body: some View {
-        Text("Nichiji")
-            .font(.largeTitle)
-            .accessibilityIdentifier("title")
+        RootView()
     }
 }
 

@@ -13,12 +13,23 @@ targets:
     type: application
     platform: iOS
     sources: [Nichiji]
+    dependencies:
+      - target: NichijiWidget
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Nichiji
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
+  NichijiWidget:
+    type: app-extension
+    platform: iOS
+    sources: [NichijiWidget]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji.widget
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Nichiji Widget
   NichijiTests:
     type: bundle.unit-test
     platform: iOS
@@ -44,6 +55,7 @@ schemes:
     build:
       targets:
         Nichiji: all
+        NichijiWidget: all
     test:
       targets:
         - NichijiTests

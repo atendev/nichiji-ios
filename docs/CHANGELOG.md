@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.5
+
+- Close Phase 3 planning and implementation tickets (005 and 006)
+- Add design system tokens and reusable UI components under `Nichiji/DesignSystem/`
+- Add view skeletons and navigation coordination under `Nichiji/Views/` for Onboarding, Today, Settings, and tab shell
+- Add `NichijiWidget` target stub to `project.yml` and populate in-code TODO comments
+- Initialize `docs/PROGRESS.md` with 11 vertical slices for Phase 5 implementation and advance Wayfinder map to Phase 4
+
 ## v0.0.4
 
 - Close the Phase 2 service interfaces and reminder-widget contracts tickets
