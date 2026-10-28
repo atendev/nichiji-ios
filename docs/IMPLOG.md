@@ -104,3 +104,22 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Deviations**: Implemented deterministic hashing algorithm for `DailyOrder.random` so widgets and app target compute identical pseudo-random selection for any given calendar date without non-deterministic system random state.
 - **Unanticipated TODOs**: None.
 - **Test Results**: All 6 tests in `DailyKanjiServiceTests` passing (date formatting, lazy rollover marking past assigned rows as missed while keeping stage `.new`, same-day idempotency, deterministic selection across ordering strategies, quiet level complete state when study pool is exhausted, and widget snapshot compilation reflecting learned state).
+
+### Slice 5: Japanese Pronunciation Audio
+
+#### Requirements Report
+- **Success Criteria**:
+  1. `AVSpeechPronunciationService` conforming to `@MainActor PronunciationService` and `AVSpeechSynthesizerDelegate`.
+  2. Detection of installed `ja-JP` speech voices via `AVSpeechSynthesisVoice`.
+  3. Kana-preferred utterance playback with speech rate calibrated for pronunciation study (0.9x default speech rate).
+  4. Instant playback cancellation via `stop()`.
+  5. Accurate tracking of `isSpeaking` state via synthesizer and delegate callbacks.
+  6. Swift Testing suite in `PronunciationServiceTests.swift`.
+- **Scope Boundary**: Speech service, delegate hooks, voice check, and unit tests in scope; UI buttons in Today view deferred to Slices 6 and 7.
+- **Anticipated TODOs**: Resolves all TODOs in `Nichiji/Services/PronunciationService.swift`.
+- **Planned Tests**: Verified in `PronunciationServiceTests`.
+
+#### Deviation Report
+- **Deviations**: None.
+- **Unanticipated TODOs**: None.
+- **Test Results**: All 5 tests in `PronunciationServiceTests` passing (utterance playback recording, fallback to text when reading is absent, typed exception throwing when `ja-JP` voice is missing, immediate stopping and state reset, and live service initialization/inspection).
