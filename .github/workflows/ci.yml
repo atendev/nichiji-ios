@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [main, feature/**]
-  pull_request:
+    branches: [main]
+    tags: ['v*']
   workflow_dispatch:
 
 concurrency:
@@ -26,7 +26,6 @@ jobs:
         run: make test
 
   unsigned-ipa:
-    if: github.event_name == 'push'
     needs: build-test
     runs-on: xcode-27
     timeout-minutes: 30
