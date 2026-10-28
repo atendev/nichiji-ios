@@ -7,7 +7,12 @@ import SwiftData
 
 @Suite("DailyKanjiService Tests")
 struct DailyKanjiServiceTests {
-    private func makeTestEnvironment() throws -> (DefaultDailyKanjiService, TestDayProvider, SwiftDataLearnerStore, TestKanjiContentStore) {
+    private func makeTestEnvironment() throws -> (
+        DefaultDailyKanjiService,
+        TestDayProvider,
+        SwiftDataLearnerStore,
+        TestKanjiContentStore
+    ) {
         let dayProvider = TestDayProvider()
         let contentStore = TestKanjiContentStore(entries: SeedKanjiDataset.entries)
 

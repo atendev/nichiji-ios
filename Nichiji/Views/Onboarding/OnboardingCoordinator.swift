@@ -4,7 +4,10 @@ import SwiftUI
 
 public struct OnboardingCoordinator: View {
     @State private var currentStep: OnboardingStep = .welcome
-    @AppStorage(LearnerPreferenceKey.hasCompletedOnboarding.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.hasCompletedOnboarding.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var hasCompletedOnboarding: Bool = false
 
     public init() {}

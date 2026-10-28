@@ -43,6 +43,7 @@ final class TestDayProvider: DayProvider, @unchecked Sendable {
     }
 
     func advance(byDays days: Int) {
-        simulatedDate = simulatedCalendar.date(byAdding: .day, value: days, to: simulatedDate) ?? simulatedDate.addingTimeInterval(Double(days) * 86400)
+        let fallback = simulatedDate.addingTimeInterval(Double(days) * 86400)
+        simulatedDate = simulatedCalendar.date(byAdding: .day, value: days, to: simulatedDate) ?? fallback
     }
 }

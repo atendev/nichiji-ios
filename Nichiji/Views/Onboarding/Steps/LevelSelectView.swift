@@ -6,10 +6,16 @@ public struct LevelSelectView: View {
     public let onNext: () -> Void
     public let onBack: () -> Void
 
-    @AppStorage(LearnerPreferenceKey.levelSystem.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.levelSystem.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var levelSystemRaw: String = LevelSystem.jlpt.rawValue
 
-    @AppStorage(LearnerPreferenceKey.selectedJLPTLevel.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.selectedJLPTLevel.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var selectedJLPTLevel: String = JLPTLevel.n5.rawValue
 
     public init(onNext: @escaping () -> Void, onBack: @escaping () -> Void) {

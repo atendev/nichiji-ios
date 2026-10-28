@@ -5,10 +5,16 @@ import SwiftUI
 public struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
 
-    @AppStorage(LearnerPreferenceKey.showsRomaji.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.showsRomaji.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var showsRomaji: Bool = true
 
-    @AppStorage(LearnerPreferenceKey.streakFreezeEnabled.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.streakFreezeEnabled.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var streakFreezeEnabled: Bool = false
 
     public init() {}

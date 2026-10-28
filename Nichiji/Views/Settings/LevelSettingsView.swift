@@ -3,10 +3,16 @@ import SwiftUI
 /*---------------------------------levels---------------------------------*/
 
 public struct LevelSettingsView: View {
-    @AppStorage(LearnerPreferenceKey.levelSystem.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.levelSystem.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var levelSystemRaw: String = LevelSystem.jlpt.rawValue
 
-    @AppStorage(LearnerPreferenceKey.dailyOrder.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.dailyOrder.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var dailyOrderRaw: String = DailyOrder.mostCommon.rawValue
 
     public init() {}
@@ -38,7 +44,9 @@ public struct LevelSettingsView: View {
     }
 
     private func orderRow(order: DailyOrder, title: String) -> some View {
-        Button(action: { dailyOrderRaw = order.rawValue }) {
+        Button {
+            dailyOrderRaw = order.rawValue
+        } label: {
             HStack {
                 Text(title)
                     .foregroundColor(.nichijiInk)

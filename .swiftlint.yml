@@ -2,3 +2,33 @@ included:
   - Nichiji
   - NichijiTests
   - NichijiUITests
+
+disabled_rules:
+  - todo
+
+line_length:
+  warning: 180
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+  ignores_interpolated_strings: true
+
+identifier_name:
+  min_length:
+    warning: 1
+    error: 1
+  excluded:
+    - id
+    - r
+    - g
+    - b
+    - a
+    - n1
+    - n2
+    - n3
+    - n4
+    - n5
+
+large_tuple:
+  warning: 4
+  error: 5

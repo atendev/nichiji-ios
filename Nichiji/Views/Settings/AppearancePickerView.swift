@@ -3,7 +3,10 @@ import SwiftUI
 /*-------------------------------appearance-------------------------------*/
 
 public struct AppearancePickerView: View {
-    @AppStorage(LearnerPreferenceKey.appearanceMode.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.appearanceMode.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
     public init() {}
@@ -23,10 +26,15 @@ public struct AppearancePickerView: View {
     }
 
     private func appearanceOption(mode: AppearanceMode, title: String) -> some View {
-        Button(action: { appearanceModeRaw = mode.rawValue }) {
+        Button {
+            appearanceModeRaw = mode.rawValue
+        } label: {
             VStack(spacing: LayoutTokens.space8) {
                 RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(appearanceModeRaw == mode.rawValue ? Color.nichijiVermilion : Color.nichijiHairline, lineWidth: 2)
+                    .stroke(
+                        appearanceModeRaw == mode.rawValue ? Color.nichijiVermilion : Color.nichijiHairline,
+                        lineWidth: 2
+                    )
                     .background(
                         RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
                             .fill(Color.nichijiSurfaceSunken)

@@ -5,7 +5,10 @@ import SwiftData
 
 @main
 struct NichijiApp: App {
-    @AppStorage(LearnerPreferenceKey.appearanceMode.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.appearanceMode.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
     private var preferredColorScheme: ColorScheme? {

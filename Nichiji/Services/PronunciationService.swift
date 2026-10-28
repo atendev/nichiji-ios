@@ -23,7 +23,7 @@ public protocol PronunciationService: AnyObject, Sendable {
 
 /// Production pronunciation service backed by AVFoundation's AVSpeechSynthesizer.
 @MainActor
-public final class AVSpeechPronunciationService: NSObject, PronunciationService, AVSpeechSynthesizerDelegate, Sendable {
+public final class AVSpeechPronunciationService: NSObject, PronunciationService, AVSpeechSynthesizerDelegate {
     private let synthesizer: AVSpeechSynthesizer
     public private(set) var isSpeaking: Bool = false
 
@@ -68,19 +68,28 @@ public final class AVSpeechPronunciationService: NSObject, PronunciationService,
 
     // MARK: - AVSpeechSynthesizerDelegate
 
-    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
+    nonisolated public func speechSynthesizer(
+        _ synthesizer: AVSpeechSynthesizer,
+        didStart utterance: AVSpeechUtterance
+    ) {
         Task { @MainActor in
             self.isSpeaking = true
         }
     }
 
-    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+    nonisolated public func speechSynthesizer(
+        _ synthesizer: AVSpeechSynthesizer,
+        didFinish utterance: AVSpeechUtterance
+    ) {
         Task { @MainActor in
             self.isSpeaking = false
         }
     }
 
-    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+    nonisolated public func speechSynthesizer(
+        _ synthesizer: AVSpeechSynthesizer,
+        didCancel utterance: AVSpeechUtterance
+    ) {
         Task { @MainActor in
             self.isSpeaking = false
         }

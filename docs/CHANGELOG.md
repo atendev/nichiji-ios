@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.0.12
+
+- Configure `.swiftlint.yml` rules (`todo`, `line_length`, `identifier_name`, `large_tuple`) for project conventions and Phase 3 scaffolding
+- Fix `orphaned_doc_comment`, `multiple_closures_with_trailing_closure`, `implicit_optional_initialization`, `redundant_sendable`, `for_where`, and `line_length` SwiftLint violations across app and test targets
+
 ## v0.0.11
 
 - Close Slice 5 requirements and implementation tickets (017 and 018)

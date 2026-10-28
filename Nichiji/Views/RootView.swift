@@ -3,7 +3,10 @@ import SwiftUI
 /*----------------------------------root----------------------------------*/
 
 public struct RootView: View {
-    @AppStorage(LearnerPreferenceKey.hasCompletedOnboarding.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.hasCompletedOnboarding.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var hasCompletedOnboarding: Bool = false
 
     public init() {}

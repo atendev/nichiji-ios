@@ -7,7 +7,7 @@ public struct TodayView: View {
 
     @State private var isLearned: Bool = false
     @State private var isLevelComplete: Bool = false
-    @State private var errorMessage: String? = nil
+    @State private var errorMessage: String?
 
     public init(onOpenSettings: @escaping () -> Void) {
         self.onOpenSettings = onOpenSettings

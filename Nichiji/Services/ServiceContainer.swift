@@ -11,8 +11,8 @@ struct ServiceContainer: Sendable {
     let pronunciationService: any PronunciationService
     let reminderScheduler: any ReminderScheduler
 
-    /// Refreshes rollover state, the 7-day notification window, and widget timelines after clock or time-zone changes.
     // TODO: Re-run DailyKanjiService.assignment(for:), rebuild ReminderScheduler, and reload WidgetCenter timelines when NSSystemTimeZoneDidChange or significantTimeChange fires.
+    /// Refreshes rollover state, the 7-day notification window, and widget timelines after clock or time-zone changes.
     func handleTimeOrZoneChange(preferences: LearnerPreferencesSnapshot) async throws {
     }
 }

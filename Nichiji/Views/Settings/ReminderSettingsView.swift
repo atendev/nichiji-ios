@@ -3,13 +3,22 @@ import SwiftUI
 /*--------------------------------reminder--------------------------------*/
 
 public struct ReminderSettingsView: View {
-    @AppStorage(LearnerPreferenceKey.reminderEnabled.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.reminderEnabled.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var reminderEnabled: Bool = true
 
-    @AppStorage(LearnerPreferenceKey.reminderHour.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.reminderHour.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var reminderHour: Int = 8
 
-    @AppStorage(LearnerPreferenceKey.reminderMinute.rawValue, store: UserDefaults(suiteName: AppStorageGroup.suiteName))
+    @AppStorage(
+        LearnerPreferenceKey.reminderMinute.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
     private var reminderMinute: Int = 0
 
     @State private var isPermissionDenied: Bool = false

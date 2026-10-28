@@ -37,7 +37,11 @@ public protocol LearnerStore: Sendable {
     func markPastAssignedAsMissed(before calendarDay: String) async throws -> [DailyAssignmentSnapshot]
 
     /// Creates and persists a new daily assignment row for the given calendar day.
-    func createAssignment(calendarDay: String, kanjiID: String, assignedAt: Date) async throws -> DailyAssignmentSnapshot
+    func createAssignment(
+        calendarDay: String,
+        kanjiID: String,
+        assignedAt: Date
+    ) async throws -> DailyAssignmentSnapshot
 
     /// Returns kanji identifiers whose progress stage has moved past new.
     func nonNewKanjiIDs() async throws -> Set<String>
@@ -90,11 +94,9 @@ public actor SwiftDataLearnerStore: LearnerStore {
         let pastAssignments = try modelContext.fetch(descriptor)
         var updatedSnapshots: [DailyAssignmentSnapshot] = []
 
-        for assignment in pastAssignments {
-            if assignment.status == .assigned {
-                assignment.status = .missed
-                updatedSnapshots.append(makeSnapshot(from: assignment))
-            }
+        for assignment in pastAssignments where assignment.status == .assigned {
+            assignment.status = .missed
+            updatedSnapshots.append(makeSnapshot(from: assignment))
         }
 
         if !updatedSnapshots.isEmpty {
@@ -103,7 +105,11 @@ public actor SwiftDataLearnerStore: LearnerStore {
         return updatedSnapshots
     }
 
-    public func createAssignment(calendarDay: String, kanjiID: String, assignedAt: Date) async throws -> DailyAssignmentSnapshot {
+    public func createAssignment(
+        calendarDay: String,
+        kanjiID: String,
+        assignedAt: Date
+    ) async throws -> DailyAssignmentSnapshot {
         if let existing = try await assignment(for: calendarDay) {
             return existing
         }
