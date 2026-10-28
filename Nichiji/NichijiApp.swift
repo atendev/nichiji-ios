@@ -50,7 +50,7 @@ struct NichijiApp: App {
                     contentStore: contentStore,
                     learnerStore: learnerStore,
                     dayProvider: dayProvider,
-                    preferencesProvider: { Self.preferences(from: defaults) }
+                    preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
                 ),
                 pronunciationService: AVSpeechPronunciationService(),
                 reminderScheduler: NoopReminderScheduler()
@@ -70,26 +70,6 @@ struct NichijiApp: App {
             groupContainer: .identifier(AppStorageGroup.suiteName),
             cloudKitDatabase: .none
         )
-    }
-
-    private nonisolated static func preferences(from defaults: UserDefaults) -> LearnerPreferencesSnapshot {
-        var preferences = LearnerPreferencesSnapshot.standard
-        preferences.levelSystem = LevelSystem(
-            rawValue: defaults.string(forKey: LearnerPreferenceKey.levelSystem.rawValue) ?? ""
-        ) ?? .jlpt
-        preferences.selectedJLPTLevel = JLPTLevel(
-            rawValue: defaults.string(forKey: LearnerPreferenceKey.selectedJLPTLevel.rawValue) ?? ""
-        ) ?? .n5
-        preferences.selectedJoyoGrade = JoyoGrade(
-            rawValue: defaults.string(forKey: LearnerPreferenceKey.selectedJoyoGrade.rawValue) ?? ""
-        ) ?? .grade1
-        preferences.dailyOrder = DailyOrder(
-            rawValue: defaults.string(forKey: LearnerPreferenceKey.dailyOrder.rawValue) ?? ""
-        ) ?? .mostCommon
-        preferences.isCustomPoolActive = defaults.bool(
-            forKey: LearnerPreferenceKey.isCustomPoolActive.rawValue
-        )
-        return preferences
     }
 
     var body: some Scene {

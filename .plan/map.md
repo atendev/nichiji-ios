@@ -33,6 +33,9 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Implement Slice 5: Japanese Pronunciation Audio](closed/018-slice-5-implement-japanese-pronunciation-audio.md): Implemented `AVSpeechPronunciationService` with `AVSpeechSynthesizerDelegate` and `PronunciationServiceTests`.
 - [Slice 6 Core Design System Components](closed/019-slice-6-core-design-system-components-requirements.md): Implemented reusable header, primary button, kanji card, and learned-state seal components with HIG sizing, accessibility, and Reduce Motion support.
 - [Slice 7 Requirements Report: Today Tab & Detail Flow](closed/020-slice-7-today-tab-and-detail-flow-requirements.md): Defined success criteria, scope boundary, test plan, and deferred ServiceContainer/ModelContainer wiring for binding Today to real services, learner state, bundled content, audio, and stroke-order data.
+- [Slice 7 Deviation Report: Today Tab & Detail Flow](closed/021-slice-7-today-tab-and-detail-flow-deviation.md): Wired shared App Group SwiftData container and ServiceContainer into Today, implemented kanji detail cards, audio, stroke-order SVG path rendering, learned/level-complete/retry states, and added `TodayTabTests` with `TestLearnerStore`.
+- [Slice 8 Requirements Report: Settings Sheet & Preferences](closed/022-slice-8-settings-sheet-and-preferences-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for appearance previews, level/order/custom pool selection and today reassignment, reminder settings, and Today reactivity.
+- [Implement Slice 8: Settings Sheet & Preferences](closed/023-slice-8-implement-settings-sheet-and-preferences.md): Built settings views, level/order/custom pool reassignment, reminder settings coordinator, and `SettingsPreferencesTests`; build and tests unverified.
 
 ## Not yet specified
 
@@ -44,4 +47,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- Implement Slice 7: Today Tab & Detail Flow
+- Slice 9 Requirements Report: Onboarding Flow (not yet ticketed)

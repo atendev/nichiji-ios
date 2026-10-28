@@ -18,6 +18,12 @@ public protocol DailyKanjiService: Sendable {
         day: String
     ) -> String?
 
+    /// Re-evaluates the active pool and swaps the day's assignment if still unlearned.
+    func refreshAssignmentAfterPreferenceChange(
+        for day: String,
+        preferences: LearnerPreferencesSnapshot
+    ) async throws -> DailyAssignmentSnapshot?
+
     /// Builds the self-contained snapshot rendered by the small and medium WidgetKit families.
     func widgetSnapshot(for day: String) async throws -> DailyKanjiWidgetSnapshot?
 }
@@ -84,7 +90,7 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
                     entries.append(entry)
                 }
             }
-            candidateEntries = entries
+            candidateEntries = entries.sorted { $0.listIndex < $1.listIndex }
         } else {
             switch preferences.levelSystem {
             case .jlpt:
@@ -103,36 +109,18 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
         excluding excludedIDs: Set<String>,
         day: String
     ) -> String? {
-        let candidates = pool.filter { !excludedIDs.contains($0.id) }
-        guard !candidates.isEmpty else { return nil }
+        let candidates = orderedCandidates(from: pool, order: order, day: day)
+            .filter { !excludedIDs.contains($0.id) }
+        return candidates.first?.id
+    }
 
-        switch order {
-        case .mostCommon:
-            let sorted = candidates.sorted {
-                let rank0 = $0.frequencyRank ?? Int.max
-                let rank1 = $1.frequencyRank ?? Int.max
-                if rank0 == rank1 {
-                    return $0.listIndex < $1.listIndex
-                }
-                return rank0 < rank1
-            }
-            return sorted.first?.id
-
-        case .listOrder:
-            let sorted = candidates.sorted { $0.listIndex < $1.listIndex }
-            return sorted.first?.id
-
-        case .random:
-            let sorted = candidates.sorted {
-                let hash0 = deterministicHash(day: day, kanjiID: $0.id)
-                let hash1 = deterministicHash(day: day, kanjiID: $1.id)
-                if hash0 == hash1 {
-                    return $0.listIndex < $1.listIndex
-                }
-                return hash0 < hash1
-            }
-            return sorted.first?.id
-        }
+    public func refreshAssignmentAfterPreferenceChange(
+        for day: String,
+        preferences: LearnerPreferencesSnapshot
+    ) async throws -> DailyAssignmentSnapshot? {
+        let pool = try await activePool(preferences: preferences)
+        let ordered = orderedCandidates(from: pool, order: preferences.dailyOrder, day: day)
+        return try await learnerStore.reassignToday(day: day, from: ordered)
     }
 
     public func widgetSnapshot(for day: String) async throws -> DailyKanjiWidgetSnapshot? {
@@ -153,6 +141,37 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
     }
 
     // MARK: - Private Helpers
+
+    private func orderedCandidates(
+        from pool: [KanjiEntry],
+        order: DailyOrder,
+        day: String
+    ) -> [KanjiEntry] {
+        switch order {
+        case .mostCommon:
+            return pool.sorted {
+                let rank0 = $0.frequencyRank ?? Int.max
+                let rank1 = $1.frequencyRank ?? Int.max
+                if rank0 == rank1 {
+                    return $0.listIndex < $1.listIndex
+                }
+                return rank0 < rank1
+            }
+
+        case .listOrder:
+            return pool.sorted { $0.listIndex < $1.listIndex }
+
+        case .random:
+            return pool.sorted {
+                let hash0 = deterministicHash(day: day, kanjiID: $0.id)
+                let hash1 = deterministicHash(day: day, kanjiID: $1.id)
+                if hash0 == hash1 {
+                    return $0.listIndex < $1.listIndex
+                }
+                return hash0 < hash1
+            }
+        }
+    }
 
     private func deterministicHash(day: String, kanjiID: String) -> UInt64 {
         var hash: UInt64 = 5381

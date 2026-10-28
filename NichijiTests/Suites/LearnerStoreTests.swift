@@ -170,4 +170,43 @@ struct LearnerStoreTests {
         #expect(afterLearned?.kanjiID == "二")
         #expect(afterLearned?.status == .learned)
     }
+
+    @Test("reassignToday keeps an unlearned assignment that is already first in the pool")
+    func reassignTodayKeepsCurrentWhenFirst() async throws {
+        let store = try makeInMemoryStore()
+        let entry1 = KanjiEntry(
+            id: "一",
+            meanings: ["one"],
+            onyomi: [],
+            kunyomi: [],
+            radical: KanjiRadical(character: "一", meaning: "one"),
+            strokeCount: 1,
+            strokePaths: [],
+            jlptLevel: .n5,
+            joyoGrade: .grade1,
+            frequencyRank: 2,
+            listIndex: 2,
+            exampleWords: []
+        )
+        let entry2 = KanjiEntry(
+            id: "二",
+            meanings: ["two"],
+            onyomi: [],
+            kunyomi: [],
+            radical: KanjiRadical(character: "二", meaning: "two"),
+            strokeCount: 2,
+            strokePaths: [],
+            jlptLevel: .n5,
+            joyoGrade: .grade1,
+            frequencyRank: 9,
+            listIndex: 3,
+            exampleWords: []
+        )
+
+        _ = try await store.createAssignment(calendarDay: "2026-10-28", kanjiID: "一", assignedAt: Date())
+
+        let kept = try await store.reassignToday(day: "2026-10-28", from: [entry1, entry2])
+        #expect(kept?.kanjiID == "一")
+        #expect(kept?.status == .assigned)
+    }
 }

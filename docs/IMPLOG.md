@@ -160,3 +160,31 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   resolution; reminder and WidgetKit rebuilds remain deferred.
 - **Test Results**: `git diff --check` passes. Xcode build and test tools are
   unavailable in this environment, so Apple validation remains pending.
+
+### Slice 8: Settings Sheet & Preferences
+
+#### Requirements Report
+- **Success Criteria**: Settings sheet with appearance picker, level and order
+  selection, custom kanji picker, reminder settings, widget guide and privacy
+  screens. Pool changes reassign an unlearned today kanji immediately and leave
+  a learned one alone. Today refreshes on preference changes. All controls meet
+  HIG tap targets and Dynamic Type.
+- **Scope Boundary**: Settings views, preference persistence, and reassignment
+  wiring only. Review settings, onboarding, the live notification scheduler,
+  and the widget extension remain deferred.
+- **Anticipated TODOs**: Review settings row, reminder rebuild and WidgetKit
+  reload after pool changes (Slices 10 and 11).
+- **Planned Tests**: Preferences round-trip, reassign unlearned today, preserve
+  learned today, custom selection persistence and pool, reminder coordinator.
+
+#### Deviation Report
+- **Deviations**: Added `refreshAssignmentAfterPreferenceChange(for:preferences:)`
+  to `DailyKanjiService`. Default reminder time moved from 9:00 to 8:00. Preference
+  loading moved into `LearnerPreferencesSnapshot.load(from:)`. Reminder times render
+  lowercase (`8:00 am`). `reassignToday` now deletes an unlearned assignment when the
+  new pool is empty. `reassignToday` now keeps today's kanji when it is already
+  first in the updated pool, instead of always swapping to the next one.
+- **Unanticipated TODOs**: None.
+- **Test Results**: `git diff --check` passes. Xcode build and test tools are
+  unavailable in this environment, so `SettingsPreferencesTests` and the full
+  suite have not been run.

@@ -13,7 +13,7 @@ Populated from the Phase 3 TODOs.
 | Slice 5: Japanese Pronunciation Audio | done | `PronunciationService` `@MainActor`, `AVSpeechSynthesizer` with `ja-JP`, kana-to-speech fallback, missing voice handling. |
 | Slice 6: Core Design System Components | tested | `HeaderBar` (`漢字 \| English`), Reduce Motion-aware vermilion `PrimaryButton`, continuous `KanjiCard`, and SwiftUI `SealStamp`. |
 | Slice 7: Today Tab & Detail Flow | tested | Shared App Group SwiftData container, service injection, real Today assignment/content/audio flow, learned and level-complete states, retry path, romaji gating, and stroke-order grid. |
-| Slice 8: Settings Sheet & Preferences | not started | Appearance picker (System/Light/Dark), level & order selectors, romaji toggle, streak freeze, inline notification warning. |
+| Slice 8: Settings Sheet & Preferences | done | Appearance picker (System/Light/Dark mini phone cards), level & order selectors, custom kanji pool picker, Today reassignment on pool change, romaji & streak freeze toggles, reminder settings with inline permission warning, widget guide & privacy sub-screens. |
 | Slice 9: Onboarding Flow (7 Screens) | not started | 7-step sequence (Welcome, Daily Intro, Flashcard Demo, Level Select, Reminder, Widget Intro, Ready), completion flag. |
 | Slice 10: Reminder Scheduler & Notifications | not started | `ReminderScheduler`, 7-day rolling window (specific next copy + generic remaining), authorization checks, time-zone rebuild triggers. |
 | Slice 11: WidgetKit Extension | not started | `systemSmall` and `systemMedium` widgets, timeline provider using `DailyKanjiService`, interactive "Got it" AppIntent. |
