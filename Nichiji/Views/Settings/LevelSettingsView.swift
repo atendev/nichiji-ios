@@ -241,6 +241,7 @@ public struct LevelSettingsView: View {
 
 // MARK: - Sections
 
+@MainActor
 private func levelSystemSection(
     activeLevelSystem: LevelSystem,
     switchAction: @escaping (LevelSystem) -> Void
@@ -282,6 +283,7 @@ private func levelSystemSection(
     }
 }
 
+@MainActor
 private func dailyOrderSection(
     selectedDailyOrder: DailyOrder,
     selectAction: @escaping (DailyOrder) -> Void
@@ -330,6 +332,7 @@ private func dailyOrderSection(
     }
 }
 
+@MainActor
 private func customSection(
     customCount: Int,
     isCustomPoolActive: Bool
