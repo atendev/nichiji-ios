@@ -33,10 +33,8 @@ struct NichijiApp: App {
             CustomKanjiSelection.self,
             StudyLogEntry.self
         ])
-        let configuration = Self.modelConfiguration(for: schema)
-
         do {
-            let container = try ModelContainer(for: schema, configurations: configuration)
+            let container = try Self.makeModelContainer(for: schema)
             let contentStore = BundledKanjiContentStore()
             let learnerStore = SwiftDataLearnerStore(modelContainer: container)
             let dayProvider = SystemDayProvider()
@@ -60,15 +58,39 @@ struct NichijiApp: App {
         }
     }
 
-    private static func modelConfiguration(for schema: Schema) -> ModelConfiguration {
+    /// Builds the shared store, falling back to the app sandbox when the App Group
+    /// container is unavailable (hosted unit tests and sideloaded installs).
+    private static func makeModelContainer(for schema: Schema) throws -> ModelContainer {
         // Hosted unit tests launch the app unsigned, so the App Group container is unavailable.
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
-            return ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return try ModelContainer(
+                for: schema,
+                configurations: ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            )
         }
-        return ModelConfiguration(
-            schema: schema,
-            groupContainer: .identifier(AppStorageGroup.suiteName),
-            cloudKitDatabase: .none
+
+        // SwiftData traps (rather than throwing) when the App Group container is
+        // missing, so probe availability before attempting the grouped configuration.
+        let groupAvailable = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: AppStorageGroup.suiteName
+        ) != nil
+
+        if groupAvailable {
+            do {
+                let shared = ModelConfiguration(
+                    schema: schema,
+                    groupContainer: .identifier(AppStorageGroup.suiteName),
+                    cloudKitDatabase: .none
+                )
+                return try ModelContainer(for: schema, configurations: shared)
+            } catch {
+                // Sideloaded re-signing can strip the App Group entitlement; run standalone.
+            }
+        }
+
+        return try ModelContainer(
+            for: schema,
+            configurations: ModelConfiguration(schema: schema, cloudKitDatabase: .none)
         )
     }
 
