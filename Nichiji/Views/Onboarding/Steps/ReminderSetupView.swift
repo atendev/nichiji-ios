@@ -2,78 +2,70 @@ import SwiftUI
 
 /*-----------------------------reminder-setup-----------------------------*/
 
-public struct ReminderSetupView: View {
-    public let onNext: () -> Void
-    public let onBack: () -> Void
+struct ReminderSetupView: View {
+    @Bindable var flow: OnboardingFlow
 
-    @AppStorage(
-        LearnerPreferenceKey.reminderEnabled.rawValue,
-        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
-    )
-    private var reminderEnabled: Bool = true
+    var body: some View {
+        OnboardingStepScaffold(
+            buttonTitle: "Continue",
+            isButtonEnabled: !flow.isRequestingAuthorization,
+            action: { Task { await flow.continueFromReminder() } }
+        ) {
+            VStack(alignment: .leading, spacing: LayoutTokens.space24) {
+                OnboardingStepHeader(
+                    title: "Daily reminder",
+                    subtitle: "One gentle reminder a day to learn today's kanji.",
+                    alignment: .leading
+                )
 
-    @AppStorage(
-        LearnerPreferenceKey.reminderHour.rawValue,
-        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
-    )
-    private var reminderHour: Int = 8
-
-    @AppStorage(
-        LearnerPreferenceKey.reminderMinute.rawValue,
-        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
-    )
-    private var reminderMinute: Int = 0
-
-    public init(onNext: @escaping () -> Void, onBack: @escaping () -> Void) {
-        self.onNext = onNext
-        self.onBack = onBack
-    }
-
-    public var body: some View {
-        VStack(spacing: LayoutTokens.space24) {
-            HStack {
-                Button(action: onBack) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.nichijiInk)
-                        .frame(width: LayoutTokens.minHitTarget, height: LayoutTokens.minHitTarget)
+                if flow.reminderAuthorization == .denied {
+                    deniedRow
                 }
-                Spacer()
-            }
-            .padding(.horizontal, LayoutTokens.space16)
 
-            VStack(spacing: LayoutTokens.space8) {
-                Text("Daily reminder")
-                    .font(.nichijiTitle)
+                Toggle("Remind me daily", isOn: $flow.reminderEnabled)
+                    .font(.nichijiBody)
                     .foregroundColor(.nichijiInk)
-
-                Text("A gentle reminder to learn today's kanji.")
-                    .font(.nichijiBody)
-                    .foregroundColor(.nichijiInkMuted)
-            }
-            .padding(.horizontal, LayoutTokens.space24)
-
-            Spacer()
-
-            VStack(spacing: LayoutTokens.space16) {
-                Toggle("Remind me each day", isOn: $reminderEnabled)
-                    .font(.nichijiBody)
                     .tint(.nichijiVermilion)
-                    .padding(.horizontal, LayoutTokens.space32)
+                    .padding(.horizontal, LayoutTokens.space16)
+                    .frame(minHeight: 64)
+                    .cardBackground(cornerRadius: LayoutTokens.cornerRadiusSmall, fill: .nichijiSurfaceRaised, stroke: .nichijiHairline)
 
-                Text(String(format: "%02d:%02d", reminderHour, reminderMinute))
-                    .font(.kanjiDisplay(size: 48))
-                    .foregroundColor(.nichijiInk)
+                if flow.reminderEnabled {
+                    ReminderTimePicker(hour: $flow.reminderHour, minute: $flow.reminderMinute)
+                } else {
+                    Text("No reminder will be sent. You can turn it on later in Settings.")
+                        .font(.nichijiCallout)
+                        .foregroundColor(.nichijiInkMuted)
+                        .padding(.horizontal, LayoutTokens.space8)
+                }
             }
-
-            Spacer()
-
-            PrimaryButton(title: "Continue", action: onNext)
-                .padding(.horizontal, LayoutTokens.space24)
-                .padding(.bottom, LayoutTokens.space32)
+        }
+        .task {
+            await flow.refreshReminderAuthorization()
         }
     }
+
+    private var deniedRow: some View {
+        HStack(alignment: .top, spacing: LayoutTokens.space12) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 18, weight: .medium))
+                .foregroundColor(.nichijiMustard)
+                .padding(.top, 2)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: LayoutTokens.space4) {
+                Text("Notifications are off")
+                    .font(.uiText(size: 16, weight: .medium))
+                    .foregroundColor(.nichijiInk)
+
+                Text("You can turn them on later in iOS Settings.")
+                    .font(.nichijiCaption)
+                    .foregroundColor(.nichijiInkMuted)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(LayoutTokens.space16)
+        .cardBackground(cornerRadius: LayoutTokens.cornerRadiusSmall, fill: .nichijiMustardWash, stroke: .nichijiMustard)
+        .accessibilityElement(children: .combine)
+    }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Request system notification authorization and schedule the initial rolling reminder window in Slice 9 and Slice 10.

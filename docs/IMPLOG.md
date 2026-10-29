@@ -188,3 +188,53 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Test Results**: `git diff --check` passes. Xcode build and test tools are
   unavailable in this environment, so `SettingsPreferencesTests` and the full
   suite have not been run.
+
+### Slice 9: Onboarding Flow
+
+#### Requirements Report
+- **Success Criteria**: `OnboardingCoordinator` runs Welcome, Daily kanji,
+  Flashcards, Level, Reminder, Widget, and Ready in order, with a six-segment
+  progress bar that skips Welcome, a back button on every later step, and a
+  spring slide (crossfade under Reduce Motion). The flashcard demo flips and
+  swipes on a static 山 card with matching buttons and no store writes. The
+  Level screen reads counts from `KanjiContentStore` and writes the level keys.
+  The Reminder screen requests permission only when on and never blocks on
+  `.denied`. Ready sets `hasCompletedOnboarding` without creating an
+  assignment, and `RootView` crossfades to the tab shell. Replay keeps progress
+  and reassigns an unlearned today when the level changed. Logic lives in an
+  `@MainActor @Observable OnboardingFlow`.
+- **Scope Boundary**: The coordinator, seven step views, `OnboardingFlow`, the
+  shared level-change helper, the `RootView` transition, and onboarding copy.
+  The live notification scheduler (Slice 10), the widget extension (Slice 11),
+  a Custom option or order control on the Level screen, and Review, Dictionary,
+  and You screens are out.
+- **Anticipated TODOs**: No permission prompt until Slice 10 replaces
+  `NoopReminderScheduler`. Reminder rebuild and widget reload on completion
+  (Slices 10 and 11). The widget graphic is a mock until Slice 11.
+- **Planned Tests**: `OnboardingFlowTests` covering step order and progress,
+  back navigation, level system switching, level writes, store-backed counts,
+  reminder authorization, completion without store writes, and replay. Re-run
+  `SettingsPreferencesTests` after the helper extraction.
+
+#### Deviation Report
+- **Deviations**: The back chevron and progress bar moved out of each step view
+  into one bar in the coordinator, so the step views no longer take `onBack`.
+  The Welcome mark is a vermilion seal drawn from shapes, not the `SealStamp`
+  component, because `SealStamp` is the green "Got it" learned badge. Replay
+  reassignment runs only when today already has an assignment, which keeps a
+  first run free of `LearnerStore` writes even when the level changes. Besides
+  `LevelChangeCoordinator`, two more Slice 8 pieces were extracted for reuse:
+  `LevelSelectionRow` and the level system switch from `LevelSettingsView`, and
+  `ReminderTimePicker` from `ReminderSettingsView`. `CustomKanjiPickerView` now
+  calls `LevelChangeCoordinator` too. Settings behavior is unchanged, except
+  that reminder time changes now sync through one `onChange` instead of
+  separate preset and picker handlers.
+- **Unanticipated TODOs**: The onboarding widget steps say "Tap Edit, then Add
+  Widget", while the Settings widget guide still says "tap +". Slice 11 should
+  align the two. The slide direction for the first step after reversing
+  direction needs a simulator check, since SwiftUI may apply the previous
+  removal edge to the outgoing view.
+- **Test Results**: `git diff --check` passes. Xcode build and test tools are
+  unavailable in this environment, so `OnboardingFlowTests`,
+  `SettingsPreferencesTests`, and the full suite have not been run. Gestures and
+  animations still need a manual simulator pass.

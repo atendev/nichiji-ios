@@ -94,7 +94,7 @@ public struct LevelSettingsView: View {
             case .jlpt:
                 ForEach(JLPTLevel.allCases, id: \.self) { level in
                     let isSelected = !isCustomPoolActive && selectedJLPTLevel == level
-                    levelRow(
+                    LevelSelectionRow(
                         code: level.codeLabel,
                         title: level.displayName,
                         countLabel: countLabel(for: level),
@@ -106,7 +106,7 @@ public struct LevelSettingsView: View {
             case .joyo:
                 ForEach(JoyoGrade.allCases, id: \.self) { grade in
                     let isSelected = !isCustomPoolActive && selectedJoyoGrade == grade
-                    levelRow(
+                    LevelSelectionRow(
                         code: grade.codeLabel,
                         title: grade.displayName,
                         countLabel: countLabel(for: grade),
@@ -117,49 +117,6 @@ public struct LevelSettingsView: View {
                 }
             }
         }
-    }
-
-    private func levelRow(
-        code: String,
-        title: String,
-        countLabel: String?,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: LayoutTokens.space12) {
-                Text(code)
-                    .font(.uiText(size: 14, weight: .medium))
-                    .foregroundColor(.nichijiInk)
-                    .frame(width: 36, alignment: .leading)
-
-                Text(title)
-                    .font(.nichijiBody)
-                    .foregroundColor(.nichijiInk)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                if let countLabel, !countLabel.isEmpty {
-                    Text(countLabel)
-                        .font(.nichijiCaption)
-                        .foregroundColor(.nichijiInkMuted)
-                }
-
-                ZStack {
-                    if isSelected {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.nichijiVermilion)
-                    }
-                }
-                .frame(width: 20, height: 20)
-            }
-            .padding(.horizontal, LayoutTokens.space16)
-            .frame(minHeight: 56)
-            .selectableCard(isSelected: isSelected)
-        }
-        .buttonStyle(.plain)
-        .minTouchTarget()
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: - Actions & Helpers
@@ -222,12 +179,11 @@ public struct LevelSettingsView: View {
         let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
         let preferences = LearnerPreferencesSnapshot.load(from: defaults)
         Task {
-            let day = services.dayProvider.calendarDay(for: services.dayProvider.now)
-            _ = try? await services.dailyKanjiService.refreshAssignmentAfterPreferenceChange(
-                for: day,
-                preferences: preferences
+            try? await LevelChangeCoordinator.applyLevelChange(
+                preferences: preferences,
+                dailyKanjiService: services.dailyKanjiService,
+                dayProvider: services.dayProvider
             )
-            // TODO: Rebuild reminder notification schedule and reload WidgetKit timelines after level or order changes in Slices 10 and 11.
         }
     }
 
@@ -241,8 +197,55 @@ public struct LevelSettingsView: View {
 
 // MARK: - Sections
 
+/// Selectable level row shared by Settings and onboarding.
+struct LevelSelectionRow: View {
+    let code: String
+    let title: String
+    let countLabel: String?
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: LayoutTokens.space12) {
+                Text(code)
+                    .font(.uiText(size: 14, weight: .medium))
+                    .foregroundColor(.nichijiInk)
+                    .frame(width: 36, alignment: .leading)
+
+                Text(title)
+                    .font(.nichijiBody)
+                    .foregroundColor(.nichijiInk)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                if let countLabel, !countLabel.isEmpty {
+                    Text(countLabel)
+                        .font(.nichijiCaption)
+                        .foregroundColor(.nichijiInkMuted)
+                }
+
+                ZStack {
+                    if isSelected {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.nichijiVermilion)
+                    }
+                }
+                .frame(width: 20, height: 20)
+            }
+            .padding(.horizontal, LayoutTokens.space16)
+            .frame(minHeight: 56)
+            .selectableCard(isSelected: isSelected)
+        }
+        .buttonStyle(.plain)
+        .minTouchTarget()
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+/// Levels-based-on switch with the scheme note, shared by Settings and onboarding.
 @MainActor
-private func levelSystemSection(
+func levelSystemSection(
     activeLevelSystem: LevelSystem,
     switchAction: @escaping (LevelSystem) -> Void
 ) -> some View {
