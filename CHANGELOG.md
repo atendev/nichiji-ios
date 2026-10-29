@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.4.1
+- Fix onboarding back and forward slides overlapping, flashcard face pop and tilt, Today scroll reset after Control Center, Settings not repainting on theme change, and the Customize kanji grid spacing. Show the system notification prompt on the Reminder step with a status button, add the live notification permission scheduler, and simplify the final step to the logo and "You're all set".
+
 ## v0.4.0
 - Implement the seven-step onboarding with an `OnboardingFlow` model, interactive flashcard demo, store-backed level rows, reminder permission request, widget preview, completion crossfade, and a replay that reassigns today on level change. Share the level-change and reminder-time controls with Settings.
 

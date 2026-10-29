@@ -16,7 +16,7 @@ What are the Success Criteria, Scope Boundary, Anticipated TODOs, and Planned Te
 
 Skills: `apple`, `domain-modeling`, `unslop`.
 Reference files: `docs/workflow.md`, `docs/PROGRESS.md`, `docs/DESIGN.md`, `Nichiji/Services/ReminderScheduler.swift`, `Nichiji/Services/ServiceContainer.swift`, `Nichiji/Views/Settings/ReminderSettingsView.swift`, `Nichiji/Views/Onboarding/OnboardingFlow.swift`.
-Pick up the Slice 10 TODOs left by Slices 8 and 9: the reminder rebuild after level changes in `LevelChangeCoordinator` and after onboarding completion, and the permission prompt at the onboarding Reminder step.
+Pick up the Slice 10 TODOs left by Slices 8 and 9: the reminder rebuild after level changes in `LevelChangeCoordinator` and after onboarding completion, and the permission prompt at the onboarding Reminder step (the prompt and `SystemReminderScheduler` authorization landed in Slice 9b; scheduling and cancelling remain).
 
 ## Resolution
 

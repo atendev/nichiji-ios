@@ -13,14 +13,7 @@ struct NichijiApp: App {
     private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
     private var preferredColorScheme: ColorScheme? {
-        switch AppearanceMode(rawValue: appearanceModeRaw) {
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        case .system, .none:
-            return nil
-        }
+        (AppearanceMode(rawValue: appearanceModeRaw) ?? .system).colorScheme
     }
 
     private let modelContainer: ModelContainer
@@ -51,7 +44,7 @@ struct NichijiApp: App {
                     preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
                 ),
                 pronunciationService: AVSpeechPronunciationService(),
-                reminderScheduler: NoopReminderScheduler()
+                reminderScheduler: SystemReminderScheduler()
             )
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")

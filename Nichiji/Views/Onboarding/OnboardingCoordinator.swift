@@ -43,18 +43,6 @@ private struct OnboardingStepHost: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var stepTransition: AnyTransition {
-        if reduceMotion {
-            return .opacity
-        }
-        switch flow.direction {
-        case .forward:
-            return .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
-        case .backward:
-            return .asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
-        }
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             if flow.showsProgress {
@@ -78,13 +66,7 @@ private struct OnboardingStepHost: View {
                 .transition(.opacity)
             }
 
-            ZStack {
-                stepView
-                    .id(flow.step)
-                    .transition(stepTransition)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
+            stepPager
         }
         .animation(
             reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.35),
@@ -92,9 +74,43 @@ private struct OnboardingStepHost: View {
         )
     }
 
+    /// Steps sit side by side and the row slides, so back and forward use the same motion.
+    /// Removal transitions are not used because SwiftUI keeps the one from the previous render.
     @ViewBuilder
-    private var stepView: some View {
-        switch flow.step {
+    private var stepPager: some View {
+        if reduceMotion {
+            ZStack {
+                stepView(for: flow.step)
+                    .id(flow.step)
+                    .transition(.opacity)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+        } else {
+            GeometryReader { proxy in
+                ZStack {
+                    ForEach(neighbouringSteps, id: \.self) { step in
+                        stepView(for: step)
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                            .offset(x: CGFloat(step.rawValue - flow.step.rawValue) * proxy.size.width)
+                            .allowsHitTesting(step == flow.step)
+                            .accessibilityHidden(step != flow.step)
+                            .transition(.identity)
+                    }
+                }
+                .frame(width: proxy.size.width, height: proxy.size.height)
+            }
+            .clipped()
+        }
+    }
+
+    private var neighbouringSteps: [OnboardingStep] {
+        OnboardingStep.allCases.filter { abs($0.rawValue - flow.step.rawValue) <= 1 }
+    }
+
+    @ViewBuilder
+    private func stepView(for step: OnboardingStep) -> some View {
+        switch step {
         case .welcome:
             WelcomeView(onNext: { flow.advance() })
         case .dailyKanji:
@@ -104,7 +120,7 @@ private struct OnboardingStepHost: View {
         case .levelSelection:
             LevelSelectView(flow: flow)
         case .reminder:
-            ReminderSetupView(flow: flow)
+            ReminderSetupView(flow: flow, isActive: step == flow.step)
         case .widgetIntro:
             WidgetIntroView(onNext: { flow.advance() })
         case .ready:

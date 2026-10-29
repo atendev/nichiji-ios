@@ -238,3 +238,35 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   unavailable in this environment, so `OnboardingFlowTests`,
   `SettingsPreferencesTests`, and the full suite have not been run. Gestures and
   animations still need a manual simulator pass.
+
+### Slice 9b: Onboarding, Today and Settings Polish (v0.4.1)
+
+#### Requirements Report
+- **Success Criteria**: Step slides never overlap in either direction. The
+  flashcard swaps faces at the edge-on point and tilts less. The Reminder step
+  shows the system prompt and a status button. The Ready step shows the logo,
+  "You're all set" and the button. Today keeps its scroll position across
+  Control Center. Settings repaints at once on a theme change. The Customize
+  kanji grid uses one 12 pt gap and square cells.
+- **Scope Boundary**: Onboarding paging, flashcard, reminder, ready, Today
+  reload handling, Settings sheet scheme, kanji grid, and the permission half of
+  the live notification scheduler. Scheduling stays in Slice 10.
+- **Anticipated TODOs**: `SystemReminderScheduler.rebuildSchedule` and
+  `cancelAllReminders` stay no-ops until Slice 10.
+- **Planned Tests**: `OnboardingFlowTests` reminder authorization. Everything
+  else is a manual simulator pass.
+
+#### Deviation Report
+- **Deviations**: The prompt also fires when the reminder toggle is switched on
+  while status is undecided, which the report did not list. The pager builds the
+  neighbouring steps off-screen, so `ReminderSetupView` takes `isActive` to keep
+  the prompt from firing early. `OnboardingStepHeader` gained
+  `reservedSubtitleLines`. Today now refreshes after a real background trip
+  only, and its scroll view is keyed on the kanji so a new kanji starts at the
+  top.
+- **Unanticipated TODOs**: None.
+- **Test Results**: No Swift toolchain in this environment, so nothing was
+  built or run, including `OnboardingFlowTests`. The pager, flip, Control
+  Center, theme repaint and grid fixes were written from reading the code and
+  need a simulator pass. `testReminderAuthorizationOnlyWhenEnabled` was
+  replaced by `testReminderAuthorizationOnlyWhenUndecided`.

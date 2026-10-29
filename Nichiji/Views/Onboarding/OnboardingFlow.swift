@@ -194,17 +194,16 @@ final class OnboardingFlow {
         reminderAuthorization = await reminderScheduler.authorizationStatus()
     }
 
-    /// Asks for notification permission when reminders are on, then always moves to the next step.
-    func continueFromReminder() async {
-        guard step == .reminder, !isRequestingAuthorization else { return }
-        if reminderEnabled {
-            isRequestingAuthorization = true
-            // TODO: NoopReminderScheduler never shows the system prompt; Slice 10 swaps in the UNUserNotificationCenter scheduler.
-            _ = try? await reminderScheduler.requestAuthorization()
-            reminderAuthorization = await reminderScheduler.authorizationStatus()
-            isRequestingAuthorization = false
-        }
-        advance()
+    /// Shows the system permission prompt when the learner has not answered it yet.
+    /// A decided status is only refreshed, since iOS never shows the prompt twice.
+    func requestReminderAuthorizationIfNeeded() async {
+        guard !isRequestingAuthorization else { return }
+        await refreshReminderAuthorization()
+        guard reminderAuthorization == .notDetermined else { return }
+        isRequestingAuthorization = true
+        _ = try? await reminderScheduler.requestAuthorization()
+        reminderAuthorization = await reminderScheduler.authorizationStatus()
+        isRequestingAuthorization = false
     }
 
     // MARK: - Completion

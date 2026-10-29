@@ -16,12 +16,7 @@ public struct WelcomeView: View {
             action: onNext
         ) {
             VStack(spacing: LayoutTokens.space24) {
-                WelcomeSeal()
-
-                Text("日字")
-                    .font(.kanjiDisplay(size: 80))
-                    .foregroundColor(.nichijiInk)
-                    .accessibilityLabel("Nichiji")
+                OnboardingLogo()
 
                 VStack(spacing: LayoutTokens.space8) {
                     Text("Nichiji")
@@ -39,10 +34,24 @@ public struct WelcomeView: View {
     }
 }
 
-/*----------------------------------seal----------------------------------*/
+/*----------------------------------logo----------------------------------*/
+
+/// Seal and 日字 shown on the first and last steps.
+struct OnboardingLogo: View {
+    var body: some View {
+        VStack(spacing: LayoutTokens.space24) {
+            OnboardingSeal()
+
+            Text("日字")
+                .font(.kanjiDisplay(size: 80))
+                .foregroundColor(.nichijiInk)
+                .accessibilityLabel("Nichiji")
+        }
+    }
+}
 
 /// Vermilion hanko-style mark drawn from shapes, so no image asset is needed.
-private struct WelcomeSeal: View {
+private struct OnboardingSeal: View {
     var body: some View {
         Text("日")
             .font(.kanjiDisplay(size: 34))

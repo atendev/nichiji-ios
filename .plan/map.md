@@ -38,6 +38,7 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Implement Slice 8: Settings Sheet & Preferences](closed/023-slice-8-implement-settings-sheet-and-preferences.md): Built settings views, level/order/custom pool reassignment, reminder settings coordinator, and `SettingsPreferencesTests`; build and tests unverified.
 - [Slice 9 Requirements Report: Onboarding Flow](closed/024-slice-9-onboarding-flow-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for the seven-step onboarding with an `OnboardingFlow` model, level rows with store-backed counts, reminder permission wiring, a static flashcard demo, a replay path that preserves progress, and a shared level-change helper.
 - [Implement Slice 9: Onboarding Flow](closed/025-slice-9-implement-onboarding-flow.md): Built `OnboardingFlow`, the seven steps, the `RootView` crossfade, replay reassignment, shared `LevelChangeCoordinator` and `ReminderTimePicker`, and `OnboardingFlowTests`; build and tests unverified.
+- [Slice 9b Requirements Report: Onboarding, Today and Settings Polish](closed/027-slice-9b-polish-and-bug-fixes-requirements.md): Fixed step slide direction, flashcard flip and tilt, Today scroll reset, Settings theme repaint and kanji grid spacing; added the Reminder step system prompt with a status button via an authorization-only `SystemReminderScheduler`; build and tests unverified.
 
 ## Not yet specified
 

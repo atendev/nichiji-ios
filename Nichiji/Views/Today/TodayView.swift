@@ -49,6 +49,7 @@ public struct TodayView: View {
     @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var reloadID = UUID()
+    @State private var wasBackgrounded = false
 
     private var poolPreferenceSignature: String {
         "\(levelSystemRaw)-\(selectedJLPTLevelRaw)-\(selectedJoyoGradeRaw)-\(dailyOrderRaw)-\(isCustomPoolActive)-\(customSelections.count)"
@@ -76,7 +77,8 @@ public struct TodayView: View {
                 .accessibilityLabel("Open settings")
             }
 
-            if isLoading {
+            // Keep the content mounted during a reload so its scroll position survives.
+            if isLoading && kanji == nil {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let errorMessage {
@@ -92,7 +94,10 @@ public struct TodayView: View {
             await loadToday()
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
+            // Control Center only passes through .inactive, so refresh after a real background trip.
+            if phase == .background { wasBackgrounded = true }
+            guard phase == .active, wasBackgrounded else { return }
+            wasBackgrounded = false
             Task {
                 await refreshAfterActivation()
             }
@@ -153,6 +158,7 @@ public struct TodayView: View {
             }
             .padding(.bottom, LayoutTokens.space32)
         }
+        .id(kanji.id)
     }
 
     private func retryView(message: String) -> some View {

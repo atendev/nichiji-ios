@@ -9,6 +9,7 @@ public struct FlashcardDemoView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var isFlipped = false
+    @State private var flipAngle: Double = 0
     @State private var dragOffset: CGSize = .zero
     @State private var flyOffX: CGFloat = 0
     @State private var cardOpacity: Double = 1
@@ -33,9 +34,9 @@ public struct FlashcardDemoView: View {
 
     private var horizontalOffset: CGFloat { dragOffset.width + flyOffX }
 
-    // Swaps faces when the card is edge-on, about halfway through the flip.
-    private var faceSwapAnimation: Animation {
-        reduceMotion ? .easeInOut(duration: 0.2) : .linear(duration: 0.01).delay(0.2)
+    // Tilt per point of drag; capped so a fly-off does not spin the card.
+    private var tiltDegrees: Double {
+        min(max(Double(horizontalOffset) / 40, -10), 10)
     }
 
     public var body: some View {
@@ -45,7 +46,8 @@ public struct FlashcardDemoView: View {
                     title: "Flashcards",
                     subtitle: isFlipped
                         ? "Swipe right for Got it, left for Forgot it."
-                        : "Tap the card to flip it."
+                        : "Tap the card to flip it.",
+                    reservedSubtitleLines: 2
                 )
 
                 card
@@ -58,7 +60,7 @@ public struct FlashcardDemoView: View {
     // MARK: - Card
 
     private var card: some View {
-        ZStack {
+        FlipCard(angle: flipAngle, rotates: !reduceMotion) {
             cardFace {
                 Text("山")
                     .font(.kanjiDisplay(size: 96))
@@ -68,9 +70,7 @@ public struct FlashcardDemoView: View {
                     .font(.nichijiCallout)
                     .foregroundColor(.nichijiInkSubtle)
             }
-            .opacity(isFlipped ? 0 : 1)
-            .animation(faceSwapAnimation, value: isFlipped)
-
+        } back: {
             cardFace {
                 Text("山")
                     .font(.kanjiDisplay(size: 56))
@@ -84,15 +84,7 @@ public struct FlashcardDemoView: View {
                     .font(.nichijiBody)
                     .foregroundColor(.nichijiInkMuted)
             }
-            .opacity(isFlipped ? 1 : 0)
-            .animation(faceSwapAnimation, value: isFlipped)
-            .rotation3DEffect(.degrees(reduceMotion ? 0 : 180), axis: (x: 0, y: 1, z: 0))
         }
-        .rotation3DEffect(
-            .degrees(isFlipped && !reduceMotion ? 180 : 0),
-            axis: (x: 0, y: 1, z: 0),
-            perspective: 0.5
-        )
         .overlay(alignment: .top) {
             if let displayedVerdict {
                 FlashcardVerdictBadge(verdict: displayedVerdict)
@@ -102,7 +94,7 @@ public struct FlashcardDemoView: View {
         }
         .frame(maxWidth: 280)
         .offset(x: horizontalOffset, y: dragOffset.height * 0.2)
-        .rotationEffect(.degrees(reduceMotion ? 0 : Double(horizontalOffset) / 20))
+        .rotationEffect(.degrees(reduceMotion ? 0 : tiltDegrees))
         .opacity(cardOpacity)
         .onTapGesture { flip() }
         .gesture(dragGesture, including: canAnswer ? .all : .subviews)
@@ -176,6 +168,7 @@ public struct FlashcardDemoView: View {
         guard !isResolving else { return }
         withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.5)) {
             isFlipped.toggle()
+            flipAngle = isFlipped ? 180 : 0
         }
     }
 
@@ -204,6 +197,7 @@ public struct FlashcardDemoView: View {
             reset.disablesAnimations = true
             withTransaction(reset) {
                 isFlipped = false
+                flipAngle = 0
                 dragOffset = .zero
                 flyOffX = 0
                 verdict = nil
@@ -214,6 +208,52 @@ public struct FlashcardDemoView: View {
             }
             isResolving = false
         }
+    }
+}
+
+/*--------------------------------flip-card-------------------------------*/
+
+/// Two-faced card whose face follows the animated angle, so the swap lands when the card is edge-on.
+private struct FlipCard<Front: View, Back: View>: View, Animatable {
+    var angle: Double
+    let rotates: Bool
+    let front: Front
+    let back: Back
+
+    init(
+        angle: Double,
+        rotates: Bool,
+        @ViewBuilder front: () -> Front,
+        @ViewBuilder back: () -> Back
+    ) {
+        self.angle = angle
+        self.rotates = rotates
+        self.front = front()
+        self.back = back()
+    }
+
+    var animatableData: Double {
+        get { angle }
+        set { angle = newValue }
+    }
+
+    var body: some View {
+        let progress = angle / 180
+        let showsBack = angle >= 90
+
+        ZStack {
+            front
+                .opacity(rotates ? (showsBack ? 0 : 1) : 1 - progress)
+
+            back
+                .rotation3DEffect(.degrees(rotates ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+                .opacity(rotates ? (showsBack ? 1 : 0) : progress)
+        }
+        .rotation3DEffect(
+            .degrees(rotates ? angle : 0),
+            axis: (x: 0, y: 1, z: 0),
+            perspective: 0.5
+        )
     }
 }
 
