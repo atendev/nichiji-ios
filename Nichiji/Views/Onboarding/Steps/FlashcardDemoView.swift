@@ -214,7 +214,7 @@ public struct FlashcardDemoView: View {
 /*--------------------------------flip-card-------------------------------*/
 
 /// Two-faced card whose face follows the animated angle, so the swap lands when the card is edge-on.
-private struct FlipCard<Front: View, Back: View>: View, Animatable {
+private struct FlipCard<Front: View, Back: View>: View, @preconcurrency Animatable {
     var angle: Double
     let rotates: Bool
     let front: Front
