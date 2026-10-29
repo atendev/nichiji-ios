@@ -6,8 +6,11 @@ struct LevelSelectView: View {
     let flow: OnboardingFlow
 
     var body: some View {
-        OnboardingStepScaffold(buttonTitle: "Continue", action: { flow.advance() }) {
-            VStack(alignment: .leading, spacing: LayoutTokens.space24) {
+        OnboardingStepScaffold(
+            buttonTitle: "Continue",
+            action: { flow.advance() },
+            content: {
+                VStack(alignment: .leading, spacing: LayoutTokens.space24) {
                 OnboardingStepHeader(
                     title: "Choose your level",
                     subtitle: "Your daily kanji come from this level. You can change it any time in Settings.",
@@ -36,6 +39,6 @@ struct LevelSelectView: View {
                     .foregroundColor(.nichijiInkSubtle)
                     .padding(.horizontal, LayoutTokens.space8)
             }
-        }
+        })
     }
 }

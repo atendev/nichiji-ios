@@ -9,9 +9,9 @@ struct ReminderSetupView: View {
         OnboardingStepScaffold(
             buttonTitle: "Continue",
             isButtonEnabled: !flow.isRequestingAuthorization,
-            action: { Task { await flow.continueFromReminder() } }
-        ) {
-            VStack(alignment: .leading, spacing: LayoutTokens.space24) {
+            action: { Task { await flow.continueFromReminder() } },
+            content: {
+                VStack(alignment: .leading, spacing: LayoutTokens.space24) {
                 OnboardingStepHeader(
                     title: "Daily reminder",
                     subtitle: "One gentle reminder a day to learn today's kanji.",
@@ -39,7 +39,7 @@ struct ReminderSetupView: View {
                         .padding(.horizontal, LayoutTokens.space8)
                 }
             }
-        }
+        })
         .task {
             await flow.refreshReminderAuthorization()
         }
