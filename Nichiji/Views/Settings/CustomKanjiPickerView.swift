@@ -1,5 +1,27 @@
 import SwiftUI
 
+private struct SelectionCellBackground: ViewModifier {
+    let isSelected: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
+                    .fill(isSelected ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
+                    .stroke(isSelected ? Color.nichijiVermilion : Color.nichijiBorderControl, lineWidth: 1)
+            )
+    }
+}
+
+extension View {
+    func selectionCellBackground(isSelected: Bool) -> some View {
+        modifier(SelectionCellBackground(isSelected: isSelected))
+    }
+}
+
 /*------------------------------custom-kanji------------------------------*/
 
 public struct CustomKanjiPickerView: View {
@@ -132,17 +154,7 @@ public struct CustomKanjiPickerView: View {
                     .foregroundColor(.nichijiInk)
                     .frame(maxWidth: .infinity, minHeight: 56)
                     .aspectRatio(1, contentMode: .fit)
-                    .background(
-                        RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                            .fill(isSelected ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                            .stroke(
-                                isSelected ? Color.nichijiVermilion : Color.nichijiBorderControl,
-                                lineWidth: 1
-                            )
-                    )
+                    .selectionCellBackground(isSelected: isSelected)
 
                 if isSelected {
                     Image(systemName: "checkmark")

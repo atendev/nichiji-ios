@@ -3,6 +3,30 @@ import SwiftUI
 import UIKit
 #endif
 
+private struct CardBackground: ViewModifier {
+    let cornerRadius: CGFloat
+    let fill: Color
+    let stroke: Color
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(fill)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(stroke, lineWidth: 1)
+            )
+    }
+}
+
+extension View {
+    func cardBackground(cornerRadius: CGFloat, fill: Color, stroke: Color) -> some View {
+        modifier(CardBackground(cornerRadius: cornerRadius, fill: fill, stroke: stroke))
+    }
+}
+
 /*--------------------------------reminder--------------------------------*/
 
 public struct ReminderSettingsView: View {
@@ -135,28 +159,14 @@ public struct ReminderSettingsView: View {
                     .foregroundColor(.nichijiInk)
                     .padding(.horizontal, LayoutTokens.space16)
                     .frame(minHeight: LayoutTokens.minHitTarget)
-                    .background(
-                        RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                            .fill(Color.nichijiSurfaceRaised)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                            .stroke(Color.nichijiBorderControl, lineWidth: 1)
-                    )
+                    .cardBackground(cornerRadius: LayoutTokens.cornerRadiusSmall, fill: .nichijiSurfaceRaised, stroke: .nichijiBorderControl)
             }
             .buttonStyle(.plain)
             .minTouchTarget()
             .accessibilityLabel("Open system notification settings")
         }
         .padding(LayoutTokens.space16)
-        .background(
-            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                .fill(Color.nichijiMustardWash)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                .stroke(Color.nichijiMustard, lineWidth: 1)
-        )
+        .cardBackground(cornerRadius: LayoutTokens.cornerRadiusSmall, fill: .nichijiMustardWash, stroke: .nichijiMustard)
     }
 
     private var reminderToggleCard: some View {
@@ -168,14 +178,7 @@ public struct ReminderSettingsView: View {
         }
         .padding(.horizontal, LayoutTokens.space16)
         .frame(minHeight: 64)
-        .background(
-            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                .fill(Color.nichijiSurfaceRaised)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                .stroke(Color.nichijiHairline, lineWidth: 1)
-        )
+        .cardBackground(cornerRadius: LayoutTokens.cornerRadiusSmall, fill: .nichijiSurfaceRaised, stroke: .nichijiHairline)
     }
 
     private var notificationPreviewCard: some View {
@@ -216,14 +219,7 @@ public struct ReminderSettingsView: View {
             }
         }
         .padding(LayoutTokens.space16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color.nichijiSurfaceRaised)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.nichijiHairline, lineWidth: 1)
-        )
+        .cardBackground(cornerRadius: 20, fill: .nichijiSurfaceRaised, stroke: .nichijiHairline)
     }
 
     private var timeSelectionSection: some View {
@@ -249,16 +245,10 @@ public struct ReminderSettingsView: View {
                                 .foregroundColor(.nichijiInk)
                         }
                         .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                                .fill(isSelected ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                                .stroke(
-                                    isSelected ? Color.nichijiVermilion : Color.nichijiBorderControl,
-                                    lineWidth: 1
-                                )
+                        .cardBackground(
+                            cornerRadius: LayoutTokens.cornerRadiusSmall,
+                            fill: isSelected ? .nichijiVermilionWash : .nichijiSurfaceRaised,
+                            stroke: isSelected ? .nichijiVermilion : .nichijiBorderControl
                         )
                     }
                     .buttonStyle(.plain)
@@ -284,14 +274,7 @@ public struct ReminderSettingsView: View {
             }
             .padding(.horizontal, LayoutTokens.space16)
             .frame(minHeight: 56)
-            .background(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .fill(Color.nichijiSurfaceRaised)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(Color.nichijiHairline, lineWidth: 1)
-            )
+            .cardBackground(cornerRadius: LayoutTokens.cornerRadiusSmall, fill: .nichijiSurfaceRaised, stroke: .nichijiHairline)
         }
     }
 

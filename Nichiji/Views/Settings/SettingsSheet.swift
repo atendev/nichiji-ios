@@ -1,5 +1,25 @@
 import SwiftUI
 
+private struct SettingsGroupBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
+                    .fill(Color.nichijiSurface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
+                    .stroke(Color.nichijiHairline, lineWidth: 1)
+            )
+    }
+}
+
+extension View {
+    func settingsGroupBackground() -> some View {
+        modifier(SettingsGroupBackground())
+    }
+}
+
 /*--------------------------------settings--------------------------------*/
 
 public struct SettingsSheet: View {
@@ -174,14 +194,7 @@ public struct SettingsSheet: View {
                     isOn: $streakFreezeEnabled
                 )
             }
-            .background(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .fill(Color.nichijiSurface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(Color.nichijiHairline, lineWidth: 1)
-            )
+            .settingsGroupBackground()
         }
     }
 
@@ -215,14 +228,7 @@ public struct SettingsSheet: View {
                 }
                 .buttonStyle(.plain)
             }
-            .background(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .fill(Color.nichijiSurface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(Color.nichijiHairline, lineWidth: 1)
-            )
+            .settingsGroupBackground()
         }
     }
 
@@ -258,90 +264,8 @@ public struct SettingsSheet: View {
                 .padding(.horizontal, LayoutTokens.space16)
                 .frame(minHeight: 52)
             }
-            .background(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .fill(Color.nichijiSurface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(Color.nichijiHairline, lineWidth: 1)
-            )
+            .settingsGroupBackground()
         }
-    }
-
-    // MARK: - Row Builders
-
-    private func sectionHeader(_ text: String) -> some View {
-        Text(text)
-            .font(.nichijiCaption)
-            .foregroundColor(.nichijiInkSubtle)
-            .kerning(0.6)
-            .padding(.horizontal, LayoutTokens.space8)
-    }
-
-    private var dividerLine: some View {
-        Rectangle()
-            .fill(Color.nichijiHairline)
-            .frame(height: 1)
-    }
-
-    private func settingsNavigationRow(
-        title: String,
-        subtitle: String?,
-        value: String?
-    ) -> some View {
-        HStack(spacing: LayoutTokens.space12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.nichijiBody)
-                    .foregroundColor(.nichijiInk)
-
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.nichijiCaption)
-                        .foregroundColor(.nichijiInkMuted)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            if let value {
-                Text(value)
-                    .font(.nichijiCallout)
-                    .foregroundColor(.nichijiInkMuted)
-            }
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.nichijiInkSubtle)
-        }
-        .padding(.horizontal, LayoutTokens.space16)
-        .frame(minHeight: 56)
-        .contentShape(Rectangle())
-    }
-
-    private func settingsToggleRow(
-        title: String,
-        subtitle: String,
-        isOn: Binding<Bool>
-    ) -> some View {
-        HStack(spacing: LayoutTokens.space12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.nichijiBody)
-                    .foregroundColor(.nichijiInk)
-
-                Text(subtitle)
-                    .font(.nichijiCaption)
-                    .foregroundColor(.nichijiInkMuted)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Toggle("", isOn: isOn)
-                .labelsHidden()
-                .tint(.nichijiVermilion)
-        }
-        .padding(.horizontal, LayoutTokens.space16)
-        .frame(minHeight: 56)
     }
 
     private func refreshCustomCount() async {
@@ -351,4 +275,79 @@ public struct SettingsSheet: View {
             customCount = ids.count
         }
     }
+}
+
+// MARK: - Row Builders
+
+private func sectionHeader(_ text: String) -> some View {
+    Text(text)
+        .font(.nichijiCaption)
+        .foregroundColor(.nichijiInkSubtle)
+        .kerning(0.6)
+        .padding(.horizontal, LayoutTokens.space8)
+}
+
+private var dividerLine: some View {
+    Rectangle()
+        .fill(Color.nichijiHairline)
+        .frame(height: 1)
+}
+
+private func settingsNavigationRow(
+    title: String,
+    subtitle: String?,
+    value: String?
+) -> some View {
+    HStack(spacing: LayoutTokens.space12) {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.nichijiBody)
+                .foregroundColor(.nichijiInk)
+
+            if let subtitle {
+                Text(subtitle)
+                    .font(.nichijiCaption)
+                    .foregroundColor(.nichijiInkMuted)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        if let value {
+            Text(value)
+                .font(.nichijiCallout)
+                .foregroundColor(.nichijiInkMuted)
+        }
+
+        Image(systemName: "chevron.right")
+            .font(.system(size: 13, weight: .medium))
+            .foregroundColor(.nichijiInkSubtle)
+    }
+    .padding(.horizontal, LayoutTokens.space16)
+    .frame(minHeight: 56)
+    .contentShape(Rectangle())
+}
+
+private func settingsToggleRow(
+    title: String,
+    subtitle: String,
+    isOn: Binding<Bool>
+) -> some View {
+    HStack(spacing: LayoutTokens.space12) {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.nichijiBody)
+                .foregroundColor(.nichijiInk)
+
+            Text(subtitle)
+                .font(.nichijiCaption)
+                .foregroundColor(.nichijiInkMuted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        Toggle("", isOn: isOn)
+            .labelsHidden()
+            .tint(.nichijiVermilion)
+    }
+    .padding(.horizontal, LayoutTokens.space16)
+    .frame(minHeight: 56)
 }

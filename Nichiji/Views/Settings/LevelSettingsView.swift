@@ -37,21 +37,13 @@ public struct LevelSettingsView: View {
 
     @State private var customCount: Int = 0
 
-    private var activeLevelSystem: LevelSystem {
-        LevelSystem(rawValue: levelSystemRaw) ?? .jlpt
-    }
+    private var activeLevelSystem: LevelSystem { LevelSystem(rawValue: levelSystemRaw) ?? .jlpt }
 
-    private var selectedJLPTLevel: JLPTLevel {
-        JLPTLevel(rawValue: selectedJLPTLevelRaw) ?? .n5
-    }
+    private var selectedJLPTLevel: JLPTLevel { JLPTLevel(rawValue: selectedJLPTLevelRaw) ?? .n5 }
 
-    private var selectedJoyoGrade: JoyoGrade {
-        JoyoGrade(rawValue: selectedJoyoGradeRaw) ?? .grade1
-    }
+    private var selectedJoyoGrade: JoyoGrade { JoyoGrade(rawValue: selectedJoyoGradeRaw) ?? .grade1 }
 
-    private var selectedDailyOrder: DailyOrder {
-        DailyOrder(rawValue: dailyOrderRaw) ?? .mostCommon
-    }
+    private var selectedDailyOrder: DailyOrder { DailyOrder(rawValue: dailyOrderRaw) ?? .mostCommon }
 
     public init() {}
 
@@ -69,13 +61,13 @@ public struct LevelSettingsView: View {
                 }
                 .padding(.top, LayoutTokens.space8)
 
-                levelSystemSection
+                levelSystemSection(activeLevelSystem: activeLevelSystem, switchAction: switchLevelSystem)
 
                 levelRowsSection
 
-                dailyOrderSection
+                dailyOrderSection(selectedDailyOrder: selectedDailyOrder, selectAction: selectDailyOrder)
 
-                customSection
+                customSection(customCount: customCount, isCustomPoolActive: isCustomPoolActive)
 
                 Text("You can change this any time. Kanji you have learned stay learned.")
                     .font(.nichijiCaption)
@@ -94,51 +86,6 @@ public struct LevelSettingsView: View {
     }
 
     // MARK: - Sections
-
-    private var levelSystemSection: some View {
-        VStack(alignment: .leading, spacing: LayoutTokens.space8) {
-            Text("LEVELS BASED ON")
-                .font(.nichijiCaption)
-                .foregroundColor(.nichijiInkSubtle)
-                .kerning(0.6)
-                .padding(.horizontal, LayoutTokens.space8)
-
-            HStack(spacing: LayoutTokens.space4) {
-                ForEach(LevelSystem.allCases, id: \.self) { system in
-                    let isSelected = activeLevelSystem == system
-                    Button {
-                        switchLevelSystem(to: system)
-                    } label: {
-                        Text(system.displayName)
-                            .font(.uiText(size: 14, weight: isSelected ? .medium : .regular))
-                            .foregroundColor(isSelected ? .nichijiInk : .nichijiInkMuted)
-                            .frame(maxWidth: .infinity, minHeight: 40)
-                            .background(
-                                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                                    .fill(isSelected ? Color.nichijiSurfaceRaised : Color.clear)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                                    .stroke(isSelected ? Color.nichijiBorderControl : Color.clear, lineWidth: 1)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .minTouchTarget()
-                    .accessibilityAddTraits(isSelected ? .isSelected : [])
-                }
-            }
-            .padding(LayoutTokens.space4)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.nichijiSurfaceSunken)
-            )
-
-            Text(activeLevelSystem.schemeNote)
-                .font(.nichijiCaption)
-                .foregroundColor(.nichijiInkSubtle)
-                .padding(.horizontal, LayoutTokens.space8)
-        }
-    }
 
     @ViewBuilder
     private var levelRowsSection: some View {
@@ -208,131 +155,11 @@ public struct LevelSettingsView: View {
             }
             .padding(.horizontal, LayoutTokens.space16)
             .frame(minHeight: 56)
-            .background(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .fill(isSelected ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(isSelected ? Color.nichijiVermilion : Color.nichijiBorderControl, lineWidth: 1)
-            )
+            .selectableCard(isSelected: isSelected)
         }
         .buttonStyle(.plain)
         .minTouchTarget()
         .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-
-    private var dailyOrderSection: some View {
-        VStack(alignment: .leading, spacing: LayoutTokens.space8) {
-            Text("DAILY ORDER")
-                .font(.nichijiCaption)
-                .foregroundColor(.nichijiInkSubtle)
-                .kerning(0.6)
-                .padding(.horizontal, LayoutTokens.space8)
-
-            VStack(spacing: LayoutTokens.space8) {
-                ForEach(DailyOrder.allCases, id: \.self) { order in
-                    let isSelected = selectedDailyOrder == order
-                    Button {
-                        selectDailyOrder(order)
-                    } label: {
-                        HStack(spacing: LayoutTokens.space12) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(order.displayName)
-                                    .font(.nichijiBody)
-                                    .foregroundColor(.nichijiInk)
-
-                                Text(order.subtitleNote)
-                                    .font(.nichijiCaption)
-                                    .foregroundColor(.nichijiInkMuted)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                            if isSelected {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.nichijiVermilion)
-                                    .frame(width: 20, height: 20)
-                            }
-                        }
-                        .padding(.horizontal, LayoutTokens.space16)
-                        .frame(minHeight: 64)
-                        .background(
-                            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                                .fill(isSelected ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                                .stroke(isSelected ? Color.nichijiVermilion : Color.nichijiBorderControl, lineWidth: 1)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .minTouchTarget()
-                    .accessibilityAddTraits(isSelected ? .isSelected : [])
-                }
-            }
-        }
-    }
-
-    private var customSection: some View {
-        VStack(alignment: .leading, spacing: LayoutTokens.space8) {
-            Text("CUSTOM")
-                .font(.nichijiCaption)
-                .foregroundColor(.nichijiInkSubtle)
-                .kerning(0.6)
-                .padding(.horizontal, LayoutTokens.space8)
-
-            NavigationLink {
-                CustomKanjiPickerView()
-            } label: {
-                HStack(spacing: LayoutTokens.space12) {
-                    Image(systemName: "square.grid.2x2")
-                        .font(.system(size: 18, weight: .regular))
-                        .foregroundColor(.nichijiInk)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Customize your kanji")
-                            .font(.nichijiBody)
-                            .foregroundColor(.nichijiInk)
-
-                        Text(
-                            customCount > 0
-                                ? "\(customCount) kanji on. Choose exactly which to study."
-                                : "Choose exactly which kanji to study."
-                        )
-                        .font(.nichijiCaption)
-                        .foregroundColor(.nichijiInkMuted)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                    if isCustomPoolActive {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.nichijiVermilion)
-                            .frame(width: 20, height: 20)
-                    } else {
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.nichijiInkSubtle)
-                    }
-                }
-                .padding(.horizontal, LayoutTokens.space16)
-                .frame(minHeight: 64)
-                .background(
-                    RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                        .fill(isCustomPoolActive ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                        .stroke(
-                            isCustomPoolActive ? Color.nichijiVermilion : Color.nichijiBorderControl,
-                            lineWidth: 1
-                        )
-                )
-            }
-            .buttonStyle(.plain)
-            .minTouchTarget()
-        }
     }
 
     // MARK: - Actions & Helpers
@@ -409,5 +236,150 @@ public struct LevelSettingsView: View {
         if let ids = try? await learnerStore.customSelectionIDs(for: activeLevelSystem) {
             customCount = ids.count
         }
+    }
+}
+
+// MARK: - Sections
+
+private func levelSystemSection(
+    activeLevelSystem: LevelSystem,
+    switchAction: @escaping (LevelSystem) -> Void
+) -> some View {
+    VStack(alignment: .leading, spacing: LayoutTokens.space8) {
+        Text("LEVELS BASED ON")
+            .font(.nichijiCaption)
+            .foregroundColor(.nichijiInkSubtle)
+            .kerning(0.6)
+            .padding(.horizontal, LayoutTokens.space8)
+
+        HStack(spacing: LayoutTokens.space4) {
+            ForEach(LevelSystem.allCases, id: \.self) { system in
+                let isSelected = activeLevelSystem == system
+                Button {
+                    switchAction(system)
+                } label: {
+                    Text(system.displayName)
+                        .font(.uiText(size: 14, weight: isSelected ? .medium : .regular))
+                        .foregroundColor(isSelected ? .nichijiInk : .nichijiInkMuted)
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .selectableCard(isSelected: isSelected)
+                }
+                .buttonStyle(.plain)
+                .minTouchTarget()
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
+            }
+        }
+        .padding(LayoutTokens.space4)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.nichijiSurfaceSunken)
+        )
+
+        Text(activeLevelSystem.schemeNote)
+            .font(.nichijiCaption)
+            .foregroundColor(.nichijiInkSubtle)
+            .padding(.horizontal, LayoutTokens.space8)
+    }
+}
+
+private func dailyOrderSection(
+    selectedDailyOrder: DailyOrder,
+    selectAction: @escaping (DailyOrder) -> Void
+) -> some View {
+    VStack(alignment: .leading, spacing: LayoutTokens.space8) {
+        Text("DAILY ORDER")
+            .font(.nichijiCaption)
+            .foregroundColor(.nichijiInkSubtle)
+            .kerning(0.6)
+            .padding(.horizontal, LayoutTokens.space8)
+
+        VStack(spacing: LayoutTokens.space8) {
+            ForEach(DailyOrder.allCases, id: \.self) { order in
+                let isSelected = selectedDailyOrder == order
+                Button {
+                    selectAction(order)
+                } label: {
+                    HStack(spacing: LayoutTokens.space12) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(order.displayName)
+                                .font(.nichijiBody)
+                                .foregroundColor(.nichijiInk)
+
+                            Text(order.subtitleNote)
+                                .font(.nichijiCaption)
+                                .foregroundColor(.nichijiInkMuted)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        if isSelected {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.nichijiVermilion)
+                                .frame(width: 20, height: 20)
+                        }
+                    }
+                    .padding(.horizontal, LayoutTokens.space16)
+                    .frame(minHeight: 64)
+                    .selectableCard(isSelected: isSelected)
+                }
+                .buttonStyle(.plain)
+                .minTouchTarget()
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
+            }
+        }
+    }
+}
+
+private func customSection(
+    customCount: Int,
+    isCustomPoolActive: Bool
+) -> some View {
+    VStack(alignment: .leading, spacing: LayoutTokens.space8) {
+        Text("CUSTOM")
+            .font(.nichijiCaption)
+            .foregroundColor(.nichijiInkSubtle)
+            .kerning(0.6)
+            .padding(.horizontal, LayoutTokens.space8)
+
+        NavigationLink {
+            CustomKanjiPickerView()
+        } label: {
+            HStack(spacing: LayoutTokens.space12) {
+                Image(systemName: "square.grid.2x2")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(.nichijiInk)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Customize your kanji")
+                        .font(.nichijiBody)
+                        .foregroundColor(.nichijiInk)
+
+                    Text(
+                        customCount > 0
+                            ? "\(customCount) kanji on. Choose exactly which to study."
+                            : "Choose exactly which kanji to study."
+                    )
+                    .font(.nichijiCaption)
+                    .foregroundColor(.nichijiInkMuted)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                if isCustomPoolActive {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.nichijiVermilion)
+                        .frame(width: 20, height: 20)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.nichijiInkSubtle)
+                }
+            }
+            .padding(.horizontal, LayoutTokens.space16)
+            .frame(minHeight: 64)
+            .selectableCard(isSelected: isCustomPoolActive)
+        }
+        .buttonStyle(.plain)
+        .minTouchTarget()
     }
 }
