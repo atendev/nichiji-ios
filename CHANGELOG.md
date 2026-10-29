@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.4.0
+- Implement the seven-step onboarding with an `OnboardingFlow` model, interactive flashcard demo, store-backed level rows, reminder permission request, widget preview, completion crossfade, and a replay that reassigns today on level change. Share the level-change and reminder-time controls with Settings.
+
 ## v0.3.0
 - Implement the Settings sheet: appearance picker, level, order and custom kanji pool selection with Today reassignment, reminder settings with permission warning, widget guide, and privacy screens.
 

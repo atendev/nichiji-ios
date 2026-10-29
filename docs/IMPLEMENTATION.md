@@ -58,3 +58,21 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify level and order switches reassign an `.assigned` today kanji via `refreshAssignmentAfterPreferenceChange(for:preferences:)` while preserving a `.learned` assignment.
    - Verify custom kanji selections persist per `LevelSystem` and filter `DailyKanjiService.activePool(preferences:)` when `isCustomPoolActive` is enabled.
    - Verify `ReminderSettingsCoordinator.applyReminderPreferences(_:scheduler:)` rebuilds schedules when enabled, cancels reminders when disabled, and preserves the learner toggle when authorization is `.denied`.
+8. **`OnboardingFlowTests`**:
+   - Verify the seven steps run in order, Welcome shows no progress, and steps 1 to 6 fill 1 to 6 segments.
+   - Verify back navigation walks the steps in reverse and reaches Welcome.
+   - Verify switching level system selects N5 or 1st grade and clears `isCustomPoolActive`, and choosing a level writes `levelSystem` and the matching level key.
+   - Verify level row counts come from `KanjiContentStore`.
+   - Verify `requestAuthorization()` runs only when reminders are on, and a `.denied` result still advances.
+   - Verify completion sets `hasCompletedOnboarding` without a `LearnerStore` write, and a replay with a changed level reassigns an `.assigned` today while leaving a `.learned` today alone.
+
+## Onboarding Flow (Slice 9)
+
+`OnboardingFlow` (`Nichiji/Views/Onboarding/OnboardingFlow.swift`) is a `@MainActor @Observable` model that owns the onboarding logic. The step views only read it and call its methods.
+
+- **Navigation**: `step`, `direction`, `advance()`, `goBack()`, `showsProgress`, and `progressFill` (equal to `step.rawValue`, so Welcome fills nothing). `progressSegmentCount` is 6.
+- **Level**: `levelRows` builds the JLPT or Jōyō rows with counts read once from `KanjiContentStore`. `selectLevelSystem(_:)` picks the system's first level. `selectLevel(_:)` writes `levelSystem`, the matching level key, and `isCustomPoolActive = false` straight to the App Group defaults.
+- **Reminder**: `reminderEnabled`, `reminderHour`, and `reminderMinute` write through to defaults. `continueFromReminder()` calls `ReminderScheduler.requestAuthorization()` only when reminders are on, records the status, and always advances.
+- **Completion**: `complete()` sets `hasCompletedOnboarding`. If the level changed and today already has an assignment (a replay), it calls `LevelChangeCoordinator.applyLevelChange(preferences:dailyKanjiService:dayProvider:)`. A first run has no assignment yet, so it writes nothing to `LearnerStore` and Today's lazy rollover picks the first kanji.
+
+`LevelChangeCoordinator` (`Nichiji/Services/LevelChangeCoordinator.swift`) is the shared reassignment path for Settings level, order, and custom pool changes and for onboarding replay. It resolves today's calendar day and calls `DailyKanjiService.refreshAssignmentAfterPreferenceChange(for:preferences:)`, which runs `LearnerStore.reassignToday(day:from:)` and keeps a `.learned` assignment.

@@ -8,12 +8,14 @@ final class TestReminderScheduler: ReminderScheduler, @unchecked Sendable {
     var scheduledRequestsCount: Int = 0
     var lastRebuiltPreferences: LearnerPreferencesSnapshot?
     var didCancelAll: Bool = false
+    var requestAuthorizationCallCount: Int = 0
 
     func authorizationStatus() async -> ReminderAuthorizationStatus {
         stubbedAuthorizationStatus
     }
 
     func requestAuthorization() async throws -> Bool {
+        requestAuthorizationCallCount += 1
         if stubbedAuthorizationStatus == .denied {
             throw NichijiError.notificationsDenied
         }

@@ -293,12 +293,11 @@ public struct CustomKanjiPickerView: View {
             let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
             var preferences = LearnerPreferencesSnapshot.load(from: defaults)
             preferences.isCustomPoolActive = isCustomPoolActive
-            let day = services.dayProvider.calendarDay(for: services.dayProvider.now)
-            _ = try await services.dailyKanjiService.refreshAssignmentAfterPreferenceChange(
-                for: day,
-                preferences: preferences
+            try await LevelChangeCoordinator.applyLevelChange(
+                preferences: preferences,
+                dailyKanjiService: services.dailyKanjiService,
+                dayProvider: services.dayProvider
             )
-            // TODO: Rebuild reminder notification schedule and reload WidgetKit timelines after custom pool updates in Slices 10 and 11.
         } catch {
             // Keep UI responsive if background store persistence fails.
         }

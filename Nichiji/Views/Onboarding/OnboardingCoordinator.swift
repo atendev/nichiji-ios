@@ -3,65 +3,134 @@ import SwiftUI
 /*-------------------------------coordinator------------------------------*/
 
 public struct OnboardingCoordinator: View {
-    @State private var currentStep: OnboardingStep = .welcome
-    @AppStorage(
-        LearnerPreferenceKey.hasCompletedOnboarding.rawValue,
-        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
-    )
-    private var hasCompletedOnboarding: Bool = false
+    @Environment(\.serviceContainer) private var services
+    @State private var flow: OnboardingFlow?
 
     public init() {}
 
     public var body: some View {
-        VStack(spacing: 0) {
-            if currentStep != .welcome {
-                OnboardingProgressBar(currentStep: currentStep)
-                    .padding(.horizontal, LayoutTokens.space16)
-                    .padding(.top, LayoutTokens.space8)
+        Group {
+            if let flow {
+                OnboardingStepHost(flow: flow)
+            } else {
+                Color.clear
+                    .onAppear { flow = makeFlow() }
             }
-
-            Group {
-                switch currentStep {
-                case .welcome:
-                    WelcomeView(onNext: { currentStep = .dailyKanji })
-                case .dailyKanji:
-                    DailyKanjiIntroView(onNext: { currentStep = .flashcards }, onBack: { currentStep = .welcome })
-                case .flashcards:
-                    FlashcardDemoView(onNext: { currentStep = .levelSelection }, onBack: { currentStep = .dailyKanji })
-                case .levelSelection:
-                    LevelSelectView(onNext: { currentStep = .reminder }, onBack: { currentStep = .flashcards })
-                case .reminder:
-                    ReminderSetupView(onNext: { currentStep = .widgetIntro }, onBack: { currentStep = .levelSelection })
-                case .widgetIntro:
-                    WidgetIntroView(onNext: { currentStep = .ready }, onBack: { currentStep = .reminder })
-                case .ready:
-                    ReadyView(onComplete: { hasCompletedOnboarding = true }, onBack: { currentStep = .widgetIntro })
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(Color.nichijiSurface.ignoresSafeArea())
+    }
+
+    private func makeFlow() -> OnboardingFlow {
+        let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
+        if let services {
+            return OnboardingFlow(services: services, defaults: defaults)
+        }
+        return OnboardingFlow(
+            defaults: defaults,
+            contentStore: BundledKanjiContentStore(),
+            reminderScheduler: NoopReminderScheduler(),
+            dayProvider: SystemDayProvider(),
+            learnerStore: nil,
+            dailyKanjiService: nil
+        )
+    }
+}
+
+/*--------------------------------step-host-------------------------------*/
+
+private struct OnboardingStepHost: View {
+    let flow: OnboardingFlow
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var stepTransition: AnyTransition {
+        if reduceMotion {
+            return .opacity
+        }
+        switch flow.direction {
+        case .forward:
+            return .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
+        case .backward:
+            return .asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if flow.showsProgress {
+                HStack(spacing: LayoutTokens.space8) {
+                    Button {
+                        flow.goBack()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.nichijiInk)
+                    }
+                    .buttonStyle(.plain)
+                    .minTouchTarget()
+                    .accessibilityLabel("Back")
+
+                    OnboardingProgressBar(filledSegments: flow.progressFill)
+                }
+                .padding(.leading, LayoutTokens.space8)
+                .padding(.trailing, LayoutTokens.screenMarginCompact)
+                .padding(.top, LayoutTokens.space8)
+                .transition(.opacity)
+            }
+
+            ZStack {
+                stepView
+                    .id(flow.step)
+                    .transition(stepTransition)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+        }
+        .animation(
+            reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.35),
+            value: flow.step
+        )
+    }
+
+    @ViewBuilder
+    private var stepView: some View {
+        switch flow.step {
+        case .welcome:
+            WelcomeView(onNext: { flow.advance() })
+        case .dailyKanji:
+            DailyKanjiIntroView(onNext: { flow.advance() })
+        case .flashcards:
+            FlashcardDemoView(onNext: { flow.advance() })
+        case .levelSelection:
+            LevelSelectView(flow: flow)
+        case .reminder:
+            ReminderSetupView(flow: flow)
+        case .widgetIntro:
+            WidgetIntroView(onNext: { flow.advance() })
+        case .ready:
+            ReadyView(
+                isCompleting: flow.isCompleting,
+                onComplete: { Task { await flow.complete() } }
+            )
+        }
     }
 }
 
 /*------------------------------progress-bar------------------------------*/
 
 struct OnboardingProgressBar: View {
-    let currentStep: OnboardingStep
+    let filledSegments: Int
 
     var body: some View {
         HStack(spacing: LayoutTokens.space4) {
-            ForEach(1...6, id: \.self) { index in
-                Rectangle()
-                    .fill(index <= currentStep.rawValue ? Color.nichijiVermilion : Color.nichijiHairline)
+            ForEach(1...OnboardingFlow.progressSegmentCount, id: \.self) { index in
+                Capsule()
+                    .fill(index <= filledSegments ? Color.nichijiVermilion : Color.nichijiHairline)
                     .frame(height: 3)
-                    .clipShape(Capsule())
             }
         }
-        .frame(height: LayoutTokens.space8)
+        .frame(height: LayoutTokens.minHitTarget)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Step \(filledSegments) of \(OnboardingFlow.progressSegmentCount)")
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Connect back-swipe gestures and step transitions with spring animations in Slice 9.
