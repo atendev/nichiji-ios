@@ -35,14 +35,13 @@ struct WidgetEnvironment: Sendable {
                 cloudKitDatabase: .none
             )
         )
-        let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
         let dayProvider = SystemDayProvider()
         let learnerStore = SwiftDataLearnerStore(modelContainer: container)
         let dailyKanjiService = DefaultDailyKanjiService(
             contentStore: BundledKanjiContentStore(),
             learnerStore: learnerStore,
             dayProvider: dayProvider,
-            preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
+            preferencesProvider: { Self.sharedPreferences() }
         )
         return WidgetEnvironment(
             dayProvider: dayProvider,
@@ -50,8 +49,13 @@ struct WidgetEnvironment: Sendable {
             dailyKanjiService: dailyKanjiService,
             reminderScheduler: SystemReminderScheduler(dailyKanjiService: dailyKanjiService, dayProvider: dayProvider),
             widgetRefresher: SystemWidgetRefresher(),
-            preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
+            preferencesProvider: { Self.sharedPreferences() }
         )
+    }
+
+    /// Reads the shared suite on demand because `UserDefaults` is not `Sendable` and cannot be captured.
+    private static func sharedPreferences() -> LearnerPreferencesSnapshot {
+        LearnerPreferencesSnapshot.load(from: UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard)
     }
 }
 
