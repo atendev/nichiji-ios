@@ -24,12 +24,14 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 - [Find a licensable JLPT N5-N1 kanji list](closed/033-jlpt-kanji-list-source.md): Use Jonathan Waller's CC BY lists pinned through OpenJLPT commit `0d1d341`, labelled as an unofficial estimate; 172 Jōyō kanji lack a level, and the dataset ticket decides whether OpenJLPT's CC BY-SA supplements fill them.
 - [Reconcile docs and stale TODOs with v0.6.0](closed/031-reconcile-docs-and-stale-todos.md): Marked Slices 1-11 `tested`, pointed the `DESIGN.md` status at v0.6.0 and this map, and retargeted stale TODOs to the tickets that replace them.
+- [Open Today from a widget tap](closed/032-widget-deep-link-to-today.md): Both widgets open `nichiji://today` through `.widgetURL`; the app selects Today and closes Settings, with no URL scheme registration needed.
 
 ## Not yet specified
 
 - Handwriting recognition for "Draw to search", stroke-order checking on the Practice sheet, the iPhone Duo / iPad two-pane layout, and configurable widgets. Each becomes tickets or moves to Out of scope once "Fix the v1.0 scope" closes.
 - Release preparation (privacy manifest, App Store metadata, signing, TestFlight), if the scope ticket puts it in v1.0.
 - Whether onboarding's Level step gets a "Customize your kanji" option (an open question in `docs/ui-reference/design-notes.md`).
+- Registering the `nichiji` URL scheme so Safari or Shortcuts can open Today. Widgets work without it, but nobody has confirmed that on a device yet.
 - The UI test follow-up task, once "Keep or remove the UI test target" closes.
 - A review reminder, daily review cap and furigana toggle, listed in the design notes as ideas not built. Revisit after "Decide the review scheduling and progress rules".
 
@@ -39,7 +41,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Open Today from a widget tap](tickets/032-widget-deep-link-to-today.md) (task, AFK)
 - [Fix the v1.0 scope](tickets/034-fix-the-v1-scope.md) (grilling, HITL)
 - [Keep or remove the UI test target](tickets/035-ui-test-target.md) (grilling, HITL)
 - [Decide the review scheduling and progress rules](tickets/039-review-scheduling-rules.md) (grilling, HITL)

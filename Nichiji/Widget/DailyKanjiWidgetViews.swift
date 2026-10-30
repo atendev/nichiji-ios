@@ -44,7 +44,7 @@ struct DailyKanjiSmallWidgetView: View {
 
 /*---------------------------------message------------------------------------*/
 
-/// Quiet placeholder for the level-complete and open-app states. It has no button, so nothing is tappable.
+/// Quiet placeholder for the level-complete and open-app states. It has no button; a tap opens the app.
 struct DailyKanjiWidgetMessageView: View {
     let content: DailyKanjiWidgetEntry.Content
 

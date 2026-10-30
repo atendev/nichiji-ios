@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.7.0
+
+- Open the app on Today when the learner taps either widget: `AppDeepLink` builds and parses `nichiji://today`, the widgets set it with `.widgetURL`, and `MainTabView` selects Today and closes Settings in `onOpenURL`. The medium widget's Got it button keeps its AppIntent
+- Add `AppDeepLinkTests`; close ticket 032
+
 ## v0.6.2
 
 - Mark Slices 1-5 and 8-11 `tested` in `PROGRESS.md` and drop the stale "Not yet built or run" notes

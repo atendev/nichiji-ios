@@ -410,3 +410,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept, with two comment-only extras: `SettingsSupportViews.swift:188` and `NichijiWidgetBundle.swift:8` now point at "Build the lock-screen widgets" (and "Fix the v1.0 scope" for configurable widgets).
 - **Unanticipated TODOs**: `DailyKanjiWidget.swift:19` keeps its "after the MVP" `.widgetURL` TODO for "Open Today from a widget tap", which removes it. `DESIGN.md:98` still calls lock-screen widgets post-MVP, which is true for v0.6.0.
 - **Test Results**: Nothing built locally (Linux host, no Xcode). CI is the gate.
+
+### Open Today from a widget tap (v0.7.0)
+
+#### Requirements Report
+
+- **Success Criteria**: Tapping either widget opens Nichiji on Today, closing Settings and switching tabs. Before onboarding the tap only opens the app. The medium widget's Got it button keeps its AppIntent and does not open the app.
+- **Scope Boundary**: One shared `nichiji://today` type in `Nichiji/Models`, `.widgetURL` on the widget entry view, the handler on `MainTabView`. Out: notification routing, lock-screen and configurable widgets, universal links, deeper Today navigation. No `CFBundleURLTypes` entry, because WidgetKit hands widget URLs to the containing app's `onOpenURL`.
+- **Anticipated TODOs**: Fix the "nothing is tappable" comment in `DailyKanjiWidgetMessageView`. No pending-URL fallback on cold launch. No routes beyond today.
+- **Planned Tests**: `AppDeepLinkTests` for the round trip, rejected URLs, case folding and the tab mapping.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code. The tap itself needs a device check.
+- **Scope Boundary**: Kept. The only departure is from the ticket Notes, not the report: no URL scheme was registered, so Safari and Shortcuts cannot open the link until a later ticket adds one.
+- **Unanticipated TODOs**: `IMPLEMENTATION.md` now lists `AppDeepLinkTests` and the deep link. The cold-launch path relies on `MainTabView` mounting on first render, which onboarding state allows but no test covers.
+- **Test Results**: Nothing built locally (Linux host). Each test expectation was hand-checked against Foundation URL parsing. CI is the gate.

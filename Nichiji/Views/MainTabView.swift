@@ -44,6 +44,11 @@ public struct MainTabView: View {
         .sheet(isPresented: $isSettingsPresented) {
             SettingsSheet()
         }
+        .onOpenURL { url in
+            guard let link = AppDeepLink(url: url) else { return }
+            isSettingsPresented = false
+            selectedTab = link.tab
+        }
     }
 }
 

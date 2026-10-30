@@ -8,7 +8,9 @@ struct DailyKanjiWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: Self.kind, provider: DailyKanjiProvider()) { entry in
+            // The medium widget's Got it button keeps its AppIntent; every other tap opens Today.
             DailyKanjiWidgetEntryView(entry: entry)
+                .widgetURL(AppDeepLink.today.url)
                 .containerBackground(for: .widget) {
                     Color.nichijiSurfaceRaised
                 }
@@ -16,7 +18,6 @@ struct DailyKanjiWidget: Widget {
         .configurationDisplayName("Today's kanji")
         .description("See today's kanji on your home screen and mark it learned.")
         .supportedFamilies([.systemSmall, .systemMedium])
-        // TODO: Add a widget deep link to Today (`.widgetURL`) after the MVP.
     }
 }
 

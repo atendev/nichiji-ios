@@ -10,6 +10,38 @@ public enum AppTab: String, Codable, CaseIterable, Sendable {
     case you
 }
 
+/// App URLs the widgets pass through `widgetURL`. The containing app receives them in
+/// `onOpenURL`, so the scheme needs no `CFBundleURLTypes` registration.
+public enum AppDeepLink: Equatable, Sendable {
+    case today
+
+    public static let scheme = "nichiji"
+
+    public var url: URL {
+        switch self {
+        case .today:
+            return URL(string: "\(Self.scheme)://today")!
+        }
+    }
+
+    /// The tab the app selects when it opens this link.
+    public var tab: AppTab {
+        switch self {
+        case .today:
+            return .today
+        }
+    }
+
+    public init?(url: URL) {
+        guard url.scheme?.lowercased() == Self.scheme,
+              url.host()?.lowercased() == "today",
+              url.path().isEmpty || url.path() == "/" else {
+            return nil
+        }
+        self = .today
+    }
+}
+
 /// Ordered steps in the seven-screen onboarding flow.
 public enum OnboardingStep: Int, Codable, CaseIterable, Sendable {
     case welcome = 0
