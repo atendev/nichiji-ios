@@ -309,3 +309,38 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Test Results**: No Swift toolchain in this environment, so nothing was built
   or run. Delivery, the identifier prefix surviving a rebuild, time-zone
   rescheduling and the denied banner need a simulator pass.
+
+### Slice 11: WidgetKit Extension (v0.5.2)
+
+#### Requirements Report
+- **Success Criteria**: `NichijiWidget` target registers `systemSmall` and
+  `systemMedium` daily kanji widgets using existing design tokens; timeline
+  provider queries `DailyKanjiService.widgetSnapshot(for:)` with a midnight
+  `reloadPolicy`; a `MarkTodaysKanjiLearnedIntent` marks today learned,
+  rebuilds reminders, and reloads timelines; host-app triggers in
+  `LevelChangeCoordinator`, `OnboardingFlow`, `ServiceContainer`, and `TodayView`
+  reload widget timelines; onboarding and Settings "Add Widget" wording align.
+- **Scope Boundary**: Widget extension rendering, timeline provider, interactive
+  AppIntent, host-app reload triggers, Add Widget copy alignment, and
+  `WidgetTimelineTests` updates are in scope. Lock-screen widgets, additional
+  families, configurable intents, deep-linking, Live Activities, and new
+  reminder scheduling logic are out of scope.
+- **Anticipated TODOs**: Leave post-MVP TODOs for lock-screen widgets,
+  additional families/configuration intents, and widget deep-link to Today.
+  Resolve existing TODOs in `NichijiWidgetBundle.swift`,
+  `LevelChangeCoordinator.swift`, `OnboardingFlow.swift`,
+  `ServiceContainer.swift`, `WidgetTimelineTests.swift`, and
+  `WidgetIntroView.swift`.
+- **Planned Tests**: Extend `WidgetTimelineTests.swift` with Phase 4 doubles to
+  cover `systemSmall`/`systemMedium` entries, level-complete placeholder,
+  interactive Got it AppIntent, host-app triggers, and Add Widget copy match.
+- **Delegated Gate**: HITL grilling was performed by subagent
+  `aec267a9a06af69b6` acting as the human stand-in. The subagent also flagged
+  risks: lock-screen scope mismatch in the Settings guide, missing widget target
+  entitlements/dependencies in `project.yml`, missing
+  `Config/Nichiji.entitlements`, and the need for a `WidgetRefresher` wrapper.
+
+#### Deviation Report
+- **Deviations**: None yet; this is the requirements ticket only.
+- **Unanticipated TODOs**: None yet.
+- **Test Results**: N/A; implementation ticket 030 is next.
