@@ -3,7 +3,7 @@ id: "030"
 title: "Implement Slice 11: WidgetKit Extension"
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["029"]
 claimed: false
 ---
@@ -41,4 +41,8 @@ Risks to address:
 
 ## Resolution
 
-<Filled in at close.>
+Implemented the `NichijiWidget` extension on `feature/slice-11-implement-widgetkit-extension` (v0.6.0). `systemSmall` shows the kanji and meaning; `systemMedium` adds readings, one example word and an interactive Got it button. A single-entry timeline built by `DailyKanjiTimelineBuilder` reloads at the next local midnight, and shows a quiet placeholder when the level is complete, onboarding is unfinished or the store cannot be read.
+
+`GotItAction` is the one Got it path for Today and the widget intent: it marks learned, rebuilds reminders and reloads timelines. `WidgetRefresher` is the only `WidgetCenter` caller and reloads after level changes, onboarding completion, time-zone changes and Today's Got it. Onboarding and Settings share `AddWidgetCopy.steps`, the onboarding preview renders the real small widget view, and the Settings lock-screen guide is now a post-MVP placeholder. `project.yml` embeds the widget with the App Group entitlement and shared sources, and `Config/*.entitlements` exist.
+
+Audit and Deviation Report are in `docs/IMPLOG.md`. No Swift toolchain here, so nothing was built locally. CI passed (lint, tests, unsigned IPA) on the third run after two fixes; merged and tagged v0.6.0.

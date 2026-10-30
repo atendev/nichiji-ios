@@ -91,10 +91,11 @@ notification window and reloads widget timelines.
 
 Widgets use WidgetKit and support `systemSmall` (kanji and primary meaning) and
 `systemMedium` (kanji, meaning, readings and a featured word) in the first
-pass, each with an interactive "Got it" button while today's assignment is
-`.assigned`. Widget timelines emit a single entry refreshed `.after(nextMidnight)`
+pass. Only the medium widget has the interactive "Got it" button, shown while
+today's assignment is `.assigned`. Widget timelines emit a single entry refreshed `.after(nextMidnight)`
 and reload explicitly after "Got it" or any level, pool, order or time-zone
-change. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+change. Before onboarding finishes the widget asks the learner to open the app,
+and a finished level shows a quiet placeholder. Lock-screen widgets are post-MVP. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
 kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed. Handwriting recognition is deferred.
 

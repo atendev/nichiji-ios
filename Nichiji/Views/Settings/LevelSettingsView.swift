@@ -179,12 +179,7 @@ public struct LevelSettingsView: View {
         let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
         let preferences = LearnerPreferencesSnapshot.load(from: defaults)
         Task {
-            try? await LevelChangeCoordinator.applyLevelChange(
-                preferences: preferences,
-                dailyKanjiService: services.dailyKanjiService,
-                dayProvider: services.dayProvider,
-                reminderScheduler: services.reminderScheduler
-            )
+            try? await services.applyLevelChange(preferences: preferences)
         }
     }
 

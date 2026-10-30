@@ -60,6 +60,7 @@ final class OnboardingFlow {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let reminderScheduler: any ReminderScheduler
     @ObservationIgnored private let dayProvider: any DayProvider
+    @ObservationIgnored private let widgetRefresher: any WidgetRefresher
     @ObservationIgnored private let learnerStore: (any LearnerStore)?
     @ObservationIgnored private let dailyKanjiService: (any DailyKanjiService)?
     @ObservationIgnored private let initialPreferences: LearnerPreferencesSnapshot
@@ -71,6 +72,7 @@ final class OnboardingFlow {
         contentStore: any KanjiContentStore,
         reminderScheduler: any ReminderScheduler,
         dayProvider: any DayProvider,
+        widgetRefresher: any WidgetRefresher,
         learnerStore: (any LearnerStore)?,
         dailyKanjiService: (any DailyKanjiService)?
     ) {
@@ -78,6 +80,7 @@ final class OnboardingFlow {
         self.defaults = defaults
         self.reminderScheduler = reminderScheduler
         self.dayProvider = dayProvider
+        self.widgetRefresher = widgetRefresher
         self.learnerStore = learnerStore
         self.dailyKanjiService = dailyKanjiService
         self.initialPreferences = preferences
@@ -102,6 +105,7 @@ final class OnboardingFlow {
             contentStore: services.contentStore,
             reminderScheduler: services.reminderScheduler,
             dayProvider: services.dayProvider,
+            widgetRefresher: services.widgetRefresher,
             learnerStore: services.learnerStore,
             dailyKanjiService: services.dailyKanjiService
         )
@@ -226,7 +230,8 @@ final class OnboardingFlow {
                     preferences: finalPreferences,
                     dailyKanjiService: dailyKanjiService,
                     dayProvider: dayProvider,
-                    reminderScheduler: reminderScheduler
+                    reminderScheduler: reminderScheduler,
+                    widgetRefresher: widgetRefresher
                 )
                 rebuiltReminders = true
             } catch {
@@ -238,8 +243,9 @@ final class OnboardingFlow {
             try? await ReminderRefresher.refresh(preferences: finalPreferences, scheduler: reminderScheduler)
         }
 
-        // TODO: Reload widget timelines on completion in Slice 11.
         defaults.set(true, forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue)
+        // The widget shows an open-app placeholder until this flag is set, so reload after it.
+        widgetRefresher.reloadTimelines()
     }
 
     private static func levelChanged(

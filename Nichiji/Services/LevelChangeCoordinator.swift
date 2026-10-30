@@ -10,15 +10,17 @@ enum LevelChangeCoordinator {
         preferences: LearnerPreferencesSnapshot,
         dailyKanjiService: any DailyKanjiService,
         dayProvider: any DayProvider,
-        reminderScheduler: any ReminderScheduler
+        reminderScheduler: any ReminderScheduler,
+        widgetRefresher: any WidgetRefresher
     ) async throws -> DailyAssignmentSnapshot? {
         let day = dayProvider.calendarDay(for: dayProvider.now)
         let assignment = try await dailyKanjiService.refreshAssignmentAfterPreferenceChange(
             for: day,
             preferences: preferences
         )
+        // Reload before the reminder rebuild so a reminder failure cannot leave the widget on the old kanji.
+        widgetRefresher.reloadTimelines()
         try await ReminderRefresher.refresh(preferences: preferences, scheduler: reminderScheduler)
-        // TODO: Reload WidgetKit timelines after level or order changes in Slice 11.
         return assignment
     }
 }

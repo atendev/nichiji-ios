@@ -30,6 +30,7 @@ public struct OnboardingCoordinator: View {
             contentStore: BundledKanjiContentStore(),
             reminderScheduler: NoopReminderScheduler(),
             dayProvider: SystemDayProvider(),
+            widgetRefresher: NoopWidgetRefresher(),
             learnerStore: nil,
             dailyKanjiService: nil
         )

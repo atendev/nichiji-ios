@@ -298,12 +298,7 @@ public struct CustomKanjiPickerView: View {
             let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
             var preferences = LearnerPreferencesSnapshot.load(from: defaults)
             preferences.isCustomPoolActive = isCustomPoolActive
-            try await LevelChangeCoordinator.applyLevelChange(
-                preferences: preferences,
-                dailyKanjiService: services.dailyKanjiService,
-                dayProvider: services.dayProvider,
-                reminderScheduler: services.reminderScheduler
-            )
+            try await services.applyLevelChange(preferences: preferences)
         } catch {
             // Keep UI responsive if background store persistence fails.
         }

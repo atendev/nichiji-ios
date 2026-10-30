@@ -20,12 +20,7 @@ struct NichijiApp: App {
     private let services: ServiceContainer
 
     init() {
-        let schema = Schema([
-            KanjiProgress.self,
-            DailyAssignment.self,
-            CustomKanjiSelection.self,
-            StudyLogEntry.self
-        ])
+        let schema = Schema.nichijiLearner
         do {
             let container = try Self.makeModelContainer(for: schema)
             let contentStore = BundledKanjiContentStore()
@@ -48,7 +43,8 @@ struct NichijiApp: App {
                 reminderScheduler: SystemReminderScheduler(
                     dailyKanjiService: dailyKanjiService,
                     dayProvider: dayProvider
-                )
+                ),
+                widgetRefresher: SystemWidgetRefresher()
             )
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")
