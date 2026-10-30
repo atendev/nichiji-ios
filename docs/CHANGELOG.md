@@ -4,6 +4,13 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.5.2
+
+- Close Slice 11 requirements ticket (029) via delegated HITL grilling subagent
+- Document Slice 11 success criteria, scope boundary, anticipated TODOs, and planned tests for the WidgetKit extension
+- Open implementation ticket 030: `Implement Slice 11: WidgetKit Extension`
+- Update `docs/PROGRESS.md` marking Slice 11 in progress
+
 ## v0.5.1
 
 - Rewrite Phase 5 of `docs/workflow.md` as an autonomous ticket run with subagent reports, a Haiku audit, CI handling, stop conditions, and a merge-before-next-ticket rule

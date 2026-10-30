@@ -42,6 +42,7 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Phase 5 tickets run auto
 
 - [Slice 10 Requirements Report: Reminder Scheduler & Notifications](closed/026-slice-10-reminder-scheduler-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for the rolling 7-day window with scheduler context injected at init, skip-if-learned copy rules, all app-side rebuild triggers, and a pure planner test seam.
 - [Implement Slice 10: Reminder Scheduler & Notifications](closed/028-slice-10-implement-reminder-scheduler.md): Implemented `ReminderPlanBuilder`, `ReminderRefresher`, and the live `SystemReminderScheduler`, wired every app-side rebuild trigger, and added planner, refresher, and trigger tests; build and tests unverified locally.
+- [Slice 11 Requirements Report: WidgetKit Extension](closed/029-slice-11-widgetkit-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for the WidgetKit extension, host-app timeline reload triggers, interactive "Got it" AppIntent, and Add Widget copy alignment; delegated HITL grilling to a subagent and surfaced entitlement/target-dependency risks.
 
 ## Not yet specified
 
@@ -53,4 +54,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- [Slice 11 Requirements Report: WidgetKit Extension](tickets/029-slice-11-widgetkit-requirements.md)
+- [Implement Slice 11: WidgetKit Extension](tickets/030-implement-slice-11-widgetkit-extension.md)
