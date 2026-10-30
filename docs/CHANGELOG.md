@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.6.1
+
+- Archive the finished MVP map to `.plan/archive/` and chart the v1.0 map: 22 tickets across housekeeping, the real dataset, Review and Practice, Dictionary, You, and lock-screen widgets
+- Close the JLPT list research ticket (033): Jonathan Waller's CC BY lists, pinned through OpenJLPT, labelled as an unofficial estimate
+
 ## v0.6.0 — ✅ Released
 ---
 
