@@ -20,6 +20,18 @@ struct ServiceContainer: Sendable {
         widgetRefresher.reloadTimelines()
     }
 
+    /// Re-picks today's kanji after a level, order, or pool change, then rebuilds reminders and reloads widgets.
+    @discardableResult
+    func applyLevelChange(preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot? {
+        try await LevelChangeCoordinator.applyLevelChange(
+            preferences: preferences,
+            dailyKanjiService: dailyKanjiService,
+            dayProvider: dayProvider,
+            reminderScheduler: reminderScheduler,
+            widgetRefresher: widgetRefresher
+        )
+    }
+
     /// Marks the day learned, then rebuilds reminders and reloads widget timelines.
     @discardableResult
     func markLearned(day: String, preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot {
