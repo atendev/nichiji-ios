@@ -182,7 +182,8 @@ public struct LevelSettingsView: View {
             try? await LevelChangeCoordinator.applyLevelChange(
                 preferences: preferences,
                 dailyKanjiService: services.dailyKanjiService,
-                dayProvider: services.dayProvider
+                dayProvider: services.dayProvider,
+                reminderScheduler: services.reminderScheduler
             )
         }
     }

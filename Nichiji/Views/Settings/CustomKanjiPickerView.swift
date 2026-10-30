@@ -301,7 +301,8 @@ public struct CustomKanjiPickerView: View {
             try await LevelChangeCoordinator.applyLevelChange(
                 preferences: preferences,
                 dailyKanjiService: services.dailyKanjiService,
-                dayProvider: services.dayProvider
+                dayProvider: services.dayProvider,
+                reminderScheduler: services.reminderScheduler
             )
         } catch {
             // Keep UI responsive if background store persistence fails.

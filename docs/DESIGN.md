@@ -73,10 +73,14 @@ pool. When a level's `.new` pool is exhausted, Today shows a quiet "level
 complete, pick another level" state rather than cycling automatically.
 
 Reminder scheduling uses a rolling window of up to 7 pending local notification
-requests. The next upcoming request uses specific copy: kanji-led (`"学 · Today's
-kanji is ready"`) if today's kanji is learned, or missed-day copy (`"You missed
-yesterday's kanji. That's okay, check it now."`) if today's assignment is still
-`.assigned`. Days 2 through 7 use generic copy (`"Today's kanji is ready"`).
+requests, never more than one a day. The next upcoming request uses specific
+copy. If the reminder time is still ahead today and today's kanji is unlearned,
+it is kanji-led (`"日 · Today's kanji is ready"`). If today is already learned,
+today is skipped. If the next fire is tomorrow, it uses missed-day copy
+(`"You missed yesterday's kanji. That's okay, check it now."`) when today is
+still `.assigned`, and generic copy when today is learned. The remaining
+requests use generic copy (`"Today's kanji is ready"`). With no assignment
+(level complete) nothing is scheduled.
 The window is rebuilt on launch, on foreground, after "Got it" from the app or
 widget, and after any reminder, level, pool or time-zone change. When
 notification permission is denied, the app preserves the reminder toggle state,

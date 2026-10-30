@@ -228,6 +228,8 @@ public struct TodayView: View {
         Task {
             do {
                 self.assignment = try await services.learnerStore.markLearned(day: assignment.calendarDay)
+                let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
+                try? await services.rebuildReminders(preferences: LearnerPreferencesSnapshot.load(from: defaults))
             } catch {
                 errorMessage = error.localizedDescription
             }

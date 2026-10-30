@@ -33,18 +33,22 @@ struct NichijiApp: App {
             let dayProvider = SystemDayProvider()
             let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
             self.modelContainer = container
+            let dailyKanjiService = DefaultDailyKanjiService(
+                contentStore: contentStore,
+                learnerStore: learnerStore,
+                dayProvider: dayProvider,
+                preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
+            )
             self.services = ServiceContainer(
                 dayProvider: dayProvider,
                 contentStore: contentStore,
                 learnerStore: learnerStore,
-                dailyKanjiService: DefaultDailyKanjiService(
-                    contentStore: contentStore,
-                    learnerStore: learnerStore,
-                    dayProvider: dayProvider,
-                    preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
-                ),
+                dailyKanjiService: dailyKanjiService,
                 pronunciationService: AVSpeechPronunciationService(),
-                reminderScheduler: SystemReminderScheduler()
+                reminderScheduler: SystemReminderScheduler(
+                    dailyKanjiService: dailyKanjiService,
+                    dayProvider: dayProvider
+                )
             )
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")

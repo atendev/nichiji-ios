@@ -219,6 +219,20 @@ struct OnboardingFlowTests {
         #expect(fixture.defaults.bool(forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue))
         #expect(fixture.learnerStore.assignments.isEmpty)
         #expect(fixture.learnerStore.progress.isEmpty)
+        #expect(fixture.scheduler.rebuildCallCount == 0)
+    }
+
+    @Test("Replay rebuilds reminders even with no assignment today or level change")
+    func testReplayRebuildsRemindersWithoutAssignment() async throws {
+        let fixture = try Fixture()
+        defer { fixture.tearDown() }
+        fixture.defaults.set(true, forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue)
+        let flow = fixture.makeFlow()
+        advance(flow, to: .ready)
+
+        await flow.complete()
+
+        #expect(fixture.scheduler.rebuildCallCount == 1)
     }
 
     @Test("Replay keeps progress, reassigns an unlearned today on level change, and leaves a learned today alone")
@@ -237,6 +251,7 @@ struct OnboardingFlowTests {
         #expect(assignedFixture.learnerStore.assignments[today]?.kanjiID == "会")
         #expect(assignedFixture.learnerStore.assignments[today]?.status == .assigned)
         #expect(assignedFixture.learnerStore.progress["山"] == .learning)
+        #expect(assignedFixture.scheduler.rebuildCallCount == 1)
 
         let learnedFixture = try Fixture()
         defer { learnedFixture.tearDown() }

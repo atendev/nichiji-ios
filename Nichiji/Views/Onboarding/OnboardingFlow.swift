@@ -214,21 +214,31 @@ final class OnboardingFlow {
         isCompleting = true
 
         let finalPreferences = LearnerPreferencesSnapshot.load(from: defaults)
+        let today = dayProvider.calendarDay(for: dayProvider.now)
+        var rebuiltReminders = false
+        // First runs have no assignment yet, so Today's lazy rollover picks with the new level instead.
         if Self.levelChanged(from: initialPreferences, to: finalPreferences),
            let learnerStore,
-           let dailyKanjiService {
-            let today = dayProvider.calendarDay(for: dayProvider.now)
-            // First runs have no assignment yet, so Today's lazy rollover picks with the new level instead.
-            if (try? await learnerStore.assignment(for: today)) != nil {
-                _ = try? await LevelChangeCoordinator.applyLevelChange(
+           let dailyKanjiService,
+           (try? await learnerStore.assignment(for: today)) != nil {
+            do {
+                _ = try await LevelChangeCoordinator.applyLevelChange(
                     preferences: finalPreferences,
                     dailyKanjiService: dailyKanjiService,
-                    dayProvider: dayProvider
+                    dayProvider: dayProvider,
+                    reminderScheduler: reminderScheduler
                 )
+                rebuiltReminders = true
+            } catch {
+                // Fall through to a plain reminder rebuild below.
             }
         }
+        // A first run must not touch the learner store here: RootView rebuilds reminders once the flag flips.
+        if !rebuiltReminders, initialPreferences.hasCompletedOnboarding {
+            try? await ReminderRefresher.refresh(preferences: finalPreferences, scheduler: reminderScheduler)
+        }
 
-        // TODO: Rebuild the reminder window and reload widget timelines on completion in Slices 10 and 11.
+        // TODO: Reload widget timelines on completion in Slice 11.
         defaults.set(true, forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue)
     }
 

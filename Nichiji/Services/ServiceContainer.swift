@@ -11,10 +11,17 @@ struct ServiceContainer: Sendable {
     let pronunciationService: any PronunciationService
     let reminderScheduler: any ReminderScheduler
 
-    /// Refreshes Today rollover state after a clock or time-zone change.
+    /// Refreshes Today rollover state and the reminder window after a clock or time-zone change.
     func handleTimeOrZoneChange(preferences: LearnerPreferencesSnapshot) async throws {
         _ = try await dailyKanjiService.assignment(for: dayProvider.calendarDay(for: dayProvider.now))
-        // Reminder and WidgetKit rebuilds remain deferred to their dedicated slices.
+        // A reminder failure must not surface as a Today error after a successful rollover.
+        try? await rebuildReminders(preferences: preferences)
+        // TODO: Reload WidgetKit timelines here in Slice 11.
+    }
+
+    /// Rebuilds or cancels the reminder window without ever prompting for permission.
+    func rebuildReminders(preferences: LearnerPreferencesSnapshot) async throws {
+        try await ReminderRefresher.refresh(preferences: preferences, scheduler: reminderScheduler)
     }
 }
 

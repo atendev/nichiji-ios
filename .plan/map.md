@@ -40,6 +40,9 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the nex
 - [Implement Slice 9: Onboarding Flow](closed/025-slice-9-implement-onboarding-flow.md): Built `OnboardingFlow`, the seven steps, the `RootView` crossfade, replay reassignment, shared `LevelChangeCoordinator` and `ReminderTimePicker`, and `OnboardingFlowTests`; build and tests unverified.
 - [Slice 9b Requirements Report: Onboarding, Today and Settings Polish](closed/027-slice-9b-polish-and-bug-fixes-requirements.md): Fixed step slide direction, flashcard flip and tilt, Today scroll reset, Settings theme repaint and kanji grid spacing; added the Reminder step system prompt with a status button via an authorization-only `SystemReminderScheduler`; build and tests unverified.
 
+- [Slice 10 Requirements Report: Reminder Scheduler & Notifications](closed/026-slice-10-reminder-scheduler-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for the rolling 7-day window with scheduler context injected at init, skip-if-learned copy rules, all app-side rebuild triggers, and a pure planner test seam.
+- [Implement Slice 10: Reminder Scheduler & Notifications](closed/028-slice-10-implement-reminder-scheduler.md): Implemented `ReminderPlanBuilder`, `ReminderRefresher`, and the live `SystemReminderScheduler`, wired every app-side rebuild trigger, and added planner, refresher, and trigger tests; build and tests unverified locally.
+
 ## Not yet specified
 
 _None. Phase 5 vertical slice loop is in progress._
@@ -50,4 +53,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- [Slice 10 Requirements Report: Reminder Scheduler & Notifications](tickets/026-slice-10-reminder-scheduler-requirements.md)
+- [Slice 11 Requirements Report: WidgetKit Extension](tickets/029-slice-11-widgetkit-requirements.md)

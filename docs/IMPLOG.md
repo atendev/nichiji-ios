@@ -270,3 +270,42 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   Center, theme repaint and grid fixes were written from reading the code and
   need a simulator pass. `testReminderAuthorizationOnlyWhenEnabled` was
   replaced by `testReminderAuthorizationOnlyWhenUndecided`.
+
+### Slice 10: Reminder Scheduler & Notifications (v0.5.0)
+
+#### Requirements Report
+- **Success Criteria**: Up to 7 pending local notifications, one a day, at the
+  chosen time. Time ahead and unlearned: kanji-led today. Time ahead and
+  learned: today skipped. Next fire tomorrow: missed-day copy when today is
+  `.assigned`, generic when learned. Days 2 through 7 generic. Off removes all
+  Nichiji requests; denied adds and removes nothing. The window rebuilds on
+  settings, level, order, pool, onboarding completion, launch, foreground,
+  app-side Got it and time-zone changes.
+- **Scope Boundary**: `SystemReminderScheduler` scheduling and cancelling with
+  `DailyKanjiService` and `DayProvider` injected at init, a pure
+  `ReminderPlanBuilder`, and the trigger wiring. Widget Got it and widget
+  reloads stay in Slice 11. The `ReminderScheduler` protocol is unchanged.
+- **Anticipated TODOs**: `LevelChangeCoordinator` takes the scheduler, so its
+  three callers change. `ServiceContainer.handleTimeOrZoneChange` and onboarding
+  completion rebuild reminders. DESIGN.md's reminder paragraph is rewritten.
+- **Planned Tests**: Planner cases (copy, skip, boundaries, clamping, time zone),
+  refresher gating, and trigger wiring against `TestReminderScheduler`. The
+  notification center itself is a manual simulator check.
+
+#### Deviation Report
+- **Deviations**: Added `ReminderRefresher`, a background rebuild path that never
+  prompts, because `ReminderSettingsCoordinator` requests authorization when
+  undecided and would prompt on launch. With no assignment (level complete) the
+  scheduler cancels instead of scheduling. `RootView` owns the launch,
+  foreground, onboarding-completion and time-zone triggers, and waits for
+  onboarding to finish. `OnboardingFlow.complete()` rebuilds reminders only when
+  an assignment already exists (a replay), so a first run writes nothing there
+  and `RootView` rebuilds once the onboarding flag flips. Reminder failures after
+  a rollover are swallowed so they never show as a Today error. The scheduler
+  adds the new window and then prunes stale Nichiji requests so the learner is
+  never left without one.
+- **Unanticipated TODOs**: The window still goes stale after 7 days without
+  opening the app. Widget reloads on these triggers stay TODOs for Slice 11.
+- **Test Results**: No Swift toolchain in this environment, so nothing was built
+  or run. Delivery, the identifier prefix surviving a rebuild, time-zone
+  rescheduling and the denied banner need a simulator pass.
