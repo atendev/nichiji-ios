@@ -185,7 +185,7 @@ public struct WidgetGuideSettingsView: View {
         )
     }
 
-    // TODO: Build lock-screen accessory widgets after the MVP, then replace this placeholder with a real preview.
+    // TODO: Replace this placeholder with a real preview in "Build the lock-screen widgets".
     private var lockScreenSection: some View {
         VStack(alignment: .leading, spacing: LayoutTokens.space4) {
             Text("Lock screen")

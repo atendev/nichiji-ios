@@ -5,7 +5,7 @@ import WidgetKit
 
 @main
 struct NichijiWidgetBundle: WidgetBundle {
-    // TODO: Add lock-screen accessory families and configurable widgets after the MVP.
+    // TODO: Add accessory families in "Build the lock-screen widgets". Configurable widgets wait on "Fix the v1.0 scope".
     var body: some Widget {
         DailyKanjiWidget()
     }

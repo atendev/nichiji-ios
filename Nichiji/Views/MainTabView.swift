@@ -85,4 +85,4 @@ struct PlaceholderTabView: View {
 
 /*----------------------------------TODO----------------------------------*/
 
-// TODO: Replace Dictionary, Review, and You placeholders with full feature flows in post-MVP slices.
+// TODO: Replace the placeholders in "Build kanji detail and the Dictionary browse grid", "Build Dictionary search", "Build the Review tab and session" and "Build the You tab".

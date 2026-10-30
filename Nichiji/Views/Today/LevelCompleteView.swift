@@ -38,4 +38,4 @@ public struct LevelCompleteView: View {
 
 /*----------------------------------TODO----------------------------------*/
 
-// TODO: Display dynamic level summary metrics and direct level switcher shortcut in Slice 7.
+// TODO: Show level summary metrics and a level switcher shortcut in "Build the You tab".

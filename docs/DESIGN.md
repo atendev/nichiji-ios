@@ -2,7 +2,7 @@
 
 Living document. Updated in Phase 0 and whenever the design changes.
 
-Status: **Phase 0 approved (updated for Phase 2 service and dataset contracts)**
+Status: **v0.6.0 shipped (Onboarding, Today, Settings, reminders, widgets). v1.0 work is planned in `.plan/map.md`.**
 
 ---
 

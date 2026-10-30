@@ -394,3 +394,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   after a lint fix and a `UserDefaults` Sendable fix. The widget gallery, the medium Got it tap, Increase Contrast, the midnight
   reload and the Add Widget flow need a simulator pass. The level-complete test
   assumes an empty content store yields a nil snapshot and is unverified.
+
+### Reconcile docs and stale TODOs with v0.6.0 (v0.6.2)
+
+#### Requirements Report
+
+- **Success Criteria**: `PROGRESS.md` Slices 1-5 and 8-11 move to `tested`, since each has a suite in `NichijiTests/Suites` and CI run 41041313347 passed on `main` after Slice 11. "Not yet built or run" leaves Slices 10 and 11. The `DESIGN.md` status line names v0.6.0 and `.plan/map.md`. The TODOs in `LevelCompleteView`, `MainTabView` and `SettingsSheet` name their replacing tickets. Docs and comments only, patch bump.
+- **Scope Boundary**: Those docs, three TODOs and ticket bookkeeping. Out: `DESIGN.md` Non-goals, the widget deep link, the UI test target, Swift logic.
+- **Anticipated TODOs**: Sweep for other stale "Slice N" or "post-MVP" TODOs and flag them.
+- **Planned Tests**: None new. Existing suites run unchanged in CI.
+
+#### Deviation Report
+
+- **Success Criteria**: Met. The bump is v0.6.2, because the map commit used v0.6.1.
+- **Scope Boundary**: Kept, with two comment-only extras: `SettingsSupportViews.swift:188` and `NichijiWidgetBundle.swift:8` now point at "Build the lock-screen widgets" (and "Fix the v1.0 scope" for configurable widgets).
+- **Unanticipated TODOs**: `DailyKanjiWidget.swift:19` keeps its "after the MVP" `.widgetURL` TODO for "Open Today from a widget tap", which removes it. `DESIGN.md:98` still calls lock-screen widgets post-MVP, which is true for v0.6.0.
+- **Test Results**: Nothing built locally (Linux host, no Xcode). CI is the gate.

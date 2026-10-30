@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.6.2
+
+- Mark Slices 1-5 and 8-11 `tested` in `PROGRESS.md` and drop the stale "Not yet built or run" notes
+- Point the `DESIGN.md` status line at v0.6.0 and the v1.0 map
+- Retarget stale TODOs in `LevelCompleteView`, `MainTabView`, `SettingsSheet`, `SettingsSupportViews` and `NichijiWidgetBundle` to the v1.0 tickets that replace them; close ticket 031
+
 ## v0.6.1
 
 - Archive the finished MVP map to `.plan/archive/` and chart the v1.0 map: 22 tickets across housekeeping, the real dataset, Review and Practice, Dictionary, You, and lock-screen widgets

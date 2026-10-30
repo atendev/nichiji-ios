@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 ## Decisions so far
 
 - [Find a licensable JLPT N5-N1 kanji list](closed/033-jlpt-kanji-list-source.md): Use Jonathan Waller's CC BY lists pinned through OpenJLPT commit `0d1d341`, labelled as an unofficial estimate; 172 Jōyō kanji lack a level, and the dataset ticket decides whether OpenJLPT's CC BY-SA supplements fill them.
+- [Reconcile docs and stale TODOs with v0.6.0](closed/031-reconcile-docs-and-stale-todos.md): Marked Slices 1-11 `tested`, pointed the `DESIGN.md` status at v0.6.0 and this map, and retargeted stale TODOs to the tickets that replace them.
 
 ## Not yet specified
 
@@ -38,7 +39,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Reconcile docs and stale TODOs with v0.6.0](tickets/031-reconcile-docs-and-stale-todos.md) (task, AFK)
 - [Open Today from a widget tap](tickets/032-widget-deep-link-to-today.md) (task, AFK)
 - [Fix the v1.0 scope](tickets/034-fix-the-v1-scope.md) (grilling, HITL)
 - [Keep or remove the UI test target](tickets/035-ui-test-target.md) (grilling, HITL)

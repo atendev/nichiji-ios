@@ -184,7 +184,7 @@ public struct SettingsSheet: View {
                 }
                 .buttonStyle(.plain)
 
-                // TODO: Add Review settings navigation row once the post-MVP Review flashcard slice is implemented.
+                // TODO: Add the Review settings row in "Build the Review settings screen".
 
                 dividerLine
 
