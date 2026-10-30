@@ -18,12 +18,12 @@ public struct ReadyView: View {
             action: onComplete
         ) {
             VStack(spacing: LayoutTokens.space24) {
-                SealStamp(text: "Ready")
+                OnboardingLogo()
 
-                OnboardingStepHeader(
-                    title: "You're all set",
-                    subtitle: "Your first kanji is waiting on Today."
-                )
+                Text("You're all set")
+                    .font(.nichijiTitle)
+                    .foregroundColor(.nichijiInk)
+                    .accessibilityAddTraits(.isHeader)
             }
         }
     }

@@ -86,6 +86,12 @@ public struct SettingsSheet: View {
     )
     private var isCustomPoolActive: Bool = false
 
+    @AppStorage(
+        LearnerPreferenceKey.appearanceMode.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var appearanceModeRaw: String = AppearanceMode.system.rawValue
+
     @State private var customCount: Int = 0
 
     private var preferencesSnapshot: LearnerPreferencesSnapshot {
@@ -141,6 +147,8 @@ public struct SettingsSheet: View {
                 await refreshCustomCount()
             }
         }
+        // A presented sheet does not follow the root's live scheme change, so it applies its own.
+        .preferredColorScheme((AppearanceMode(rawValue: appearanceModeRaw) ?? .system).colorScheme)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }

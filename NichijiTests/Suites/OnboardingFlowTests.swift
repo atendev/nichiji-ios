@@ -177,30 +177,33 @@ struct OnboardingFlowTests {
         #expect(joyoCounts[.joyo(.grade2)] == 1)
     }
 
-    @Test("Reminder permission is requested only when the toggle is on, and denied still advances")
-    func testReminderAuthorizationOnlyWhenEnabled() async throws {
-        let offFixture = try Fixture()
-        defer { offFixture.tearDown() }
-        let offFlow = offFixture.makeFlow()
-        offFlow.reminderEnabled = false
-        advance(offFlow, to: .reminder)
-        await offFlow.continueFromReminder()
+    @Test("Reminder permission is requested only while undecided, and Continue never blocks")
+    func testReminderAuthorizationOnlyWhenUndecided() async throws {
+        let undecided = try Fixture()
+        defer { undecided.tearDown() }
+        undecided.scheduler.stubbedAuthorizationStatus = .notDetermined
+        let undecidedFlow = undecided.makeFlow()
+        advance(undecidedFlow, to: .reminder)
+        await undecidedFlow.requestReminderAuthorizationIfNeeded()
 
-        #expect(offFixture.scheduler.requestAuthorizationCallCount == 0)
-        #expect(offFlow.step == .widgetIntro)
-        #expect(offFixture.defaults.bool(forKey: LearnerPreferenceKey.reminderEnabled.rawValue) == false)
+        #expect(undecided.scheduler.requestAuthorizationCallCount == 1)
+        #expect(undecidedFlow.reminderAuthorization == .notDetermined)
+        #expect(!undecidedFlow.isRequestingAuthorization)
 
-        let deniedFixture = try Fixture()
-        defer { deniedFixture.tearDown() }
-        deniedFixture.scheduler.stubbedAuthorizationStatus = .denied
-        let deniedFlow = deniedFixture.makeFlow()
-        #expect(deniedFlow.reminderEnabled)
-        advance(deniedFlow, to: .reminder)
-        await deniedFlow.continueFromReminder()
+        for decided in [ReminderAuthorizationStatus.denied, .authorized] {
+            let fixture = try Fixture()
+            defer { fixture.tearDown() }
+            fixture.scheduler.stubbedAuthorizationStatus = decided
+            let flow = fixture.makeFlow()
+            advance(flow, to: .reminder)
+            await flow.requestReminderAuthorizationIfNeeded()
 
-        #expect(deniedFixture.scheduler.requestAuthorizationCallCount == 1)
-        #expect(deniedFlow.reminderAuthorization == .denied)
-        #expect(deniedFlow.step == .widgetIntro)
+            #expect(fixture.scheduler.requestAuthorizationCallCount == 0)
+            #expect(flow.reminderAuthorization == decided)
+
+            flow.advance()
+            #expect(flow.step == .widgetIntro)
+        }
     }
 
     @Test("Completion sets the onboarding flag and makes no learner store write")
@@ -216,6 +219,20 @@ struct OnboardingFlowTests {
         #expect(fixture.defaults.bool(forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue))
         #expect(fixture.learnerStore.assignments.isEmpty)
         #expect(fixture.learnerStore.progress.isEmpty)
+        #expect(fixture.scheduler.rebuildCallCount == 0)
+    }
+
+    @Test("Replay rebuilds reminders even with no assignment today or level change")
+    func testReplayRebuildsRemindersWithoutAssignment() async throws {
+        let fixture = try Fixture()
+        defer { fixture.tearDown() }
+        fixture.defaults.set(true, forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue)
+        let flow = fixture.makeFlow()
+        advance(flow, to: .ready)
+
+        await flow.complete()
+
+        #expect(fixture.scheduler.rebuildCallCount == 1)
     }
 
     @Test("Replay keeps progress, reassigns an unlearned today on level change, and leaves a learned today alone")
@@ -234,6 +251,7 @@ struct OnboardingFlowTests {
         #expect(assignedFixture.learnerStore.assignments[today]?.kanjiID == "会")
         #expect(assignedFixture.learnerStore.assignments[today]?.status == .assigned)
         #expect(assignedFixture.learnerStore.progress["山"] == .learning)
+        #expect(assignedFixture.scheduler.rebuildCallCount == 1)
 
         let learnedFixture = try Fixture()
         defer { learnedFixture.tearDown() }

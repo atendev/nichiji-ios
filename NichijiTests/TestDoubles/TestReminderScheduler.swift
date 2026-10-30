@@ -9,6 +9,8 @@ final class TestReminderScheduler: ReminderScheduler, @unchecked Sendable {
     var lastRebuiltPreferences: LearnerPreferencesSnapshot?
     var didCancelAll: Bool = false
     var requestAuthorizationCallCount: Int = 0
+    var rebuildCallCount: Int = 0
+    var shouldThrowOnRebuild: Bool = false
 
     func authorizationStatus() async -> ReminderAuthorizationStatus {
         stubbedAuthorizationStatus
@@ -23,6 +25,8 @@ final class TestReminderScheduler: ReminderScheduler, @unchecked Sendable {
     }
 
     func rebuildSchedule(preferences: LearnerPreferencesSnapshot) async throws {
+        rebuildCallCount += 1
+        if shouldThrowOnRebuild { throw NichijiError.notificationsDenied }
         lastRebuiltPreferences = preferences
         scheduledRequestsCount = 7
     }

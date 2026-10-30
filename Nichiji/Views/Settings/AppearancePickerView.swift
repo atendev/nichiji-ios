@@ -1,5 +1,16 @@
 import SwiftUI
 
+extension AppearanceMode {
+    /// Forced color scheme, or nil to follow the system.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .light: .light
+        case .dark: .dark
+        case .system: nil
+        }
+    }
+}
+
 /*-------------------------------appearance-------------------------------*/
 
 public struct AppearancePickerView: View {

@@ -57,6 +57,9 @@ public struct CustomKanjiPickerView: View {
         return selectedIDs.intersection(displayedIDs).count
     }
 
+    /// Same gap between columns and between rows.
+    private static let gridSpacing = LayoutTokens.space12
+
     public init() {}
 
     public var body: some View {
@@ -96,7 +99,7 @@ public struct CustomKanjiPickerView: View {
         let sectionIDs = Set(section.entries.map(\.id))
         let onCount = selectedIDs.intersection(sectionIDs).count
         let isAllSelected = !section.entries.isEmpty && onCount == section.entries.count
-        let columns = Array(repeating: GridItem(.flexible(), spacing: LayoutTokens.space8), count: 5)
+        let columns = Array(repeating: GridItem(.flexible(), spacing: Self.gridSpacing), count: 5)
 
         return VStack(alignment: .leading, spacing: LayoutTokens.space12) {
             HStack(alignment: .center, spacing: LayoutTokens.space12) {
@@ -133,7 +136,7 @@ public struct CustomKanjiPickerView: View {
             }
 
             if !section.entries.isEmpty {
-                LazyVGrid(columns: columns, spacing: LayoutTokens.space8) {
+                LazyVGrid(columns: columns, spacing: Self.gridSpacing) {
                     ForEach(section.entries) { entry in
                         kanjiCell(for: entry)
                     }
@@ -149,11 +152,13 @@ public struct CustomKanjiPickerView: View {
             toggleKanji(entry.id)
         } label: {
             ZStack(alignment: .topTrailing) {
-                Text(entry.id)
-                    .font(.kanjiDisplay(size: 28))
-                    .foregroundColor(.nichijiInk)
-                    .frame(maxWidth: .infinity, minHeight: 56)
+                Color.clear
                     .aspectRatio(1, contentMode: .fit)
+                    .overlay {
+                        Text(entry.id)
+                            .font(.kanjiDisplay(size: 30))
+                            .foregroundColor(.nichijiInk)
+                    }
                     .selectionCellBackground(isSelected: isSelected)
 
                 if isSelected {
@@ -296,7 +301,8 @@ public struct CustomKanjiPickerView: View {
             try await LevelChangeCoordinator.applyLevelChange(
                 preferences: preferences,
                 dailyKanjiService: services.dailyKanjiService,
-                dayProvider: services.dayProvider
+                dayProvider: services.dayProvider,
+                reminderScheduler: services.reminderScheduler
             )
         } catch {
             // Keep UI responsive if background store persistence fails.

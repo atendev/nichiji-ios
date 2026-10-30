@@ -194,17 +194,16 @@ final class OnboardingFlow {
         reminderAuthorization = await reminderScheduler.authorizationStatus()
     }
 
-    /// Asks for notification permission when reminders are on, then always moves to the next step.
-    func continueFromReminder() async {
-        guard step == .reminder, !isRequestingAuthorization else { return }
-        if reminderEnabled {
-            isRequestingAuthorization = true
-            // TODO: NoopReminderScheduler never shows the system prompt; Slice 10 swaps in the UNUserNotificationCenter scheduler.
-            _ = try? await reminderScheduler.requestAuthorization()
-            reminderAuthorization = await reminderScheduler.authorizationStatus()
-            isRequestingAuthorization = false
-        }
-        advance()
+    /// Shows the system permission prompt when the learner has not answered it yet.
+    /// A decided status is only refreshed, since iOS never shows the prompt twice.
+    func requestReminderAuthorizationIfNeeded() async {
+        guard !isRequestingAuthorization else { return }
+        await refreshReminderAuthorization()
+        guard reminderAuthorization == .notDetermined else { return }
+        isRequestingAuthorization = true
+        _ = try? await reminderScheduler.requestAuthorization()
+        reminderAuthorization = await reminderScheduler.authorizationStatus()
+        isRequestingAuthorization = false
     }
 
     // MARK: - Completion
@@ -215,21 +214,31 @@ final class OnboardingFlow {
         isCompleting = true
 
         let finalPreferences = LearnerPreferencesSnapshot.load(from: defaults)
+        let today = dayProvider.calendarDay(for: dayProvider.now)
+        var rebuiltReminders = false
+        // First runs have no assignment yet, so Today's lazy rollover picks with the new level instead.
         if Self.levelChanged(from: initialPreferences, to: finalPreferences),
            let learnerStore,
-           let dailyKanjiService {
-            let today = dayProvider.calendarDay(for: dayProvider.now)
-            // First runs have no assignment yet, so Today's lazy rollover picks with the new level instead.
-            if (try? await learnerStore.assignment(for: today)) != nil {
-                _ = try? await LevelChangeCoordinator.applyLevelChange(
+           let dailyKanjiService,
+           (try? await learnerStore.assignment(for: today)) != nil {
+            do {
+                _ = try await LevelChangeCoordinator.applyLevelChange(
                     preferences: finalPreferences,
                     dailyKanjiService: dailyKanjiService,
-                    dayProvider: dayProvider
+                    dayProvider: dayProvider,
+                    reminderScheduler: reminderScheduler
                 )
+                rebuiltReminders = true
+            } catch {
+                // Fall through to a plain reminder rebuild below.
             }
         }
+        // A first run must not touch the learner store here: RootView rebuilds reminders once the flag flips.
+        if !rebuiltReminders, initialPreferences.hasCompletedOnboarding {
+            try? await ReminderRefresher.refresh(preferences: finalPreferences, scheduler: reminderScheduler)
+        }
 
-        // TODO: Rebuild the reminder window and reload widget timelines on completion in Slices 10 and 11.
+        // TODO: Reload widget timelines on completion in Slice 11.
         defaults.set(true, forKey: LearnerPreferenceKey.hasCompletedOnboarding.rawValue)
     }
 

@@ -13,14 +13,7 @@ struct NichijiApp: App {
     private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
     private var preferredColorScheme: ColorScheme? {
-        switch AppearanceMode(rawValue: appearanceModeRaw) {
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        case .system, .none:
-            return nil
-        }
+        (AppearanceMode(rawValue: appearanceModeRaw) ?? .system).colorScheme
     }
 
     private let modelContainer: ModelContainer
@@ -40,18 +33,22 @@ struct NichijiApp: App {
             let dayProvider = SystemDayProvider()
             let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
             self.modelContainer = container
+            let dailyKanjiService = DefaultDailyKanjiService(
+                contentStore: contentStore,
+                learnerStore: learnerStore,
+                dayProvider: dayProvider,
+                preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
+            )
             self.services = ServiceContainer(
                 dayProvider: dayProvider,
                 contentStore: contentStore,
                 learnerStore: learnerStore,
-                dailyKanjiService: DefaultDailyKanjiService(
-                    contentStore: contentStore,
-                    learnerStore: learnerStore,
-                    dayProvider: dayProvider,
-                    preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
-                ),
+                dailyKanjiService: dailyKanjiService,
                 pronunciationService: AVSpeechPronunciationService(),
-                reminderScheduler: NoopReminderScheduler()
+                reminderScheduler: SystemReminderScheduler(
+                    dailyKanjiService: dailyKanjiService,
+                    dayProvider: dayProvider
+                )
             )
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")

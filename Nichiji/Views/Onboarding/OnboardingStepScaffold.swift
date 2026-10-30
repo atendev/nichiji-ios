@@ -46,6 +46,8 @@ struct OnboardingStepHeader: View {
     let title: String
     let subtitle: String
     var alignment: HorizontalAlignment = .center
+    /// Holds this many subtitle lines so swapping copy does not move the content below.
+    var reservedSubtitleLines: Int?
 
     var body: some View {
         VStack(alignment: alignment, spacing: LayoutTokens.space8) {
@@ -58,6 +60,7 @@ struct OnboardingStepHeader: View {
                 .font(.nichijiBody)
                 .foregroundColor(.nichijiInkMuted)
                 .multilineTextAlignment(alignment == .center ? .center : .leading)
+                .lineLimit(reservedSubtitleLines ?? Int.max, reservesSpace: reservedSubtitleLines != nil)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)

@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.5.0
+
+- Add `ReminderPlanBuilder`, a pure planner for the rolling 7-day reminder window with kanji-led, missed-day, and generic copy
+- Implement `SystemReminderScheduler` scheduling and cancelling on `UNUserNotificationCenter`, adding the new window before pruning stale `nichiji.reminder.` requests
+- Add `ReminderRefresher` so background rebuilds never prompt for permission
+- Rebuild reminders on settings, level, order, pool, onboarding, launch, foreground, Got it, and time-zone changes
+- Add planner, refresher, and trigger tests in `ReminderSchedulerTests` and `OnboardingFlowTests`
+- Close Slice 10 requirements and implementation tickets (026 and 028), open the Slice 11 requirements ticket (029)
+
 ## v0.0.12
 
 - Configure `.swiftlint.yml` rules (`todo`, `line_length`, `identifier_name`, `large_tuple`) for project conventions and Phase 3 scaffolding
