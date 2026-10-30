@@ -4,7 +4,8 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
-## v0.6.0
+## v0.6.0 — ✅ Released
+---
 
 - Add the `NichijiWidget` extension with `systemSmall` and `systemMedium` daily kanji widgets, a single-entry timeline that reloads at the next local midnight, and quiet level-complete and open-app placeholders
 - Add the interactive "Got it" `MarkTodaysKanjiLearnedIntent`, which marks today learned, rebuilds reminders, and reloads timelines, via a shared `GotItAction`

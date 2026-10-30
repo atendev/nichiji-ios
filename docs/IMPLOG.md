@@ -388,8 +388,9 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   `@Sendable` completions in `DailyKanjiProvider` and the `@Parameter` /
   `static let title` in the intent.
 - **Test Results**: No Swift toolchain in this environment, so nothing was
-  built or run, including the new `WidgetTimelineTests` cases and the updated
-  `OnboardingFlowTests` and `ReminderSchedulerTests`. The first build is remote
-  CI. The widget gallery, the medium Got it tap, Increase Contrast, the midnight
+  built locally. Remote CI built and tested it: lint, `make test` (including the
+  new `WidgetTimelineTests` and the updated `OnboardingFlowTests` and
+  `ReminderSchedulerTests`) and the unsigned IPA all passed on the third run,
+  after a lint fix and a `UserDefaults` Sendable fix. The widget gallery, the medium Got it tap, Increase Contrast, the midnight
   reload and the Add Widget flow need a simulator pass. The level-complete test
   assumes an empty content store yields a nil snapshot and is unverified.

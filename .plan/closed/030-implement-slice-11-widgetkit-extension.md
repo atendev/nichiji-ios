@@ -45,4 +45,4 @@ Implemented the `NichijiWidget` extension on `feature/slice-11-implement-widgetk
 
 `GotItAction` is the one Got it path for Today and the widget intent: it marks learned, rebuilds reminders and reloads timelines. `WidgetRefresher` is the only `WidgetCenter` caller and reloads after level changes, onboarding completion, time-zone changes and Today's Got it. Onboarding and Settings share `AddWidgetCopy.steps`, the onboarding preview renders the real small widget view, and the Settings lock-screen guide is now a post-MVP placeholder. `project.yml` embeds the widget with the App Group entitlement and shared sources, and `Config/*.entitlements` exist.
 
-Audit and Deviation Report are in `docs/IMPLOG.md`. No Swift toolchain here, so nothing was built or run locally. CI: pending; see Final Report.
+Audit and Deviation Report are in `docs/IMPLOG.md`. No Swift toolchain here, so nothing was built locally. CI passed (lint, tests, unsigned IPA) on the third run after two fixes; merged and tagged v0.6.0.
