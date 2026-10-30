@@ -10,13 +10,26 @@ struct ServiceContainer: Sendable {
     let dailyKanjiService: any DailyKanjiService
     let pronunciationService: any PronunciationService
     let reminderScheduler: any ReminderScheduler
+    var widgetRefresher: any WidgetRefresher = NoopWidgetRefresher()
 
     /// Refreshes Today rollover state and the reminder window after a clock or time-zone change.
     func handleTimeOrZoneChange(preferences: LearnerPreferencesSnapshot) async throws {
         _ = try await dailyKanjiService.assignment(for: dayProvider.calendarDay(for: dayProvider.now))
         // A reminder failure must not surface as a Today error after a successful rollover.
         try? await rebuildReminders(preferences: preferences)
-        // TODO: Reload WidgetKit timelines here in Slice 11.
+        widgetRefresher.reloadTimelines()
+    }
+
+    /// Marks the day learned, then rebuilds reminders and reloads widget timelines.
+    @discardableResult
+    func markLearned(day: String, preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot {
+        try await GotItAction.perform(
+            day: day,
+            preferences: preferences,
+            learnerStore: learnerStore,
+            reminderScheduler: reminderScheduler,
+            widgetRefresher: widgetRefresher
+        )
     }
 
     /// Rebuilds or cancels the reminder window without ever prompting for permission.

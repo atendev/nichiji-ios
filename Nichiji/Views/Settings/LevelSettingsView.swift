@@ -183,7 +183,8 @@ public struct LevelSettingsView: View {
                 preferences: preferences,
                 dailyKanjiService: services.dailyKanjiService,
                 dayProvider: services.dayProvider,
-                reminderScheduler: services.reminderScheduler
+                reminderScheduler: services.reminderScheduler,
+                widgetRefresher: services.widgetRefresher
             )
         }
     }

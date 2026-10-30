@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.6.0
+
+- Add the `NichijiWidget` extension with `systemSmall` and `systemMedium` daily kanji widgets, a single-entry timeline that reloads at the next local midnight, and quiet level-complete and open-app placeholders
+- Add the interactive "Got it" `MarkTodaysKanjiLearnedIntent`, which marks today learned, rebuilds reminders, and reloads timelines, via a shared `GotItAction`
+- Add `WidgetRefresher` and reload widget timelines after level changes, onboarding completion, time-zone changes, and Today's Got it
+- Share one Add Widget step list between onboarding and Settings, render the onboarding preview from the real small widget view, and turn the lock-screen guide into a post-MVP placeholder
+- Embed the widget in `project.yml` with the App Group entitlement and shared sources, add `Config/*.entitlements`, and drop the invalid principal class from the widget `Info.plist`
+- Extend `WidgetTimelineTests` and `OnboardingFlowTests`; close the Slice 11 implementation ticket (030)
+
 ## v0.5.2
 
 - Close Slice 11 requirements ticket (029) via delegated HITL grilling subagent

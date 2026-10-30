@@ -21,6 +21,8 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Provides toggleable `isJapaneseVoiceAvailable` flag to verify graceful error and disabled state handling without hardware speech synthesis dependencies.
 4. **`TestReminderScheduler`**:
    - Double recording scheduled notification requests, simulated authorization statuses (`.authorized`, `.denied`), and rebuild invocations without contacting `UNUserNotificationCenter`.
+5. **`TestWidgetRefresher`**:
+   - Double counting `reloadTimelines()` calls so widget reload triggers can be asserted without `WidgetCenter`.
 
 ### Planned feature test suites (`NichijiTests/Suites/`)
 
@@ -50,9 +52,10 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify Days 2 through 7 use generic copy (`"Today's kanji is ready"`).
    - Verify denied authorization preserves learner settings toggle without throwing silent failures.
 6. **`WidgetTimelineTests`**:
-   - Verify timeline provider builds `DailyKanjiWidgetSnapshot` from active assignment.
-   - Verify timeline reload policy refreshes at `nextMidnight`.
-   - Verify interactive "Got it" AppIntent marks assignment learned and triggers timeline reloads.
+   - Verify `DailyKanjiTimelineBuilder` builds a today entry from the active assignment, flags a learned day, and returns the level-complete and open-app placeholders.
+   - Verify the reload date is `nextMidnight`, or 15 minutes later after a read failure.
+   - Verify `GotItAction` marks the day learned, rebuilds reminders, and reloads timelines, and that a stale widget tap only reloads.
+   - Verify level change, time-zone change, onboarding completion, and Today's Got it each reload timelines through `WidgetRefresher`.
 7. **`SettingsPreferencesTests`**:
    - Verify `LearnerPreferencesSnapshot.load(from:)` and `save(to:)` round-trip all `LearnerPreferenceKey` values and format level and reminder summaries.
    - Verify level and order switches reassign an `.assigned` today kanji via `refreshAssignmentAfterPreferenceChange(for:preferences:)` while preserving a `.learned` assignment.
@@ -76,3 +79,16 @@ Repeatable verification that grows alongside features: each new feature gets tes
 - **Completion**: `complete()` sets `hasCompletedOnboarding`. If the level changed and today already has an assignment (a replay), it calls `LevelChangeCoordinator.applyLevelChange(preferences:dailyKanjiService:dayProvider:)`. A first run has no assignment yet, so it writes nothing to `LearnerStore` and Today's lazy rollover picks the first kanji.
 
 `LevelChangeCoordinator` (`Nichiji/Services/LevelChangeCoordinator.swift`) is the shared reassignment path for Settings level, order, and custom pool changes and for onboarding replay. It resolves today's calendar day and calls `DailyKanjiService.refreshAssignmentAfterPreferenceChange(for:preferences:)`, which runs `LearnerStore.reassignToday(day:from:)` and keeps a `.learned` assignment.
+
+## Widget Extension (Slice 11)
+
+The `NichijiWidget` target compiles `Nichiji/Models`, `Nichiji/Services`, `Nichiji/DesignSystem/Tokens`, and `Nichiji/Widget` directly, so the extension and the app share one set of types. Logic lives in `Nichiji/Widget/` so `@testable import Nichiji` can reach it; only SwiftUI glue and the AppIntent sit in `NichijiWidget/`.
+
+- **`WidgetRefresher`**: protocol with `reloadTimelines()`. `SystemWidgetRefresher` calls `WidgetCenter.shared.reloadAllTimelines()`; `NoopWidgetRefresher` is the `ServiceContainer` default. It is the only place that touches `WidgetCenter`.
+- **`DailyKanjiTimelineBuilder`**: `build()` returns a `DailyKanjiTimelinePlan` with one `DailyKanjiWidgetEntry` and a reload date. Content is `.today(snapshot)`, `.levelComplete`, or `.openApp` (onboarding unfinished or the store unreadable). The reload date is the next local midnight, or 15 minutes out after a read failure.
+- **`WidgetEnvironment`**: builds the App Group store, `DailyKanjiService`, and `SystemReminderScheduler` for the extension. `live()` throws `NichijiError.storeUnavailable` when the group container is missing.
+- **`GotItAction`**: `perform(...)` marks learned, rebuilds reminders, and reloads widgets; it backs Today (through `ServiceContainer.markLearned`) and the widget. `performFromWidget(calendarDay:environment:)` only reloads when the widget's day is no longer today.
+- **`MarkTodaysKanjiLearnedIntent`**: the interactive Got it button on `systemMedium`. It carries the day the widget showed.
+- **Reload triggers**: `LevelChangeCoordinator.applyLevelChange` (before the reminder rebuild), `OnboardingFlow.complete()`, `ServiceContainer.handleTimeOrZoneChange(preferences:)`, and `ServiceContainer.markLearned`.
+- **Shared copy and layout**: `AddWidgetCopy.steps` feeds the onboarding step and the Settings guide. `DailyKanjiSmallWidgetView` renders both the real small widget and the onboarding preview.
+- **Post-MVP**: lock-screen families, configurable widgets, and a widget deep link to Today are TODOs.

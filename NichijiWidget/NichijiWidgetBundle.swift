@@ -1,12 +1,12 @@
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
-/*----------------------------------widget--------------------------------*/
+/*---------------------------------bundle-------------------------------------*/
 
-// TODO: Implement systemSmall and systemMedium daily kanji widgets and interactive Got it AppIntent in Slice 11.
-struct NichijiWidgetEntryView: View {
-    var body: some View {
-        Text("Nichiji")
-            .font(.headline)
+@main
+struct NichijiWidgetBundle: WidgetBundle {
+    // TODO: Add lock-screen accessory families and configurable widgets after the MVP.
+    var body: some Widget {
+        DailyKanjiWidget()
     }
 }

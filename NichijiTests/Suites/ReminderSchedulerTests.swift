@@ -203,7 +203,8 @@ struct ReminderSchedulerTests {
             preferences: .standard,
             dailyKanjiService: service,
             dayProvider: dayProvider,
-            reminderScheduler: scheduler
+            reminderScheduler: scheduler,
+            widgetRefresher: TestWidgetRefresher()
         )
 
         #expect(scheduler.rebuildCallCount == 1)

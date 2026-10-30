@@ -43,10 +43,11 @@ Follow `docs/workflow.md` and `AGENTS.md` at all times. Phase 5 tickets run auto
 - [Slice 10 Requirements Report: Reminder Scheduler & Notifications](closed/026-slice-10-reminder-scheduler-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for the rolling 7-day window with scheduler context injected at init, skip-if-learned copy rules, all app-side rebuild triggers, and a pure planner test seam.
 - [Implement Slice 10: Reminder Scheduler & Notifications](closed/028-slice-10-implement-reminder-scheduler.md): Implemented `ReminderPlanBuilder`, `ReminderRefresher`, and the live `SystemReminderScheduler`, wired every app-side rebuild trigger, and added planner, refresher, and trigger tests; build and tests unverified locally.
 - [Slice 11 Requirements Report: WidgetKit Extension](closed/029-slice-11-widgetkit-requirements.md): Defined success criteria, scope boundary, anticipated TODOs, and test plan for the WidgetKit extension, host-app timeline reload triggers, interactive "Got it" AppIntent, and Add Widget copy alignment; delegated HITL grilling to a subagent and surfaced entitlement/target-dependency risks.
+- [Implement Slice 11: WidgetKit Extension](closed/030-implement-slice-11-widgetkit-extension.md): Added `systemSmall` and `systemMedium` widgets with a midnight timeline, an interactive Got it intent sharing `GotItAction` with Today, a `WidgetRefresher` wired into every reload trigger, shared Add Widget copy, and the widget target in `project.yml`; build and tests unverified locally.
 
 ## Not yet specified
 
-_None. Phase 5 vertical slice loop is in progress._
+_None. All 11 vertical slices have closed implementation tickets._
 
 ## Out of scope
 
@@ -54,4 +55,4 @@ _None. Phase 5 vertical slice loop is in progress._
 
 ## Frontier
 
-- [Implement Slice 11: WidgetKit Extension](tickets/030-implement-slice-11-widgetkit-extension.md)
+_None. Every ticket is closed._

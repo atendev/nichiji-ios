@@ -15,6 +15,7 @@ struct OnboardingFlowTests {
         let learnerStore = TestLearnerStore()
         let contentStore = TestKanjiContentStore(entries: SeedKanjiDataset.entries + [OnboardingFlowTests.n4Entry])
         let scheduler = TestReminderScheduler()
+        let widgetRefresher = TestWidgetRefresher()
 
         var service: DefaultDailyKanjiService {
             DefaultDailyKanjiService(
@@ -37,6 +38,7 @@ struct OnboardingFlowTests {
                 contentStore: contentStore,
                 reminderScheduler: scheduler,
                 dayProvider: dayProvider,
+                widgetRefresher: widgetRefresher,
                 learnerStore: learnerStore,
                 dailyKanjiService: service
             )
@@ -220,6 +222,18 @@ struct OnboardingFlowTests {
         #expect(fixture.learnerStore.assignments.isEmpty)
         #expect(fixture.learnerStore.progress.isEmpty)
         #expect(fixture.scheduler.rebuildCallCount == 0)
+    }
+
+    @Test("Completion reloads widget timelines once the onboarding flag is set")
+    func testCompletionReloadsWidgets() async throws {
+        let fixture = try Fixture()
+        defer { fixture.tearDown() }
+        let flow = fixture.makeFlow()
+        advance(flow, to: .ready)
+
+        await flow.complete()
+
+        #expect(fixture.widgetRefresher.reloadCount == 1)
     }
 
     @Test("Replay rebuilds reminders even with no assignment today or level change")

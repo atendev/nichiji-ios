@@ -13,7 +13,7 @@ public struct WidgetGuideSettingsView: View {
                         .font(.nichijiTitle)
                         .foregroundColor(.nichijiInk)
 
-                    Text("Keep today's kanji on your home screen or lock screen.")
+                    Text("Keep today's kanji on your home screen.")
                         .font(.nichijiBody)
                         .foregroundColor(.nichijiInkMuted)
                 }
@@ -25,10 +25,23 @@ public struct WidgetGuideSettingsView: View {
 
                 lockScreenSection
 
-                Text("To add one, touch and hold your home screen, tap +, then choose Nichiji.")
-                    .font(.nichijiBody)
-                    .foregroundColor(.nichijiInk)
-                    .padding(.horizontal, LayoutTokens.space8)
+                VStack(alignment: .leading, spacing: LayoutTokens.space12) {
+                    ForEach(Array(AddWidgetCopy.steps.enumerated()), id: \.offset) { index, step in
+                        HStack(alignment: .firstTextBaseline, spacing: LayoutTokens.space12) {
+                            Text("\(index + 1)")
+                                .font(.uiText(size: 14, weight: .medium))
+                                .foregroundColor(.nichijiVermilion)
+                                .frame(width: 20, alignment: .leading)
+
+                            Text(step)
+                                .font(.nichijiBody)
+                                .foregroundColor(.nichijiInk)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+                .padding(.horizontal, LayoutTokens.space8)
             }
             .padding(.horizontal, LayoutTokens.screenMarginRegular)
             .padding(.bottom, LayoutTokens.space48)
@@ -172,38 +185,18 @@ public struct WidgetGuideSettingsView: View {
         )
     }
 
+    // TODO: Build lock-screen accessory widgets after the MVP, then replace this placeholder with a real preview.
     private var lockScreenSection: some View {
-        VStack(alignment: .leading, spacing: LayoutTokens.space12) {
-            VStack(alignment: .leading, spacing: LayoutTokens.space4) {
-                Text("Lock screen")
-                    .font(.nichijiHeading)
-                    .foregroundColor(.nichijiInk)
+        VStack(alignment: .leading, spacing: LayoutTokens.space4) {
+            Text("Lock screen")
+                .font(.nichijiHeading)
+                .foregroundColor(.nichijiInk)
 
-                Text("Drawn in a single ink so it follows your lock screen tint.")
-                    .font(.nichijiCallout)
-                    .foregroundColor(.nichijiInkMuted)
-            }
-
-            HStack(spacing: LayoutTokens.space12) {
-                Text("学")
-                    .font(.kanjiDisplay(size: 36))
-                    .foregroundColor(.nichijiInk)
-
-                Text("study, learning")
-                    .font(.nichijiCallout)
-                    .foregroundColor(.nichijiInk)
-
-                Spacer()
-            }
-            .padding(.horizontal, LayoutTokens.space16)
-            .frame(height: 64)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.nichijiSurfaceSunken)
-            )
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Lock screen widget showing the kanji 学 and its meaning")
+            Text("Lock screen widgets are coming later.")
+                .font(.nichijiCallout)
+                .foregroundColor(.nichijiInkMuted)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(LayoutTokens.space24)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
@@ -213,6 +206,7 @@ public struct WidgetGuideSettingsView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.nichijiHairline, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
     }
 }
 

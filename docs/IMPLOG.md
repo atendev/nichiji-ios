@@ -310,7 +310,7 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   or run. Delivery, the identifier prefix surviving a rebuild, time-zone
   rescheduling and the denied banner need a simulator pass.
 
-### Slice 11: WidgetKit Extension (v0.5.2)
+### Slice 11: WidgetKit Extension (v0.6.0)
 
 #### Requirements Report
 - **Success Criteria**: `NichijiWidget` target registers `systemSmall` and
@@ -341,6 +341,55 @@ Running log of phase history and slices. Each slice gets its Requirements Report
   `Config/Nichiji.entitlements`, and the need for a `WidgetRefresher` wrapper.
 
 #### Deviation Report
-- **Deviations**: None yet; this is the requirements ticket only.
-- **Unanticipated TODOs**: None yet.
-- **Test Results**: N/A; implementation ticket 030 is next.
+- **Deviations**: Only the medium widget has the Got it button. The small widget
+  shows "TODAY", the kanji, the meaning and a "Learned" mark, and nothing on it
+  is tappable, so the onboarding preview no longer shows a Got it button. The
+  widget shows an open-app placeholder ("Open Nichiji to start learning.")
+  before onboarding completes and after any read failure, which the report did
+  not list. It waits for onboarding because reading the snapshot creates
+  today's assignment with default preferences. After a failure it retries in 15
+  minutes instead of waiting for midnight. Level complete has its own
+  placeholder. The widget logic lives in `Nichiji/Widget/` (provider builder,
+  `GotItAction`, `WidgetEnvironment`, `WidgetRefresher`, shared small view) and
+  is compiled into both the app and the extension through `project.yml`, with
+  only the widget, medium view and intent in `NichijiWidget/`. The extension
+  also compiles all of `Nichiji/Models`, `Nichiji/Services` and the design
+  tokens, so it builds code it never uses (`PronunciationService`,
+  `SystemReminderScheduler`). `GotItAction` is one Got it path for Today and the
+  widget; `TodayView` now calls a new `ServiceContainer.markLearned`. A tap on a
+  stale widget only reloads and marks nothing, so a learner cannot mark a kanji
+  they never saw. `LevelChangeCoordinator` reloads widgets before the reminder
+  rebuild so a reminder failure cannot leave the old kanji on screen.
+  `OnboardingFlow.complete` reloads after the onboarding flag is set, so a
+  completion with a level change reloads twice. `ServiceContainer.widgetRefresher`
+  defaults to `NoopWidgetRefresher`, so a call site that forgets to pass one
+  silently never reloads. `project.yml` also gained `MARKETING_VERSION "1.0"`
+  and `CURRENT_PROJECT_VERSION "1"` so the extension matches the app, and the
+  `NSExtensionPrincipalClass` key was removed from the widget Info.plist
+  because the bundle uses `@main`. The Settings guide now shares
+  `AddWidgetCopy.steps` with onboarding and its lock-screen card is a
+  post-MVP placeholder. The Got it AppIntent itself is not unit tested, because
+  the test target cannot see the extension. Its logic is covered through
+  `GotItAction.performFromWidget`. No test renders the small or medium views.
+- **Unanticipated TODOs**: Post-MVP TODOs were added for lock-screen widgets and
+  configuration intents (`NichijiWidgetBundle.swift`, `SettingsSupportViews.swift`)
+  and the widget deep link to Today (`DailyKanjiWidget.swift`). The widget
+  reads through `widgetSnapshot`, which can create the day's assignment and run
+  rollover from the extension process, racing the app on first open of a day.
+  Trim the extension sources to what it needs once CI builds. Both targets now
+  share source files, so a type that pulls in app-only UI would break the
+  extension build; check `Nichiji/Models` and `Nichiji/Services` first if CI
+  fails. XcodeGen regenerates `NichijiWidget/Info.plist` and both
+  `Config/*.entitlements` from `project.yml`, so edit them there. The app
+  falls back to a standalone store when the App Group is missing, while the
+  widget shows the placeholder; a sideloaded install will never fill the
+  widget. `MARKETING_VERSION` is "1.0" while the release notes say v0.6.0.
+  Swift 6 strict concurrency risks to watch: `Timeline` passed across
+  `@Sendable` completions in `DailyKanjiProvider` and the `@Parameter` /
+  `static let title` in the intent.
+- **Test Results**: No Swift toolchain in this environment, so nothing was
+  built or run, including the new `WidgetTimelineTests` cases and the updated
+  `OnboardingFlowTests` and `ReminderSchedulerTests`. The first build is remote
+  CI. The widget gallery, the medium Got it tap, Increase Contrast, the midnight
+  reload and the Add Widget flow need a simulator pass. The level-complete test
+  assumes an empty content store yields a nil snapshot and is unverified.

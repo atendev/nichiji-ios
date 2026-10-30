@@ -302,7 +302,8 @@ public struct CustomKanjiPickerView: View {
                 preferences: preferences,
                 dailyKanjiService: services.dailyKanjiService,
                 dayProvider: services.dayProvider,
-                reminderScheduler: services.reminderScheduler
+                reminderScheduler: services.reminderScheduler,
+                widgetRefresher: services.widgetRefresher
             )
         } catch {
             // Keep UI responsive if background store persistence fails.
