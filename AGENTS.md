@@ -3,7 +3,8 @@
 
 # Commit Style
 - NO CO-AUTHOR CLAUSE!
-- Always run the commit by the user and get confirmation before commiting.
+- Phases 0-4: run the commit by the user and get confirmation before commiting.
+- Phase 5 ticket runs: commit after the subagent audit returns `APPROVE`, no user confirmation needed. Never merge or push to `main` without permission.
 - Commits are short and sweet.
 - Check if commit changes enough for a version update.
 - Format:
@@ -16,4 +17,4 @@
 
 # Versioning
 - We will keep track of version control starting at v0.0.0 and will follow normal conventions with versioning.
-- Whenever a commit is supposed to happen, check whether it counts as something that would bump up the version. If so, ask the user about it before final commit.
+- Whenever a commit is supposed to happen, check whether it counts as something that would bump up the version. In Phases 0-4, ask the user before final commit. In Phase 5 ticket runs, pick the bump per `docs/workflow.md` and note it in the final report. Tagging is always the user's call.

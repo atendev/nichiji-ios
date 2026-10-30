@@ -4,24 +4,61 @@ A phased process for working through a project with an AI collaborator, from
 initial braindump to shipped features, with clean version history and
 documentation at every step.
 
+The process has two modes. Phases 0–4 are collaborative: the user and agent
+work through design, data, interfaces, TODOs, and tests together, and the
+user approves each phase. Phase 5 is autonomous: the user hands the agent a
+Wayfinder ticket and the agent implements, audits, commits, and sees CI
+through using subagents, returning only when something goes very wrong.
+
 ---
 
 ## Agent Rules
 
-These apply at all times, across every phase:
+### Always
 
-- Never proceed to the next phase without explicit confirmation.
-- Wait for confirmation before committing or merging.
-- Never implement more than the current phase asks for.
-- Never assume a correction is minor enough to skip a re-review. Always
-  re-present after changes.
+- Never implement more than the current phase or ticket asks for.
 - Do not people please. If there's a concern about an approach — technical
   risk, design inconsistency, something that might cause problems later —
   raise it, even if the user seems confident. State the concern clearly and
   specifically and let the user decide whether to address it or proceed
-  anyway.
+  anyway. In Phase 5 the concern goes in the final report (or stops the run
+  if it hits a stop condition below).
+- Report outcomes faithfully. Failing tests, skipped steps, and unverified
+  builds are stated plainly, never smoothed over.
+
+### Phases 0–4: human in the loop
+
+- Never proceed to the next phase without explicit confirmation.
+- Wait for confirmation before committing or merging.
+- Never assume a correction is minor enough to skip a re-review. Always
+  re-present after changes.
 - All reviews follow the same loop: the agent writes the file(s), the user
   approves, then it's committed. No committing on spec.
+
+### Phase 5: autonomous ticket runs
+
+- The user hands over a ticket. The agent runs it end to end without
+  pausing for approval.
+- Confirmation gates (the Requirements Report, the Deviation Report, the
+  diff review) are handed to subagents, not the user. Each delegated gate is
+  named in the final report so the user can review its output.
+- Implementation is audited by an independent subagent before every commit.
+  The audit gets the diff and the ticket's question, never the
+  implementer's own verdict.
+- Come back to the user only for a **stop condition**:
+  - A command is held by a guard hook (ask the user whether to run it; never
+    work around the hold).
+  - The run is out of tokens.
+  - The ticket is HITL (grilling, prototype, or a task needing the human).
+    The agent never stands in for the user.
+  - Two audit rounds pass without `APPROVE`.
+  - Three CI fix attempts fail.
+  - A failure the agent cannot explain after one reasonable attempt.
+  - A slice contradicts a decision already closed in the map, so
+    `DESIGN.md` cannot simply be updated to match.
+  - The next step would force push, rewrite history, merge to `main`, push
+    to `main`, delete data outside build/cache directories, or touch
+    anything outside the repo. These need explicit permission each time.
 
 ### Comment Style
 
@@ -50,6 +87,8 @@ These apply at all times, across every phase:
 ---
 
 ## Documentation Set
+
+All files live in `docs/`.
 
 | File | Purpose | Updated |
 |---|---|---|
@@ -129,30 +168,61 @@ Wait for final user approval before moving on.
 ## Phase 5: Implementation Loop
 
 With Phases 0–4 approved, implementation proceeds as a repeating loop of
-vertical slices:
+vertical slices. Each slice is a Wayfinder ticket (see `.plan/`) and each
+run resolves exactly one ticket. The user hands the agent a ticket (or
+points it at the map and lets it take the first frontier ticket) and the
+agent runs the whole loop below on its own, using subagents for every gate
+that used to wait on the user.
 
-1. Pick one TODO cluster (typically one feature/interface from Phase 3).
-2. **On trunk**, write a Requirements Report for the slice (see below).
-   Wait for approval before doing anything else.
-3. Create the slice branch and implement it.
-4. Run the existing test suite.
-5. Write/update tests for the new slice, per the Planned Tests from the
-   Requirements Report.
-6. **On trunk**, write a Deviation Report for the slice (see below). Wait
-   for approval before proceeding.
-7. Update `PROGRESS.md` status for the feature.
-8. Update `CHANGELOG.md` (see Versioning below).
-9. Log the Requirements Report and Deviation Report into `IMPLOG.md`.
-10. If the slice revealed something that contradicts `DESIGN.md`, stop and
-    update `DESIGN.md` first before continuing.
-11. Present the diff to the user for approval.
-12. Commit (only after approval), following commit style rules above.
-13. Decide whether this version gets tagged (see Versioning below).
+1. **Check the branch.** Never work on the default branch, and never edit a
+   file (including the claim) while on it. The user merges each slice back
+   to `main` before the next ticket starts, so a run always starts from
+   `main`. If on `main`, read `.plan/map.md` (read-only) to identify the
+   named ticket or the first frontier ticket, then create a `feature/xxx`
+   branch from that ticket's slug. If an earlier slice's branch is still
+   unmerged (the map on `main` shows its ticket open), stop and tell the
+   user. Only stay on an existing feature branch when resuming that same
+   ticket.
+2. **Pick and claim the ticket.** With the branch in place, take the named
+   ticket or the first frontier ticket and claim it (`claimed: true`) before
+   any work. A frontier ticket is open, unclaimed, and has every ticket in
+   its `blocked_by` closed (see `.plan/README.md`); skip tickets with any
+   open blocker. Refer to tickets by name, never by number. The map's
+   `## Notes` are the standing instructions for how to implement. If the
+   ticket is HITL, stop and tell the user.
+3. **Requirements Report.** Spawn a subagent to write it from the ticket,
+   the map, and the design docs (`DESIGN.md`, `IMPLEMENTATION.md`,
+   `PROGRESS.md`). See "Requirements Report" below. Use its output as the
+   requirements and carry on. There is no approval gate.
+4. **Implement.** Use TDD where it fits. Run the linter, the build, and the
+   relevant tests as you go.
+5. **Tests.** Run the existing suite, then write/update tests for the slice
+   per the Planned Tests from the Requirements Report.
+6. **Docs.** Update `PROGRESS.md` and `CHANGELOG.md` (see Versioning
+   below). If the slice contradicts `DESIGN.md`, update `DESIGN.md` first,
+   unless it contradicts a decision already closed in the map — that is a
+   stop condition.
+7. **Record the resolution.** Write the `.plan/` changes now, before the
+   audit, so they ride in the single audited commit: post the resolution in
+   the ticket, close it (move it to `.plan/closed/`), add its line to the
+   map's Decisions so far, update the Frontier, and add or graduate any
+   newly surfaced tickets. CI has not run yet, so the resolution notes CI as
+   "pending; see Final Report". The Final Report carries the real CI result.
+8. **Deviation Report.** Spawn a subagent to write it from the diff, the
+   ticket, and the Requirements Report (see below). Log the Requirements
+   Report and Deviation Report into `IMPLOG.md`.
+9. **Audit.** See "Audit" below. Commit only after `APPROVE`.
+10. **Commit** to the current feature branch, following the commit style
+    rules above. This is the one commit for the run (code, docs, and
+    `.plan/` changes together). Merging to `main` or pushing to `main` needs
+    explicit permission (see the stop conditions).
+11. **CI.** Push the feature branch, trigger the run, and watch it (see
+    "CI" below). There is no further commit after a green run.
+12. **Report back.** See "Final Report" below.
 
 ### Requirements Report
 
-Written on trunk, before the slice branch is created. Implementation does
-not begin until this is approved. It covers:
+Written by a subagent before implementation begins. It covers:
 
 - **Success Criteria** — plain description of the end state/behavior of
   the slice. What does "this slice works" look like?
@@ -169,13 +239,57 @@ not begin until this is approved. It covers:
 
 ### Deviation Report
 
-Written on trunk, after the slice implementation is complete but before
-commit and merge. Covers whether the implementation matched the Success
-Criteria, stayed within the Scope Boundary, and hit the Anticipated TODOs
-(or turned up new ones).
+Written by a subagent after the slice implementation is complete but before
+the audit. Covers whether the implementation matched the Success Criteria,
+stayed within the Scope Boundary, and hit the Anticipated TODOs (or turned
+up new ones).
 
 The Requirements Report and Deviation Report together are what get logged
 into `IMPLOG.md` for the slice.
+
+### Audit
+
+Spawn a fresh subagent on `haiku` (Agent tool, `model: "haiku"`). If haiku
+is unavailable, use `deepseek-v4.1-flash` through `delegate_task`. Give it
+the diff, the ticket's question, and the Requirements Report — not the
+implementer's own verdict. It answers `APPROVE` or a list of concrete
+problems.
+
+- On problems, fix them and re-audit with a fresh subagent.
+- After two rounds with no `APPROVE`, stop and report.
+
+### CI
+
+If the repo has remote CI (`.github/workflows/ci.yml`), push the feature
+branch (never force). CI starts automatically only on push to `main` or on
+a version tag, or manually through `workflow_dispatch`, so a branch push
+alone starts nothing. The agent has standing permission to trigger the run
+for the feature branch with `gh workflow run ci.yml --ref <branch>`. Then
+find the run with `gh run list --workflow ci.yml --branch <branch> --limit 1`
+and watch it with `gh run watch <id> --exit-status` until it finishes.
+Never trigger runs for `main`.
+
+On CI failure, spawn a subagent with the failing job logs and the branch
+diff. It finds the cause and fixes it. The fix goes through the audit,
+then commit, push, and watch again. CI-fix commits share the run's version
+entry (see Versioning). After three failed attempts, stop and report. If the
+run ends with CI red, the Final Report says so plainly, since the ticket was
+already closed in the audited commit and the user may need to reopen it.
+
+### Final Report
+
+Written when the run ends, whether it finished or stopped. It lists:
+
+- the ticket name and branch,
+- commit SHAs and the version bump,
+- the audit verdict and number of rounds,
+- the CI result,
+- every delegated gate (Requirements Report, Deviation Report, audit) so
+  the user can review its output,
+- any concerns raised, and anything left for the user.
+
+If the next step is a merge to `main`, or a version tag, ask. Merging and
+tagging stay the user's decision.
 
 ---
 
@@ -192,11 +306,14 @@ Semver (`MAJOR.MINOR.PATCH`), pre-1.0 conventions:
   specifically, not just a large feature.
 
 **Every commit gets a version bump, recorded in `CHANGELOG.md`.** The
-current version lives at the top of `CHANGELOG.md` — no separate `VERSION`
-file.
+current version lives at the top of `docs/CHANGELOG.md` — no separate `VERSION`
+file. In Phase 5 the agent picks the bump from the rules above and records
+it without asking. CI-fix commits within the same ticket run share that
+run's version entry instead of bumping again.
 
 **Tagging is a separate, deliberate decision made after each version bump**
-— not automatic. Most versions stay untagged but remain in git history via
+— not automatic, and always the user's call. The agent never tags on its
+own; it raises the question in the Final Report. Most versions stay untagged but remain in git history via
 commits and the changelog. A version gets tagged when it represents a real
 checkpoint (e.g., a full feature cluster is done and passing the test
 suite, or the design has been stable for a while).

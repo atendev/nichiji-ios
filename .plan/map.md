@@ -8,7 +8,7 @@ Complete Phases 0 through 4 of the project workflow (`docs/DESIGN.md`, `docs/IMP
 
 Domain: local-first iOS kanji learning app (Swift 6, SwiftUI, SwiftData, WidgetKit, iOS 27.0).
 Skills to consult: `grilling`, `domain-modeling`, `apple`, `unslop`.
-Follow `docs/workflow.md` and `AGENTS.md` at all times. Never proceed to the next workflow phase or commit without user confirmation.
+Follow `docs/workflow.md` and `AGENTS.md` at all times. Phase 5 tickets run autonomously with subagent audits (see Phase 5 in `docs/workflow.md`); stop only on its stop conditions.
 
 ## Decisions so far
 

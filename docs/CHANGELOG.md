@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.5.1
+
+- Rewrite Phase 5 of `docs/workflow.md` as an autonomous ticket run with subagent reports, a Haiku audit, CI handling, stop conditions, and a merge-before-next-ticket rule
+- Limit the user-confirmation commit rule in `AGENTS.md` and `.plan/map.md` to Phases 0-4
+
 ## v0.5.0
 
 - Add `ReminderPlanBuilder`, a pure planner for the rolling 7-day reminder window with kanji-led, missed-day, and generic copy
