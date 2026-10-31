@@ -4,7 +4,8 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
-## v0.9.0
+## v0.9.0 — ✅ Released
+---
 
 - Add the Review settings screen: a Settings row summarizing cards per session and order opens `ReviewSettingsView` with card types, order, session size, example word, repeat forgotten, and audio settings, saved to shared `UserDefaults` on every change
 - Add display copy, chip labels and `settingsSummary` to the review preference types; share the settings section header, divider and toggle row helpers
