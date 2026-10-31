@@ -7,7 +7,7 @@ Nichiji is a local-first iOS kanji learning application built around learning on
 ### Content
 
 **Kanji entry**:
-An immutable bundled record describing a single kanji character, its readings, meanings, radical, stroke paths, level classifications, and example words.
+An immutable bundled record describing a single kanji character, its readings, meanings, radical, level classifications, and example words. Stroke paths load separately and lazily. Level classifications are the unofficial JLPT level plus the Jōyō grade.
 _Avoid_: Kanji model, card, character record
 
 **Reading**:
@@ -15,8 +15,40 @@ A pronunciation of a kanji, categorized as either onyomi (Chinese-derived, rende
 _Avoid_: Pronunciation, furigana
 
 **Example word**:
-A Japanese vocabulary item containing a kanji entry, showing the written word, kana reading, romaji, and English gloss.
+A Japanese vocabulary item containing a kanji entry, showing the written word, kana reading, romaji, and English gloss. Chosen at generation time from JMdict, at most three per kanji.
 _Avoid_: Compound, vocab, sample sentence
+
+**Bundled dataset**:
+The generated, version-pinned content shipped in the app: `Dataset/Shared/` (`kanji-index.json`, `kanji/<hex>.json`, `DATA-SOURCES.md`) for both targets and `Dataset/AppOnly/` (`stroke-order/<hex>.svg`, `words.json`) for the app only.
+_Avoid_: Database, content pack
+
+**Dataset generator**:
+The build-time script in `tools/dataset/` that builds the bundled dataset from pinned upstream files. It is not part of any app target.
+_Avoid_: Importer, seeder
+
+**Kanji index**:
+The lightweight `kanji-index.json` of summary rows (`KanjiIndexEntry`) used for pools and ordering.
+_Avoid_: Manifest, catalog
+
+**Word index**:
+The app-only `words.json` of common JMdict forms that Dictionary search reads.
+_Avoid_: Word database
+
+**Jōyō kanji**:
+The 2,136 kanji with a KANJIDIC2 grade of 1 to 6 or 8. Grades 9 and 10 (jinmeiyō) are not Jōyō and have no `joyoGrade`.
+_Avoid_: Common-use kanji
+
+**JLPT level (unofficial)**:
+The N5 to N1 value from Jonathan Waller's community lists. The JLPT publishes no official kanji lists.
+_Avoid_: Official level
+
+**Estimated JLPT level**:
+A level OpenJLPT assigned to a Jōyō kanji that Waller's lists omit. It is flagged and shown as "(est.)".
+_Avoid_: Guessed level
+
+**Featured word**:
+The first example word of a kanji, used by the lock-screen widgets and the flashcard answer.
+_Avoid_: Top word, main example
 
 ### Study pool and daily assignment
 

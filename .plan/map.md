@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Settle the bundled dataset scope and schema](closed/036-bundled-dataset-scope-and-schema.md): Ship 2,383 kanji (2,136 Jōyō plus 247 Waller N1 jinmeiyō; 172 estimated levels flagged); `KanjiEntry` drops `strokePaths` and gains `isJLPTLevelEstimated`; up to 3 JMdict examples each plus an app-only 17.7k-word index; stdlib-Python generator in `tools/dataset/` with output committed to `Dataset/`; budgets 3 MB widget and 8 MB app; refresh every release; Jōyō counts verified.
 - [Register the nichiji URL scheme](closed/053-register-the-nichiji-url-scheme.md): `project.yml` adds an `info:` block on the Nichiji target (`Config/Nichiji-Info.plist`, `CFBundleURLTypes`) that Xcode merges with the generated keys, so Safari and Shortcuts reach `nichiji://today` through the existing `onOpenURL`; a device check is still due.
 - [Build the UI launch smoke test](closed/056-build-the-ui-launch-smoke-test.md): `testLaunchShowsPrimaryAction` waits 15 s for `primaryButton` or Today's "Learned today" seal, and the `Nichiji` scheme now runs `NichijiUITests` under `make test` and CI.
 - [Build the Review settings screen](closed/041-review-settings-screen.md): Settings gets a Review row (`10 cards · Due first`) that opens `ReviewSettingsView`, which saves a `ReviewPreferencesSnapshot` to shared `UserDefaults` on every change and keeps one card type on; the engine reads order and size now, and the Review session ticket is the first reader of the rest.
@@ -37,7 +38,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
-_(empty — the remaining fog graduated or moved to Out of scope)_
+- Waller's list licence version: the tanos.co.uk page was only reachable through a Wayback copy and states no licence version. Revisit when the Sources screen is built.
 
 ## Out of scope
 
@@ -48,5 +49,6 @@ _(empty — the remaining fog graduated or moved to Out of scope)_
 
 ## Frontier
 
-- [Settle the bundled dataset scope and schema](tickets/036-bundled-dataset-scope-and-schema.md) (grilling)
+- [Build the dataset generator and pin its first output](tickets/037-build-the-dataset-generator.md) (task, AFK)
+- [Decide how Dictionary search matches and ranks](tickets/044-dictionary-search-rules.md) (grilling)
 - [Decide the streak and stats rules](tickets/047-streak-and-stats-rules.md) (grilling)

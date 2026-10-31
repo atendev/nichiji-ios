@@ -25,5 +25,14 @@ Minor bump.
 - The Settings Sources screen is ticket "Build the Sources screen", not this one.
 - A missing record or SVG surfaces as unavailable, never a silent substitute.
 
+Also from [Settle the bundled dataset scope and schema](../closed/036-bundled-dataset-scope-and-schema.md):
+
+- Drop `strokePaths`, `legacyJLPTLevel` and the `ExampleWord` `max*` fields from the models. Add `isJLPTLevelEstimated`. `KanjiIndexEntry` carries `frequencyRank`.
+- Remove the hardcoded grade-count fallback in `LevelSettingsView.swift`; the bundle supplies counts.
+- Show "N1 (est.)" for estimated levels in the Details row and subtitle, and add the Level-screen footer "JLPT levels are unofficial community lists", linking to Sources once that screen exists.
+- An empty `exampleWords` array (5 kanji) must render safely.
+- `words.json` is app-only and loads lazily on first search; the widget never touches it.
+- Delete the three verification and "from memory" caveats in `docs/ui-reference/design-notes.md`: line 62 (grade counts need verifying), line 70 (picker lists are samples, grade placement from memory) and line 126 (lists, grade placement, counts and example words from memory).
+
 ## Resolution
 
