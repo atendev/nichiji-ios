@@ -1,0 +1,128 @@
+{
+  "JMdict_e.gz": {
+    "enforced": false,
+    "licence": "CC BY-SA 4.0 (EDRDG)",
+    "sha256": "7cbacefaf3264a72476327c7bff837348b239ea605ad7818d5cf79c7f5ea9dcb",
+    "url": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
+    "version": "2026-10-31"
+  },
+  "kanjidic2.xml.gz": {
+    "enforced": false,
+    "licence": "CC BY-SA 4.0 (EDRDG)",
+    "sha256": "8e70bfa3a7a7df640e3ba254a80438201904d95df0fb23c9323476c2676d3346",
+    "url": "https://www.edrdg.org/kanjidic/kanjidic2.xml.gz",
+    "version": "2026-304"
+  },
+  "kanjivg-main.zip": {
+    "enforced": true,
+    "licence": "CC BY-SA 3.0 (KanjiVG)",
+    "sha256": "b5df6cd2bc249dd49b8041eb99e38ba9f8dc6b9ea57962a80084b4a315d1a7fc",
+    "url": "https://github.com/KanjiVG/kanjivg/releases/download/r20260714/kanjivg-20260714-main.zip",
+    "version": "r20260714"
+  },
+  "openjlpt-kanji-n1.json": {
+    "enforced": true,
+    "licence": "CC BY-SA 4.0 (OpenJLPT)",
+    "sha256": "1814dd4fd4b363854fb861f091c2ca408bac01c96dddb6e9b3a5e2566069a79e",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/data/json/kanji/n1.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "openjlpt-kanji-n2.json": {
+    "enforced": true,
+    "licence": "CC BY-SA 4.0 (OpenJLPT)",
+    "sha256": "2e3bd6f9a26d8794aad2dd770b094836bc6c478950202d631e5fb9233e26cc85",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/data/json/kanji/n2.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "openjlpt-kanji-n3.json": {
+    "enforced": true,
+    "licence": "CC BY-SA 4.0 (OpenJLPT)",
+    "sha256": "c81669777f0ea37f848105babf8177ab36e968900307e5118b57e4156ed05fef",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/data/json/kanji/n3.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "openjlpt-kanji-n4.json": {
+    "enforced": true,
+    "licence": "CC BY-SA 4.0 (OpenJLPT)",
+    "sha256": "a034d51bea0ee6c9ee1cc48b1cc83d9602641b9f5d38d99a55f5136f447a58d8",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/data/json/kanji/n4.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "openjlpt-kanji-n5.json": {
+    "enforced": true,
+    "licence": "CC BY-SA 4.0 (OpenJLPT)",
+    "sha256": "c81458831e5e2e807ce0bb81a5af971d493ac8a9243701005eb57fe353990fce",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/data/json/kanji/n5.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-kanji-n1.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "a5194d58e9f522bd065c065de5029d262d8580f995a85aca0acb7a7eb304ff3b",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/kanji-eng-n1.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-kanji-n2.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "61f83b12bf76f2bec417472ac8171213f43465d2487d9a7a8adf659e6f018a34",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/kanji-eng-n2.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-kanji-n3.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "49659ae47992824cc3bf0711efcaf1ca4cfcefc19ce140c20932d42e914ad300",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/kanji-eng-n3.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-kanji-n4.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "52b731c4e64f0cfa8260f76696e4e31e9337306c8bf9f38250f2f13305d4cd92",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/kanji-eng-n4.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-kanji-n5.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "ed3e37ad2a3ac01093e5eded49a0be44efff227737bc8e9cec06707b0602c6dc",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/kanji-eng-n5.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-vocab-n1.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "45fda879f81d73a09517267d4f30d21466fa67f98f52b16ad78db04e5bacf27c",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/vocab-eng-n1.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-vocab-n2.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "7c14c1a337550f2046d213b132f29e199e97d88aa6663735ce9eb6d2b0551ca7",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/vocab-eng-n2.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-vocab-n3.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "adc67d77756583de575e2378f0d3bcc666d064d0d1025f43bf026b60680c3027",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/vocab-eng-n3.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-vocab-n4.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "6f0d3696e8314e6d768827b56286570e26c8909c3a1191f1ba583a1d99f35d0f",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/vocab-eng-n4.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  },
+  "waller-vocab-n5.json": {
+    "enforced": true,
+    "licence": "CC BY (Jonathan Waller)",
+    "sha256": "a4b868288951a37cd2bdd34173d0dd06848817ae68eb5f036c0c23a3ffdb3df3",
+    "url": "https://raw.githubusercontent.com/evanclan/OpenJLPT/0d1d3410bec90bd4098a7c72de820543cb4f707c/sources/waller/vocab-eng-n5.json",
+    "version": "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+  }
+}

@@ -27,10 +27,10 @@ Minor bump.
 
 Also from [Settle the bundled dataset scope and schema](../closed/036-bundled-dataset-scope-and-schema.md):
 
-- Drop `strokePaths`, `legacyJLPTLevel` and the `ExampleWord` `max*` fields from the models. Add `isJLPTLevelEstimated`. `KanjiIndexEntry` carries `frequencyRank`.
+- Drop `strokePaths` and the `ExampleWord` `max*` fields from the models; there is no `legacyJLPTLevel`. "Build the dataset generator and pin its first output" already added `isJLPTLevelEstimated`, `KanjiIndexEntry.frequencyRank` and the `KanjiIndex` wrapper (`formatVersion` 1, `entries`), and left `strokePaths` decoding as optional so the bundle loads before this ticket removes it.
 - Remove the hardcoded grade-count fallback in `LevelSettingsView.swift`; the bundle supplies counts.
 - Show "N1 (est.)" for estimated levels in the Details row and subtitle, and add the Level-screen footer "JLPT levels are unofficial community lists", linking to Sources once that screen exists.
-- An empty `exampleWords` array (5 kanji) must render safely.
+- An empty `exampleWords` array (11 kanji; the list is in the resolution of "Build the dataset generator and pin its first output") must render safely.
 - `words.json` is app-only and loads lazily on first search; the widget never touches it.
 - Delete the three verification and "from memory" caveats in `docs/ui-reference/design-notes.md`: line 62 (grade counts need verifying), line 70 (picker lists are samples, grade placement from memory) and line 126 (lists, grade placement, counts and example words from memory).
 

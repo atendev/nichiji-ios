@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the dataset generator and pin its first output](closed/037-build-the-dataset-generator.md): `tools/dataset/` (stdlib Python, `make dataset-fetch` / `dataset` / `dataset-test`) builds the committed `Dataset/` offline and deterministically: 2,383 kanji matching every pinned grade and N-level count, stroke-path-only SVGs, 2.2 MB shared and 7.0 MB app; 18,195 common words and 11 kanji with no example differ from the dataset ticket's figures.
 - [Settle the bundled dataset scope and schema](closed/036-bundled-dataset-scope-and-schema.md): Ship 2,383 kanji (2,136 Jōyō plus 247 Waller N1 jinmeiyō; 172 estimated levels flagged); `KanjiEntry` drops `strokePaths` and gains `isJLPTLevelEstimated`; up to 3 JMdict examples each plus an app-only 17.7k-word index; stdlib-Python generator in `tools/dataset/` with output committed to `Dataset/`; budgets 3 MB widget and 8 MB app; refresh every release; Jōyō counts verified.
 - [Register the nichiji URL scheme](closed/053-register-the-nichiji-url-scheme.md): `project.yml` adds an `info:` block on the Nichiji target (`Config/Nichiji-Info.plist`, `CFBundleURLTypes`) that Xcode merges with the generated keys, so Safari and Shortcuts reach `nichiji://today` through the existing `onOpenURL`; a device check is still due.
 - [Build the UI launch smoke test](closed/056-build-the-ui-launch-smoke-test.md): `testLaunchShowsPrimaryAction` waits 15 s for `primaryButton` or Today's "Learned today" seal, and the `Nichiji` scheme now runs `NichijiUITests` under `make test` and CI.
@@ -49,6 +50,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build the dataset generator and pin its first output](tickets/037-build-the-dataset-generator.md) (task, AFK)
+- [Load the generated dataset in the app and widget](tickets/038-load-the-generated-bundle.md) (task, AFK)
 - [Decide how Dictionary search matches and ranks](tickets/044-dictionary-search-rules.md) (grilling)
 - [Decide the streak and stats rules](tickets/047-streak-and-stats-rules.md) (grilling)

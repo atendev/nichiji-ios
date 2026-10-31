@@ -91,9 +91,12 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
     public let kunyomi: [KanjiReading]
     public let radical: KanjiRadical
     public let strokeCount: Int
-    /// Ordered SVG path strings in a 109x109 KanjiVG coordinate space.
+    /// Ordered SVG path strings in a 109x109 KanjiVG coordinate space. The generated bundle leaves this empty; the SVGs load lazily from `stroke-order/`.
     public let strokePaths: [String]
+    /// Unofficial community level; see `isJLPTLevelEstimated`.
     public let jlptLevel: JLPTLevel?
+    /// True when the level comes from the OpenJLPT supplement instead of Waller's lists.
+    public let isJLPTLevelEstimated: Bool
     public let joyoGrade: JoyoGrade?
     public let frequencyRank: Int?
     public let listIndex: Int
@@ -111,7 +114,8 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
         joyoGrade: JoyoGrade?,
         frequencyRank: Int?,
         listIndex: Int,
-        exampleWords: [ExampleWord]
+        exampleWords: [ExampleWord],
+        isJLPTLevelEstimated: Bool = false
     ) {
         self.id = id
         self.meanings = meanings
@@ -121,10 +125,28 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
         self.strokeCount = strokeCount
         self.strokePaths = strokePaths
         self.jlptLevel = jlptLevel
+        self.isJLPTLevelEstimated = isJLPTLevelEstimated
         self.joyoGrade = joyoGrade
         self.frequencyRank = frequencyRank
         self.listIndex = listIndex
         self.exampleWords = exampleWords
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        meanings = try container.decode([String].self, forKey: .meanings)
+        onyomi = try container.decode([KanjiReading].self, forKey: .onyomi)
+        kunyomi = try container.decode([KanjiReading].self, forKey: .kunyomi)
+        radical = try container.decode(KanjiRadical.self, forKey: .radical)
+        strokeCount = try container.decode(Int.self, forKey: .strokeCount)
+        strokePaths = try container.decodeIfPresent([String].self, forKey: .strokePaths) ?? []
+        jlptLevel = try container.decodeIfPresent(JLPTLevel.self, forKey: .jlptLevel)
+        isJLPTLevelEstimated = try container.decodeIfPresent(Bool.self, forKey: .isJLPTLevelEstimated) ?? false
+        joyoGrade = try container.decodeIfPresent(JoyoGrade.self, forKey: .joyoGrade)
+        frequencyRank = try container.decodeIfPresent(Int.self, forKey: .frequencyRank)
+        listIndex = try container.decode(Int.self, forKey: .listIndex)
+        exampleWords = try container.decode([ExampleWord].self, forKey: .exampleWords)
     }
 }
 
@@ -136,6 +158,7 @@ public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
     public let strokeCount: Int
     public let jlptLevel: JLPTLevel?
     public let joyoGrade: JoyoGrade?
+    public let frequencyRank: Int?
     public let listIndex: Int
 
     public init(
@@ -145,7 +168,8 @@ public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
         strokeCount: Int,
         jlptLevel: JLPTLevel?,
         joyoGrade: JoyoGrade?,
-        listIndex: Int
+        listIndex: Int,
+        frequencyRank: Int? = nil
     ) {
         self.id = id
         self.primaryMeaning = primaryMeaning
@@ -153,6 +177,13 @@ public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
         self.strokeCount = strokeCount
         self.jlptLevel = jlptLevel
         self.joyoGrade = joyoGrade
+        self.frequencyRank = frequencyRank
         self.listIndex = listIndex
     }
+}
+
+/// Top-level shape of the generated `kanji-index.json`.
+public struct KanjiIndex: Codable, Sendable {
+    public let formatVersion: Int
+    public let entries: [KanjiIndexEntry]
 }
