@@ -490,3 +490,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept.
 - **Unanticipated TODOs**: None.
 - **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate. `Config/Nichiji-Info.plist` is written by hand and should be equivalent to what XcodeGen emits; `make generate` rewrites its formatting.
+
+### Build the dataset generator and pin its first output (v0.10.0)
+
+#### Requirements Report
+
+- **Success Criteria**: `make dataset-fetch` pins the inputs and `make dataset` builds `Dataset/` offline and byte-identically: 2,383 kanji, grade counts 80/160/200/202/193/191/1,110, N-level counts 84/169/387/398/1,345, 172 estimated levels, budgets of 3 MB shared and 8 MB app, and the 9 known KanjiVG stroke-count mismatches allow-listed. A Swift contract test decodes the bundle with the real types.
+- **Scope Boundary**: The generator, Makefile targets, `Dataset/`, the additive Swift model changes the contract test needs, and the contract test. The release-checklist note already lives in "Prepare the v1.0 release build". Runtime loading, target wiring, lazy SVG loading, the Sources screen and removing `strokePaths` belong to later tickets.
+- **Anticipated TODOs**: Removing `strokePaths` and the `ExampleWord` `max*` fields, the lazy SVG loader, and the `words.json` consumer all wait for "Load the generated dataset in the app and widget" and the Dictionary tickets.
+- **Planned Tests**: `unittest` on inline fixtures for the parsers, level join, example ranking, Hepburn transliteration, radical table, ordering, determinism, hash enforcement and budgets; `DatasetContractTests` for the Swift side.
+
+#### Deviation Report
+
+- **Success Criteria**: Met except two figures from the dataset ticket that do not reproduce under any selection rule tried: the bundle has 18,195 common words (not 17,709) and 11 kanji with no example (not 5). Both are recorded in the ticket Resolution and the map. Pins, determinism, counts, budgets, the stroke-count allow-list, radical table, Hepburn romaji and `DATA-SOURCES.md` are in place.
+- **Scope Boundary**: Kept. The only app-code change is additive (`isJLPTLevelEstimated`, `frequencyRank`, `KanjiIndex`); `strokePaths` stays with a default. `make dataset-test` joined the CI test job and `.cache/` and `__pycache__/` joined `.gitignore`.
+- **Unanticipated TODOs**: None. The audit found a too-narrow Han range, Greek and fullwidth-symbol headwords in `words.json`, an always-true filter, two unused names and stale counts; all are fixed.
+- **Test Results**: `make dataset-test` runs 39 tests, all OK. Nothing was built for Swift because the host is Linux with no toolchain, so CI is the gate for `DatasetContractTests` and the model changes.

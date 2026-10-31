@@ -4,6 +4,13 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.10.0
+
+- Add the dataset generator in `tools/dataset/`: `make dataset-fetch` downloads pinned KANJIDIC2, JMdict, KanjiVG and N-level inputs into untracked `.cache/` and writes `sources.lock.json`; `make dataset` builds the committed `Dataset/` bundle offline and deterministically
+- Commit the first bundle: 2,383 kanji records, the index, minified stroke-order SVGs, an app-only `words.json` and a generated `DATA-SOURCES.md`; budgets are checked at 2.2 MB shared and 7.0 MB for the app
+- Add `KanjiEntry.isJLPTLevelEstimated`, `KanjiIndexEntry.frequencyRank` and the `KanjiIndex` wrapper, plus `DatasetContractTests` that decode the bundle and assert the grade and N-level counts
+- Add `make dataset-test` to CI; close ticket 037
+
 ## v0.9.3
 
 - Register the `nichiji` URL scheme: the Nichiji target gains an `info:` block (`Config/Nichiji-Info.plist`) with `CFBundleURLTypes`, so Safari and Shortcuts can open `nichiji://today` on Today through the existing `onOpenURL` (device check still due)

@@ -7,3 +7,5 @@ build/
 .swiftpm/
 *.xcresult
 .agent-state.md
+tools/dataset/.cache/
+__pycache__/
