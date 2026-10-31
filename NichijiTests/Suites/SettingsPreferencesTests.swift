@@ -179,3 +179,87 @@ struct SettingsPreferencesTests {
         #expect(enabledPrefs.reminderEnabled == true)
     }
 }
+
+/*-------------------------review-settings-tests--------------------------*/
+
+extension SettingsPreferencesTests {
+    @Test("Review settings round-trip every field and summarize as the Settings row value")
+    func reviewSettingsRoundTripAndSummary() throws {
+        let suiteName = "com.aten.nichiji.tests.review-settings.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let initial = ReviewPreferencesSnapshot.load(from: defaults)
+        #expect(initial == .standard)
+        #expect(initial.settingsSummary == "10 cards · Due first")
+
+        var updated = ReviewPreferencesSnapshot.standard
+        updated.setCardType(.meaningToKanji, enabled: true)
+        updated.setCardType(.kanjiToReading, enabled: false)
+        updated.order = .random
+        updated.sessionSize = .allDue
+        updated.showsExampleWord = false
+        updated.repeatsForgotten = false
+        updated.autoplaysAudio = true
+        updated.audioContent = .readingAndWord
+        updated.save(to: defaults)
+
+        let reloaded = ReviewPreferencesSnapshot.load(from: defaults)
+        #expect(reloaded == updated)
+        #expect(reloaded.cardTypes == [.kanjiToMeaning, .meaningToKanji])
+        #expect(reloaded.settingsSummary == "All due · Random")
+        #expect(ReviewPreferencesSnapshot.settingsSummary(sessionSize: .five, order: .hardestFirst) == "5 cards · Hardest first")
+        #expect(ReviewSessionSize.allCases.map(\.chipLabel) == ["5", "10", "20", "All due"])
+    }
+
+    @Test("Review settings keep the last card type on through save and load")
+    func reviewSettingsKeepOneCardType() throws {
+        let suiteName = "com.aten.nichiji.tests.review-card-types.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        var preferences = ReviewPreferencesSnapshot.standard
+        let droppedReading = preferences.setCardType(.kanjiToReading, enabled: false)
+        let droppedMeaning = preferences.setCardType(.kanjiToMeaning, enabled: false)
+        #expect(droppedReading)
+        #expect(!droppedMeaning)
+        preferences.save(to: defaults)
+
+        #expect(ReviewPreferencesSnapshot.load(from: defaults).cardTypes == [.kanjiToMeaning])
+    }
+
+    @Test("Saved review settings set the engine's queue order and session size")
+    func reviewSettingsDriveDueQueue() throws {
+        let suiteName = "com.aten.nichiji.tests.review-queue.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        var chosen = ReviewPreferencesSnapshot.standard
+        chosen.sessionSize = .five
+        chosen.order = .newestFirst
+        chosen.save(to: defaults)
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(identifier: "UTC"))
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let candidates = (0..<8).map { offset in
+            KanjiProgressSnapshot(
+                kanjiID: "k\(offset)",
+                stage: .learning,
+                firstLearnedAt: now.addingTimeInterval(Double(offset - 10) * 86_400),
+                nextReviewAt: now.addingTimeInterval(-86_400)
+            )
+        }
+        var generator = SystemRandomNumberGenerator()
+
+        let queue = ReviewScheduler.dueQueue(
+            from: candidates,
+            on: now,
+            calendar: calendar,
+            preferences: ReviewPreferencesSnapshot.load(from: defaults),
+            using: &generator
+        )
+
+        #expect(queue.map(\.kanjiID) == ["k7", "k6", "k5", "k4", "k3"])
+    }
+}

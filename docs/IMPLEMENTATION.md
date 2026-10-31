@@ -61,6 +61,7 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify level and order switches reassign an `.assigned` today kanji via `refreshAssignmentAfterPreferenceChange(for:preferences:)` while preserving a `.learned` assignment.
    - Verify custom kanji selections persist per `LevelSystem` and filter `DailyKanjiService.activePool(preferences:)` when `isCustomPoolActive` is enabled.
    - Verify `ReminderSettingsCoordinator.applyReminderPreferences(_:scheduler:)` rebuilds schedules when enabled, cancels reminders when disabled, and preserves the learner toggle when authorization is `.denied`.
+   - Verify `ReviewPreferencesSnapshot` round-trips every review setting, formats the Settings row summary and chip labels, keeps the last card type on through save and load, and that a saved order and session size drive `ReviewScheduler.dueQueue`.
 8. **`OnboardingFlowTests`**:
    - Verify the seven steps run in order, Welcome shows no progress, and steps 1 to 6 fill 1 to 6 segments.
    - Verify back navigation walks the steps in reverse and reaches Welcome.

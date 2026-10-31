@@ -442,3 +442,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept. Only wiring touched the widget environment and test fixtures. Follow-up notes went to 043, 045 (now owns Forget it UI) and 048.
 - **Unanticipated TODOs**: `forgetIt` no longer bumps `forgotItCount`, matching "keeps both counts".
 - **Test Results**: Nothing built locally (Linux host). Planned tests were written or merged, except a dedicated assertion that `SystemReminderScheduler` passes the due count through (it uses `UNUserNotificationCenter`), and singular-copy and zero-due cases, which existing tests already cover. CI is the gate.
+
+### Build the Review settings screen (v0.9.0)
+
+#### Requirements Report
+
+- **Success Criteria**: Settings has a Review row between Daily reminder and Show romaji. Its subtitle is "Card types, order, audio." and its value is `<N> cards · <Order>` or `All due · <Order>`, which defaults to `10 cards · Due first`. The row pushes `ReviewSettingsView` with the mock's Card types, Order, Session and Audio sections. The last card type stays on. The defaults come from decision 039. Every change saves at once through `ReviewPreferencesSnapshot.save` to App Group `UserDefaults`, and `ReviewService.startSession(preferences:)` takes the loaded snapshot. The screen uses `selectableCard`, the settings row styles and 44 pt targets, and VoiceOver reports selected states.
+- **Scope Boundary**: The row, its summary, the view and persistence. Scheduler rules, the Review tab and session start stay out.
+- **Anticipated TODOs**: `cardTypes`, `showsExampleWord`, `repeatsForgotten`, `autoplaysAudio` and `audioContent` get their first reader in 043. Audio has no consumer yet. The Review tab's options entry point is 043's.
+- **Planned Tests**: Extend `SettingsPreferencesTests` with defaults and summary, the full round trip, the last card type through save and load, and a saved order and size driving the queue.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code. The row is `ReviewSettingsRow`, which reads order and size live through `@AppStorage`. A tap on the last card type is a no-op. Chips stack at accessibility sizes.
+- **Scope Boundary**: Kept. `sectionHeader`, `dividerLine`, `settingsNavigationRow` and `settingsToggleRow` went from private to internal for reuse. The shared toggle row now passes its title as the hidden label, so VoiceOver names every settings switch.
+- **Unanticipated TODOs**: None. 043's Notes list the readers it owes.
+- **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate. "5 cards · Hardest first" is checked through the static summary only.

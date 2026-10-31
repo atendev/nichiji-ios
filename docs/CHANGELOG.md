@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.9.0
+
+- Add the Review settings screen: a Settings row summarizing cards per session and order opens `ReviewSettingsView` with card types, order, session size, example word, repeat forgotten, and audio settings, saved to shared `UserDefaults` on every change
+- Add display copy, chip labels and `settingsSummary` to the review preference types; share the settings section header, divider and toggle row helpers
+- Extend `SettingsPreferencesTests` for the review settings round trip, the last-card-type rule, and the saved order and size driving the due queue; close ticket 041
+
 ## v0.8.0
 
 - Add the review engine: `ReviewService` (in `ServiceContainer`) over a pure `ReviewScheduler` with the Leitner table, a day-granular due queue ordered and capped by review preferences, first-answer-per-session verdicts, and `gotItReview` / `forgotItReview` log rows under the session day
