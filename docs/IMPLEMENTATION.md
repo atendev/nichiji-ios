@@ -68,6 +68,9 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify level row counts come from `KanjiContentStore`.
    - Verify `requestAuthorization()` runs only when reminders are on, and a `.denied` result still advances.
    - Verify completion sets `hasCompletedOnboarding` without a `LearnerStore` write, and a replay with a changed level reassigns an `.assigned` today while leaving a `.learned` today alone.
+9. **`AppDeepLinkTests`**:
+   - Verify `AppDeepLink.today` round-trips through `nichiji://today`, matches scheme and host case-insensitively, accepts a trailing slash, and rejects other schemes, hosts and paths.
+   - Verify the today link selects `AppTab.today`.
 
 ## Onboarding Flow (Slice 9)
 
@@ -91,4 +94,5 @@ The `NichijiWidget` target compiles `Nichiji/Models`, `Nichiji/Services`, `Nichi
 - **`MarkTodaysKanjiLearnedIntent`**: the interactive Got it button on `systemMedium`. It carries the day the widget showed.
 - **Reload triggers**: `LevelChangeCoordinator.applyLevelChange` (before the reminder rebuild), `OnboardingFlow.complete()`, `ServiceContainer.handleTimeOrZoneChange(preferences:)`, and `ServiceContainer.markLearned`.
 - **Shared copy and layout**: `AddWidgetCopy.steps` feeds the onboarding step and the Settings guide. `DailyKanjiSmallWidgetView` renders both the real small widget and the onboarding preview.
-- **Post-MVP**: lock-screen families, configurable widgets, and a widget deep link to Today are TODOs.
+- **Deep link**: `AppDeepLink` (`Nichiji/Models/NavigationState.swift`) builds and parses `nichiji://today`. Both widgets set it with `.widgetURL`; `MainTabView.onOpenURL` closes Settings and selects Today. WidgetKit delivers it to the containing app, so no URL scheme is registered.
+- **Post-MVP**: lock-screen families and configurable widgets are TODOs.

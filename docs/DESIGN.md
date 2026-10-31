@@ -2,7 +2,7 @@
 
 Living document. Updated in Phase 0 and whenever the design changes.
 
-Status: **Phase 0 approved (updated for Phase 2 service and dataset contracts)**
+Status: **v0.6.0 shipped (Onboarding, Today, Settings, reminders, widgets). v1.0 work is planned in `.plan/map.md`.**
 
 ---
 
@@ -95,7 +95,9 @@ pass. Only the medium widget has the interactive "Got it" button, shown while
 today's assignment is `.assigned`. Widget timelines emit a single entry refreshed `.after(nextMidnight)`
 and reload explicitly after "Got it" or any level, pool, order or time-zone
 change. Before onboarding finishes the widget asks the learner to open the app,
-and a finished level shows a quiet placeholder. Lock-screen widgets are post-MVP. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+and a finished level shows a quiet placeholder. Tapping either widget outside
+the Got it button opens the app on Today (`nichiji://today`) and closes the
+Settings sheet. Lock-screen widgets are post-MVP. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
 kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed. Handwriting recognition is deferred.
 

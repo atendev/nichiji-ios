@@ -9,7 +9,10 @@ This folder holds the Wayfinder map for the project. Commit it. It is the record
   TICKET.template.md     copy this to start a ticket
   tickets/               open tickets, one file each
   closed/                resolved tickets
+  archive/               finished maps, kept for their Decisions so far
 ```
+
+When a map's destination is reached, move `map.md` into `archive/` and start a new one. Closed tickets stay in `closed/` and numbering continues.
 
 ## Rules
 
