@@ -38,9 +38,9 @@ The tagline is "One Kanji. One Day. Every Day."
 ## Architecture
 
 The app uses SwiftUI with feature-oriented views, shared design-system
-components, and five `Sendable` service protocols (`KanjiContentStore`,
-`LearnerStore`, `DailyKanjiService`, `PronunciationService` and
-`ReminderScheduler`) plus an injected `DayProvider` passed through a
+components, and six `Sendable` service protocols (`KanjiContentStore`,
+`LearnerStore`, `DailyKanjiService`, `PronunciationService`,
+`ReminderScheduler` and `ReviewService`) plus an injected `DayProvider` passed through a
 `ServiceContainer` in the SwiftUI environment. The first pass implements
 onboarding and Today without locking future Dictionary, Review or You screens
 out of the navigation model.
@@ -52,7 +52,8 @@ for the in-app Sources screen. Both the main app and widget extension bundle
 `kanji-index.json` and per-character JSON records so either process can perform
 daily rollover offline, while stroke-order SVGs are bundled only in the main
 app and loaded lazily on demand. Runtime network access is not part of the
-design.
+design. The dataset is version-pinned per release and regenerated from
+upstream at each release; there is no automated update process.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
@@ -78,7 +79,9 @@ copy. If the reminder time is still ahead today and today's kanji is unlearned,
 it is kanji-led (`"日 · Today's kanji is ready"`). If today is already learned,
 today is skipped. If the next fire is tomorrow, it uses missed-day copy
 (`"You missed yesterday's kanji. That's okay, check it now."`) when today is
-still `.assigned`, and generic copy when today is learned. The remaining
+still `.assigned`. When today is learned, it uses review-due copy
+(`"3 kanji due for review"`) if kanji are due on that day, and generic copy
+otherwise. The remaining
 requests use generic copy (`"Today's kanji is ready"`). With no assignment
 (level complete) nothing is scheduled.
 The window is rebuilt on launch, on foreground, after "Got it" from the app or
@@ -97,7 +100,11 @@ and reload explicitly after "Got it" or any level, pool, order or time-zone
 change. Before onboarding finishes the widget asks the learner to open the app,
 and a finished level shows a quiet placeholder. Tapping either widget outside
 the Got it button opens the app on Today (`nichiji://today`) and closes the
-Settings sheet. Lock-screen widgets are post-MVP. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+Settings sheet. Lock-screen widgets ship in all three accessory families: the
+circular family shows the kanji glyph (with a small checkmark once learned),
+the rectangular family adds the primary meaning and featured word, and the
+inline family shows one line of kanji and meaning. All are read-only; a tap
+opens Today. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
 kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed. Handwriting recognition is deferred.
 
@@ -171,10 +178,13 @@ respect Reduce Motion.
 
 ## Non-goals
 
-The first implementation does not include Dictionary, Review, You, real
-handwriting recognition, stroke-order checking, fuzzy search, account sync or
-backend services. It also does not implement the Duo split-pane layout, but
-the architecture must leave room for it.
+Version 1.0 ships the single-column phone layout and does not include real
+handwriting recognition (Dictionary carries no "Draw a kanji to search"
+button), stroke-order checking on the Practice pad (the pad records strokes
+only), configurable widgets, a daily review cap, a furigana toggle, a Custom
+option in onboarding, account sync or backend services. It does not implement
+the iPhone Duo or iPad two-pane layout, but the architecture must leave room
+for it.
 
 ## Open questions
 

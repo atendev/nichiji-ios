@@ -32,7 +32,7 @@ struct TodayTabTests {
         let store = TestLearnerStore()
         _ = try await store.createAssignment(calendarDay: "2026-10-28", kanjiID: "日", assignedAt: Date())
 
-        let updated = try await store.markLearned(day: "2026-10-28")
+        let updated = try await store.markLearned(day: "2026-10-28", nextReviewAt: Date())
         let nonNewIDs = try await store.nonNewKanjiIDs()
 
         #expect(updated.status == .learned)
@@ -51,7 +51,7 @@ struct TodayTabTests {
         )
         let today = dayProvider.calendarDay(for: dayProvider.now)
         _ = try await service.assignment(for: today)
-        _ = try await store.markLearned(day: today)
+        _ = try await store.markLearned(day: today, nextReviewAt: Date())
         dayProvider.advance(byDays: 1)
 
         let tomorrow = dayProvider.calendarDay(for: dayProvider.now)

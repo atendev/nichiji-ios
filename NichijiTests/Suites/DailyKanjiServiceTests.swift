@@ -126,7 +126,7 @@ struct DailyKanjiServiceTests {
         // Assign and complete it
         let assignment = try await customService.assignment(for: today)
         #expect(assignment?.kanjiID == singleEntry.id)
-        _ = try await learnerStore.markLearned(day: today)
+        _ = try await learnerStore.markLearned(day: today, nextReviewAt: Date())
 
         // Next day -> pool should now be empty
         dayProvider.advance(byDays: 1)
@@ -147,7 +147,7 @@ struct DailyKanjiServiceTests {
         #expect(initialSnapshot?.primaryMeaning == "day")
 
         // Mark learned
-        _ = try await learnerStore.markLearned(day: today)
+        _ = try await learnerStore.markLearned(day: today, nextReviewAt: Date())
 
         let learnedSnapshot = try await service.widgetSnapshot(for: today)
         #expect(learnedSnapshot?.isLearned == true)

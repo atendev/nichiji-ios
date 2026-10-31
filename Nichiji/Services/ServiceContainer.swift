@@ -10,6 +10,7 @@ struct ServiceContainer: Sendable {
     let dailyKanjiService: any DailyKanjiService
     let pronunciationService: any PronunciationService
     let reminderScheduler: any ReminderScheduler
+    let reviewService: any ReviewService
     var widgetRefresher: any WidgetRefresher = NoopWidgetRefresher()
 
     /// Refreshes Today rollover state and the reminder window after a clock or time-zone change.
@@ -38,9 +39,9 @@ struct ServiceContainer: Sendable {
         try await GotItAction.perform(
             day: day,
             preferences: preferences,
+            dayProvider: dayProvider,
             learnerStore: learnerStore,
-            reminderScheduler: reminderScheduler,
-            widgetRefresher: widgetRefresher
+            effects: GotItEffects(reminderScheduler: reminderScheduler, widgetRefresher: widgetRefresher)
         )
     }
 

@@ -60,7 +60,7 @@ struct LearnerStoreTests {
             assignedAt: Date()
         )
 
-        let updated = try await store.markLearned(day: "2026-10-28")
+        let updated = try await store.markLearned(day: "2026-10-28", nextReviewAt: Date())
         #expect(updated.status == .learned)
         #expect(updated.completedAt != nil)
 
@@ -96,14 +96,15 @@ struct LearnerStoreTests {
     func forgetItResetsStageToNew() async throws {
         let store = try makeInMemoryStore()
         _ = try await store.createAssignment(calendarDay: "2026-10-28", kanjiID: "木", assignedAt: Date())
-        _ = try await store.markLearned(day: "2026-10-28")
+        _ = try await store.markLearned(day: "2026-10-28", nextReviewAt: Date())
 
         var nonNew = try await store.nonNewKanjiIDs()
         #expect(nonNew.contains("木"))
 
-        try await store.forgetIt(kanjiID: "木")
+        try await store.forgetIt(kanjiID: "木", calendarDay: "2026-10-29")
         nonNew = try await store.nonNewKanjiIDs()
         #expect(!nonNew.contains("木"))
+        #expect(try await store.reviewableProgress().isEmpty)
     }
 
     @Test("Custom selection persists and retrieves accurately")
@@ -163,7 +164,7 @@ struct LearnerStoreTests {
         #expect(swapped?.kanjiID == "二")
 
         // Mark learned.
-        _ = try await store.markLearned(day: "2026-10-28")
+        _ = try await store.markLearned(day: "2026-10-28", nextReviewAt: Date())
 
         // Try reassigning when learned -> must NOT overwrite learned kanji.
         let afterLearned = try await store.reassignToday(day: "2026-10-28", from: [entry1])

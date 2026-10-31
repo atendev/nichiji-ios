@@ -4,6 +4,29 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.8.0
+
+- Add the review engine: `ReviewService` (in `ServiceContainer`) over a pure `ReviewScheduler` with the Leitner table, a day-granular due queue ordered and capped by review preferences, first-answer-per-session verdicts, and `gotItReview` / `forgotItReview` log rows under the session day
+- Add `ReviewPreferencesSnapshot` in shared `UserDefaults` with the mock defaults; the last card type cannot be turned off
+- Today's and the widget's Got it schedule the first review for tomorrow through `GotItAction`; Forget it clears `nextReviewAt` and `lastReviewedAt`, keeps counts, and logs its calendar day
+- Reminder window: a learned day's first reminder reads "N kanji due for review" when kanji are due that day
+- Add `ReviewServiceTests` and `TestReviewService`; close ticket 040
+
+## v0.7.2
+
+- Set the review scheduling rules: Leitner table (learning +1d, familiar +3d, `known` graduates out of the due queue), day-granular due, first answer per session decides, Forget it lives on kanji detail and returns the kanji to the pool, review settings adopt the mock defaults in shared `UserDefaults`, and the reminder window gains review-due copy
+- Update `CONTEXT.md` (Review session, Due, known graduates) and the `DESIGN.md` reminder paragraph
+- Decide the lock-screen widgets: all three accessory families (circular kanji glyph, rectangular adds meaning and featured word, inline one line), read-only with taps opening Today, and a lock-screen section with previews and steps in the Settings widget guide
+- Update the `DESIGN.md` widget section; point tickets 040, 041, 043 and 051 at their closed decisions
+- Close tickets 039 and 050
+
+## v0.7.1
+
+- Fix the v1.0 feature boundary: release work (App Store metadata, privacy manifest, signing, TestFlight), per-release dataset regeneration, the `nichiji` URL scheme and the You CSV export are in; handwriting recognition, stroke-order checking, Duo/two-pane, configurable widgets, the onboarding Custom option, review cap and furigana toggle are out
+- Rewrite `DESIGN.md` Non-goals to the v1.0 boundary; chart tickets 053-056 (URL scheme, release build, App Store metadata, UI launch smoke test)
+- Keep the UI test target as a state-independent launch smoke test wired into the scheme and CI
+- Close tickets 034 and 035
+
 ## v0.7.0
 
 - Open the app on Today when the learner taps either widget: `AppDeepLink` builds and parses `nichiji://today`, the widgets set it with `.widgetURL`, and `MainTabView` selects Today and closes Settings in `onOpenURL`. The medium widget's Got it button keeps its AppIntent

@@ -61,6 +61,7 @@ struct WidgetTimelineTests {
                 dailyKanjiService: service,
                 pronunciationService: TestPronunciationService(),
                 reminderScheduler: scheduler,
+                reviewService: TestReviewService(),
                 widgetRefresher: widgetRefresher
             )
         }
@@ -106,7 +107,7 @@ struct WidgetTimelineTests {
     func learnedDayEntry() async throws {
         let fixture = Fixture()
         _ = try await fixture.service.assignment(for: fixture.today)
-        _ = try await fixture.learnerStore.markLearned(day: fixture.today)
+        _ = try await fixture.learnerStore.markLearned(day: fixture.today, nextReviewAt: Date())
 
         let plan = await fixture.builder.build()
 
@@ -158,9 +159,9 @@ struct WidgetTimelineTests {
         let assignment = try await GotItAction.perform(
             day: fixture.today,
             preferences: fixture.preferences,
+            dayProvider: fixture.dayProvider,
             learnerStore: fixture.learnerStore,
-            reminderScheduler: fixture.scheduler,
-            widgetRefresher: fixture.widgetRefresher
+            effects: GotItEffects(reminderScheduler: fixture.scheduler, widgetRefresher: fixture.widgetRefresher)
         )
 
         #expect(assignment.status == .learned)
@@ -178,9 +179,9 @@ struct WidgetTimelineTests {
         try await GotItAction.perform(
             day: fixture.today,
             preferences: fixture.preferences,
+            dayProvider: fixture.dayProvider,
             learnerStore: fixture.learnerStore,
-            reminderScheduler: fixture.scheduler,
-            widgetRefresher: fixture.widgetRefresher
+            effects: GotItEffects(reminderScheduler: fixture.scheduler, widgetRefresher: fixture.widgetRefresher)
         )
 
         #expect(fixture.learnerStore.assignments[fixture.today]?.status == .learned)
@@ -194,7 +195,9 @@ struct WidgetTimelineTests {
 
         try await GotItAction.performFromWidget(calendarDay: fixture.today, environment: fixture.environment)
 
+        let kanjiID = try #require(fixture.learnerStore.assignments[fixture.today]?.kanjiID)
         #expect(fixture.learnerStore.assignments[fixture.today]?.status == .learned)
+        #expect(fixture.learnerStore.nextReviewAt[kanjiID] == fixture.dayProvider.nextMidnight(after: fixture.dayProvider.now))
         #expect(fixture.scheduler.rebuildCallCount == 1)
         #expect(fixture.widgetRefresher.reloadCount == 1)
     }

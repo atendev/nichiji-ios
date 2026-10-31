@@ -7,6 +7,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     var assignments: [String: DailyAssignmentSnapshot] = [:]
     var progress: [String: StudyStage] = [:]
     var customSelections: [LevelSystem: Set<String>] = [:]
+    var nextReviewAt: [String: Date] = [:]
+    var loggedActions: [(kanjiID: String, action: StudyAction, calendarDay: String)] = []
     var shouldThrow = false
 
     func assignment(for calendarDay: String) async throws -> DailyAssignmentSnapshot? {
@@ -57,7 +59,7 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         return customSelections[levelSystem] ?? []
     }
 
-    func markLearned(day: String) async throws -> DailyAssignmentSnapshot {
+    func markLearned(day: String, nextReviewAt: Date) async throws -> DailyAssignmentSnapshot {
         try checkForError()
         guard let existing = assignments[day] else {
             throw NichijiError.contentMissing(kanjiID: day)
@@ -71,12 +73,44 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         )
         assignments[day] = learned
         progress[existing.kanjiID] = .learning
+        self.nextReviewAt[existing.kanjiID] = nextReviewAt
+        loggedActions.append((kanjiID: existing.kanjiID, action: .learnedDaily, calendarDay: day))
         return learned
     }
 
-    func forgetIt(kanjiID: String) async throws {
+    func forgetIt(kanjiID: String, calendarDay: String) async throws {
         try checkForError()
         progress[kanjiID] = .new
+        nextReviewAt[kanjiID] = nil
+        loggedActions.append((kanjiID: kanjiID, action: .resetToNew, calendarDay: calendarDay))
+    }
+
+    func progress(for kanjiID: String) async throws -> KanjiProgressSnapshot? {
+        try checkForError()
+        guard let stage = progress[kanjiID] else { return nil }
+        return KanjiProgressSnapshot(kanjiID: kanjiID, stage: stage, nextReviewAt: nextReviewAt[kanjiID])
+    }
+
+    func reviewableProgress() async throws -> [KanjiProgressSnapshot] {
+        try checkForError()
+        return progress
+            .filter { $0.value == .learning || $0.value == .familiar }
+            .map { KanjiProgressSnapshot(kanjiID: $0.key, stage: $0.value, nextReviewAt: nextReviewAt[$0.key]) }
+    }
+
+    func recordReview(
+        kanjiID: String,
+        answer: ReviewAnswer,
+        outcome: ReviewOutcome?,
+        reviewedAt: Date,
+        calendarDay: String
+    ) async throws {
+        try checkForError()
+        if let outcome {
+            progress[kanjiID] = outcome.stage
+            nextReviewAt[kanjiID] = outcome.nextReviewAt
+        }
+        loggedActions.append((kanjiID: kanjiID, action: answer.logAction, calendarDay: calendarDay))
     }
 
     func setCustomSelection(_ kanjiIDs: Set<String>, levelSystem: LevelSystem) async throws {

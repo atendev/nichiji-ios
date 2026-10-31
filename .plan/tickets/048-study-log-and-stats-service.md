@@ -14,6 +14,8 @@ Does every study action write a log entry, and does a tested service compute eve
 
 ## Notes
 
+From "Build the review engine": review answers now log rows, Forget it logs its real `calendarDay`, and the widget Got it logs through `GotItAction`. Older `resetToNew` rows may still carry an empty day.
+
 Skills: `tdd`, `domain-modeling`, `unslop`.
 No UI in this ticket.
 

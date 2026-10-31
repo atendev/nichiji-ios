@@ -7,10 +7,12 @@ import UserNotifications
 struct SystemReminderScheduler: ReminderScheduler {
     private let dailyKanjiService: any DailyKanjiService
     private let dayProvider: any DayProvider
+    private let reviewService: any ReviewService
 
-    init(dailyKanjiService: any DailyKanjiService, dayProvider: any DayProvider) {
+    init(dailyKanjiService: any DailyKanjiService, dayProvider: any DayProvider, reviewService: any ReviewService) {
         self.dailyKanjiService = dailyKanjiService
         self.dayProvider = dayProvider
+        self.reviewService = reviewService
     }
 
     func authorizationStatus() async -> ReminderAuthorizationStatus {
@@ -42,12 +44,18 @@ struct SystemReminderScheduler: ReminderScheduler {
         let today: ReminderTodayState = assignment.status == .learned
             ? .learned
             : .assigned(kanji: assignment.kanjiID)
+        // A learned day's window starts tomorrow, so count what will be due then. A failed count falls back to generic copy.
+        var reviewsDue = 0
+        if today == .learned {
+            reviewsDue = (try? await reviewService.dueCount(on: dayProvider.nextMidnight(after: now))) ?? 0
+        }
         let plans = ReminderPlanBuilder.plans(
             now: now,
             calendar: dayProvider.calendar,
             hour: preferences.reminderHour,
             minute: preferences.reminderMinute,
-            today: today
+            today: today,
+            reviewsDue: reviewsDue
         )
 
         // Add first, then prune, so the learner is never left with an empty window.

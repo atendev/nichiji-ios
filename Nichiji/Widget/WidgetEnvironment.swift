@@ -47,7 +47,11 @@ struct WidgetEnvironment: Sendable {
             dayProvider: dayProvider,
             learnerStore: learnerStore,
             dailyKanjiService: dailyKanjiService,
-            reminderScheduler: SystemReminderScheduler(dailyKanjiService: dailyKanjiService, dayProvider: dayProvider),
+            reminderScheduler: SystemReminderScheduler(
+                dailyKanjiService: dailyKanjiService,
+                dayProvider: dayProvider,
+                reviewService: DefaultReviewService(learnerStore: learnerStore, dayProvider: dayProvider)
+            ),
             widgetRefresher: SystemWidgetRefresher(),
             preferencesProvider: { Self.sharedPreferences() }
         )

@@ -70,6 +70,33 @@ struct ReminderSchedulerTests {
         #expect(result.dropFirst().allSatisfy { $0.copy == .generic })
     }
 
+    @Test("Learned today with reviews due gives review-due copy first, then six generic days")
+    func learnedWithReviewsDueIsReviewLed() {
+        let result = ReminderPlanBuilder.plans(
+            now: Self.date(2026, 3, 10, 7, 0), calendar: Self.calendar(), hour: 8, minute: 0, today: .learned, reviewsDue: 3
+        )
+
+        #expect(result[0].identifier == "nichiji.reminder.2026-03-11")
+        #expect(result[0].copy == .reviewsDue(3))
+        #expect(result[0].copy.body == "3 kanji due for review")
+        #expect(result.dropFirst().allSatisfy { $0.copy == .generic })
+    }
+
+    @Test("An unlearned day keeps kanji-led or missed-day copy even with reviews due")
+    func assignedIgnoresReviewsDue() {
+        let ahead = ReminderPlanBuilder.plans(
+            now: Self.date(2026, 3, 10, 7, 0), calendar: Self.calendar(), hour: 8, minute: 0,
+            today: .assigned(kanji: "日"), reviewsDue: 3
+        )
+        let passed = ReminderPlanBuilder.plans(
+            now: Self.date(2026, 3, 10, 9, 30), calendar: Self.calendar(), hour: 8, minute: 0,
+            today: .assigned(kanji: "日"), reviewsDue: 3
+        )
+
+        #expect(ahead[0].copy == .kanjiLed("日"))
+        #expect(passed[0].copy == .missedDay)
+    }
+
     @Test("Time passed and learned today starts tomorrow with generic copy")
     func timePassedLearnedIsGeneric() {
         let result = Self.plans(now: Self.date(2026, 3, 10, 9, 30), today: .learned)
@@ -228,7 +255,8 @@ struct ReminderSchedulerTests {
             learnerStore: learnerStore,
             dailyKanjiService: service,
             pronunciationService: TestPronunciationService(),
-            reminderScheduler: scheduler
+            reminderScheduler: scheduler,
+            reviewService: TestReviewService()
         )
 
         try await container.handleTimeOrZoneChange(preferences: .standard)
@@ -255,7 +283,8 @@ struct ReminderSchedulerTests {
                 dayProvider: dayProvider
             ),
             pronunciationService: TestPronunciationService(),
-            reminderScheduler: scheduler
+            reminderScheduler: scheduler,
+            reviewService: TestReviewService()
         )
 
         try await container.handleTimeOrZoneChange(preferences: .standard)

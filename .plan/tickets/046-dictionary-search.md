@@ -16,7 +16,7 @@ Does typing in the Dictionary search bar return the kanji and word results the s
 
 Skills: `apple`, `tdd`, `unslop`.
 Implement the rules from "Decide how Dictionary search matches and ranks". Matching and ranking are a pure, tested function; the view only renders. Results open kanji detail.
-Includes draw to search only if the scope ticket put handwriting recognition in v1.0; otherwise it graduates as its own ticket.
+Draw to search is out of v1.0 ([Fix the v1.0 scope](../closed/034-fix-the-v1-scope.md)): the Dictionary ships without the button.
 Minor bump.
 
 ## Resolution

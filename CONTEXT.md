@@ -51,8 +51,16 @@ The mutable learner state for a specific kanji entry, tracking its study stage, 
 _Avoid_: User kanji, card state
 
 **Study stage**:
-The learner's familiarity tier for a kanji entry: `new`, `learning`, `familiar`, or `known`.
+The learner's familiarity tier for a kanji entry: `new`, `learning`, `familiar`, or `known`. The `known` tier graduates: the kanji leaves the due queue entirely and only returns through Forget it.
 _Avoid_: Mastery level, SRS stage, rank
+
+**Due**:
+A kanji whose next review day is today or earlier; only due kanji fill a review session.
+_Avoid_: Overdue card, pending review
+
+**Review session**:
+A bounded run of flashcards drawn from the due kanji under the learner's review settings. The first answer to each kanji in a session decides its stage and next due day; a repeated forgotten card is practice that only logs.
+_Avoid_: Drill, quiz, round
 
 **Learned**:
 The state of a daily assignment or kanji entry after the learner taps "Got it" on Today or the widget, moving its study stage out of `new`.

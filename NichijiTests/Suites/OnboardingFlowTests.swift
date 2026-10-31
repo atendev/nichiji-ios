@@ -270,7 +270,7 @@ struct OnboardingFlowTests {
         let learnedFixture = try Fixture()
         defer { learnedFixture.tearDown() }
         _ = try await learnedFixture.service.assignment(for: today)
-        _ = try await learnedFixture.learnerStore.markLearned(day: today)
+        _ = try await learnedFixture.learnerStore.markLearned(day: today, nextReviewAt: Date())
 
         let learnedFlow = learnedFixture.makeFlow()
         learnedFlow.selectLevel(.jlpt(.n4))
