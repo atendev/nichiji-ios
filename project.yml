@@ -22,6 +22,14 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.com.aten.nichiji
+    # Xcode merges the generated INFOPLIST_KEY_* values into this plist.
+    info:
+      path: Config/Nichiji-Info.plist
+      properties:
+        CFBundleURLTypes:
+          - CFBundleURLName: com.aten.nichiji
+            CFBundleURLSchemes:
+              - nichiji
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji

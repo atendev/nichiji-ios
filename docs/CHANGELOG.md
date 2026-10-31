@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.9.3
+
+- Register the `nichiji` URL scheme: the Nichiji target gains an `info:` block (`Config/Nichiji-Info.plist`) with `CFBundleURLTypes`, so Safari and Shortcuts can open `nichiji://today` on Today through the existing `onOpenURL` (device check still due)
+- Add `AppDeepLinkTests.bundleRegistersScheme`; close ticket 053
+
 ## v0.9.2
 
 - Fix the UI launch smoke test: `testLaunchShowsPrimaryAction` waits up to 15 s for the shared `primaryButton` or Today's "Learned today" seal, replacing the stale `"title"` wait
