@@ -7,6 +7,22 @@ public enum ReviewCardType: String, Codable, CaseIterable, Sendable {
     case kanjiToMeaning
     case kanjiToReading
     case meaningToKanji
+
+    public var displayName: String {
+        switch self {
+        case .kanjiToMeaning: "Kanji to meaning"
+        case .kanjiToReading: "Kanji to reading"
+        case .meaningToKanji: "Meaning to kanji"
+        }
+    }
+
+    public var subtitleNote: String {
+        switch self {
+        case .kanjiToMeaning: "See the kanji, recall what it means."
+        case .kanjiToReading: "See the kanji, recall how it is read."
+        case .meaningToKanji: "See the meaning, recall the kanji."
+        }
+    }
 }
 
 /// Ordering strategy for the cards in a review session.
@@ -15,6 +31,24 @@ public enum ReviewOrder: String, Codable, CaseIterable, Sendable {
     case hardestFirst
     case newestFirst
     case random
+
+    public var displayName: String {
+        switch self {
+        case .dueFirst: "Due first"
+        case .hardestFirst: "Hardest first"
+        case .newestFirst: "Newest first"
+        case .random: "Random"
+        }
+    }
+
+    public var subtitleNote: String {
+        switch self {
+        case .dueFirst: "Kanji that are due longest ago come first."
+        case .hardestFirst: "Kanji you forget most often come first."
+        case .newestFirst: "Recently learned kanji come first."
+        case .random: "A different mix every time."
+        }
+    }
 }
 
 /// Number of cards a review session pulls from the due queue.
@@ -33,12 +67,24 @@ public enum ReviewSessionSize: String, Codable, CaseIterable, Sendable {
         case .allDue: nil
         }
     }
+
+    /// Chip label on the Review settings screen.
+    public var chipLabel: String {
+        limit.map(String.init) ?? "All due"
+    }
 }
 
 /// What the review audio speaks when it plays.
 public enum ReviewAudioContent: String, Codable, CaseIterable, Sendable {
     case reading
     case readingAndWord
+
+    public var displayName: String {
+        switch self {
+        case .reading: "Reading"
+        case .readingAndWord: "Reading and word"
+        }
+    }
 }
 
 /// Shared UserDefaults keys for review session preferences.
@@ -86,6 +132,16 @@ public struct ReviewPreferencesSnapshot: Codable, Equatable, Sendable {
     }
 
     public static let standard = ReviewPreferencesSnapshot()
+
+    /// Summary string displayed in the main Settings row (`10 cards · Due first`).
+    public var settingsSummary: String {
+        Self.settingsSummary(sessionSize: sessionSize, order: order)
+    }
+
+    public static func settingsSummary(sessionSize: ReviewSessionSize, order: ReviewOrder) -> String {
+        let size = sessionSize.limit.map { "\($0) cards" } ?? "All due"
+        return "\(size) · \(order.displayName)"
+    }
 
     /// Turns a card type on or off. Turning off the last enabled type is ignored and returns false.
     @discardableResult

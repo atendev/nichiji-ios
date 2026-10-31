@@ -184,7 +184,9 @@ public struct SettingsSheet: View {
                 }
                 .buttonStyle(.plain)
 
-                // TODO: Add the Review settings row in "Build the Review settings screen".
+                dividerLine
+
+                ReviewSettingsRow()
 
                 dividerLine
 
@@ -287,7 +289,7 @@ public struct SettingsSheet: View {
 
 // MARK: - Row Builders
 
-private func sectionHeader(_ text: String) -> some View {
+func sectionHeader(_ text: String) -> some View {
     Text(text)
         .font(.nichijiCaption)
         .foregroundColor(.nichijiInkSubtle)
@@ -295,13 +297,13 @@ private func sectionHeader(_ text: String) -> some View {
         .padding(.horizontal, LayoutTokens.space8)
 }
 
-private var dividerLine: some View {
+var dividerLine: some View {
     Rectangle()
         .fill(Color.nichijiHairline)
         .frame(height: 1)
 }
 
-private func settingsNavigationRow(
+func settingsNavigationRow(
     title: String,
     subtitle: String?,
     value: String?
@@ -335,7 +337,7 @@ private func settingsNavigationRow(
     .contentShape(Rectangle())
 }
 
-private func settingsToggleRow(
+func settingsToggleRow(
     title: String,
     subtitle: String,
     isOn: Binding<Bool>
@@ -352,7 +354,7 @@ private func settingsToggleRow(
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
-        Toggle("", isOn: isOn)
+        Toggle(title, isOn: isOn)
             .labelsHidden()
             .tint(.nichijiVermilion)
     }
