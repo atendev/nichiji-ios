@@ -8,7 +8,9 @@ The process has two modes. Phases 0–4 are collaborative: the user and agent
 work through design, data, interfaces, TODOs, and tests together, and the
 user approves each phase. Phase 5 is autonomous: the user hands the agent a
 Wayfinder ticket and the agent implements, audits, commits, and sees CI
-through using subagents, returning only when something goes very wrong.
+through using subagents. The user's only touchpoint is a one-click merge
+question at the end; the agent returns earlier only when something goes very
+wrong.
 
 ---
 
@@ -42,23 +44,37 @@ through using subagents, returning only when something goes very wrong.
 - Confirmation gates (the Requirements Report, the Deviation Report, the
   diff review) are handed to subagents, not the user. Each delegated gate is
   named in the final report so the user can review its output.
+- Audit subagents are audit-only. They never edit files; they answer
+  `APPROVE` or a list of concrete changes, and the main agent applies them.
+- The Requirements Report is audited by a fresh subagent before any
+  implementation starts.
+- Audit subagents default to `haiku`. The agent may use `sonnet` for a
+  ticket that needs more reasoning (a tricky or cross-cutting slice, a
+  design-heavy grilling ticket) and says so in the Final Report.
 - Implementation is audited by an independent subagent before every commit.
   The audit gets the diff and the ticket's question, never the
   implementer's own verdict.
+- The only user gate is the merge question at the end of the run (see
+  "Merge" below), asked with `AskUserQuestion` so the user clicks a button
+  instead of typing.
 - Come back to the user only for a **stop condition**:
   - A command is held by a guard hook (ask the user whether to run it; never
     work around the hold).
   - The run is out of tokens.
-  - The ticket is HITL (grilling, prototype, or a task needing the human).
-    The agent never stands in for the user.
+  - The ticket is HITL (prototype, or a task needing the human). The agent
+    never stands in for the user. Grilling tickets are not a stop: a subagent
+    runs the grilling and the user approves its answers with a button (see
+    "Grilling tickets" below).
   - Two audit rounds pass without `APPROVE`.
   - Three CI fix attempts fail.
   - A failure the agent cannot explain after one reasonable attempt.
   - A slice contradicts a decision already closed in the map, so
     `DESIGN.md` cannot simply be updated to match.
-  - The next step would force push, rewrite history, merge to `main`, push
-    to `main`, delete data outside build/cache directories, or touch
-    anything outside the repo. These need explicit permission each time.
+  - CI is red after the fix attempts, so there is nothing safe to merge.
+  - The next step would force push, rewrite history, push directly to
+    `main`, delete data outside build/cache directories, or touch anything
+    outside the repo. These need explicit permission each time. Merging to
+    `main` is covered by the merge question, not by this stop condition.
 
 ### Comment Style
 
@@ -175,9 +191,9 @@ agent runs the whole loop below on its own, using subagents for every gate
 that used to wait on the user.
 
 1. **Check the branch.** Never work on the default branch, and never edit a
-   file (including the claim) while on it. The user merges each slice back
-   to `main` before the next ticket starts, so a run always starts from
-   `main`. If on `main`, read `.plan/map.md` (read-only) to identify the
+   file (including the claim) while on it. Each run ends by merging its slice
+   back to `main` (see "Merge"), so a run always starts from `main`. If on
+   `main`, read `.plan/map.md` (read-only) to identify the
    named ticket or the first frontier ticket, then create a `feature/xxx`
    branch from that ticket's slug. If an earlier slice's branch is still
    unmerged (the map on `main` shows its ticket open), stop and tell the
@@ -189,40 +205,48 @@ that used to wait on the user.
    its `blocked_by` closed (see `.plan/README.md`); skip tickets with any
    open blocker. Refer to tickets by name, never by number. The map's
    `## Notes` are the standing instructions for how to implement. If the
-   ticket is HITL, stop and tell the user.
-3. **Requirements Report.** Spawn a subagent to write it from the ticket,
-   the map, and the design docs (`DESIGN.md`, `IMPLEMENTATION.md`,
-   `PROGRESS.md`). See "Requirements Report" below. Use its output as the
-   requirements and carry on. There is no approval gate.
-4. **Implement.** Use TDD where it fits. Run the linter, the build, and the
-   relevant tests as you go.
-5. **Tests.** Run the existing suite, then write/update tests for the slice
+   ticket is HITL and not a grilling ticket, stop and tell the user.
+3. **Requirements Report.** Write it from the ticket, the map, and the
+   design docs (`DESIGN.md`, `IMPLEMENTATION.md`, `PROGRESS.md`), or spawn a
+   subagent to. See "Requirements Report" below. Grilling tickets get the
+   same report, covering what the grilling must settle.
+4. **Audit the report.** Spawn a fresh subagent (`haiku` by default) to audit the report
+   against the ticket and design docs. It is audit-only: `APPROVE` or a list
+   of concrete changes. Apply the changes and re-audit with a fresh
+   subagent. After two rounds with no `APPROVE`, stop and report. Only an
+   approved report becomes the requirements.
+5. **Implement.** Use TDD where it fits. Run the linter, the build, and the
+   relevant tests as you go. For a grilling ticket, this step is the
+   grilling run instead (see "Grilling tickets" below).
+6. **Tests.** Run the existing suite, then write/update tests for the slice
    per the Planned Tests from the Requirements Report.
-6. **Docs.** Update `PROGRESS.md` and `CHANGELOG.md` (see Versioning
+7. **Docs.** Update `PROGRESS.md` and `CHANGELOG.md` (see Versioning
    below). If the slice contradicts `DESIGN.md`, update `DESIGN.md` first,
    unless it contradicts a decision already closed in the map — that is a
    stop condition.
-7. **Record the resolution.** Write the `.plan/` changes now, before the
+8. **Record the resolution.** Write the `.plan/` changes now, before the
    audit, so they ride in the single audited commit: post the resolution in
    the ticket, close it (move it to `.plan/closed/`), add its line to the
    map's Decisions so far, update the Frontier, and add or graduate any
    newly surfaced tickets. CI has not run yet, so the resolution notes CI as
    "pending; see Final Report". The Final Report carries the real CI result.
-8. **Deviation Report.** Spawn a subagent to write it from the diff, the
+9. **Deviation Report.** Spawn a subagent to write it from the diff, the
    ticket, and the Requirements Report (see below). Log the Requirements
    Report and Deviation Report into `IMPLOG.md`.
-9. **Audit.** See "Audit" below. Commit only after `APPROVE`.
-10. **Commit** to the current feature branch, following the commit style
+10. **Audit.** See "Audit" below. Commit only after `APPROVE`.
+11. **Commit** to the current feature branch, following the commit style
     rules above. This is the one commit for the run (code, docs, and
-    `.plan/` changes together). Merging to `main` or pushing to `main` needs
-    explicit permission (see the stop conditions).
-11. **CI.** Push the feature branch, trigger the run, and watch it (see
+    `.plan/` changes together). Never commit to `main`.
+12. **CI.** Push the feature branch, trigger the run, and watch it (see
     "CI" below). There is no further commit after a green run.
-12. **Report back.** See "Final Report" below.
+13. **Merge.** With CI green (or no remote CI) and the audit approved, ask
+    the merge question (see "Merge" below). On Merge, merge and delete the
+    branch.
+14. **Report back.** See "Final Report" below.
 
 ### Requirements Report
 
-Written by a subagent before implementation begins. It covers:
+Written before implementation begins, then audited (step 4). It covers:
 
 - **Success Criteria** — plain description of the end state/behavior of
   the slice. What does "this slice works" look like?
@@ -249,11 +273,14 @@ into `IMPLOG.md` for the slice.
 
 ### Audit
 
-Spawn a fresh subagent on `haiku` (Agent tool, `model: "haiku"`). If haiku
-is unavailable, use `deepseek-v4.1-flash` through `delegate_task`. Give it
+Spawn a fresh subagent on `haiku` (Agent tool, `model: "haiku"`) by
+default, or `sonnet` when the ticket needs more reasoning. If the chosen
+model is unavailable, use `deepseek-v4.1-flash` through `delegate_task`. Give it
 the diff, the ticket's question, and the Requirements Report — not the
-implementer's own verdict. It answers `APPROVE` or a list of concrete
-problems.
+implementer's own verdict. It is audit-only and never edits files. Besides
+reviewing the diff, it runs the build and the test suite and confirms the
+slice's Success Criteria actually hold. It answers `APPROVE` or a list of
+concrete problems.
 
 - On problems, fix them and re-audit with a fresh subagent.
 - After two rounds with no `APPROVE`, stop and report.
@@ -276,20 +303,58 @@ entry (see Versioning). After three failed attempts, stop and report. If the
 run ends with CI red, the Final Report says so plainly, since the ticket was
 already closed in the audited commit and the user may need to reopen it.
 
+### Grilling tickets
+
+A grilling ticket's output is decisions, not code. Steps 1–4 run as normal
+(branch, claim, Requirements Report, report audit). Then:
+
+1. Spawn a subagent (`sonnet` by default here, since the work is design
+   reasoning) to run the grilling. It works through the ticket's questions
+   against the map and design docs, challenges weak assumptions, and returns
+   each question with its proposed answer and a one-line rationale. It does
+   not edit files.
+2. Present those questions and answers to the user in the chat.
+3. Ask with `AskUserQuestion`, options **Approve** and **Reject**, so the
+   user clicks instead of typing. The user can add a note under Other to say
+   what to change.
+4. On **Approve**, the answers become the ticket's resolution. Continue from
+   step 8 (record the resolution) through the commit, CI if applicable, and
+   the Merge question. On **Reject**, revise the answers using the user's
+   note (re-run the grilling subagent if needed) and ask again. The answers
+   are never recorded without an approval.
+
+### Merge
+
+Runs only when the audit returned `APPROVE` and CI is green (or the repo has
+no remote CI). Otherwise skip it and report.
+
+1. Make sure the feature branch is pushed and a pull request exists
+   (`gh pr create`, base `main`). Write its description with the commit's
+   summary.
+2. Ask with `AskUserQuestion`, options **Merge** and **Don't merge**, so the
+   user clicks instead of typing. The question names the ticket, branch,
+   version bump, audit verdict, and CI result in a line or two.
+3. On **Merge**: `gh pr merge --merge --delete-branch`, then check out
+   `main`, pull, and delete the local branch. This answer is the explicit
+   permission to merge, for this run only. It does not cover pushing to
+   `main` directly, force pushes, or tagging.
+4. On **Don't merge** (or no answer): leave the branch and PR in place and
+   say so in the Final Report.
+
 ### Final Report
 
 Written when the run ends, whether it finished or stopped. It lists:
 
 - the ticket name and branch,
 - commit SHAs and the version bump,
-- the audit verdict and number of rounds,
+- the report audit and the implementation audit verdicts and rounds,
 - the CI result,
-- every delegated gate (Requirements Report, Deviation Report, audit) so
-  the user can review its output,
+- the merge outcome (merged and branch deleted, or left open),
+- every delegated gate (Requirements Report and its audit, Deviation Report,
+  implementation audit) so the user can review its output,
 - any concerns raised, and anything left for the user.
 
-If the next step is a merge to `main`, or a version tag, ask. Merging and
-tagging stay the user's decision.
+Tagging stays the user's decision: raise it in the report, never tag.
 
 ---
 

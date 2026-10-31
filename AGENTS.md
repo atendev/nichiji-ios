@@ -4,7 +4,7 @@
 # Commit Style
 - NO CO-AUTHOR CLAUSE!
 - Phases 0-4: run the commit by the user and get confirmation before commiting.
-- Phase 5 ticket runs: commit after the subagent audit returns `APPROVE`, no user confirmation needed. Never merge or push to `main` without permission.
+- Phase 5 ticket runs: commit after the subagent audit returns `APPROVE`, no user confirmation needed. Merge to `main` only after the user picks Merge in the end-of-run merge question. Never push to `main` directly.
 - Commits are short and sweet.
 - Check if commit changes enough for a version update.
 - Format:
