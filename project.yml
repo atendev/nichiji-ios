@@ -77,6 +77,8 @@ schemes:
     build:
       targets:
         Nichiji: all
+        NichijiUITests: [test]
     test:
       targets:
         - NichijiTests
+        - NichijiUITests
