@@ -36,6 +36,13 @@ struct AppDeepLinkTests {
         #expect(AppDeepLink(url: url) == nil)
     }
 
+    @Test("The app bundle registers the nichiji URL scheme")
+    func bundleRegistersScheme() throws {
+        let types = try #require(Bundle.main.infoDictionary?["CFBundleURLTypes"] as? [[String: Any]])
+        let schemes = types.flatMap { $0["CFBundleURLSchemes"] as? [String] ?? [] }
+        #expect(schemes.contains(AppDeepLink.scheme))
+    }
+
     @Test("The today link selects the Today tab")
     func selectsTodayTab() {
         #expect(AppDeepLink.today.tab == .today)

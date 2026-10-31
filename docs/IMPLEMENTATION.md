@@ -96,5 +96,5 @@ The `NichijiWidget` target compiles `Nichiji/Models`, `Nichiji/Services`, `Nichi
 - **`MarkTodaysKanjiLearnedIntent`**: the interactive Got it button on `systemMedium`. It carries the day the widget showed.
 - **Reload triggers**: `LevelChangeCoordinator.applyLevelChange` (before the reminder rebuild), `OnboardingFlow.complete()`, `ServiceContainer.handleTimeOrZoneChange(preferences:)`, and `ServiceContainer.markLearned`.
 - **Shared copy and layout**: `AddWidgetCopy.steps` feeds the onboarding step and the Settings guide. `DailyKanjiSmallWidgetView` renders both the real small widget and the onboarding preview.
-- **Deep link**: `AppDeepLink` (`Nichiji/Models/NavigationState.swift`) builds and parses `nichiji://today`. Both widgets set it with `.widgetURL`; `MainTabView.onOpenURL` closes Settings and selects Today. WidgetKit delivers it to the containing app, so no URL scheme is registered.
+- **Deep link**: `AppDeepLink` (`Nichiji/Models/NavigationState.swift`) builds and parses `nichiji://today`. Both widgets set it with `.widgetURL`; `MainTabView.onOpenURL` closes Settings and selects Today. The `nichiji` scheme is registered in `project.yml` through `Config/Nichiji-Info.plist`, so Safari and Shortcuts reach it too.
 - **Post-MVP**: lock-screen families and configurable widgets are TODOs.

@@ -474,3 +474,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept.
 - **Unanticipated TODOs**: None.
 - **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate.
+
+### Register the nichiji URL scheme (v0.9.3)
+
+#### Requirements Report
+
+- **Success Criteria**: `nichiji://today` typed in Safari or run from a Shortcut opens the app on Today with Settings closed. The built Info.plist carries one `CFBundleURLTypes` entry (name `com.aten.nichiji`, scheme `nichiji`), and the generated display name and launch screen keys survive the merge. Before onboarding finishes the URL only opens the app. The widget link and Got it intent are unchanged.
+- **Scope Boundary**: The `info:` block on the Nichiji target in `project.yml`, `Config/Nichiji-Info.plist`, one unit test, the stale `AppDeepLink` comment, and docs and `.plan/` changes. `onOpenURL`, `AppDeepLink` parsing, cold-launch URL queuing, universal links, other routes and the widget plist stay out.
+- **Anticipated TODOs**: None in code. A URL that arrives mid-onboarding is dropped by design, and cold-launch delivery after onboarding is unverified. If the device check shows a missed URL, it becomes a new ticket.
+- **Planned Tests**: `AppDeepLinkTests.bundleRegistersScheme` reads `CFBundleURLTypes` from `Bundle.main` (the hosted app bundle) and expects `AppDeepLink.scheme`. Parsing and tab tests stay as they are.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code. The plist merge, Safari and Shortcuts behavior and cold launch need a device check.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate. `Config/Nichiji-Info.plist` is written by hand and should be equivalent to what XcodeGen emits; `make generate` rewrites its formatting.

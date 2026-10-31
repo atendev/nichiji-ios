@@ -10,8 +10,8 @@ public enum AppTab: String, Codable, CaseIterable, Sendable {
     case you
 }
 
-/// App URLs the widgets pass through `widgetURL`. The containing app receives them in
-/// `onOpenURL`, so the scheme needs no `CFBundleURLTypes` registration.
+/// App URLs from the widgets (`widgetURL`) and from outside the app, such as Safari or
+/// Shortcuts. The scheme is registered in `project.yml` and received in `onOpenURL`.
 public enum AppDeepLink: Equatable, Sendable {
     case today
 
