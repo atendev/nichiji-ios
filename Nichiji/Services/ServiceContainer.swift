@@ -41,8 +41,7 @@ struct ServiceContainer: Sendable {
             preferences: preferences,
             dayProvider: dayProvider,
             learnerStore: learnerStore,
-            reminderScheduler: reminderScheduler,
-            widgetRefresher: widgetRefresher
+            effects: GotItEffects(reminderScheduler: reminderScheduler, widgetRefresher: widgetRefresher)
         )
     }
 

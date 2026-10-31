@@ -66,8 +66,7 @@ struct DefaultReviewService: ReviewService {
             from: candidates,
             on: now,
             calendar: dayProvider.calendar,
-            order: preferences.order,
-            limit: preferences.sessionSize.limit,
+            preferences: preferences,
             using: &generator
         )
         return ReviewSession(

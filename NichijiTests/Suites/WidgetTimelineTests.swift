@@ -161,8 +161,7 @@ struct WidgetTimelineTests {
             preferences: fixture.preferences,
             dayProvider: fixture.dayProvider,
             learnerStore: fixture.learnerStore,
-            reminderScheduler: fixture.scheduler,
-            widgetRefresher: fixture.widgetRefresher
+            effects: GotItEffects(reminderScheduler: fixture.scheduler, widgetRefresher: fixture.widgetRefresher)
         )
 
         #expect(assignment.status == .learned)
@@ -182,8 +181,7 @@ struct WidgetTimelineTests {
             preferences: fixture.preferences,
             dayProvider: fixture.dayProvider,
             learnerStore: fixture.learnerStore,
-            reminderScheduler: fixture.scheduler,
-            widgetRefresher: fixture.widgetRefresher
+            effects: GotItEffects(reminderScheduler: fixture.scheduler, widgetRefresher: fixture.widgetRefresher)
         )
 
         #expect(fixture.learnerStore.assignments[fixture.today]?.status == .learned)

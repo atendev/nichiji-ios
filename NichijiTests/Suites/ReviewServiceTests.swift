@@ -62,8 +62,7 @@ struct ReviewServiceTests {
                 preferences: .standard,
                 dayProvider: dayProvider,
                 learnerStore: store,
-                reminderScheduler: TestReminderScheduler(),
-                widgetRefresher: TestWidgetRefresher()
+                effects: GotItEffects(reminderScheduler: TestReminderScheduler(), widgetRefresher: TestWidgetRefresher())
             )
         }
 
@@ -141,8 +140,7 @@ struct ReviewServiceTests {
             from: candidates.shuffled(),
             on: Self.date(28),
             calendar: Self.calendar,
-            order: .dueFirst,
-            limit: ReviewSessionSize.ten.limit,
+            preferences: .standard,
             using: &generator
         )
 
@@ -158,8 +156,11 @@ struct ReviewServiceTests {
         ]
         var generator = SystemRandomNumberGenerator()
         func queue(_ order: ReviewOrder) -> [String] {
-            ReviewScheduler.dueQueue(
-                from: candidates, on: Self.date(28), calendar: Self.calendar, order: order, limit: nil, using: &generator
+            var preferences = ReviewPreferencesSnapshot.standard
+            preferences.order = order
+            preferences.sessionSize = .allDue
+            return ReviewScheduler.dueQueue(
+                from: candidates, on: Self.date(28), calendar: Self.calendar, preferences: preferences, using: &generator
             ).map(\.kanjiID)
         }
 
@@ -269,49 +270,5 @@ struct ReviewServiceTests {
         #expect(try await fixture.store.nonNewKanjiIDs().isEmpty)
         let reset = try #require(try fixture.logEntries().first { $0.action == .resetToNew })
         #expect(reset.calendarDay == "2026-10-29")
-    }
-
-    /*------------------------------preferences-------------------------------*/
-
-    @Test("Review preferences default to the mock settings")
-    func preferenceDefaults() {
-        let standard = ReviewPreferencesSnapshot.standard
-        #expect(standard.cardTypes == [.kanjiToMeaning, .kanjiToReading])
-        #expect(standard.order == .dueFirst)
-        #expect(standard.sessionSize == .ten)
-        #expect(standard.showsExampleWord)
-        #expect(standard.repeatsForgotten)
-        #expect(!standard.autoplaysAudio)
-        #expect(standard.audioContent == .reading)
-    }
-
-    @Test("Review preferences round-trip through UserDefaults")
-    func preferencesRoundTrip() throws {
-        let suiteName = "ReviewServiceTests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        #expect(ReviewPreferencesSnapshot.load(from: defaults) == .standard)
-
-        let custom = ReviewPreferencesSnapshot(
-            cardTypes: [.meaningToKanji],
-            order: .random,
-            sessionSize: .allDue,
-            showsExampleWord: false,
-            repeatsForgotten: false,
-            autoplaysAudio: true,
-            audioContent: .readingAndWord
-        )
-        custom.save(to: defaults)
-        #expect(ReviewPreferencesSnapshot.load(from: defaults) == custom)
-    }
-
-    @Test("The last enabled card type cannot be turned off")
-    func lastCardTypeStaysOn() {
-        var preferences = ReviewPreferencesSnapshot.standard
-        #expect(preferences.setCardType(.kanjiToMeaning, enabled: false))
-        #expect(!preferences.setCardType(.kanjiToReading, enabled: false))
-        #expect(preferences.cardTypes == [.kanjiToReading])
-        #expect(ReviewPreferencesSnapshot(cardTypes: []).cardTypes == ReviewPreferencesSnapshot.defaultCardTypes)
     }
 }

@@ -97,13 +97,12 @@ enum ReviewScheduler {
         from candidates: [KanjiProgressSnapshot],
         on day: Date,
         calendar: Calendar,
-        order: ReviewOrder,
-        limit: Int?,
+        preferences: ReviewPreferencesSnapshot,
         using generator: inout Generator
     ) -> [KanjiProgressSnapshot] {
         let due = candidates.filter { isDue($0, on: day, calendar: calendar) }
         let ordered: [KanjiProgressSnapshot]
-        switch order {
+        switch preferences.order {
         case .dueFirst:
             ordered = due.sorted(by: dueFirst)
         case .hardestFirst:
@@ -119,7 +118,7 @@ enum ReviewScheduler {
         case .random:
             ordered = due.sorted(by: dueFirst).shuffled(using: &generator)
         }
-        guard let limit else { return ordered }
+        guard let limit = preferences.sessionSize.limit else { return ordered }
         return Array(ordered.prefix(max(limit, 0)))
     }
 
