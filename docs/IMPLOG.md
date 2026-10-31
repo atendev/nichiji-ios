@@ -458,3 +458,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept. `sectionHeader`, `dividerLine`, `settingsNavigationRow` and `settingsToggleRow` went from private to internal for reuse. The shared toggle row now passes its title as the hidden label, so VoiceOver names every settings switch.
 - **Unanticipated TODOs**: None. 043's Notes list the readers it owes.
 - **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate. "5 cards · Hardest first" is checked through the static summary only.
+
+### Build the UI launch smoke test (v0.9.2)
+
+#### Requirements Report
+
+- **Success Criteria**: `make test` runs `NichijiUITests` alongside `NichijiTests`. `testLaunchShowsPrimaryAction` replaces the stale `"title"` wait and asserts that an element with identifier `primaryButton` or label "Learned today" appears within 15 s. This replaces the ticket's `app.buttons["primaryButton"]` check, because once today is learned Today shows the `SealStamp` and no `PrimaryButton`. The timeout is the flake control. App code is untouched.
+- **Scope Boundary**: The UI test, the `Nichiji` scheme's build and test targets in `project.yml`, and the docs and `.plan/` resolution. App code, new identifiers and more UI flows are out.
+- **Anticipated TODOs**: None in code. "Register the nichiji URL scheme" also edits `project.yml`, in a different block.
+- **Planned Tests**: The UI test on CI. A fresh simulator opens onboarding because `hasCompletedOnboarding` defaults to false, so CI covers the button branch only. `NichijiTests` still run, and `swiftlint --strict` passes. The report took two audit rounds without `APPROVE`, and the user chose to proceed with the revised report.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code: approved predicate, 15 s timeout, stale wait removed, app code untouched. The ticket Resolution records the replaced check and the Notes point to it.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate.

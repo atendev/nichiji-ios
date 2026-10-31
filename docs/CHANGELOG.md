@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.9.2
+
+- Fix the UI launch smoke test: `testLaunchShowsPrimaryAction` waits up to 15 s for the shared `primaryButton` or Today's "Learned today" seal, replacing the stale `"title"` wait
+- Add `NichijiUITests` to the `Nichiji` scheme so `make test` and CI run it; close ticket 056
+
 ## v0.9.1
 
 - Doc: automate the Phase 5 ticket flow with a Haiku audit of the Requirements Report, a subagent grilling run with a click-to-approve answer check, and a one-click merge question that merges and deletes the branch

@@ -7,6 +7,7 @@ Repeatable verification that grows alongside features: each new feature gets tes
 - **Framework**: Built on Apple Swift Testing (`import Testing`, `@Suite`, `@Test`, `#expect(...)`) under Swift 6 strict concurrency (`SWIFT_STRICT_CONCURRENCY: complete`).
 - **Store isolation**: SwiftData unit tests construct an ephemeral `ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))` to ensure zero state leakage between tests and independent execution.
 - **Local offline execution**: Tests require no network connection, external simulator services, or persistent disk access.
+- **UI launch smoke test**: `NichijiUITests` is the one XCTest target. Its single test launches the app and waits up to 15 s for the shared `primaryButton` or, on a simulator where today is already learned, Today's "Learned today" seal. CI starts fresh on onboarding, so it covers the button branch. The `Nichiji` scheme runs it under `make test`.
 
 ### Test doubles (`NichijiTests/TestDoubles/`)
 

@@ -2,9 +2,12 @@ import XCTest
 
 final class NichijiUITests: XCTestCase {
     @MainActor
-    func testLaunchShowsTitle() {
+    func testLaunchShowsPrimaryAction() {
         let app = XCUIApplication()
         app.launch()
-        XCTAssertTrue(app.staticTexts["title"].waitForExistence(timeout: 5))
+        let primaryAction = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == 'primaryButton' OR label == 'Learned today'"))
+            .firstMatch
+        XCTAssertTrue(primaryAction.waitForExistence(timeout: 15))
     }
 }
