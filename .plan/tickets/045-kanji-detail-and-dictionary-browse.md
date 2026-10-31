@@ -14,6 +14,8 @@ Can the learner browse every kanji by level in the Dictionary tab and open any k
 
 ## Notes
 
+Owns the Forget it entry point on kanji detail (closed decision on review rules): a quiet control with a confirmation, calling `ReviewService.forgetIt`. Rebuild reminders after it.
+
 Skills: `apple`, `unslop`.
 Design: screens 32, 35-36, `Dictionary.dc.html`, `KanjiDetail.dc.html`.
 

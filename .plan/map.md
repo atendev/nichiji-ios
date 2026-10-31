@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the review engine](closed/040-review-engine.md): `ReviewService` over a pure Leitner `ReviewScheduler`; sessions log under their start day, Got it from Today or the widget schedules tomorrow's first review, Forget it clears the schedule, review preferences live in shared `UserDefaults`, and reminders gain review-due copy.
 - [Decide what the lock-screen widgets show](closed/050-lock-screen-widget-design.md): All three accessory families — circular kanji glyph, rectangular adds meaning and featured word, inline one line — read-only with taps opening Today; the Settings guide gets lock-screen previews and steps.
 - [Decide the review scheduling and progress rules](closed/039-review-scheduling-rules.md): Leitner table (learning +1d, familiar +3d, known graduates out of the queue), day-granular due, first answer per session decides, Forget it lives on kanji detail, reminder's specific slot gains "N kanji due for review" copy; widgets stay today-only.
 - [Keep or remove the UI test target](closed/035-ui-test-target.md): Keep as a state-independent launch smoke test (assert the shared primary button on any first screen), wired into the scheme so `make test` and CI run it. Graduates "Build the UI launch smoke test".
@@ -44,6 +45,6 @@ _(empty — the remaining fog graduated or moved to Out of scope)_
 
 ## Frontier
 
-- [Build the review engine](tickets/040-review-engine.md) (task)
+- [Build the Review settings screen](tickets/041-review-settings-screen.md) (task)
 - [Build the UI launch smoke test](tickets/056-build-the-ui-launch-smoke-test.md) (task)
 - [Register the nichiji URL scheme](tickets/053-register-the-nichiji-url-scheme.md) (task)

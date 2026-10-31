@@ -12,12 +12,14 @@ enum ReminderTodayState: Equatable, Sendable {
 enum ReminderCopy: Equatable, Sendable {
     case kanjiLed(String)
     case missedDay
+    case reviewsDue(Int)
     case generic
 
     var body: String {
         switch self {
         case .kanjiLed(let kanji): "\(kanji) · Today's kanji is ready"
         case .missedDay: "You missed yesterday's kanji. That's okay, check it now."
+        case .reviewsDue(let count): "\(count) kanji due for review"
         case .generic: "Today's kanji is ready"
         }
     }
@@ -40,12 +42,14 @@ enum ReminderPlanBuilder {
     static let identifierPrefix = "nichiji.reminder."
 
     /// Plans up to 7 daily reminders. Today is skipped once learned or once its time has passed.
+    /// Once today is learned, `reviewsDue` counts the kanji due on the first reminder's day and sets its copy.
     static func plans(
         now: Date,
         calendar: Calendar,
         hour: Int,
         minute: Int,
-        today: ReminderTodayState
+        today: ReminderTodayState,
+        reviewsDue: Int = 0
     ) -> [ReminderPlan] {
         let hour = min(max(hour, 0), 23)
         let minute = min(max(minute, 0), 59)
@@ -63,7 +67,9 @@ enum ReminderPlanBuilder {
                 firstCopy = .missedDay
             }
         case .learned:
-            break
+            if reviewsDue > 0 {
+                firstCopy = .reviewsDue(reviewsDue)
+            }
         }
 
         return (0..<windowSize).compactMap { index in

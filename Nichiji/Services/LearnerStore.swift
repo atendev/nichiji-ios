@@ -49,11 +49,26 @@ public protocol LearnerStore: Sendable {
     /// Returns the kanji identifiers selected in the learner's custom study pool for a level system.
     func customSelectionIDs(for levelSystem: LevelSystem) async throws -> Set<String>
 
-    /// Marks the given day's assignment as learned from Today or the interactive widget.
-    func markLearned(day: String) async throws -> DailyAssignmentSnapshot
+    /// Marks the given day's assignment as learned from Today or the interactive widget, scheduling its first review.
+    func markLearned(day: String, nextReviewAt: Date) async throws -> DailyAssignmentSnapshot
 
-    /// Resets a kanji's progress back to the unlearned new stage.
-    func forgetIt(kanjiID: String) async throws
+    /// Resets a kanji to the new stage and clears its schedule, logging the reset under the given day.
+    func forgetIt(kanjiID: String, calendarDay: String) async throws
+
+    /// Fetches the progress snapshot for one kanji.
+    func progress(for kanjiID: String) async throws -> KanjiProgressSnapshot?
+
+    /// Returns progress for every kanji in the learning or familiar stage.
+    func reviewableProgress() async throws -> [KanjiProgressSnapshot]
+
+    /// Logs a review answer and bumps its count. A non-nil outcome also moves the stage and schedule.
+    func recordReview(
+        kanjiID: String,
+        answer: ReviewAnswer,
+        outcome: ReviewOutcome?,
+        reviewedAt: Date,
+        calendarDay: String
+    ) async throws
 
     /// Replaces the custom kanji study pool for the given level system.
     func setCustomSelection(_ kanjiIDs: Set<String>, levelSystem: LevelSystem) async throws
@@ -154,7 +169,7 @@ public actor SwiftDataLearnerStore: LearnerStore {
         return Set(matches.map(\.kanjiID))
     }
 
-    public func markLearned(day: String) async throws -> DailyAssignmentSnapshot {
+    public func markLearned(day: String, nextReviewAt: Date) async throws -> DailyAssignmentSnapshot {
         let descriptor = FetchDescriptor<DailyAssignment>(
             predicate: #Predicate { $0.calendarDay == day }
         )
@@ -167,22 +182,13 @@ public actor SwiftDataLearnerStore: LearnerStore {
 
         // Progress mutation: advance stage to .learning.
         let kanjiID = assignment.kanjiID
-        let progressDescriptor = FetchDescriptor<KanjiProgress>(
-            predicate: #Predicate { $0.kanjiID == kanjiID }
-        )
-        let progressRows = try modelContext.fetch(progressDescriptor)
-        let progress: KanjiProgress
-        if let existing = progressRows.first {
-            progress = existing
-        } else {
-            progress = KanjiProgress(kanjiID: kanjiID)
-            modelContext.insert(progress)
-        }
+        let progress = try progressRow(for: kanjiID)
 
         if progress.firstLearnedAt == nil {
             progress.firstLearnedAt = Date()
         }
         progress.stage = .learning
+        progress.nextReviewAt = nextReviewAt
         progress.gotItCount += 1
 
         let logEntry = StudyLogEntry(
@@ -197,27 +203,65 @@ public actor SwiftDataLearnerStore: LearnerStore {
         return makeSnapshot(from: assignment)
     }
 
-    public func forgetIt(kanjiID: String) async throws {
-        let progressDescriptor = FetchDescriptor<KanjiProgress>(
-            predicate: #Predicate { $0.kanjiID == kanjiID }
-        )
-        let progressRows = try modelContext.fetch(progressDescriptor)
-        let progress: KanjiProgress
-        if let existing = progressRows.first {
-            progress = existing
-        } else {
-            progress = KanjiProgress(kanjiID: kanjiID)
-            modelContext.insert(progress)
-        }
+    public func forgetIt(kanjiID: String, calendarDay: String) async throws {
+        let progress = try progressRow(for: kanjiID)
 
+        // First-learned date and both counts stay, so history and stats survive the reset.
         progress.stage = .new
-        progress.forgotItCount += 1
+        progress.nextReviewAt = nil
+        progress.lastReviewedAt = nil
 
         let logEntry = StudyLogEntry(
             kanjiID: kanjiID,
             action: .resetToNew,
             timestamp: Date(),
-            calendarDay: ""
+            calendarDay: calendarDay
+        )
+        modelContext.insert(logEntry)
+
+        try modelContext.save()
+    }
+
+    public func progress(for kanjiID: String) async throws -> KanjiProgressSnapshot? {
+        let descriptor = FetchDescriptor<KanjiProgress>(
+            predicate: #Predicate { $0.kanjiID == kanjiID }
+        )
+        return try modelContext.fetch(descriptor).first.map(makeSnapshot)
+    }
+
+    public func reviewableProgress() async throws -> [KanjiProgressSnapshot] {
+        let learningRaw = StudyStage.learning.rawValue
+        let familiarRaw = StudyStage.familiar.rawValue
+        let descriptor = FetchDescriptor<KanjiProgress>(
+            predicate: #Predicate { $0.stageRaw == learningRaw || $0.stageRaw == familiarRaw }
+        )
+        return try modelContext.fetch(descriptor).map(makeSnapshot)
+    }
+
+    public func recordReview(
+        kanjiID: String,
+        answer: ReviewAnswer,
+        outcome: ReviewOutcome?,
+        reviewedAt: Date,
+        calendarDay: String
+    ) async throws {
+        let progress = try progressRow(for: kanjiID)
+
+        switch answer {
+        case .gotIt: progress.gotItCount += 1
+        case .forgotIt: progress.forgotItCount += 1
+        }
+        if let outcome {
+            progress.stage = outcome.stage
+            progress.nextReviewAt = outcome.nextReviewAt
+            progress.lastReviewedAt = reviewedAt
+        }
+
+        let logEntry = StudyLogEntry(
+            kanjiID: kanjiID,
+            action: answer.logAction,
+            timestamp: reviewedAt,
+            calendarDay: calendarDay
         )
         modelContext.insert(logEntry)
 
@@ -274,6 +318,30 @@ public actor SwiftDataLearnerStore: LearnerStore {
     }
 
     // MARK: - Private Helpers
+
+    private func progressRow(for kanjiID: String) throws -> KanjiProgress {
+        let descriptor = FetchDescriptor<KanjiProgress>(
+            predicate: #Predicate { $0.kanjiID == kanjiID }
+        )
+        if let existing = try modelContext.fetch(descriptor).first {
+            return existing
+        }
+        let progress = KanjiProgress(kanjiID: kanjiID)
+        modelContext.insert(progress)
+        return progress
+    }
+
+    private func makeSnapshot(from progress: KanjiProgress) -> KanjiProgressSnapshot {
+        KanjiProgressSnapshot(
+            kanjiID: progress.kanjiID,
+            stage: progress.stage,
+            firstLearnedAt: progress.firstLearnedAt,
+            lastReviewedAt: progress.lastReviewedAt,
+            nextReviewAt: progress.nextReviewAt,
+            gotItCount: progress.gotItCount,
+            forgotItCount: progress.forgotItCount
+        )
+    }
 
     private func makeSnapshot(from assignment: DailyAssignment) -> DailyAssignmentSnapshot {
         DailyAssignmentSnapshot(

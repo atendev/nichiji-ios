@@ -14,6 +14,8 @@ Can the learner see what is due, run a flashcard session, and finish on a summar
 
 ## Notes
 
+From "Build the review engine": drive sessions through `ReviewService` (`startSession`, `answer`), re-queue forgotten cards in the view when `repeatsForgotten` is on, and rebuild reminders when a session ends so the review-due copy stays current.
+
 Skills: `apple`, `unslop`.
 Design: screens 39-42, `Review.dc.html`, `ReviewSession.dc.html`, and the Review section of `docs/ui-reference/design-notes.md`.
 

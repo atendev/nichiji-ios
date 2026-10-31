@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.8.0
+
+- Add the review engine: `ReviewService` (in `ServiceContainer`) over a pure `ReviewScheduler` with the Leitner table, a day-granular due queue ordered and capped by review preferences, first-answer-per-session verdicts, and `gotItReview` / `forgotItReview` log rows under the session day
+- Add `ReviewPreferencesSnapshot` in shared `UserDefaults` with the mock defaults; the last card type cannot be turned off
+- Today's and the widget's Got it schedule the first review for tomorrow through `GotItAction`; Forget it clears `nextReviewAt` and `lastReviewedAt`, keeps counts, and logs its calendar day
+- Reminder window: a learned day's first reminder reads "N kanji due for review" when kanji are due that day
+- Add `ReviewServiceTests` and `TestReviewService`; close ticket 040
+
 ## v0.7.2
 
 - Set the review scheduling rules: Leitner table (learning +1d, familiar +3d, `known` graduates out of the due queue), day-granular due, first answer per session decides, Forget it lives on kanji detail and returns the kanji to the pool, review settings adopt the mock defaults in shared `UserDefaults`, and the reminder window gains review-due copy

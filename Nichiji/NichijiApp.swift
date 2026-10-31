@@ -34,6 +34,7 @@ struct NichijiApp: App {
                 dayProvider: dayProvider,
                 preferencesProvider: { LearnerPreferencesSnapshot.load(from: defaults) }
             )
+            let reviewService = DefaultReviewService(learnerStore: learnerStore, dayProvider: dayProvider)
             self.services = ServiceContainer(
                 dayProvider: dayProvider,
                 contentStore: contentStore,
@@ -42,8 +43,10 @@ struct NichijiApp: App {
                 pronunciationService: AVSpeechPronunciationService(),
                 reminderScheduler: SystemReminderScheduler(
                     dailyKanjiService: dailyKanjiService,
-                    dayProvider: dayProvider
+                    dayProvider: dayProvider,
+                    reviewService: reviewService
                 ),
+                reviewService: reviewService,
                 widgetRefresher: SystemWidgetRefresher()
             )
         } catch {

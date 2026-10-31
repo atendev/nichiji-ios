@@ -108,7 +108,7 @@ struct SettingsPreferencesTests {
 
         let today = dayProvider.calendarDay(for: dayProvider.now)
         _ = try await service.assignment(for: today)
-        _ = try await learnerStore.markLearned(day: today)
+        _ = try await learnerStore.markLearned(day: today, nextReviewAt: Date())
 
         var n4Preferences = LearnerPreferencesSnapshot.standard
         n4Preferences.selectedJLPTLevel = .n4

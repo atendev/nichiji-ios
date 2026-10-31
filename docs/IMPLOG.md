@@ -426,3 +426,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept. The only departure is from the ticket Notes, not the report: no URL scheme was registered, so Safari and Shortcuts cannot open the link until a later ticket adds one.
 - **Unanticipated TODOs**: `IMPLEMENTATION.md` now lists `AppDeepLinkTests` and the deep link. The cold-launch path relies on `MainTabView` mounting on first render, which onboarding state allows but no test covers.
 - **Test Results**: Nothing built locally (Linux host). Each test expectation was hand-checked against Foundation URL parsing. CI is the gate.
+
+### Build the review engine (v0.8.0)
+
+#### Requirements Report
+
+- **Success Criteria**: `ReviewService` in `ServiceContainer` over a pure Leitner `ReviewScheduler` with an injected `DayProvider`. Learning +1d, familiar +3d, `known` leaves the queue, due is day-granular. The first answer per session decides; repeats only log and count. Review preferences live in App Group `UserDefaults` with the mock defaults and at least one card type on. Answers log `gotItReview` / `forgotItReview` under the session day. Forget it clears both review dates, keeps `firstLearnedAt` and counts, and logs its real day. `markLearned` schedules +1d through `GotItAction` for Today and the widget. The reminder window gains "N kanji due for review" copy once today is learned.
+- **Scope Boundary**: No UI. Settings screen (041), session UI and repeat loop (043), stats (048) and the Forget it entry point (kanji detail) stay out.
+- **Anticipated TODOs**: Forget it UI had no owner; 048 overlapped on the empty `calendarDay` and the widget log row; `meaningToKanji` is stored but unused until 043.
+- **Planned Tests**: New `ReviewServiceTests` for every Leitner rule, day-granular due, queue order and cap, first-answer verdicts, session-day logging, Forget it, and preferences. Additions to `LearnerStoreTests`, `WidgetTimelineTests` and `ReminderSchedulerTests`.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code. `markLearned` takes a precomputed `nextReviewAt` rather than a clock. The reminder count is taken for tomorrow (the first reminder's day) and falls back to generic copy on failure. All four orders are implemented, the cap is the `ReviewSessionSize` enum, and learning rows with no due date count as due now. Reminder rebuild after a review session moves to 043.
+- **Scope Boundary**: Kept. Only wiring touched the widget environment and test fixtures. Follow-up notes went to 043, 045 (now owns Forget it UI) and 048.
+- **Unanticipated TODOs**: `forgetIt` no longer bumps `forgotItCount`, matching "keeps both counts".
+- **Test Results**: Nothing built locally (Linux host). Planned tests were written or merged, except a dedicated assertion that `SystemReminderScheduler` passes the due count through (it uses `UNUserNotificationCenter`), and singular-copy and zero-due cases, which existing tests already cover. CI is the gate.

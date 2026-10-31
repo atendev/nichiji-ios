@@ -38,9 +38,9 @@ The tagline is "One Kanji. One Day. Every Day."
 ## Architecture
 
 The app uses SwiftUI with feature-oriented views, shared design-system
-components, and five `Sendable` service protocols (`KanjiContentStore`,
-`LearnerStore`, `DailyKanjiService`, `PronunciationService` and
-`ReminderScheduler`) plus an injected `DayProvider` passed through a
+components, and six `Sendable` service protocols (`KanjiContentStore`,
+`LearnerStore`, `DailyKanjiService`, `PronunciationService`,
+`ReminderScheduler` and `ReviewService`) plus an injected `DayProvider` passed through a
 `ServiceContainer` in the SwiftUI environment. The first pass implements
 onboarding and Today without locking future Dictionary, Review or You screens
 out of the navigation model.
@@ -77,11 +77,11 @@ Reminder scheduling uses a rolling window of up to 7 pending local notification
 requests, never more than one a day. The next upcoming request uses specific
 copy. If the reminder time is still ahead today and today's kanji is unlearned,
 it is kanji-led (`"日 · Today's kanji is ready"`). If today is already learned,
-today is skipped. When the learner has due review cards, the next upcoming
-request uses review-due copy (`"3 kanji due for review"`) instead of generic
-copy. If the next fire is tomorrow, it uses missed-day copy
+today is skipped. If the next fire is tomorrow, it uses missed-day copy
 (`"You missed yesterday's kanji. That's okay, check it now."`) when today is
-still `.assigned`, and generic copy when today is learned. The remaining
+still `.assigned`. When today is learned, it uses review-due copy
+(`"3 kanji due for review"`) if kanji are due on that day, and generic copy
+otherwise. The remaining
 requests use generic copy (`"Today's kanji is ready"`). With no assignment
 (level complete) nothing is scheduled.
 The window is rebuilt on launch, on foreground, after "Got it" from the app or
