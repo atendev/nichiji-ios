@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.7.2
+
+- Set the review scheduling rules: Leitner table (learning +1d, familiar +3d, `known` graduates out of the due queue), day-granular due, first answer per session decides, Forget it lives on kanji detail and returns the kanji to the pool, review settings adopt the mock defaults in shared `UserDefaults`, and the reminder window gains review-due copy
+- Update `CONTEXT.md` (Review session, Due, known graduates) and the `DESIGN.md` reminder paragraph
+- Decide the lock-screen widgets: all three accessory families (circular kanji glyph, rectangular adds meaning and featured word, inline one line), read-only with taps opening Today, and a lock-screen section with previews and steps in the Settings widget guide
+- Update the `DESIGN.md` widget section; point tickets 040, 041, 043 and 051 at their closed decisions
+- Close tickets 039 and 050
+
 ## v0.7.1
 
 - Fix the v1.0 feature boundary: release work (App Store metadata, privacy manifest, signing, TestFlight), per-release dataset regeneration, the `nichiji` URL scheme and the You CSV export are in; handwriting recognition, stroke-order checking, Duo/two-pane, configurable widgets, the onboarding Custom option, review cap and furigana toggle are out

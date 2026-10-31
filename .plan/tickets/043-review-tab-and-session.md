@@ -20,7 +20,7 @@ Design: screens 39-42, `Review.dc.html`, `ReviewSession.dc.html`, and the Review
 - Review home: due count with tiles, Start review, Session options (opens Review settings), stage counts, Coming up, This week dots.
 - Session: a settings button inside the session (an open item in the design notes), full-screen cards, tap to flip, swipe or buttons after flipping, the onboarding flashcard tilt and colors (share code with `FlashcardDemoView`), progress bar, close, audio button, next card fades up, Reduce Motion respected.
 - The answer side has "Practice this kanji", opening the Practice sheet.
-- Summary: reviewed, got it, forgot. Repeat forgotten cards when the setting is on.
+- Summary: reviewed, got it, forgot. Repeat forgotten cards when the setting is on; per [the scheduling decision](../closed/039-review-scheduling-rules.md), only the first answer per kanji moves the schedule, and every answer logs.
 - Replace the Review placeholder in `MainTabView`.
 
 Minor bump.

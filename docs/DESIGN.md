@@ -77,7 +77,9 @@ Reminder scheduling uses a rolling window of up to 7 pending local notification
 requests, never more than one a day. The next upcoming request uses specific
 copy. If the reminder time is still ahead today and today's kanji is unlearned,
 it is kanji-led (`"日 · Today's kanji is ready"`). If today is already learned,
-today is skipped. If the next fire is tomorrow, it uses missed-day copy
+today is skipped. When the learner has due review cards, the next upcoming
+request uses review-due copy (`"3 kanji due for review"`) instead of generic
+copy. If the next fire is tomorrow, it uses missed-day copy
 (`"You missed yesterday's kanji. That's okay, check it now."`) when today is
 still `.assigned`, and generic copy when today is learned. The remaining
 requests use generic copy (`"Today's kanji is ready"`). With no assignment
@@ -98,7 +100,11 @@ and reload explicitly after "Got it" or any level, pool, order or time-zone
 change. Before onboarding finishes the widget asks the learner to open the app,
 and a finished level shows a quiet placeholder. Tapping either widget outside
 the Got it button opens the app on Today (`nichiji://today`) and closes the
-Settings sheet. Lock-screen widgets are post-MVP. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+Settings sheet. Lock-screen widgets ship in all three accessory families: the
+circular family shows the kanji glyph (with a small checkmark once learned),
+the rectangular family adds the primary meaning and featured word, and the
+inline family shows one line of kanji and meaning. All are read-only; a tap
+opens Today. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
 kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed. Handwriting recognition is deferred.
 

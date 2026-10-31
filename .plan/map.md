@@ -23,6 +23,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Decide what the lock-screen widgets show](closed/050-lock-screen-widget-design.md): All three accessory families — circular kanji glyph, rectangular adds meaning and featured word, inline one line — read-only with taps opening Today; the Settings guide gets lock-screen previews and steps.
+- [Decide the review scheduling and progress rules](closed/039-review-scheduling-rules.md): Leitner table (learning +1d, familiar +3d, known graduates out of the queue), day-granular due, first answer per session decides, Forget it lives on kanji detail, reminder's specific slot gains "N kanji due for review" copy; widgets stay today-only.
 - [Keep or remove the UI test target](closed/035-ui-test-target.md): Keep as a state-independent launch smoke test (assert the shared primary button on any first screen), wired into the scheme so `make test` and CI run it. Graduates "Build the UI launch smoke test".
 - [Fix the v1.0 scope](closed/034-fix-the-v1-scope.md): In: release work (metadata, signing, TestFlight), per-release dataset regeneration, the `nichiji` URL scheme, You CSV export. Out: handwriting recognition, stroke-order checking, Duo/two-pane, configurable widgets, the onboarding Custom option, review cap, furigana toggle.
 - [Find a licensable JLPT N5-N1 kanji list](closed/033-jlpt-kanji-list-source.md): Use Jonathan Waller's CC BY lists pinned through OpenJLPT commit `0d1d341`, labelled as an unofficial estimate; 172 Jōyō kanji lack a level, and the dataset ticket decides whether OpenJLPT's CC BY-SA supplements fill them.
@@ -31,7 +33,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
-- A review reminder, listed in the design notes as an idea not built. Revisit after "Decide the review scheduling and progress rules".
+_(empty — the remaining fog graduated or moved to Out of scope)_
 
 ## Out of scope
 
@@ -42,7 +44,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Decide the review scheduling and progress rules](tickets/039-review-scheduling-rules.md) (grilling, HITL)
-- [Decide what the lock-screen widgets show](tickets/050-lock-screen-widget-design.md) (grilling, HITL)
-- [Register the nichiji URL scheme](tickets/053-register-the-nichiji-url-scheme.md) (task)
+- [Build the review engine](tickets/040-review-engine.md) (task)
 - [Build the UI launch smoke test](tickets/056-build-the-ui-launch-smoke-test.md) (task)
+- [Register the nichiji URL scheme](tickets/053-register-the-nichiji-url-scheme.md) (task)

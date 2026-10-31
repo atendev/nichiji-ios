@@ -17,6 +17,8 @@ Does a tested service produce the due queue for a session and apply Got it and F
 Skills: `tdd`, `domain-modeling`, `unslop`.
 No UI in this ticket.
 
+Implement the rules from "Decide the review scheduling and progress rules" ([closed decision](../closed/039-review-scheduling-rules.md)): Leitner table (learning +1d, familiar +3d, known graduates), day-granular due, first answer per session decides, `resetToNew` clears `nextReviewAt`/`lastReviewedAt` and carries its `calendarDay`. The reminder window's specific-copy slot gains a review-due variant (`"3 kanji due for review"`) when today is learned and reviews are due — extend `ReminderPlanBuilder` accordingly.
+
 - Review preferences in App Group `UserDefaults`, alongside `LearnerPreferences`.
 - A `ReviewService` protocol in `ServiceContainer` with a pure scheduler underneath (same seam as `ReminderPlanBuilder`) and an injected `DayProvider`.
 - `LearnerStore` mutations for answers and Forget it, through the `@ModelActor`.
