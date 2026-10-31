@@ -25,5 +25,7 @@ Design: screens 32, 35-36, `Dictionary.dc.html`, `KanjiDetail.dc.html`.
 
 Minor bump.
 
+From [Settle the bundled dataset scope and schema](../closed/036-bundled-dataset-scope-and-schema.md): the 247 jinmeiyō N1 kanji have no Jōyō grade, so Jōyō browse mode places them in no group. Decide whether to add a "Name kanji" group or leave them search-only. Estimated levels show "(est.)" in the Details row.
+
 ## Resolution
 

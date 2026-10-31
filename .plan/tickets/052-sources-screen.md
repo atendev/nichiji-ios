@@ -19,5 +19,7 @@ No such screen exists yet. The CC BY-SA licenses on KANJIDIC2, JMdict, KanjiVG a
 Render the generated `DATA-SOURCES.md` bundled by the dataset tickets, with tappable license links. Add the row to the About group in `SettingsSheet`, next to Privacy.
 Patch bump. Must ship before any release build.
 
+From [Settle the bundled dataset scope and schema](../closed/036-bundled-dataset-scope-and-schema.md): the screen lists Waller (CC BY), the OpenJLPT supplement (CC BY-SA 4.0), KANJIDIC2, JMdict and KanjiVG, shows the snapshot dates, and carries the sentence "The JLPT has not published official kanji lists since 2010. Levels follow Jonathan Waller's community lists." Estimated levels get the extra OpenJLPT line from ticket 033, which also names Tatoeba as an upstream of OpenJLPT. The Waller licence-version fog on the map is revisited here. The Level-screen footer links here.
+
 ## Resolution
 

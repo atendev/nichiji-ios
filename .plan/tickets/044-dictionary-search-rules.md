@@ -24,5 +24,7 @@ Decide:
 - Whether the index is built at generation time or at launch, and its memory budget.
 - Draw to search: in or out per "Fix the v1.0 scope". If out, the button is hidden, not mocked.
 
+Settled by [Settle the bundled dataset scope and schema](../closed/036-bundled-dataset-scope-and-schema.md): the word source is an app-only `words.json` of 17,709 common JMdict forms (`id`, `word`, `kana`, `romaji`, `meaning`), built at generation time, about 1.6 MB raw. Kana-only words are excluded. This ticket still owns matching, ranking, romaji folding and the memory budget.
+
 ## Resolution
 
