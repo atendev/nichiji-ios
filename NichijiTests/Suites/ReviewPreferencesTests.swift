@@ -42,8 +42,10 @@ struct ReviewPreferencesTests {
     @Test("The last enabled card type cannot be turned off")
     func lastCardTypeStaysOn() {
         var preferences = ReviewPreferencesSnapshot.standard
-        #expect(preferences.setCardType(.kanjiToMeaning, enabled: false))
-        #expect(!preferences.setCardType(.kanjiToReading, enabled: false))
+        let removedMeaning = preferences.setCardType(.kanjiToMeaning, enabled: false)
+        let removedReading = preferences.setCardType(.kanjiToReading, enabled: false)
+        #expect(removedMeaning)
+        #expect(!removedReading)
         #expect(preferences.cardTypes == [.kanjiToReading])
         #expect(ReviewPreferencesSnapshot(cardTypes: []).cardTypes == ReviewPreferencesSnapshot.defaultCardTypes)
     }
