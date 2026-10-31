@@ -52,7 +52,8 @@ for the in-app Sources screen. Both the main app and widget extension bundle
 `kanji-index.json` and per-character JSON records so either process can perform
 daily rollover offline, while stroke-order SVGs are bundled only in the main
 app and loaded lazily on demand. Runtime network access is not part of the
-design.
+design. The dataset is version-pinned per release and regenerated from
+upstream at each release; there is no automated update process.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
@@ -171,10 +172,13 @@ respect Reduce Motion.
 
 ## Non-goals
 
-The first implementation does not include Dictionary, Review, You, real
-handwriting recognition, stroke-order checking, fuzzy search, account sync or
-backend services. It also does not implement the Duo split-pane layout, but
-the architecture must leave room for it.
+Version 1.0 ships the single-column phone layout and does not include real
+handwriting recognition (Dictionary carries no "Draw a kanji to search"
+button), stroke-order checking on the Practice pad (the pad records strokes
+only), configurable widgets, a daily review cap, a furigana toggle, a Custom
+option in onboarding, account sync or backend services. It does not implement
+the iPhone Duo or iPad two-pane layout, but the architecture must leave room
+for it.
 
 ## Open questions
 

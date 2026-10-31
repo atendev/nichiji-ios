@@ -4,6 +4,13 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.7.1
+
+- Fix the v1.0 feature boundary: release work (App Store metadata, privacy manifest, signing, TestFlight), per-release dataset regeneration, the `nichiji` URL scheme and the You CSV export are in; handwriting recognition, stroke-order checking, Duo/two-pane, configurable widgets, the onboarding Custom option, review cap and furigana toggle are out
+- Rewrite `DESIGN.md` Non-goals to the v1.0 boundary; chart tickets 053-056 (URL scheme, release build, App Store metadata, UI launch smoke test)
+- Keep the UI test target as a state-independent launch smoke test wired into the scheme and CI
+- Close tickets 034 and 035
+
 ## v0.7.0
 
 - Open the app on Today when the learner taps either widget: `AppDeepLink` builds and parses `nichiji://today`, the widgets set it with `.widgetURL`, and `MainTabView` selects Today and closes Settings in `onOpenURL`. The medium widget's Got it button keeps its AppIntent
