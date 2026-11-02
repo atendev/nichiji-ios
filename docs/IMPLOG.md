@@ -587,3 +587,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Unanticipated TODOs**: None. The search TODO in `DictionaryView` is gone.
 - **Test Results**: `DictionarySearchFoldingTests`, `DictionarySearchTests` and `DictionarySearchDatasetTests` were added, with a Python test for `rank` and `kanji-search.json`. Only `make dataset-test` ran (42 tests, OK). The empty-state heading copy has no test, and word taps are tested at `tapAction`, not through the UI.
 
+### Build the lock-screen widgets (v0.16.0)
+
+#### Requirements Report
+
+- **Success Criteria**: The three accessory families render assigned, learned, level-complete and before-onboarding content as the closed design table says, refresh on the existing timeline and triggers, open Today on tap, and the Settings guide shows real previews and lock-screen steps.
+- **Scope Boundary**: Accessory views, widget registration, guide section and copy. No new interactivity, timeline change or content state.
+- **Anticipated TODOs**: None. The bundle keeps its TODO for configurable widgets, which waits on the v1.0 scope.
+- **Planned Tests**: `AccessoryWidgetCopy` for inline text, the featured word line and accessibility labels, plus a check that the shared timeline still builds one entry reloading at midnight.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code; nothing in Swift was built or run, because the host is Linux with no toolchain. The accessory families are added to the existing widget kind instead of a second widget, so they share its provider and `reloadAllTimelines` calls.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None. The circular open-app cell shows a plain 日 instead of the brand seal: the seal asset is not in the project and `SealStamp` is a checkmark ring in a folder the widget target does not compile, and the design system says never to redraw the mark. `widgetRenderingMode` is not used; `widgetAccentable` alone gives the accent split. Kanji sizes (34 and 38 pt through `kanjiDisplay`) and the meaning line (`uiText` 14 pt) fit the accessory frames instead of the home-screen `kanjiWidget` token, and the Settings previews sit on hairline fills as preview chrome. The Settings section lost its combined accessibility element because the previews carry their own labels.
+- **Test Results**: Added three `WidgetTimelineTests` cases (inline copy, featured word line, accessibility labels); the planned midnight-timeline check was dropped because the timeline is unchanged and `assignedDayEntry` already covers it. Not run here; CI is the check.
+

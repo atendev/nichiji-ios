@@ -13,7 +13,7 @@ public struct WidgetGuideSettingsView: View {
                         .font(.nichijiTitle)
                         .foregroundColor(.nichijiInk)
 
-                    Text("Keep today's kanji on your home screen.")
+                    Text("Keep today's kanji on your home and lock screens.")
                         .font(.nichijiBody)
                         .foregroundColor(.nichijiInkMuted)
                 }
@@ -185,16 +185,55 @@ public struct WidgetGuideSettingsView: View {
         )
     }
 
-    // TODO: Replace this placeholder with a real preview in "Build the lock-screen widgets".
     private var lockScreenSection: some View {
-        VStack(alignment: .leading, spacing: LayoutTokens.space4) {
-            Text("Lock screen")
-                .font(.nichijiHeading)
-                .foregroundColor(.nichijiInk)
+        let content = DailyKanjiWidgetEntry.sample.content
+        return VStack(alignment: .leading, spacing: LayoutTokens.space12) {
+            VStack(alignment: .leading, spacing: LayoutTokens.space4) {
+                Text("Lock screen")
+                    .font(.nichijiHeading)
+                    .foregroundColor(.nichijiInk)
 
-            Text("Lock screen widgets are coming later.")
-                .font(.nichijiCallout)
-                .foregroundColor(.nichijiInkMuted)
+                Text("The kanji at a glance. Tap to open Today.")
+                    .font(.nichijiCallout)
+                    .foregroundColor(.nichijiInkMuted)
+            }
+
+            VStack(alignment: .leading, spacing: LayoutTokens.space12) {
+                AccessoryInlineWidgetView(content: content)
+                    .font(.uiText(size: 14, weight: .medium))
+
+                HStack(spacing: LayoutTokens.space12) {
+                    AccessoryCircularWidgetView(content: content)
+                        .frame(width: 72, height: 72)
+                        .background(Circle().fill(Color.nichijiHairline))
+
+                    AccessoryRectangularWidgetView(content: content)
+                        .padding(LayoutTokens.space8)
+                        .frame(width: 160, height: 72, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color.nichijiHairline)
+                        )
+                }
+            }
+            .foregroundColor(.nichijiInk)
+
+            VStack(alignment: .leading, spacing: LayoutTokens.space8) {
+                ForEach(Array(AddWidgetCopy.lockScreenSteps.enumerated()), id: \.offset) { index, step in
+                    HStack(alignment: .firstTextBaseline, spacing: LayoutTokens.space12) {
+                        Text("\(index + 1)")
+                            .font(.uiText(size: 14, weight: .medium))
+                            .foregroundColor(.nichijiVermilion)
+                            .frame(width: 20, alignment: .leading)
+
+                        Text(step)
+                            .font(.nichijiCallout)
+                            .foregroundColor(.nichijiInk)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(LayoutTokens.space24)
@@ -206,7 +245,6 @@ public struct WidgetGuideSettingsView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.nichijiHairline, lineWidth: 1)
         )
-        .accessibilityElement(children: .combine)
     }
 }
 

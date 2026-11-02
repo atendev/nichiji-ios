@@ -8,7 +8,7 @@ struct DailyKanjiWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: Self.kind, provider: DailyKanjiProvider()) { entry in
-            // The medium widget's Got it button keeps its AppIntent; every other tap opens Today.
+            // The medium widget's Got it button keeps its AppIntent; every other tap, lock screen included, opens Today.
             DailyKanjiWidgetEntryView(entry: entry)
                 .widgetURL(AppDeepLink.today.url)
                 .containerBackground(for: .widget) {
@@ -16,8 +16,8 @@ struct DailyKanjiWidget: Widget {
                 }
         }
         .configurationDisplayName("Today's kanji")
-        .description("See today's kanji on your home screen and mark it learned.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .description("See today's kanji on your home and lock screens.")
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }
 
@@ -65,6 +65,12 @@ struct DailyKanjiWidgetEntryView: View {
 
     var body: some View {
         switch family {
+        case .accessoryCircular:
+            AccessoryCircularWidgetView(content: entry.content)
+        case .accessoryRectangular:
+            AccessoryRectangularWidgetView(content: entry.content)
+        case .accessoryInline:
+            AccessoryInlineWidgetView(content: entry.content)
         case .systemMedium:
             DailyKanjiMediumWidgetView(content: entry.content)
         default:
