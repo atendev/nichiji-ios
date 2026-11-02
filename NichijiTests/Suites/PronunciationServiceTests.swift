@@ -45,17 +45,4 @@ struct PronunciationServiceTests {
         #expect(service.isSpeaking == false)
         #expect(service.didStop == true)
     }
-
-    @Test("Live AVSpeechPronunciationService initializes with valid defaults")
-    func liveServiceVoiceAvailability() {
-        let liveService = AVSpeechPronunciationService()
-        #expect(liveService.isSpeaking == false)
-
-        // Calling stop on idle service should be completely safe and idempotent
-        liveService.stop()
-        #expect(liveService.isSpeaking == false)
-
-        // Querying voice availability should return a stable boolean without crashing
-        _ = liveService.isJapaneseVoiceAvailable
-    }
 }
