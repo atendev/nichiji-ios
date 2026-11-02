@@ -149,21 +149,11 @@ struct StrokePathParser {
 
         switch command.uppercased() {
         case "M":
-            guard let end = point(relative: relative) else { return false }
-            path.move(to: end)
-            current = end
-            subpathStart = end
-        case "L":
-            guard let end = point(relative: relative) else { return false }
-            lineTo(end)
-        case "H":
-            guard let x = number() else { return false }
-            lineTo(CGPoint(x: relative ? current.x + x : x, y: current.y))
-        case "V":
-            guard let y = number() else { return false }
-            lineTo(CGPoint(x: current.x, y: relative ? current.y + y : y))
+            return moveTo(relative: relative)
+        case "L", "H", "V":
+            return lineTo(command.uppercased(), relative: relative)
         case "C":
-            guard let control1 = point(relative: relative) else { return false }
+            let control1 = point(relative: relative)
             return curve(control1: control1, relative: relative)
         case "S":
             let control1 = previousControl.map { CGPoint(x: 2 * current.x - $0.x, y: 2 * current.y - $0.y) } ?? current
@@ -171,19 +161,38 @@ struct StrokePathParser {
         case "Z":
             path.closeSubpath()
             current = subpathStart
+            return true
         default:
             return false
         }
+    }
+
+    private mutating func moveTo(relative: Bool) -> Bool {
+        guard let end = point(relative: relative) else { return false }
+        path.move(to: end)
+        current = end
+        subpathStart = end
         return true
     }
 
-    private mutating func lineTo(_ end: CGPoint) {
+    private mutating func lineTo(_ kind: String, relative: Bool) -> Bool {
+        let end: CGPoint?
+        switch kind {
+        case "H":
+            end = number().map { CGPoint(x: relative ? current.x + $0 : $0, y: current.y) }
+        case "V":
+            end = number().map { CGPoint(x: current.x, y: relative ? current.y + $0 : $0) }
+        default:
+            end = point(relative: relative)
+        }
+        guard let end else { return false }
         path.addLine(to: end)
         current = end
+        return true
     }
 
-    private mutating func curve(control1: CGPoint, relative: Bool) -> Bool {
-        guard let control2 = point(relative: relative), let end = point(relative: relative) else { return false }
+    private mutating func curve(control1: CGPoint?, relative: Bool) -> Bool {
+        guard let control1, let control2 = point(relative: relative), let end = point(relative: relative) else { return false }
         path.addCurve(to: end, control1: control1, control2: control2)
         current = end
         lastControl = control2
