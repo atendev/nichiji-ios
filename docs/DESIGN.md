@@ -117,7 +117,7 @@ pass. Only the medium widget has the interactive "Got it" button, shown while
 today's assignment is `.assigned`. Widget timelines emit a single entry refreshed `.after(nextMidnight)`
 and reload explicitly after "Got it" or any level, pool, order or time-zone
 change. Before onboarding finishes the widget asks the learner to open the app,
-and a finished level shows a quiet placeholder. Tapping either widget outside
+and a finished level shows a quiet placeholder. Tapping the widget outside
 the Got it button opens the app on Today (`nichiji://today`) and closes the
 Settings sheet. Lock-screen widgets ship in all three accessory families: the
 circular family shows the kanji glyph (with a small checkmark once learned),

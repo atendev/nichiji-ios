@@ -4,6 +4,13 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.16.0
+
+- Add the lock-screen widgets: `accessoryCircular` (kanji glyph, small check once learned), `accessoryRectangular` (kanji, meaning, featured word and kana, "Learned" row) and `accessoryInline` (`学 study, learning`). They join the existing widget, so they share its midnight timeline and `WidgetRefresher` reloads. The kanji is `widgetAccentable`; the rest is vibrant monochrome
+- Every state is covered: assigned, learned, level complete and before onboarding. Taps are read-only and open Today through `nichiji://today`
+- Replace the Settings widget guide's lock-screen placeholder with previews of the three families and a lock-screen step list
+- Close ticket 051
+
 ## v0.15.0
 
 - Add Dictionary search: a search bar above the browse grid reads the query by script (kanji, then kana, then Latin as romaji plus English), folds both sides with one `SearchFolding`, and ranks Kanji and Words by tier, field, frequency and the new JMdict `rank`. It runs about 150 ms after the last keystroke, off the main actor, over an in-memory `DictionarySearchIndex` built once on first Dictionary open ("Preparing search…" while it builds)

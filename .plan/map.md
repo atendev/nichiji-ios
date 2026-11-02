@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the lock-screen widgets](closed/051-lock-screen-widgets.md): The circular, rectangular and inline accessory families join the daily kanji widget, sharing its provider, midnight timeline and refresh triggers; `AccessoryWidgetCopy` pins the text per state, taps open Today, and the Settings guide previews the three families with lock-screen steps.
 - [Build Dictionary search](closed/046-dictionary-search.md): A search bar above the browse grid reads the query by script, folds both sides with one function and ranks Kanji and Words from an in-memory index built on first open; word rows open detail or a "Which kanji?" sheet, `words.json` gains `rank`, and the generator writes `kanji-search.json`. The app set is within 3% of its budget.
 - [Build kanji detail and the Dictionary browse grid](closed/045-kanji-detail-and-dictionary-browse.md): Dictionary browses all 2,383 kanji from the index by level system (Jōyō ends with a "Name kanji" group for the 247 jinmeiyō kanji) on a shared `KanjiGridTile`; a tile pushes the shared `KanjiDetailView`; Forget it sits on detail and Today, confirms, resets and rebuilds reminders.
 - [Decide how Dictionary search matches and ranks](closed/044-dictionary-search-rules.md): Script picks the mode (kanji, then kana, then Latin as romaji plus English); one Swift folding for romaji; exact, prefix and substring tiers with English at word starts only; Kanji and Words sections ranked by tier, field and frequency, with a new JMdict `rank` on words; word rows open a "Which kanji?" sheet; the generator adds an app-only `kanji-search.json`, and the index builds in memory on first Dictionary open (about 20 MB). Draw to search is hidden.
@@ -57,5 +58,4 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 ## Frontier
 
 - [Decide the streak and stats rules](tickets/047-streak-and-stats-rules.md) (grilling)
-- [Build the lock-screen widgets](tickets/051-lock-screen-widgets.md) (task, AFK)
 - [Build the Sources screen](tickets/052-sources-screen.md) (task, AFK)
