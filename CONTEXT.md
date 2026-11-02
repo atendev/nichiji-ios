@@ -112,3 +112,25 @@ _Avoid_: Wrong, fail, missed
 **Forget it**:
 The explicit learner action that resets a learned kanji back to the `new` study stage and returns it to the study pool.
 _Avoid_: Reset, unlearn, delete progress
+
+### Stats
+
+**Study day**:
+A local calendar day with at least one learned daily kanji or review answer (Got it or Forgot it). Forget it does not make a study day.
+_Avoid_: Active day, streak day
+
+**Day streak**:
+The run of consecutive study days ending yesterday, plus today once today is a study day. Today never breaks it before it ends.
+_Avoid_: Chain, combo
+
+**Streak freeze**:
+The optional rule that forgives one missed day per locale calendar week, refilling each week. A forgiven day keeps the day streak alive without adding to it. It is recomputed from history, never stored.
+_Avoid_: Streak shield, skip token
+
+**Milestone**:
+A lifetime achievement on the You tab computed from history, so once earned it stays earned after Forget it or a broken streak.
+_Avoid_: Badge, trophy, award
+
+**Needs attention**:
+Up to three kanji past `new` with at least one Forgot it answer, most forgotten first.
+_Avoid_: Weak kanji, leeches

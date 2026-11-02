@@ -27,6 +27,8 @@ Minor bump.
 
 From "Build the Review tab and session": also fill the Review header's "N DAY STREAK" subtitle from the stats service (TODO in `ReviewView.swift`).
 
+From [Decide the streak and stats rules](../closed/047-streak-and-stats-rules.md): the sixth tile is Days studied, not Time studying. Copy for the freeze row, needs attention, history rows and day headings, milestones and the level-complete screen is in its Resolution.
+
 From [Build kanji detail and the Dictionary browse grid](../closed/045-kanji-detail-and-dictionary-browse.md): open the shared `KanjiDetailView(kanjiID:)` from You Learned. Forget it comes with it, which covers the You Learned entry point the review-rules decision lists.
 
 ## Resolution
