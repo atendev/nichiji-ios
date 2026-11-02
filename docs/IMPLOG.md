@@ -570,3 +570,20 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept. Notes on "Build Dictionary search" and "Build the You tab" point them at `KanjiDetailRoute` and `KanjiDetailView`. The You tab note carries the You Learned Forget it entry point forward, without building it here.
 - **Unanticipated TODOs**: None. The `MainTabView` TODO now names only the You placeholder.
 - **Test Results**: `DictionaryBrowseTests` (9) and `KanjiDetailTests` (8). `TestKanjiContentStore` gains `indexEntries()` and a record load counter. Nothing ran locally because the host is Linux with no Swift toolchain, so CI is the gate. A subagent wrote the Requirements Report. Both haiku report audits ended without `APPROVE`, and the user chose to continue with Forget it on Today as well. A haiku subagent wrote this Deviation Report. The implementation audit (haiku) took three rounds. Round 1 found Today's Forget it going stale after a reset made from detail, and round 2 found the same on a pushed detail. Both now refresh the stage on appear. Round 3 asked for an explicit visible navigation bar on detail. The user chose a third round after the two-round stop, then chose to commit with that one-line fix.
+
+### Build Dictionary search (v0.15.0)
+
+#### Requirements Report
+
+- **Success Criteria**: Typing in the Dictionary search bar shows Kanji and Words as the rules define: the script picks the mode, one folding runs on data and query, results rank by tier, field, frequency and JMdict `rank`, capped at 20 kanji and 50 words. Search runs about 150 ms after the last keystroke over an index built once off the main actor, with "Preparing search…" while it builds. A word row opens detail or a "Which kanji?" sheet. No Draw button. The generator adds `rank` and `kanji-search.json`.
+- **Scope Boundary**: The search core, loader, bar, results, sheet and navigation, plus committing the generator work and bundling the new file. Draw to search, edit distance and any change to the browse grid, kanji detail or widget stay out.
+- **Anticipated TODOs**: None. Draw to search is a note in `PROGRESS.md`, not a code TODO. The report flagged that search code should stay out of the widget-compiled folders, that `KanjiContentStore` should not widen, and that the 8 MiB app budget has about 3% left.
+- **Planned Tests**: Folding pairs, mode selection and length gates, kanji and word ranking, English word starts, kanji-in-query order, caps, empty states, word tap actions, dataset contract and bundled smoke, and Python tests for `rank` and `kanji-search.json`.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code; nothing in Swift was built or run, because the host is Linux with no toolchain. Folding also collapses `aa`, `ee` and `ii` and folds `ā`, `ī`, `ē`, since the generated romaji uses all five macron vowels. A kana query also matches a word's written form. English matches per gloss, split at ", ".
+- **Scope Boundary**: Kept. `DictionarySearchSource` is a new protocol with a bundled reader, instead of widening `KanjiContentStore`, and the Dictionary `NavigationStack` now binds a `[KanjiDetailRoute]` path so the sheet and word rows can push detail.
+- **Unanticipated TODOs**: None. The search TODO in `DictionaryView` is gone.
+- **Test Results**: `DictionarySearchFoldingTests`, `DictionarySearchTests` and `DictionarySearchDatasetTests` were added, with a Python test for `rank` and `kanji-search.json`. Only `make dataset-test` ran (42 tests, OK). The empty-state heading copy has no test, and word taps are tested at `tapAction`, not through the UI.
+

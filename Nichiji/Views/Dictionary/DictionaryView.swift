@@ -12,10 +12,30 @@ public struct DictionaryView: View {
     )
     private var levelSystemRaw: String = LevelSystem.jlpt.rawValue
 
+    @AppStorage(
+        LearnerPreferenceKey.showsRomaji.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var showsRomaji: Bool = true
+
     @State private var sections: [KanjiBrowseSection] = []
     @State private var errorMessage: String?
     @State private var isLoaded = false
     @State private var reloadID = UUID()
+    @State private var path: [KanjiDetailRoute] = []
+    @State private var query = ""
+    @State private var searchIndex: DictionarySearchIndex?
+    @State private var searchFailure: String?
+    @State private var results: DictionarySearchResults?
+    @State private var chosenWord: WordResult?
+
+    private let searchSource: any DictionarySearchSource
+
+    /// Re-runs the search when the text changes or the index finishes building.
+    private struct SearchRequest: Hashable {
+        let query: String
+        let isIndexReady: Bool
+    }
 
     private var activeLevelSystem: LevelSystem {
         LevelSystem(rawValue: levelSystemRaw) ?? .jlpt
@@ -23,10 +43,15 @@ public struct DictionaryView: View {
 
     public init(onOpenSettings: @escaping () -> Void) {
         self.onOpenSettings = onOpenSettings
+        self.searchSource = BundledDictionarySearchSource()
+    }
+
+    private var isSearching: Bool {
+        DictionaryQuery.parse(query) != nil
     }
 
     public var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 HeaderBar(kanjiTitle: "辞書", englishTitle: "Dictionary") {
                     Button(action: onOpenSettings) {
@@ -38,9 +63,11 @@ public struct DictionaryView: View {
                     .accessibilityLabel("Open settings")
                 }
 
-                // TODO: "Build Dictionary search" adds the search bar and its results above the grid.
+                DictionarySearchBar(text: $query)
 
-                if let errorMessage {
+                if isSearching {
+                    searchContent
+                } else if let errorMessage {
                     retryView(message: errorMessage)
                 } else if !isLoaded {
                     ProgressView()
@@ -59,6 +86,37 @@ public struct DictionaryView: View {
         }
         .task(id: "\(levelSystemRaw)-\(reloadID)") {
             await loadSections()
+        }
+        .task {
+            await prepareSearchIndex()
+        }
+        .task(id: SearchRequest(query: query, isIndexReady: searchIndex != nil)) {
+            await runSearch()
+        }
+        .sheet(item: $chosenWord) { result in
+            WhichKanjiSheet(result: result, showsRomaji: showsRomaji) { kanjiID in
+                chosenWord = nil
+                path.append(KanjiDetailRoute(kanjiID: kanjiID))
+            }
+        }
+    }
+
+    @ViewBuilder private var searchContent: some View {
+        if let searchFailure {
+            messageView(title: "Search is unavailable", message: searchFailure)
+        } else if searchIndex == nil {
+            HStack(spacing: LayoutTokens.space12) {
+                ProgressView()
+                Text("Preparing search\u{2026}")
+                    .font(.nichijiCallout)
+                    .foregroundColor(.nichijiInkMuted)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityElement(children: .combine)
+        } else if let results {
+            DictionarySearchResultsView(results: results, showsRomaji: showsRomaji, onSelectWord: openWord)
+        } else {
+            Color.clear
         }
     }
 
@@ -103,6 +161,22 @@ public struct DictionaryView: View {
         }
     }
 
+    private func messageView(title: String, message: String) -> some View {
+        VStack(spacing: LayoutTokens.space16) {
+            Spacer()
+            Text(title)
+                .font(.nichijiTitle)
+                .foregroundColor(.nichijiInk)
+                .multilineTextAlignment(.center)
+            Text(message)
+                .font(.nichijiCallout)
+                .foregroundColor(.nichijiInkMuted)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, LayoutTokens.space32)
+            Spacer()
+        }
+    }
+
     private func retryView(message: String) -> some View {
         VStack(spacing: LayoutTokens.space16) {
             Spacer()
@@ -140,5 +214,50 @@ public struct DictionaryView: View {
         case .failure(let error):
             errorMessage = error.localizedDescription
         }
+    }
+
+    /*-------------------------------search-------------------------------*/
+
+    private func openWord(_ result: WordResult) {
+        switch result.tapAction {
+        case .unavailable:
+            break
+        case .openKanji(let kanjiID):
+            path.append(KanjiDetailRoute(kanjiID: kanjiID))
+        case .chooseKanji:
+            chosenWord = result
+        }
+    }
+
+    /// Builds the folded index once, in the background, the first time Dictionary appears.
+    private func prepareSearchIndex() async {
+        guard searchIndex == nil else { return }
+        let contentStore = services?.contentStore ?? BundledKanjiContentStore()
+        let source = searchSource
+        let result = await Task.detached(priority: .userInitiated) {
+            Result { try DictionarySearchIndex.load(contentStore: contentStore, source: source) }
+        }.value
+
+        switch result {
+        case .success(let index):
+            searchIndex = index
+            searchFailure = nil
+        case .failure(let error):
+            searchFailure = error.localizedDescription
+        }
+    }
+
+    /// Waits about 150 ms after the last keystroke, then scans off the main actor.
+    private func runSearch() async {
+        guard isSearching else {
+            results = nil
+            return
+        }
+        try? await Task.sleep(for: .milliseconds(150))
+        guard !Task.isCancelled, let index = searchIndex else { return }
+        let text = query
+        let found = await Task.detached(priority: .userInitiated) { index.search(text) }.value
+        guard !Task.isCancelled else { return }
+        results = found
     }
 }

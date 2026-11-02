@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.15.0
+
+- Add Dictionary search: a search bar above the browse grid reads the query by script (kanji, then kana, then Latin as romaji plus English), folds both sides with one `SearchFolding`, and ranks Kanji and Words by tier, field, frequency and the new JMdict `rank`. It runs about 150 ms after the last keystroke, off the main actor, over an in-memory `DictionarySearchIndex` built once on first Dictionary open ("Preparing search…" while it builds)
+- Add the "Which kanji?" sheet for word rows with two or more distinct kanji; a word with one kanji opens its detail directly, and a word with none is not tappable
+- Generator: add `rank` to each `words.json` record and the app-only `kanji-search.json` (full readings, romaji and meanings per kanji); the app set is now 8.14 MB of its 8 MiB budget, and `project.yml` bundles the new file
+- Draw to search stays out of v1.0, so the Dictionary has no draw button
+- Close ticket 046
+
 ## v0.14.0
 
 - Replace the Dictionary placeholder with a browse grid of all 2,383 kanji, grouped by the active level system (N5 to N1, or grade 1 to Secondary plus a "Name kanji" group for the 247 jinmeiyō kanji). It is built from the index through `KanjiContentStore.indexEntries()` and `KanjiBrowseGrouping`, so no records are decoded

@@ -36,6 +36,13 @@ class Word:
         bands = [int(tag[2:]) for tag in self.priority if re.fullmatch(r"nf\d+", tag)]
         return min(bands) if bands else 99
 
+    @property
+    def rank(self) -> int:
+        """Search rank, lower is more common: the nf band (1-48), else 50 plus the common tags it lacks."""
+        if self.nf_band != 99:
+            return self.nf_band
+        return 50 + len(COMMON_TAGS) - len(set(self.priority) & set(COMMON_TAGS))
+
 
 def open_text(path) -> bytes:
     data = path.read_bytes()

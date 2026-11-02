@@ -85,6 +85,16 @@ class JMdictTests(unittest.TestCase):
         self.assertEqual((word.tier, word.nf_band, word.sequence), (0, 2, 100))
         self.assertEqual(next(w for w in self.words if w.headword == "陽向").tier, 2)
 
+    def test_rank_prefers_nf_band_then_common_tag_count(self):
+        def ranked(*tags):
+            return jmdict.Word(1, "日", "ひ", "sun", list(tags)).rank
+
+        self.assertEqual(ranked("ichi1", "nf02"), 2)
+        self.assertEqual(ranked("news1", "ichi1", "spec1"), 51)
+        self.assertEqual(ranked("ichi1"), 53)
+        self.assertEqual(ranked("news2"), 54)
+        self.assertLess(ranked("nf48"), ranked("ichi1", "news1"))
+
     def test_gloss_cap_and_reading_restriction(self):
         word = next(w for w in self.words if w.headword == "毎日")
         self.assertEqual(word.meaning, "every day, daily, each day")
