@@ -4,6 +4,13 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.13.0
+
+- Add the Review tab: the due count with up to six due kanji tiles and an "About N minutes" estimate, Start review, a Session options link to Review settings, Your kanji stage counts with a stage bar, Coming up (tomorrow, in 2 to 3 days, next week) and This week review dots
+- Add the full-screen review session: tap to flip, swipe or buttons after flipping, card types rotating through the enabled types, the example word, a speaker that plays the reading, autoplay on flip, "Practice this kanji" on the answer side, a settings button, forgotten cards repeated once at the end, and a "Review complete" summary. Finishing or closing after an answer rebuilds reminders
+- Move the flashcard flip, tilt, swipe, badges and answer buttons into a shared `SwipeFlashcard`, which the onboarding demo now uses too
+- Add `ReviewDeck`, `ReviewHomeSummary` and `ReviewSessionModel` with their tests; close ticket 043
+
 ## v0.12.1
 
 - Remove the live `AVSpeechPronunciationService` unit test: CI's simulator has a broken voice database, so the voice lookup stalled for 94 to 257 seconds before passing. The mocked pronunciation tests still cover the service contract

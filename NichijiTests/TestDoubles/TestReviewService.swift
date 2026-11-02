@@ -10,14 +10,18 @@ final class TestReviewService: ReviewService, @unchecked Sendable {
     private(set) var answers: [(kanjiID: String, answer: ReviewAnswer)] = []
     private(set) var forgottenIDs: [String] = []
     private(set) var dueCountDates: [Date] = []
+    private(set) var startedPreferences: [ReviewPreferencesSnapshot] = []
+    private(set) var answeredSessions: [ReviewSession] = []
 
     func startSession(preferences: ReviewPreferencesSnapshot) async throws -> ReviewSession {
         try checkForError()
+        startedPreferences.append(preferences)
         return ReviewSession(calendarDay: "2026-10-28", startedAt: Date(), queue: queue)
     }
 
     func answer(_ answer: ReviewAnswer, kanjiID: String, in session: ReviewSession) async throws -> ReviewSession {
         try checkForError()
+        answeredSessions.append(session)
         answers.append((kanjiID: kanjiID, answer: answer))
         var session = session
         session.recordVerdict(answer, for: kanjiID)

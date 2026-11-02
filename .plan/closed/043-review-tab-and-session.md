@@ -3,7 +3,7 @@ id: "043"
 title: Build the Review tab and session
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["040", "041", "042"]
 claimed: false
 ---
@@ -30,4 +30,16 @@ Design: screens 39-42, `Review.dc.html`, `ReviewSession.dc.html`, and the Review
 Minor bump.
 
 ## Resolution
+
+Yes. The Review tab replaces the placeholder in `MainTabView`. `ReviewView` builds a `ReviewHomeSummary` from the progress rows and the study log. It shows the due count, up to six tiles plus "+N", and "About N minutes" at 20 seconds a card, capped by the session size. Start review opens the session full screen, and a Session options link pushes `ReviewSettingsView`. Below sit stage counts with a bar, Coming up and This week. Coming up counts learning and familiar kanji due tomorrow, in 2 to 3 days, and in 4 to 7 days. This week dots mark days with a review answer in the log.
+
+`ReviewSessionView` runs full screen. `ReviewSessionModel` starts the session through `ReviewService` and records each answer. The deck advances only after the card has flown off. `ReviewDeck` rotates card types through the enabled types in `allCases` order. It repeats a forgotten kanji once at the end when the setting is on, which grows the counter total. Summary counts use each kanji's first answer. The engine's `ReviewSession` verdicts keep a repeat from moving the schedule.
+
+The speaker always speaks the reading. Autoplay on flip follows the audio setting. "Practice this kanji" opens the shared Practice sheet. A settings button in the session opens Review settings in a sheet; card types, example word, autoplay and repeats apply to cards not shown yet. Finishing, or closing after an answer, rebuilds reminders once.
+
+Flip, tilt, swipe, badges and answer buttons now live in a shared `SwipeFlashcard`, which the onboarding demo uses too. Its swipe rules are pure and tested.
+
+The "N DAY STREAK" subtitle waits for the stats service; a TODO in `ReviewView.swift` points at "Build the You tab". The design notes now list the session settings button.
+
+CI: pending; see Final Report.
 

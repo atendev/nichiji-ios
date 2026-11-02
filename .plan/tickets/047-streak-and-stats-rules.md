@@ -26,5 +26,7 @@ Decide:
 - CSV export columns, file name, and that it goes through the share sheet.
 - What the level-complete screen shows (the TODO in `LevelCompleteView`).
 
+From "Build the Review tab and session": the Review tab's This week dots mark days with a review answer (`gotItReview` or `forgotItReview`). Confirm or change that when the streak rules are set.
+
 ## Resolution
 
