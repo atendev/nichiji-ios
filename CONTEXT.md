@@ -31,8 +31,11 @@ The lightweight `kanji-index.json` of summary rows (`KanjiIndexEntry`) used for 
 _Avoid_: Manifest, catalog
 
 **Word index**:
-The app-only `words.json` of common JMdict forms that Dictionary search reads.
+The app-only `words.json` of common JMdict forms, each with a `rank`, that Dictionary search reads.
 _Avoid_: Word database
+
+**Search index**:
+The folded in-memory `DictionarySearchIndex`, built once from `kanji-search.json`, `words.json` and the kanji index when Dictionary first opens.
 
 **Jōyō kanji**:
 The 2,136 kanji with a KANJIDIC2 grade of 1 to 6 or 8. Grades 9 and 10 (jinmeiyō) are not Jōyō and have no `joyoGrade`.

@@ -116,6 +116,10 @@ def word_record(word: jmdict.Word) -> dict:
     }
 
 
+def search_word_record(word: jmdict.Word) -> dict:
+    return {**word_record(word), "rank": word.rank}
+
+
 def readings(kind: str, values: list[str]) -> list[dict]:
     return [{"kind": kind, "kana": value, "romaji": romaji.romanize(value)} for value in values]
 
@@ -154,6 +158,7 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
     order = list_order(literals, inputs.kanji)
     files: dict[str, str] = {}
     index = []
+    search_kanji = []
     for literal in literals:
         entry = inputs.kanji[literal]
         level, estimated = assign_level(literal, inputs)
@@ -177,6 +182,14 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
         record.update({k: v for k, v in optional.items() if v is not None})
         files[f"Shared/kanji/{kanjivg.hex_name(literal)}.json"] = dump(record)
         files[f"AppOnly/stroke-order/{kanjivg.hex_name(literal)}.svg"] = kanjivg.minify(inputs.svgs[literal])
+        search_kanji.append(
+            {
+                "id": literal,
+                "meanings": entry.meanings,
+                "onyomi": record["onyomi"],
+                "kunyomi": record["kunyomi"],
+            }
+        )
         first_reading = (entry.onyomi or entry.kunyomi or [""])[0]
         summary = {
             "id": literal,
@@ -190,7 +203,8 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
     index.sort(key=lambda item: item["listIndex"])
     files["Shared/kanji-index.json"] = dump({"formatVersion": 1, "entries": index})
     common = sorted({(w.sequence, w.headword): w for w in usable if w.is_common}.values(), key=lambda w: (w.sequence, w.headword))
-    files["AppOnly/words.json"] = dump([word_record(w) for w in common])
+    files["AppOnly/words.json"] = dump([search_word_record(w) for w in common])
+    files["AppOnly/kanji-search.json"] = dump(search_kanji)
     files["Shared/DATA-SOURCES.md"] = data_sources(lock, len(literals), len(common))
     return files
 

@@ -80,6 +80,12 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify `KanjiDetailContent.load` returns the entry, strokes and stage, tolerates missing strokes and progress, and throws for an unknown kanji.
    - Verify Forget it shows only past `new`, and `ServiceContainer.forgetIt` resets then rebuilds reminders, survives a reminder failure and skips the rebuild when the reset fails.
 
+12. **`DictionarySearchFoldingTests`** and **`DictionarySearchTests`**:
+   - Verify folding on both sides: `ō`/`ou`/`oo`, `ū`/`uu`, `shi`/`si`, `tsu`/`tu`, `chi`/`ti`, `mb`/`nb`, dropped markers, katakana to hiragana, English hyphens as spaces.
+   - Verify the query reader: script picks the mode, Latin letters drop from kana queries, one kana or kanji searches, one Latin letter does not.
+   - Verify ranking: tier, then field, then frequency with unranked last, then list order; words by tier, `rank`, shorter kana. English matches word starts only, per gloss. Caps are 20 kanji and 50 words. Word taps open detail, the sheet or nothing.
+   - **`DictionarySearchDatasetTests`** decodes `kanji-search.json` and `words.json` (2,383 and 18,195 records, `rank` 1 to 53), checks obvious hits on the bundled data, and bounds ten keystroke scans at five seconds.
+
 ## Onboarding Flow (Slice 9)
 
 `OnboardingFlow` (`Nichiji/Views/Onboarding/OnboardingFlow.swift`) is a `@MainActor @Observable` model that owns the onboarding logic. The step views only read it and call its methods.

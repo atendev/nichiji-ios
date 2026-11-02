@@ -6,8 +6,10 @@ Builds the committed `Dataset/` bundle from KANJIDIC2, JMdict, KanjiVG and the p
 - `make dataset` runs offline from `.cache/` and is deterministic. It fails if a cached file does not match `sources.lock.json`, a KanjiVG stroke count differs from KANJIDIC2 outside `strokecount-allowlist.json`, or the output passes 3 MB (Shared) or 8 MB (Shared plus AppOnly).
 - `make dataset-test` runs the unit tests on small inline fixtures.
 
-Output: `Dataset/Shared/` (`kanji-index.json`, `kanji/<hex>.json`, `DATA-SOURCES.md`) goes to both targets, `Dataset/AppOnly/` (`stroke-order/<hex>.svg`, `words.json`) to the app only. SVGs keep only the ordered stroke paths; the licence and attribution live in `DATA-SOURCES.md`.
+Output: `Dataset/Shared/` (`kanji-index.json`, `kanji/<hex>.json`, `DATA-SOURCES.md`) goes to both targets, `Dataset/AppOnly/` (`stroke-order/<hex>.svg`, `words.json`, `kanji-search.json`) to the app only. SVGs keep only the ordered stroke paths; the licence and attribution live in `DATA-SOURCES.md`.
 
 Refresh for every App Store release: run `make dataset-fetch`, `make dataset`, review the diff, and commit. Ship a data-only patch if the EDRDG snapshot is older than 6 months.
 
 Selection rules: the 2,136 Joyo kanji plus Waller's 247 non-Joyo kanji (all N1). Up to 3 JMdict examples per kanji, ranked by priority tier, then same-or-easier Waller vocabulary level, then `nf` band, then sequence number. Headwords with digits, Latin letters or `sK/iK/oK/rK` forms are dropped, and every kanji in a word must be in the bundle. `words.json` holds the same words restricted to the common tier (`news1`, `ichi1`, `spec1`, `gai1`).
+
+Search files: each `words.json` record carries `rank`, lower is more common: the lowest JMdict `nf` band (1 to 48), else 50 plus the number of the four common tags the word lacks. `kanji-search.json` lists every kanji's full meanings and onyomi and kunyomi (kana and romaji, markers kept) for the in-app search index. With both, the app set is about 8.14 MB of its 8 MiB budget.

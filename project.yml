@@ -24,6 +24,8 @@ targets:
         buildPhase: resources
       - path: Dataset/AppOnly/words.json
         buildPhase: resources
+      - path: Dataset/AppOnly/kanji-search.json
+        buildPhase: resources
       - path: Dataset/AppOnly/stroke-order
         type: folder
         buildPhase: resources

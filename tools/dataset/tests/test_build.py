@@ -101,6 +101,7 @@ class GenerateTests(unittest.TestCase):
         self.assertIn("Shared/kanji/065e5.json", self.files)
         self.assertIn("AppOnly/stroke-order/065e5.svg", self.files)
         self.assertIn("AppOnly/words.json", self.files)
+        self.assertIn("AppOnly/kanji-search.json", self.files)
 
     def test_record_keys_match_swift_names(self):
         record = json.loads(self.files["Shared/kanji/065e5.json"])
@@ -129,6 +130,21 @@ class GenerateTests(unittest.TestCase):
     def test_words_json_has_common_words_only(self):
         words = json.loads(self.files["AppOnly/words.json"])
         self.assertEqual(sorted(w["word"] for w in words), ["月日"])
+
+    def test_words_json_carries_rank(self):
+        words = json.loads(self.files["AppOnly/words.json"])
+        self.assertEqual(set(words[0]), {"id", "word", "kana", "romaji", "meaning", "rank"})
+        self.assertEqual(words[0]["rank"], 53)
+
+    def test_kanji_search_has_full_readings_and_meanings_in_code_point_order(self):
+        search = json.loads(self.files["AppOnly/kanji-search.json"])
+        self.assertEqual([e["id"] for e in search], ["学", "日", "月", "鬱"])
+        search = sorted(search, key=lambda e: e["id"] != "日")
+        self.assertEqual(set(search[0]), {"id", "meanings", "onyomi", "kunyomi"})
+        self.assertEqual(search[0]["meanings"], ["meaning of 日"])
+        self.assertEqual(search[0]["onyomi"], [{"kind": "onyomi", "kana": "オン", "romaji": "on"}])
+        self.assertEqual(search[0]["kunyomi"][0]["kana"], "く.る")
+        self.assertEqual(search[0]["kunyomi"][0]["romaji"], "ku.ru")
 
     def test_generation_is_deterministic(self):
         again = build.generate(make_inputs(), set(), LOCK)
