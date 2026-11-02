@@ -50,6 +50,7 @@ public struct TodayView: View {
     @State private var isLoading = false
     @State private var reloadID = UUID()
     @State private var wasBackgrounded = false
+    @State private var practiceTarget: PracticeTarget?
 
     private var poolPreferenceSignature: String {
         "\(levelSystemRaw)-\(selectedJLPTLevelRaw)-\(selectedJoyoGradeRaw)-\(dailyOrderRaw)-\(isCustomPoolActive)-\(customSelections.count)"
@@ -90,6 +91,7 @@ public struct TodayView: View {
             }
         }
         .background(Color.nichijiSurface.ignoresSafeArea())
+        .practiceSheet(target: $practiceTarget)
         .task(id: reloadID) {
             await loadToday()
         }
@@ -154,7 +156,8 @@ public struct TodayView: View {
 
                 StrokeOrderCardView(
                     strokeCount: kanji.strokeCount,
-                    strokePaths: strokePaths
+                    strokePaths: strokePaths,
+                    onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: strokePaths) }
                 )
             }
             .padding(.bottom, LayoutTokens.space32)

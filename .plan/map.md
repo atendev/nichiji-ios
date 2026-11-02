@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the Practice sheet](closed/042-practice-sheet.md): Today's "Practice this kanji" opens `PracticeSheet` through the shared `practiceSheet(target:)` presenter; a `Canvas` recorder (not PencilKit) over a `PracticePad` value type gives one stroke per drag, Undo, Clear and the counter, with a Guide toggle and the stroke order grid at the large detent.
 - [Load the generated dataset in the app and widget](closed/038-load-the-generated-bundle.md): The store reads the index once, decodes records on demand and reads SVGs lazily in the app, throwing `contentMissing` for any missing file; models drop `strokePaths` and the `max*` fields, counts come from a new `count(for:)`, the seed moved to tests, and the Level footer and "(est.)" label are in.
 - [Build the dataset generator and pin its first output](closed/037-build-the-dataset-generator.md): `tools/dataset/` (stdlib Python, `make dataset-fetch` / `dataset` / `dataset-test`) builds the committed `Dataset/` offline and deterministically: 2,383 kanji matching every pinned grade and N-level count, stroke-path-only SVGs, 2.2 MB shared and 7.0 MB app; 18,195 common words and 11 kanji with no example differ from the dataset ticket's figures.
 - [Settle the bundled dataset scope and schema](closed/036-bundled-dataset-scope-and-schema.md): Ship 2,383 kanji (2,136 Jōyō plus 247 Waller N1 jinmeiyō; 172 estimated levels flagged); `KanjiEntry` drops `strokePaths` and gains `isJLPTLevelEstimated`; up to 3 JMdict examples each plus an app-only 17.7k-word index; stdlib-Python generator in `tools/dataset/` with output committed to `Dataset/`; budgets 3 MB widget and 8 MB app; refresh every release; Jōyō counts verified.
@@ -51,8 +52,9 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build the Practice sheet](tickets/042-practice-sheet.md) (task, AFK)
+- [Build the Review tab and session](tickets/043-review-tab-and-session.md) (task, AFK)
 - [Decide how Dictionary search matches and ranks](tickets/044-dictionary-search-rules.md) (grilling)
+- [Build kanji detail and the Dictionary browse grid](tickets/045-kanji-detail-and-dictionary-browse.md) (task, AFK)
 - [Decide the streak and stats rules](tickets/047-streak-and-stats-rules.md) (grilling)
 - [Build the lock-screen widgets](tickets/051-lock-screen-widgets.md) (task, AFK)
 - [Build the Sources screen](tickets/052-sources-screen.md) (task, AFK)

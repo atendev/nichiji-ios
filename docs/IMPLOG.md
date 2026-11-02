@@ -522,3 +522,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Added `count(for:)` to the store protocol so onboarding and the Level screen do not decode thousands of records to count them. Today now treats a missing SVG as an empty stroke card instead of failing the whole screen.
 - **Unanticipated TODOs**: None.
 - **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate. The requirements and implementation reports were written inline rather than by subagents.
+
+### Build the Practice sheet (v0.12.0)
+
+#### Requirements Report
+
+- **Success Criteria**: "Practice this kanji" on Today opens a sheet for today's kanji (header "Practice", kanji, meaning, Done) at `.fraction(0.7)` and `.large` detents, dismissed by drag, a tap on the dim or Done. A square `Canvas` pad with a dashed crosshair and a fixed-size guide kanji behind a Guide toggle records one stroke per drag (a tap counts). The counter reads "N strokes drawn · M in the kanji" with M from `KanjiEntry.strokeCount`; Undo needs a finished stroke and Clear a non-empty pad. The stroke order grid sits below. `practiceSheet(target:)` is the shared presenter.
+- **Scope Boundary**: `PracticePad`, `PracticeTarget`, `PracticeSheet`, the presenter, optional `onPractice` on `StrokeOrderCardView`, the Today wiring and `PracticeSheetTests`. The review answer side, kanji detail, stroke checking, stroke persistence and PencilKit stay out.
+- **Anticipated TODOs**: Stroke checking stays out of v1.0; the review session and kanji detail tickets build their own `PracticeTarget` and call the presenter.
+- **Planned Tests**: `PracticePad` begin/extend/end, taps, undo, clear, clamping, `canUndo`/`isEmpty`, the counter label, and `PracticeTarget` mapping including missing stroke data.
+
+#### Deviation Report
+
+- **Success Criteria**: Met on reading of the diff; unverified by a build.
+- **Scope Boundary**: Kept. One addition: `Font.kanjiGuide(size:)`, a fixed-size Shippori Mincho token so the guide fits the pad at any Dynamic Type size. The `DESIGN.md` Today paragraph that said Practice was not built now describes the sheet.
+- **Unanticipated TODOs**: None.
+- **Test Results**: `PracticeSheetTests` adds 13 tests. Nothing ran locally because the host is Linux with no Swift toolchain, so CI is the gate. The Requirements Report took two audit rounds without `APPROVE` (stroke data source, then a disabled-state test); the user chose to continue with both fixes applied. The implementation audit (haiku) returned `APPROVE` in round one.
