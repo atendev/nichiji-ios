@@ -26,5 +26,7 @@ No UI in this ticket.
 
 Minor bump.
 
+From [Decide the streak and stats rules](../closed/047-streak-and-stats-rules.md): compute every number its Resolution lists. Days studied replaces time studying, so no timing is logged. Expose one study-day function and switch the Review tab's This week dots (`ReviewHomeSummary`) to it.
+
 ## Resolution
 
