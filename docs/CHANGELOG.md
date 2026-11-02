@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.12.1
+
+- Remove the live `AVSpeechPronunciationService` unit test: CI's simulator has a broken voice database, so the voice lookup stalled for 94 to 257 seconds before passing. The mocked pronunciation tests still cover the service contract
+
 ## v0.12.0
 
 - Add the Practice sheet: "Practice this kanji" on Today opens a bottom sheet (70% and large detents) with a tracing pad, a faint guide kanji behind a Guide toggle, Undo, Clear, a "N strokes drawn · M in the kanji" counter and the stroke order grid; dismiss by drag, tapping outside or Done
