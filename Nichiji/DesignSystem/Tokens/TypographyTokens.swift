@@ -28,6 +28,11 @@ public extension Font {
         .custom("ShipporiMincho-Regular", size: size, relativeTo: .title)
     }
 
+    // Fixed size so the practice guide always fits its pad, whatever the Dynamic Type setting.
+    static func kanjiGuide(size: CGFloat) -> Font {
+        .custom("ShipporiMincho-Regular", fixedSize: size)
+    }
+
     // Interface typography using Zen Kaku Gothic New with weights strictly <= 500.
     static var nichijiTitle: Font {
         .custom("ZenKakuGothicNew-Medium", size: 28, relativeTo: .title)

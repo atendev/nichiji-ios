@@ -5,12 +5,13 @@ import SwiftUI
 public struct StrokeOrderCardView: View {
     public let strokeCount: Int
     public let strokePaths: [String]
-    public let onPractice: () -> Void
+    public let onPractice: (() -> Void)?
 
+    // Without `onPractice` the card hides its practice button, as it does inside the Practice sheet.
     public init(
         strokeCount: Int = 0,
         strokePaths: [String] = [],
-        onPractice: @escaping () -> Void = {}
+        onPractice: (() -> Void)? = nil
     ) {
         self.strokeCount = strokeCount
         self.strokePaths = strokePaths
@@ -50,24 +51,25 @@ public struct StrokeOrderCardView: View {
                     }
                 }
 
-                Button(action: onPractice) {
-                    HStack(spacing: LayoutTokens.space8) {
-                        Image(systemName: "pencil")
-                        Text("Practice this kanji")
+                if let onPractice {
+                    Button(action: onPractice) {
+                        HStack(spacing: LayoutTokens.space8) {
+                            Image(systemName: "pencil")
+                            Text("Practice this kanji")
+                        }
+                        .font(.nichijiBody)
+                        .foregroundColor(.nichijiInk)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: LayoutTokens.minHitTarget)
+                        .contentShape(Rectangle())
+                        .overlay(
+                            RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
+                                .stroke(Color.nichijiBorderControl, style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                        )
                     }
-                    .font(.nichijiBody)
-                    .foregroundColor(.nichijiInk)
-                    .opacity(0.6)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: LayoutTokens.minHitTarget)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                            .stroke(Color.nichijiBorderControl, style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                    )
+                    .accessibilityLabel("Practice this kanji")
+                    .accessibilityHint("Opens a pad to trace the kanji")
                 }
-                .disabled(true)
-                .accessibilityLabel("Practice this kanji")
-                .accessibilityHint("Handwriting practice is not available yet")
             }
         }
         .padding(.horizontal, LayoutTokens.space16)

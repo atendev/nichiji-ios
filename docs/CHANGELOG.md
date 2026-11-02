@@ -4,6 +4,13 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.12.0
+
+- Add the Practice sheet: "Practice this kanji" on Today opens a bottom sheet (70% and large detents) with a tracing pad, a faint guide kanji behind a Guide toggle, Undo, Clear, a "N strokes drawn · M in the kanji" counter and the stroke order grid; dismiss by drag, tapping outside or Done
+- Add `PracticePad` (unit-coordinate stroke recorder) and `PracticeTarget`, plus the shared `practiceSheet(target:)` presenter that the review session and kanji detail will reuse
+- Make `StrokeOrderCardView.onPractice` optional: nil hides the button, and the button is now enabled when set
+- Add `Font.kanjiGuide(size:)` and `PracticeSheetTests`; close ticket 042
+
 ## v0.11.0
 
 - Load the generated dataset: `BundledKanjiContentStore` reads `kanji-index.json` once, decodes `kanji/<hex>.json` on demand with caching and reads `stroke-order/<hex>.svg` lazily in the app; a missing record or SVG throws `contentMissing`, and Today shows a "stroke diagram is unavailable" line instead of failing

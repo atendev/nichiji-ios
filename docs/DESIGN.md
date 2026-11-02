@@ -144,8 +144,10 @@ provide navigation and action icons.
 
 Onboarding leads into Today. Today places the daily kanji first, followed by
 readings, the details card, example words and stroke order. The primary action
-marks the kanji as learned. Practice and handwriting feedback are not part of
-the first implementation.
+marks the kanji as learned. "Practice this kanji" at the bottom of the stroke
+card opens the Practice sheet: a tracing pad over a faint guide kanji, with
+Undo, Clear and a stroke counter, and the stroke order grid at the full
+detent. The pad records strokes and gives no handwriting feedback.
 
 The settings sheet is shared across tabs in the planned navigation. Its
 appearance control is functional from the first implementation. Reminder
