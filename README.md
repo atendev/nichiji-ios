@@ -16,7 +16,7 @@ make ipa        # unsigned Nichiji.ipa for device builds
 
 ## Testing on a device
 
-Every push to `main` that passes CI uploads an unsigned `Nichiji.ipa` as the `Nichiji-unsigned-ipa` artifact. Download it, then sign and install it with a free Apple ID using a sideloading tool. Free-account installs expire after 7 days.
+Every passing CI run, started manually from the Actions tab or with `gh workflow run ci.yml --ref <branch>`, uploads an unsigned `Nichiji.ipa` as the `Nichiji-unsigned-ipa` artifact. Download it, then sign and install it with a free Apple ID using a sideloading tool. Free-account installs expire after 7 days.
 
 ## Not set up yet
 
