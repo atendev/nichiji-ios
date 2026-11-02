@@ -35,19 +35,12 @@ public struct StrokeOrderCardView: View {
                         .foregroundColor(.nichijiInkMuted)
                 }
 
+                let paths = strokePaths.map(StrokePathParser.path(from:))
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: LayoutTokens.space8) {
-                    ForEach(Array(strokePaths.enumerated()), id: \.offset) { index, path in
-                        VStack(spacing: LayoutTokens.space4) {
-                            StrokePathShape(pathData: path)
-                                .stroke(Color.nichijiInk, lineWidth: 2)
-                                .aspectRatio(1, contentMode: .fit)
-                                .padding(LayoutTokens.space8)
-                                .background(Color.nichijiSurface)
-                                .continuousCornerRadius(LayoutTokens.cornerRadiusSmall)
-                            Text("\(index + 1)")
-                                .font(.nichijiCaption)
-                                .foregroundColor(.nichijiInkMuted)
-                        }
+                    ForEach(paths.indices, id: \.self) { index in
+                        StrokeStepView(paths: paths, step: index)
+                            .accessibilityElement()
+                            .accessibilityLabel("Stroke \(index + 1) of \(paths.count)")
                     }
                 }
 
@@ -76,63 +69,184 @@ public struct StrokeOrderCardView: View {
     }
 }
 
-private struct StrokePathShape: Shape {
-    let pathData: String
+private struct StrokeStepView: View {
+    let paths: [Path]
+    let step: Int
 
-    private func resolve(_ x: CGFloat, _ y: CGFloat, from current: CGPoint, relative: Bool) -> CGPoint {
-        relative ? CGPoint(x: current.x + x, y: current.y + y) : CGPoint(x: x, y: y)
+    var body: some View {
+        Canvas { context, size in
+            let side = min(size.width, size.height)
+            let scale = side / StrokePathParser.viewBoxSize
+            context.translateBy(x: (size.width - side) / 2, y: (size.height - side) / 2)
+            context.scaleBy(x: scale, y: scale)
+            let style = StrokeStyle(lineWidth: StrokePathParser.strokeWidth, lineCap: .round, lineJoin: .round)
+            for (index, path) in paths.enumerated() {
+                let color: Color = index == step ? .nichijiInk : index < step ? .nichijiInkMuted : .nichijiHairline
+                context.stroke(path, with: .color(color), style: style)
+            }
+        }
+        .aspectRatio(1, contentMode: .fit)
+        .padding(LayoutTokens.space12)
+        .background(Color.nichijiSurfaceSunken)
+        .overlay(alignment: .topLeading) {
+            Text("\(step + 1)")
+                .font(.nichijiCaption)
+                .foregroundColor(.nichijiInkMuted)
+                .padding(LayoutTokens.space8)
+        }
+        .continuousCornerRadius(LayoutTokens.cornerRadiusSmall)
+    }
+}
+
+/// Builds a `Path` in KanjiVG's 109-unit viewBox from one SVG path `d` attribute.
+struct StrokePathParser {
+    static let viewBoxSize: CGFloat = 109
+    static let strokeWidth: CGFloat = 4
+
+    static func path(from data: String) -> Path {
+        var parser = StrokePathParser(tokens: tokenize(data))
+        parser.run()
+        return parser.path
     }
 
-    func path(in rect: CGRect) -> Path {
-        let values = pathData
-            .replacingOccurrences(of: ",", with: " ")
-            .split(whereSeparator: { $0 == " " || $0 == "\n" })
-        var index = 0
-        var command = ""
-        var current = CGPoint.zero
-        var path = Path()
+    private enum Token {
+        case command(Character)
+        case number(CGFloat)
+    }
 
-        func number() -> CGFloat? {
-            guard index < values.count, let value = Double(values[index]) else { return nil }
-            index += 1
-            return CGFloat(value)
-        }
+    private let tokens: [Token]
+    private var index = 0
+    private var path = Path()
+    private var current = CGPoint.zero
+    private var subpathStart = CGPoint.zero
+    private var lastControl: CGPoint?
 
-        while index < values.count {
-            let token = String(values[index])
-            if token.count == 1, token.first?.isLetter == true {
-                command = token
+    private init(tokens: [Token]) {
+        self.tokens = tokens
+    }
+
+    private mutating func run() {
+        var command: Character = " "
+        while index < tokens.count {
+            let start = index
+            if case let .command(letter) = tokens[index] {
+                command = letter
                 index += 1
             }
-
-            switch command {
-            case "M", "m":
-                guard let x = number(), let y = number() else { break }
-                let point = resolve(x, y, from: current, relative: command == "m")
-                path.move(to: point)
-                current = point
-                command = command == "m" ? "l" : "L"
-            case "L", "l":
-                guard let x = number(), let y = number() else { break }
-                let point = resolve(x, y, from: current, relative: command == "l")
-                path.addLine(to: point)
-                current = point
-            case "C", "c":
-                guard let x1 = number(), let y1 = number(),
-                      let x2 = number(), let y2 = number(),
-                      let x = number(), let y = number() else { break }
-                let isRelative = command == "c"
-                let control1 = resolve(x1, y1, from: current, relative: isRelative)
-                let control2 = resolve(x2, y2, from: current, relative: isRelative)
-                let point = resolve(x, y, from: current, relative: isRelative)
-                path.addCurve(to: point, control1: control1, control2: control2)
-                current = point
-            default:
-                index += 1
+            guard apply(command), index > start else { return }
+            if command == "M" {
+                command = "L"
+            } else if command == "m" {
+                command = "l"
             }
         }
+    }
 
-        let scale = min(rect.width, rect.height) / 109
-        return path.applying(CGAffineTransform(scaleX: scale, y: scale))
+    private mutating func apply(_ command: Character) -> Bool {
+        let relative = command.isLowercase
+        let previousControl = lastControl
+        lastControl = nil
+
+        switch command.uppercased() {
+        case "M":
+            return moveTo(relative: relative)
+        case "L", "H", "V":
+            return lineTo(command.uppercased(), relative: relative)
+        case "C":
+            let control1 = point(relative: relative)
+            return curve(control1: control1, relative: relative)
+        case "S":
+            let control1 = previousControl.map { CGPoint(x: 2 * current.x - $0.x, y: 2 * current.y - $0.y) } ?? current
+            return curve(control1: control1, relative: relative)
+        case "Z":
+            path.closeSubpath()
+            current = subpathStart
+            return true
+        default:
+            return false
+        }
+    }
+
+    private mutating func moveTo(relative: Bool) -> Bool {
+        guard let end = point(relative: relative) else { return false }
+        path.move(to: end)
+        current = end
+        subpathStart = end
+        return true
+    }
+
+    private mutating func lineTo(_ kind: String, relative: Bool) -> Bool {
+        let end: CGPoint?
+        switch kind {
+        case "H":
+            end = number().map { CGPoint(x: relative ? current.x + $0 : $0, y: current.y) }
+        case "V":
+            end = number().map { CGPoint(x: current.x, y: relative ? current.y + $0 : $0) }
+        default:
+            end = point(relative: relative)
+        }
+        guard let end else { return false }
+        path.addLine(to: end)
+        current = end
+        return true
+    }
+
+    private mutating func curve(control1: CGPoint?, relative: Bool) -> Bool {
+        guard let control1, let control2 = point(relative: relative), let end = point(relative: relative) else { return false }
+        path.addCurve(to: end, control1: control1, control2: control2)
+        current = end
+        lastControl = control2
+        return true
+    }
+
+    private mutating func number() -> CGFloat? {
+        guard index < tokens.count, case let .number(value) = tokens[index] else { return nil }
+        index += 1
+        return value
+    }
+
+    private mutating func point(relative: Bool) -> CGPoint? {
+        guard let x = number(), let y = number() else { return nil }
+        return relative ? CGPoint(x: current.x + x, y: current.y + y) : CGPoint(x: x, y: y)
+    }
+
+    private static func tokenize(_ data: String) -> [Token] {
+        var tokens: [Token] = []
+        var buffer = ""
+
+        func flush() {
+            if let value = Double(buffer) {
+                tokens.append(.number(CGFloat(value)))
+            }
+            buffer = ""
+        }
+
+        for character in data {
+            if character == "," || character.isWhitespace {
+                flush()
+            } else if character.isLetter, character != "e", character != "E" {
+                flush()
+                tokens.append(.command(character))
+            } else {
+                if startsNumber(character, after: buffer) {
+                    flush()
+                }
+                buffer.append(character)
+            }
+        }
+        flush()
+        return tokens
+    }
+
+    private static func startsNumber(_ character: Character, after buffer: String) -> Bool {
+        let hasExponent = buffer.contains { $0 == "e" || $0 == "E" }
+        switch character {
+        case "-", "+":
+            return buffer.last != "e" && buffer.last != "E"
+        case ".":
+            return buffer.contains(".") && !hasExponent
+        default:
+            return false
+        }
     }
 }

@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.13.3
+
+- Fix the empty stroke order grid: a new `StrokePathParser` reads compact KanjiVG path data (packed commands and minus signs, `S`/`s` smooth curves), and each cell draws the whole kanji faintly, earlier strokes muted and the current stroke in ink, with the number inside the cell as in the mockup
+
 ## v0.13.2
 
 - Make CI manual only: drop the push-to-`main` and version-tag triggers, keeping `workflow_dispatch`, and update `docs/workflow.md` and the README IPA note
