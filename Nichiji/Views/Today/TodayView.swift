@@ -139,6 +139,7 @@ public struct TodayView: View {
                     radical: kanji.radical.character,
                     strokeCount: kanji.strokeCount,
                     jlptLevel: kanji.jlptLevel.map { $0.rawValue },
+                    isJLPTLevelEstimated: kanji.isJLPTLevelEstimated,
                     joyoGrade: kanji.joyoGrade.map(gradeLabel),
                     showsRomaji: showsRomaji
                 )
@@ -203,7 +204,7 @@ public struct TodayView: View {
 
             let loadedKanji = try services.contentStore.entry(for: loadedAssignment.kanjiID)
             kanji = loadedKanji
-            strokePaths = try services.contentStore.strokePaths(for: loadedKanji.id)
+            strokePaths = (try? services.contentStore.strokePaths(for: loadedKanji.id)) ?? []
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription

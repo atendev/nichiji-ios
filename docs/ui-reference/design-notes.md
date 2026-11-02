@@ -59,7 +59,7 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
 
 - The Level screen starts with a **JLPT / Jōyō grade** switch ("Levels based on"). Switching picks the first level of the new system (N5 or 1st grade).
   - JLPT rows: N5 to N1.
-  - Jōyō rows: 1st to 6th grade and Secondary school, with sample counts of 80, 160, 200, 202, 193, 191 and 1,110 kanji. The counts need verifying.
+  - Jōyō rows: 1st to 6th grade and Secondary school, with 80, 160, 200, 202, 193, 191 and 1,110 kanji.
 - **Daily order** (three radio rows): **Most common** (default), **List order**, **Random**.
 - Below that is a **CUSTOM** row, "Customize your kanji".
 - The settings sheet and Today's header follow the system: "3rd grade · Jōyō" and "GRADE 3" for Jōyō, "N5" for JLPT, "CUSTOM" when custom is active.
@@ -67,7 +67,6 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
   - Sticky header per group (name, "N kanji · M on"), a small right-aligned Select all / Clear all button, and a 5-column grid of kanji toggles (on = vermilion wash and border with a tiny check). The bottom bar shows "N on of M kanji" and a Done button.
   - When Custom is active it is highlighted and the levels are not.
 - Open question: add "Customize your kanji" to the onboarding Level screen too. Not built.
-- The kanji lists in the picker are samples, not verified. The Jōyō grade placement was done from memory.
 
 ## Dictionary
 
@@ -123,5 +122,4 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
 - Theme switching is a preview only (choosing Dark doesn't re-theme the app).
 - A You-page layout pass, a review-session settings button, and a formal home for the mustard yellow.
 - The onboarding Level screen's custom option (see above).
-- Kanji lists, Jōyō grade placement, grade counts and example words are from memory and need verification.
 - The Dictionary browse grid and You "By level" bars still group by JLPT only.

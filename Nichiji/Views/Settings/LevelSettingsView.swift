@@ -73,6 +73,13 @@ public struct LevelSettingsView: View {
                     .font(.nichijiCaption)
                     .foregroundColor(.nichijiInkSubtle)
                     .padding(.horizontal, LayoutTokens.space8)
+
+                if activeLevelSystem == .jlpt {
+                    Text("JLPT levels are unofficial community lists.")
+                        .font(.nichijiCaption)
+                        .foregroundColor(.nichijiInkSubtle)
+                        .padding(.horizontal, LayoutTokens.space8)
+                }
             }
             .padding(.horizontal, LayoutTokens.screenMarginRegular)
             .padding(.bottom, LayoutTokens.space48)
@@ -123,25 +130,14 @@ public struct LevelSettingsView: View {
 
     private func countLabel(for jlptLevel: JLPTLevel) -> String? {
         let store = services?.contentStore ?? BundledKanjiContentStore()
-        let count = (try? store.entries(for: jlptLevel).count) ?? 0
+        let count = (try? store.count(for: jlptLevel)) ?? 0
         return count > 0 ? "\(count) kanji" : nil
     }
 
     private func countLabel(for joyoGrade: JoyoGrade) -> String? {
         let store = services?.contentStore ?? BundledKanjiContentStore()
-        let count = (try? store.entries(for: joyoGrade).count) ?? 0
-        if count > 0 {
-            return "\(count) kanji"
-        }
-        switch joyoGrade {
-        case .grade1: return "80 kanji"
-        case .grade2: return "160 kanji"
-        case .grade3: return "200 kanji"
-        case .grade4: return "202 kanji"
-        case .grade5: return "193 kanji"
-        case .grade6: return "191 kanji"
-        case .secondary: return "1,110 kanji"
-        }
+        let count = (try? store.count(for: joyoGrade)) ?? 0
+        return count > 0 ? "\(count) kanji" : nil
     }
 
     private func switchLevelSystem(to system: LevelSystem) {

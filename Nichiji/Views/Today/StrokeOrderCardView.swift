@@ -28,6 +28,12 @@ public struct StrokeOrderCardView: View {
                     .font(.nichijiCallout)
                     .foregroundColor(.nichijiInkMuted)
 
+                if strokePaths.isEmpty {
+                    Text("The stroke diagram is unavailable for this kanji.")
+                        .font(.nichijiCallout)
+                        .foregroundColor(.nichijiInkMuted)
+                }
+
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: LayoutTokens.space8) {
                     ForEach(Array(strokePaths.enumerated()), id: \.offset) { index, path in
                         VStack(spacing: LayoutTokens.space4) {

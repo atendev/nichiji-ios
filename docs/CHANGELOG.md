@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.11.0
+
+- Load the generated dataset: `BundledKanjiContentStore` reads `kanji-index.json` once, decodes `kanji/<hex>.json` on demand with caching and reads `stroke-order/<hex>.svg` lazily in the app; a missing record or SVG throws `contentMissing`, and Today shows a "stroke diagram is unavailable" line instead of failing
+- Add `count(for:)` to `KanjiContentStore` so onboarding and the Level screen count from the index; drop the hardcoded grade-count fallback
+- Drop `KanjiEntry.strokePaths` and the `ExampleWord` `max*` fields; move `SeedKanjiDataset` into `NichijiTests`
+- Show "N1 (est.)" in the Details row for estimated levels and add the Level footer "JLPT levels are unofficial community lists."
+- Wire `Dataset/` into `project.yml` (index and records in the app and widget, SVGs and `words.json` in the app only) and remove the three "from memory" caveats from `design-notes.md`; close ticket 038
+
 ## v0.10.0
 
 - Add the dataset generator in `tools/dataset/`: `make dataset-fetch` downloads pinned KANJIDIC2, JMdict, KanjiVG and N-level inputs into untracked `.cache/` and writes `sources.lock.json`; `make dataset` builds the committed `Dataset/` bundle offline and deterministically

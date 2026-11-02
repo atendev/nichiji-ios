@@ -56,7 +56,6 @@ struct OnboardingFlowTests {
         kunyomi: [],
         radical: KanjiRadical(character: "人", meaning: "person"),
         strokeCount: 6,
-        strokePaths: ["M50,15 L20,50"],
         jlptLevel: .n4,
         joyoGrade: .grade2,
         frequencyRank: 4,

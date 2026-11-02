@@ -14,7 +14,19 @@ targets:
   Nichiji:
     type: application
     platform: iOS
-    sources: [Nichiji]
+    # Folder references keep the generator's `kanji/` and `stroke-order/` layout in the bundle.
+    sources:
+      - Nichiji
+      - path: Dataset/Shared/kanji-index.json
+        buildPhase: resources
+      - path: Dataset/Shared/kanji
+        type: folder
+        buildPhase: resources
+      - path: Dataset/AppOnly/words.json
+        buildPhase: resources
+      - path: Dataset/AppOnly/stroke-order
+        type: folder
+        buildPhase: resources
     dependencies:
       - target: NichijiWidget
     entitlements:
@@ -46,6 +58,11 @@ targets:
       - Nichiji/Services
       - Nichiji/Widget
       - Nichiji/DesignSystem/Tokens
+      - path: Dataset/Shared/kanji-index.json
+        buildPhase: resources
+      - path: Dataset/Shared/kanji
+        type: folder
+        buildPhase: resources
     entitlements:
       path: Config/NichijiWidget.entitlements
       properties:

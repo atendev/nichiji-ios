@@ -218,11 +218,14 @@ public struct CustomKanjiPickerView: View {
 
     // MARK: - Actions
 
-    private func loadSectionsAndSelections() async {
-        let contentStore = services?.contentStore ?? BundledKanjiContentStore()
+    /// Decoding every record behind a level is heavy, so it runs off the main actor.
+    nonisolated private static func buildSections(
+        for system: LevelSystem,
+        contentStore: KanjiContentStore
+    ) -> [KanjiGroupSection] {
         var loadedSections: [KanjiGroupSection] = []
 
-        switch activeLevelSystem {
+        switch system {
         case .jlpt:
             for level in JLPTLevel.allCases {
                 let entries = (try? contentStore.entries(for: level)) ?? []
@@ -250,6 +253,16 @@ public struct CustomKanjiPickerView: View {
                 }
             }
         }
+        return loadedSections
+    }
+
+    private func loadSectionsAndSelections() async {
+        let contentStore = services?.contentStore ?? BundledKanjiContentStore()
+        let system = activeLevelSystem
+        let loadedSections = await Task.detached {
+            Self.buildSections(for: system, contentStore: contentStore)
+        }.value
+        guard !Task.isCancelled else { return }
 
         sections = loadedSections
 

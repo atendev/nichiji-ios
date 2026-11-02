@@ -92,10 +92,10 @@ final class OnboardingFlow {
         self.reminderHour = preferences.reminderHour
         self.reminderMinute = preferences.reminderMinute
         self.jlptCounts = Dictionary(uniqueKeysWithValues: JLPTLevel.allCases.map { level in
-            (level, (try? contentStore.entries(for: level).count) ?? 0)
+            (level, (try? contentStore.count(for: level)) ?? 0)
         })
         self.joyoCounts = Dictionary(uniqueKeysWithValues: JoyoGrade.allCases.map { grade in
-            (grade, (try? contentStore.entries(for: grade).count) ?? 0)
+            (grade, (try? contentStore.count(for: grade)) ?? 0)
         })
     }
 

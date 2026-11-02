@@ -53,6 +53,51 @@ struct KanjiContentStoreTests {
         #expect(paths.allSatisfy { $0.starts(with: "M") })
     }
 
+    @Test("Level and grade counts come from the index and match the pinned lists")
+    func countsMatchIndex() throws {
+        let store = BundledKanjiContentStore()
+
+        #expect(try store.count(for: .n5) == 84)
+        #expect(try store.count(for: .n1) == 1_345)
+        #expect(try store.count(for: .grade1) == 80)
+        #expect(try store.count(for: .secondary) == 1_110)
+        #expect(try store.entries(for: .n5).count == 84)
+    }
+
+    @Test("Estimated levels are flagged on the record")
+    func estimatedLevelFlag() throws {
+        let store = BundledKanjiContentStore()
+
+        #expect(try store.entry(for: "日").isJLPTLevelEstimated == false)
+        let estimated = try store.entries(for: .n1).filter(\.isJLPTLevelEstimated)
+        #expect(!estimated.isEmpty)
+    }
+
+    @Test("A kanji with no example words decodes with an empty list")
+    func emptyExampleWords() throws {
+        let store = BundledKanjiContentStore()
+        let all = try JLPTLevel.allCases.flatMap { try store.entries(for: $0) }
+
+        #expect(all.contains { $0.exampleWords.isEmpty })
+    }
+
+    @Test("Stroke path extraction keeps document order")
+    func pathDataOrder() {
+        let svg = #"<svg><g><path d="M1,1c2,2"/><path d="M3,3l4,4"/></g></svg>"#
+
+        #expect(BundledKanjiContentStore.pathData(in: svg) == ["M1,1c2,2", "M3,3l4,4"])
+        #expect(BundledKanjiContentStore.pathData(in: "<svg/>").isEmpty)
+    }
+
+    @Test("Multi-character IDs are unavailable, not resolved to their first character")
+    func multiCharacterIDThrows() {
+        let store = BundledKanjiContentStore()
+
+        #expect(throws: NichijiError.self) {
+            try store.entry(for: "日本")
+        }
+    }
+
     @Test("Querying missing kanji throws contentMissing error")
     func missingKanjiThrowsError() {
         let store = BundledKanjiContentStore()
@@ -73,14 +118,13 @@ struct KanjiContentStoreTests {
             kunyomi: [],
             radical: KanjiRadical(character: "子", meaning: "child"),
             strokeCount: 8,
-            strokePaths: ["M0,0 L10,10"],
             jlptLevel: .n5,
             joyoGrade: .grade1,
             frequencyRank: 60,
             listIndex: 7,
             exampleWords: []
         )
-        let double = TestKanjiContentStore(entries: [sample])
+        let double = TestKanjiContentStore(entries: [sample], strokePaths: ["学": ["M0,0 L10,10"]])
 
         let retrieved = try double.entry(for: "学")
         #expect(retrieved.id == "学")
