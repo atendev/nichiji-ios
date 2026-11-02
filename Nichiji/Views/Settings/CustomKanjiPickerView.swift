@@ -218,49 +218,11 @@ public struct CustomKanjiPickerView: View {
 
     // MARK: - Actions
 
-    /// Decoding every record behind a level is heavy, so it runs off the main actor.
-    nonisolated private static func buildSections(
-        for system: LevelSystem,
-        contentStore: KanjiContentStore
-    ) -> [KanjiGroupSection] {
-        var loadedSections: [KanjiGroupSection] = []
-
-        switch system {
-        case .jlpt:
-            for level in JLPTLevel.allCases {
-                let entries = (try? contentStore.entries(for: level)) ?? []
-                if !entries.isEmpty || level == .n5 {
-                    loadedSections.append(
-                        KanjiGroupSection(
-                            id: level.rawValue,
-                            title: level.codeLabel,
-                            entries: entries
-                        )
-                    )
-                }
-            }
-        case .joyo:
-            for grade in JoyoGrade.allCases {
-                let entries = (try? contentStore.entries(for: grade)) ?? []
-                if !entries.isEmpty || grade == .grade1 {
-                    loadedSections.append(
-                        KanjiGroupSection(
-                            id: grade.rawValue,
-                            title: grade.displayName,
-                            entries: entries
-                        )
-                    )
-                }
-            }
-        }
-        return loadedSections
-    }
-
     private func loadSectionsAndSelections() async {
         let contentStore = services?.contentStore ?? BundledKanjiContentStore()
         let system = activeLevelSystem
         let loadedSections = await Task.detached {
-            Self.buildSections(for: system, contentStore: contentStore)
+            buildSections(for: system, contentStore: contentStore)
         }.value
         guard !Task.isCancelled else { return }
 
@@ -327,4 +289,42 @@ private struct KanjiGroupSection: Identifiable {
     let id: String
     let title: String
     let entries: [KanjiEntry]
+}
+
+/// Decoding every record behind a level is heavy, so it runs off the main actor.
+private func buildSections(
+    for system: LevelSystem,
+    contentStore: KanjiContentStore
+) -> [KanjiGroupSection] {
+    var loadedSections: [KanjiGroupSection] = []
+
+    switch system {
+    case .jlpt:
+        for level in JLPTLevel.allCases {
+            let entries = (try? contentStore.entries(for: level)) ?? []
+            if !entries.isEmpty || level == .n5 {
+                loadedSections.append(
+                    KanjiGroupSection(
+                        id: level.rawValue,
+                        title: level.codeLabel,
+                        entries: entries
+                    )
+                )
+            }
+        }
+    case .joyo:
+        for grade in JoyoGrade.allCases {
+            let entries = (try? contentStore.entries(for: grade)) ?? []
+            if !entries.isEmpty || grade == .grade1 {
+                loadedSections.append(
+                    KanjiGroupSection(
+                        id: grade.rawValue,
+                        title: grade.displayName,
+                        entries: entries
+                    )
+                )
+            }
+        }
+    }
+    return loadedSections
 }
