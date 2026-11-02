@@ -198,6 +198,7 @@ struct WidgetTimelineTests {
         let kanjiID = try #require(fixture.learnerStore.assignments[fixture.today]?.kanjiID)
         #expect(fixture.learnerStore.assignments[fixture.today]?.status == .learned)
         #expect(fixture.learnerStore.nextReviewAt[kanjiID] == fixture.dayProvider.nextMidnight(after: fixture.dayProvider.now))
+        #expect(fixture.learnerStore.loggedActions.map { $0.action } == [.learnedDaily])
         #expect(fixture.scheduler.rebuildCallCount == 1)
         #expect(fixture.widgetRefresher.reloadCount == 1)
     }

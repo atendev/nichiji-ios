@@ -61,6 +61,12 @@ public protocol LearnerStore: Sendable {
     /// Returns progress for every kanji in the learning or familiar stage.
     func reviewableProgress() async throws -> [KanjiProgressSnapshot]
 
+    /// Returns progress for every kanji with a progress row.
+    func allProgress() async throws -> [KanjiProgressSnapshot]
+
+    /// Returns every study log row oldest first, with each day as stored.
+    func studyLog() async throws -> [StudyLogRecord]
+
     /// Logs a review answer and bumps its count. A non-nil outcome also moves the stage and schedule.
     func recordReview(
         kanjiID: String,
@@ -236,6 +242,15 @@ public actor SwiftDataLearnerStore: LearnerStore {
             predicate: #Predicate { $0.stageRaw == learningRaw || $0.stageRaw == familiarRaw }
         )
         return try modelContext.fetch(descriptor).map(makeSnapshot)
+    }
+
+    public func allProgress() async throws -> [KanjiProgressSnapshot] {
+        try modelContext.fetch(FetchDescriptor<KanjiProgress>()).map(makeSnapshot)
+    }
+
+    public func studyLog() async throws -> [StudyLogRecord] {
+        let descriptor = FetchDescriptor<StudyLogEntry>(sortBy: [SortDescriptor(\.timestamp)])
+        return try modelContext.fetch(descriptor).map(\.record)
     }
 
     public func recordReview(

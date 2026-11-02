@@ -603,3 +603,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Unanticipated TODOs**: None. The circular open-app cell shows a plain 日 instead of the brand seal: the seal asset is not in the project and `SealStamp` is a checkmark ring in a folder the widget target does not compile, and the design system says never to redraw the mark. `widgetRenderingMode` is not used; `widgetAccentable` alone gives the accent split. Kanji sizes (34 and 38 pt through `kanjiDisplay`) and the meaning line (`uiText` 14 pt) fit the accessory frames instead of the home-screen `kanjiWidget` token, and the Settings previews sit on hairline fills as preview chrome. The Settings section lost its combined accessibility element because the previews carry their own labels.
 - **Test Results**: Added three `AccessoryWidgetCopyTests` cases (inline copy, featured word line, accessibility labels); the planned midnight-timeline check was dropped because the timeline is unchanged and `assignedDayEntry` already covers it. Not run here; CI is the check.
 
+
+### Build the study log and stats service (v0.17.0)
+
+#### Requirements Report
+
+- **Success Criteria**: Every study action writes one log row, and one `StudyLogRecord.day(using:)` resolves old empty days. A pure `StatsCalculator` returns streaks with the freeze, the tiles, the 12-week grid, By level, milestones, Needs attention and the learned list, with history, level-complete figures, `LevelSequence` and the CSV as separate calls behind `StatsService`.
+- **Scope Boundary**: Store reads, `StudyDay` and the This week dots, the calculator, history, CSV, `StatsService`, container wiring, tests and docs. The You tab, its views and all display copy stay out.
+- **Anticipated TODOs**: None new. `LevelCompleteView`, the `ReviewView` streak subtitle and the You placeholder keep their TODOs for the You tab. The ticket note about an empty Forget it day is stale.
+- **Planned Tests**: Store logging and order, effective day, `StudyDay`, streaks and every freeze-row case, tiles, grid buckets, By level, milestones, Needs attention ties, history headings, level-complete, `LevelSequence`, CSV and the service.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code; nothing in Swift was built or run, because the host is Linux with no toolchain. A miss only spends the freeze while a streak is live, which the report did not say; streak numbers are unchanged and only the freeze row can differ. The freeze state sits at `LearnerStats.streak.freeze`, and `ServiceContainer.statsService` is a computed property.
+- **Scope Boundary**: Kept. The `ReviewHomeSummary` rename to `isStudyDay` touched `ReviewHomeCards`, but its VoiceOver copy still says "reviewed"; the You tab ticket now owns that wording.
+- **Unanticipated TODOs**: None. The first draft only spent the freeze while a streak was live; the implementation audit caught it, and the code now follows the approved rule (any miss spends the week's freeze).
+- **Test Results**: Not run; CI is the check. The widget Got it row is tested on the test double, not the SwiftData store. The store test sorts rows because Got it and Forget it stamp the real clock. CSV meanings are injected except in the service test. `longestBridgesWithFreeze` pins that a miss with no live streak still spends the freeze.

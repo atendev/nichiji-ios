@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.17.0
+
+- Add the stats service: `StatsService` and a pure `StatsCalculator` compute every You tab number from the study log and progress. That covers the day streak and longest streak with the streak freeze (one forgiven miss per locale week, recomputed, never stored), the freeze row, kanji learned, reviews done, got-it rate, days studied, learning since, the 12-week activity grid, By level bars, the seven milestones, Needs attention and the learned list
+- Add history grouped by day, the history CSV export (`nichiji-history-YYYY-MM-DD.csv`, UTF-8 with a BOM), level-complete figures and `LevelSequence` for the "Start <next level>" button
+- `LearnerStore` gains `studyLog()` and `allProgress()`. Older rows with an empty day count under their timestamp's day through `StudyLogRecord.day(using:)`
+- The Review tab's This week dots now mark study days (learned or reviewed) through the shared `StudyDay` rule
+- The level milestone follows the level system with a Custom pool too, so a Custom Jōyō pool reads "Finish Grade 1"
+- Close ticket 048
+
 ## v0.16.0
 
 - Add the lock-screen widgets: `accessoryCircular` (kanji glyph, small check once learned), `accessoryRectangular` (kanji, meaning, featured word and kana, "Learned" row) and `accessoryInline` (`学 study, learning`). They join the existing widget, so they share its midnight timeline and `WidgetRefresher` reloads. The kanji is `widgetAccentable`; the rest is vibrant monochrome
