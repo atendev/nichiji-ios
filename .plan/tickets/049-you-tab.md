@@ -25,5 +25,7 @@ Design: screens 43-51, `You.dc.html`, `YouHistory.dc.html`.
 
 Minor bump.
 
+From "Build the Review tab and session": also fill the Review header's "N DAY STREAK" subtitle from the stats service (TODO in `ReviewView.swift`).
+
 ## Resolution
 

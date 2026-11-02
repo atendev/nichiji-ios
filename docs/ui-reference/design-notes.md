@@ -20,7 +20,7 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
 - Bottom tabs: **Today, Dictionary, Review, You**.
 - Search was renamed to Dictionary (book icon). Practice is not a tab. You is the fourth tab.
 - Practice is only reached from a kanji (see Practice).
-- Settings button (sliders icon, top right) is on Today, Dictionary, Review and You. It always opens the same bottom sheet. It is not on the full-screen review session or the kanji detail screen.
+- Settings button (sliders icon, top right) is on Today, Dictionary, Review and You. It always opens the same bottom sheet. It is not on the kanji detail screen. The full-screen review session has its own settings button, which opens Review settings in a sheet.
 
 ## Onboarding (7 screens plus a live preview)
 
@@ -82,7 +82,7 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
 - **Session (flashcards)**:
   - Tap to flip. After flipping, **swipe right = Got it, left = Forgot it** (same tilt, badges and colors as onboarding), or use the two buttons. Swiping and the buttons are disabled until the card is flipped.
   - The next card **fades up**.
-  - Progress bar and counter at the top, close button at top left.
+  - Progress bar and counter at the top, close button at top left, settings button at top right. Changes apply to the cards not shown yet; order and size apply to the next session.
   - **Audio button** (speaker) on every card, top right. It plays the reading. The mockup only animates it.
   - Answer side has a **"Practice this kanji"** button at the bottom: thick dashed outline, no fill, pencil on the left.
   - Ends with a "Review complete" summary: reviewed, got it, forgot.
@@ -120,6 +120,6 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
 
 - Real audio, real fuzzy search, real handwriting recognition for draw-to-search, real stroke data and stroke checking.
 - Theme switching is a preview only (choosing Dark doesn't re-theme the app).
-- A You-page layout pass, a review-session settings button, and a formal home for the mustard yellow.
+- A You-page layout pass and a formal home for the mustard yellow.
 - The onboarding Level screen's custom option (see above).
 - The Dictionary browse grid and You "By level" bars still group by JLPT only.

@@ -24,13 +24,11 @@ public struct MainTabView: View {
             }
             .tag(AppTab.dictionary)
 
-            PlaceholderTabView(kanjiTitle: "復習", englishTitle: "Review", systemImage: "rectangle.stack") {
-                isSettingsPresented = true
-            }
-            .tabItem {
-                Label("Review", systemImage: "rectangle.stack")
-            }
-            .tag(AppTab.review)
+            ReviewView(onOpenSettings: { isSettingsPresented = true })
+                .tabItem {
+                    Label("Review", systemImage: "rectangle.stack")
+                }
+                .tag(AppTab.review)
 
             PlaceholderTabView(kanjiTitle: "私", englishTitle: "You", systemImage: "person") {
                 isSettingsPresented = true
@@ -90,4 +88,4 @@ struct PlaceholderTabView: View {
 
 /*----------------------------------TODO----------------------------------*/
 
-// TODO: Replace the placeholders in "Build kanji detail and the Dictionary browse grid", "Build Dictionary search", "Build the Review tab and session" and "Build the You tab".
+// TODO: Replace the placeholders in "Build kanji detail and the Dictionary browse grid", "Build Dictionary search" and "Build the You tab".
