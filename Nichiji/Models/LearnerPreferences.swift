@@ -131,6 +131,11 @@ public extension JoyoGrade {
         }
     }
 
+    /// Value shown in the kanji Details card Grade row (`1` through `6`, or `Secondary`).
+    var detailsLabel: String {
+        self == .secondary ? "Secondary" : codeLabel
+    }
+
     /// Summary string displayed in the main Settings row (`1st grade · Jōyō`).
     var settingsSummary: String {
         "\(displayName) · Jōyō"

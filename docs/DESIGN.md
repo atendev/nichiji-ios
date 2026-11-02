@@ -55,6 +55,14 @@ app and loaded lazily on demand. Runtime network access is not part of the
 design. The dataset is version-pinned per release and regenerated from
 upstream at each release; there is no automated update process.
 
+Dictionary opens on a browse grid of every bundled kanji, grouped by the
+active level system: N5 to N1 for JLPT, or grade 1 to Secondary then a "Name
+kanji" group for the jinmeiyō kanji with no Jōyō grade. The grid reads only
+`kanji-index.json`. A tile pushes the shared kanji detail screen (hero,
+Details, Example words, Stroke order with "Practice this kanji"). Detail and
+Today end with a quiet Forget it control for kanji past `new`; it confirms,
+resets the kanji through `ReviewService` and rebuilds reminders.
+
 Dictionary search covers every bundled kanji and word, whatever the study
 pool. The query's script picks what it searches: kanji search literals and
 words containing them, kana search readings, and Latin searches romaji and

@@ -45,6 +45,13 @@ struct ServiceContainer: Sendable {
         )
     }
 
+    /// Returns a kanji to the new stage, then rebuilds reminders so their due-review count stays right.
+    func forgetIt(kanjiID: String, preferences: LearnerPreferencesSnapshot) async throws {
+        try await reviewService.forgetIt(kanjiID: kanjiID)
+        // The reset already saved, so a reminder failure must not surface as a Forget it error.
+        try? await rebuildReminders(preferences: preferences)
+    }
+
     /// Rebuilds or cancels the reminder window without ever prompting for permission.
     func rebuildReminders(preferences: LearnerPreferencesSnapshot) async throws {
         try await ReminderRefresher.refresh(preferences: preferences, scheduler: reminderScheduler)

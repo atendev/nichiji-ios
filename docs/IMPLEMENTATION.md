@@ -73,6 +73,12 @@ Repeatable verification that grows alongside features: each new feature gets tes
 9. **`AppDeepLinkTests`**:
    - Verify `AppDeepLink.today` round-trips through `nichiji://today`, matches scheme and host case-insensitively, accepts a trailing slash, and rejects other schemes, hosts and paths.
    - Verify the today link selects `AppTab.today`.
+10. **`DictionaryBrowseTests`**:
+   - Verify `KanjiBrowseGrouping` orders JLPT and Jōyō sections, puts ungraded kanji in "Name kanji" and unleveled kanji in "Other kanji", places every kanji once, and drops empty groups.
+   - Verify the count label, the tile accessibility label and 44 pt minimum, that loading reads only the index, and that the bundled index groups all 2,383 kanji with 247 Name kanji.
+11. **`KanjiDetailTests`**:
+   - Verify `KanjiDetailContent.load` returns the entry, strokes and stage, tolerates missing strokes and progress, and throws for an unknown kanji.
+   - Verify Forget it shows only past `new`, and `ServiceContainer.forgetIt` resets then rebuilds reminders, survives a reminder failure and skips the rebuild when the reset fails.
 
 ## Onboarding Flow (Slice 9)
 

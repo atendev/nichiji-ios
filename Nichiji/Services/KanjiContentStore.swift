@@ -19,6 +19,9 @@ public protocol KanjiContentStore: Sendable {
     /// Counts the bundled kanji in a Joyo grade without decoding their records.
     func count(for joyoGrade: JoyoGrade) throws -> Int
 
+    /// Returns every bundled kanji's index summary in canonical list order, without decoding any records.
+    func indexEntries() throws -> [KanjiIndexEntry]
+
     /// Lazily loads ordered SVG stroke paths for a kanji literal in the main app target.
     func strokePaths(for kanjiID: String) throws -> [String]
 }
@@ -75,6 +78,13 @@ public final class BundledKanjiContentStore: KanjiContentStore, @unchecked Senda
         defer { lock.unlock() }
 
         return try loadIndex().filter { $0.joyoGrade == joyoGrade }.count
+    }
+
+    public func indexEntries() throws -> [KanjiIndexEntry] {
+        lock.lock()
+        defer { lock.unlock() }
+
+        return try loadIndex().sorted { $0.listIndex < $1.listIndex }
     }
 
     public func strokePaths(for kanjiID: String) throws -> [String] {
