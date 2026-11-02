@@ -48,7 +48,7 @@ public struct DetailsCardView: View {
                 detailRow(label: "Strokes", value: "\(strokeCount)")
                 if let jlptLevel {
                     Divider().background(Color.nichijiHairline)
-                    detailRow(label: "JLPT", value: isJLPTLevelEstimated ? "\(jlptLevel.uppercased()) (est.)" : jlptLevel.uppercased())
+                    detailRow(label: "JLPT", value: Self.jlptLabel(jlptLevel, isEstimated: isJLPTLevelEstimated))
                 }
                 if let joyoGrade {
                     Divider().background(Color.nichijiHairline)
@@ -57,6 +57,11 @@ public struct DetailsCardView: View {
             }
         }
         .padding(.horizontal, LayoutTokens.space16)
+    }
+
+    /// JLPT row value; estimated levels carry "(est.)" because the lists are unofficial.
+    static func jlptLabel(_ level: String, isEstimated: Bool) -> String {
+        isEstimated ? "\(level.uppercased()) (est.)" : level.uppercased()
     }
 
     private func detailRow(label: String, readings: [KanjiReading]) -> some View {

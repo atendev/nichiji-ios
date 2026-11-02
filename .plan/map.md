@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build kanji detail and the Dictionary browse grid](closed/045-kanji-detail-and-dictionary-browse.md): Dictionary browses all 2,383 kanji from the index by level system (Jōyō ends with a "Name kanji" group for the 247 jinmeiyō kanji) on a shared `KanjiGridTile`; a tile pushes the shared `KanjiDetailView`; Forget it sits on detail and Today, confirms, resets and rebuilds reminders.
 - [Decide how Dictionary search matches and ranks](closed/044-dictionary-search-rules.md): Script picks the mode (kanji, then kana, then Latin as romaji plus English); one Swift folding for romaji; exact, prefix and substring tiers with English at word starts only; Kanji and Words sections ranked by tier, field and frequency, with a new JMdict `rank` on words; word rows open a "Which kanji?" sheet; the generator adds an app-only `kanji-search.json`, and the index builds in memory on first Dictionary open (about 20 MB). Draw to search is hidden.
 - [Build the Review tab and session](closed/043-review-tab-and-session.md): The Review tab shows due count, tiles, estimate, stage counts, Coming up and review-day dots; the full-screen session runs a `ReviewDeck` (rotating card types, forgotten cards repeated once) on a shared `SwipeFlashcard` with audio, Practice, an in-session settings button and a summary, and rebuilds reminders when it ends.
 - [Build the Practice sheet](closed/042-practice-sheet.md): Today's "Practice this kanji" opens `PracticeSheet` through the shared `practiceSheet(target:)` presenter; a `Canvas` recorder (not PencilKit) over a `PracticePad` value type gives one stroke per drag, Undo, Clear and the counter, with a Guide toggle and the stroke order grid at the large detent.
@@ -54,7 +55,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build kanji detail and the Dictionary browse grid](tickets/045-kanji-detail-and-dictionary-browse.md) (task, AFK)
+- [Build Dictionary search](tickets/046-dictionary-search.md) (task, AFK)
 - [Decide the streak and stats rules](tickets/047-streak-and-stats-rules.md) (grilling)
 - [Build the lock-screen widgets](tickets/051-lock-screen-widgets.md) (task, AFK)
 - [Build the Sources screen](tickets/052-sources-screen.md) (task, AFK)

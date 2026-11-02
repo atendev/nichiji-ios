@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.14.0
+
+- Replace the Dictionary placeholder with a browse grid of all 2,383 kanji, grouped by the active level system (N5 to N1, or grade 1 to Secondary plus a "Name kanji" group for the 247 jinmeiyō kanji). It is built from the index through `KanjiContentStore.indexEntries()` and `KanjiBrowseGrouping`, so no records are decoded
+- Add the shared `KanjiDetailView`, pushed from a Dictionary tile: hero, Details, Example words, Stroke order and "Practice this kanji"
+- Add Forget it on kanji detail and Today: a quiet control for kanji past `new` that confirms, then calls `ServiceContainer.forgetIt`, which resets through `ReviewService` and rebuilds reminders
+- Share `KanjiGridTile` between the Dictionary grid and the custom kanji picker, and the Grade label between Today and detail
+- Close ticket 045
+
 ## v0.13.3
 
 - Fix the empty stroke order grid: a new `StrokePathParser` reads compact KanjiVG path data (packed commands and minus signs, `S`/`s` smooth curves), and each cell draws the whole kanji faintly, earlier strokes muted and the current stroke in ink, with the number inside the cell as in the mockup

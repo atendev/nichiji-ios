@@ -122,4 +122,4 @@ All numbers, kanji lists and stroke diagrams in the mockups are sample data unle
 - Theme switching is a preview only (choosing Dark doesn't re-theme the app).
 - A You-page layout pass and a formal home for the mustard yellow.
 - The onboarding Level screen's custom option (see above).
-- The Dictionary browse grid and You "By level" bars still group by JLPT only.
+- The You "By level" bars still group by JLPT only.

@@ -20,5 +20,7 @@ Includes the generator change: `rank` on each `words.json` record and the app-on
 Draw to search is out of v1.0 ([Fix the v1.0 scope](../closed/034-fix-the-v1-scope.md)): the Dictionary ships without the button.
 Minor bump.
 
+From [Build kanji detail and the Dictionary browse grid](../closed/045-kanji-detail-and-dictionary-browse.md): the search bar goes where the TODO in `DictionaryView` sits, above the browse grid inside its `NavigationStack`. Kanji results can push `KanjiDetailRoute(kanjiID:)` to open the shared `KanjiDetailView`.
+
 ## Resolution
 

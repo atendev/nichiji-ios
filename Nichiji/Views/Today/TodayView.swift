@@ -51,6 +51,7 @@ public struct TodayView: View {
     @State private var reloadID = UUID()
     @State private var wasBackgrounded = false
     @State private var practiceTarget: PracticeTarget?
+    @State private var stage: StudyStage?
 
     private var poolPreferenceSignature: String {
         "\(levelSystemRaw)-\(selectedJLPTLevelRaw)-\(selectedJoyoGradeRaw)-\(dailyOrderRaw)-\(isCustomPoolActive)-\(customSelections.count)"
@@ -94,6 +95,10 @@ public struct TodayView: View {
         .practiceSheet(target: $practiceTarget)
         .task(id: reloadID) {
             await loadToday()
+        }
+        // Tabs stay alive, so a Forget it on Dictionary detail would leave Today's control stale.
+        .onAppear {
+            Task { await refreshStage() }
         }
         .onChange(of: scenePhase) { _, phase in
             // Control Center only passes through .inactive, so refresh after a real background trip.
@@ -142,7 +147,7 @@ public struct TodayView: View {
                     strokeCount: kanji.strokeCount,
                     jlptLevel: kanji.jlptLevel.map { $0.rawValue },
                     isJLPTLevelEstimated: kanji.isJLPTLevelEstimated,
-                    joyoGrade: kanji.joyoGrade.map(gradeLabel),
+                    joyoGrade: kanji.joyoGrade?.detailsLabel,
                     showsRomaji: showsRomaji
                 )
 
@@ -159,6 +164,10 @@ public struct TodayView: View {
                     strokePaths: strokePaths,
                     onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: strokePaths) }
                 )
+
+                ForgetItControl(kanjiID: kanji.id, stage: stage) {
+                    stage = .new
+                }
             }
             .padding(.bottom, LayoutTokens.space32)
         }
@@ -202,12 +211,14 @@ public struct TodayView: View {
             guard let loadedAssignment else {
                 kanji = nil
                 strokePaths = []
+                stage = nil
                 return
             }
 
             let loadedKanji = try services.contentStore.entry(for: loadedAssignment.kanjiID)
             kanji = loadedKanji
             strokePaths = (try? services.contentStore.strokePaths(for: loadedKanji.id)) ?? []
+            stage = try? await services.learnerStore.progress(for: loadedKanji.id)?.stage
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -232,14 +243,22 @@ public struct TodayView: View {
         Task {
             do {
                 let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
-                self.assignment = try await services.markLearned(
+                let updated = try await services.markLearned(
                     day: assignment.calendarDay,
                     preferences: LearnerPreferencesSnapshot.load(from: defaults)
                 )
+                self.assignment = updated
+                // A re-learned kanji reuses its progress row, so the query count alone won't refresh the stage.
+                await refreshStage()
             } catch {
                 errorMessage = error.localizedDescription
             }
         }
+    }
+
+    private func refreshStage() async {
+        guard let services, let kanjiID = kanji?.id else { return }
+        stage = try? await services.learnerStore.progress(for: kanjiID)?.stage
     }
 
     private func speak(_ text: String, reading: String?) {
@@ -248,18 +267,6 @@ public struct TodayView: View {
             try services.pronunciationService.speak(text, reading: reading)
         } catch {
             errorMessage = error.localizedDescription
-        }
-    }
-
-    private func gradeLabel(_ grade: JoyoGrade) -> String {
-        switch grade {
-        case .grade1: "1"
-        case .grade2: "2"
-        case .grade3: "3"
-        case .grade4: "4"
-        case .grade5: "5"
-        case .grade6: "6"
-        case .secondary: "Secondary"
         }
     }
 }

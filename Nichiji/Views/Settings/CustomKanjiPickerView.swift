@@ -1,27 +1,5 @@
 import SwiftUI
 
-private struct SelectionCellBackground: ViewModifier {
-    let isSelected: Bool
-
-    func body(content: Content) -> some View {
-        content
-            .background(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .fill(isSelected ? Color.nichijiVermilionWash : Color.nichijiSurfaceRaised)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(isSelected ? Color.nichijiVermilion : Color.nichijiBorderControl, lineWidth: 1)
-            )
-    }
-}
-
-extension View {
-    func selectionCellBackground(isSelected: Bool) -> some View {
-        modifier(SelectionCellBackground(isSelected: isSelected))
-    }
-}
-
 /*------------------------------custom-kanji------------------------------*/
 
 public struct CustomKanjiPickerView: View {
@@ -56,9 +34,6 @@ public struct CustomKanjiPickerView: View {
         let displayedIDs = Set(sections.flatMap { $0.entries.map(\.id) })
         return selectedIDs.intersection(displayedIDs).count
     }
-
-    /// Same gap between columns and between rows.
-    private static let gridSpacing = LayoutTokens.space12
 
     public init() {}
 
@@ -99,7 +74,6 @@ public struct CustomKanjiPickerView: View {
         let sectionIDs = Set(section.entries.map(\.id))
         let onCount = selectedIDs.intersection(sectionIDs).count
         let isAllSelected = !section.entries.isEmpty && onCount == section.entries.count
-        let columns = Array(repeating: GridItem(.flexible(), spacing: Self.gridSpacing), count: 5)
 
         return VStack(alignment: .leading, spacing: LayoutTokens.space12) {
             HStack(alignment: .center, spacing: LayoutTokens.space12) {
@@ -136,7 +110,7 @@ public struct CustomKanjiPickerView: View {
             }
 
             if !section.entries.isEmpty {
-                LazyVGrid(columns: columns, spacing: Self.gridSpacing) {
+                LazyVGrid(columns: KanjiGridTile.columns, spacing: KanjiGridTile.spacing) {
                     ForEach(section.entries) { entry in
                         kanjiCell(for: entry)
                     }
@@ -152,14 +126,7 @@ public struct CustomKanjiPickerView: View {
             toggleKanji(entry.id)
         } label: {
             ZStack(alignment: .topTrailing) {
-                Color.clear
-                    .aspectRatio(1, contentMode: .fit)
-                    .overlay {
-                        Text(entry.id)
-                            .font(.kanjiDisplay(size: 30))
-                            .foregroundColor(.nichijiInk)
-                    }
-                    .selectionCellBackground(isSelected: isSelected)
+                KanjiGridTile(kanji: entry.id, isSelected: isSelected)
 
                 if isSelected {
                     Image(systemName: "checkmark")
