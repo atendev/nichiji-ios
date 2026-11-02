@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.13.1
+
+- Set the Dictionary search rules: the query's script picks the mode, romaji folds on both sides, exact/prefix/substring tiers with English at word starts only, Kanji and Words sections ranked by tier, field and frequency, a "Which kanji?" sheet for word rows, and an in-memory index built on first Dictionary open from `words.json` and a new app-only `kanji-search.json`
+- Add a Dictionary search paragraph to `DESIGN.md`; point ticket 046 at the decision, including the generator change
+- Close ticket 044
+
 ## v0.13.0
 
 - Add the Review tab: the due count with up to six due kanji tiles and an "About N minutes" estimate, Start review, a Session options link to Review settings, Your kanji stage counts with a stage bar, Coming up (tomorrow, in 2 to 3 days, next week) and This week review dots

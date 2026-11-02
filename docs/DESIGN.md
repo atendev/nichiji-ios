@@ -55,6 +55,17 @@ app and loaded lazily on demand. Runtime network access is not part of the
 design. The dataset is version-pinned per release and regenerated from
 upstream at each release; there is no automated update process.
 
+Dictionary search covers every bundled kanji and word, whatever the study
+pool. The query's script picks what it searches: kanji search literals and
+words containing them, kana search readings, and Latin searches romaji and
+English meanings together. Romaji is folded on both sides (macrons and doubled
+vowels collapse, common spelling pairs fold) and matches as exact, prefix or
+substring; English matches only at word starts. Results come in a Kanji
+section and a Words section, ranked by match quality, then frequency. A word
+row opens a small "Which kanji?" sheet. The search index is built in memory
+the first time Dictionary opens, from the app-only `words.json` and
+`kanji-search.json`.
+
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
 local store. SwiftData stores learner-owned records (`KanjiProgress`,
