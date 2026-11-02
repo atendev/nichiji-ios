@@ -58,11 +58,11 @@ struct DatasetContractTests {
         #expect(entries.filter(\.isJLPTLevelEstimated).count == 172)
     }
 
-    @Test("Records carry no inline stroke paths")
-    func recordsLeaveStrokePathsToSVG() throws {
+    @Test("Records carry at most three example words")
+    func recordsCapExampleWords() throws {
         let entries = try Self.loadEntries()
 
-        #expect(entries.allSatisfy { $0.strokePaths.isEmpty })
         #expect(entries.allSatisfy { $0.exampleWords.count <= 3 })
+        #expect(entries.filter { $0.exampleWords.isEmpty }.count == 11)
     }
 }

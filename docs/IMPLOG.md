@@ -506,3 +506,19 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept. The only app-code change is additive (`isJLPTLevelEstimated`, `frequencyRank`, `KanjiIndex`); `strokePaths` stays with a default. `make dataset-test` joined the CI test job and `.cache/` and `__pycache__/` joined `.gitignore`.
 - **Unanticipated TODOs**: None. The audit found a too-narrow Han range, Greek and fullwidth-symbol headwords in `words.json`, an always-true filter, two unused names and stale counts; all are fixed.
 - **Test Results**: `make dataset-test` runs 39 tests, all OK. Nothing was built for Swift because the host is Linux with no toolchain, so CI is the gate for `DatasetContractTests` and the model changes.
+
+### Load the generated dataset in the app and widget (v0.11.0)
+
+#### Requirements Report
+
+- **Success Criteria**: Every kanji the app and widget show comes from the generated bundle. Counts, level and grade pools, Details and the stroke card read the real data; `strokePaths` and the `max*` fields are gone; the seed lives only in `NichijiTests`; a missing record or SVG is unavailable, never a substitute.
+- **Scope Boundary**: The store, models, `project.yml` resources, the Level footer, "(est.)" in Details, the hardcoded-count removal and the three design-notes caveats. The Sources screen, the `words.json` reader and a kanji detail screen stay out.
+- **Anticipated TODOs**: "(est.)" in a subtitle has no host until kanji detail exists. The Level footer links to Sources once that screen exists.
+- **Planned Tests**: Real-bundle store tests for counts, the estimated flag, empty example words, multi-character IDs and SVG path extraction; `DatasetContractTests` now asserts the 11 empty-example records.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code; unverified by a build.
+- **Scope Boundary**: Added `count(for:)` to the store protocol so onboarding and the Level screen do not decode thousands of records to count them. Today now treats a missing SVG as an empty stroke card instead of failing the whole screen.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Nothing was built locally because the host is Linux with no Swift toolchain, so CI is the gate. The requirements and implementation reports were written inline rather than by subagents.

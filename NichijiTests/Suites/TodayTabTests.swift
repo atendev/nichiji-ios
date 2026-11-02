@@ -79,11 +79,10 @@ struct TodayTabTests {
         #expect(assignment != nil)
     }
 
-    @Test("Romaji and stroke data are available for the detail cards")
+    @Test("Romaji is available for the detail cards")
     func detailCardData() throws {
         let entry = try TestKanjiContentStore(entries: SeedKanjiDataset.entries).entry(for: "日")
         #expect(entry.onyomi.contains { !$0.romaji.isEmpty })
         #expect(entry.exampleWords.contains { !$0.romaji.isEmpty })
-        #expect(entry.strokePaths.count == entry.strokeCount)
     }
 }

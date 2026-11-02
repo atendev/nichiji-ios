@@ -3,7 +3,7 @@ id: "038"
 title: Load the generated dataset in the app and widget
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["037"]
 claimed: false
 ---
@@ -36,3 +36,4 @@ Also from [Settle the bundled dataset scope and schema](../closed/036-bundled-da
 
 ## Resolution
 
+`BundledKanjiContentStore` now serves the whole bundle: `kanji-index.json` loads once, records decode on demand and stay cached, and `stroke-order/<hex>.svg` is read lazily in the app. A missing record or SVG throws `contentMissing`; Today shows a "stroke diagram is unavailable" line for a missing SVG. I added `count(for:)` to the store protocol so onboarding and the Level screen count from the index. `strokePaths` and the `ExampleWord` `max*` fields are removed and `SeedKanjiDataset` moved to `NichijiTests`. `project.yml` puts the index and records in both targets and the SVGs and `words.json` in the app only. The Level screen lost its hardcoded counts and gained the "JLPT levels are unofficial community lists." footer, Details shows "N1 (est.)", and the three design-notes caveats are gone. The footer's Sources link and any "(est.)" subtitle wait for the Sources and kanji detail screens.

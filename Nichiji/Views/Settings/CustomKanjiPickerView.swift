@@ -220,36 +220,11 @@ public struct CustomKanjiPickerView: View {
 
     private func loadSectionsAndSelections() async {
         let contentStore = services?.contentStore ?? BundledKanjiContentStore()
-        var loadedSections: [KanjiGroupSection] = []
-
-        switch activeLevelSystem {
-        case .jlpt:
-            for level in JLPTLevel.allCases {
-                let entries = (try? contentStore.entries(for: level)) ?? []
-                if !entries.isEmpty || level == .n5 {
-                    loadedSections.append(
-                        KanjiGroupSection(
-                            id: level.rawValue,
-                            title: level.codeLabel,
-                            entries: entries
-                        )
-                    )
-                }
-            }
-        case .joyo:
-            for grade in JoyoGrade.allCases {
-                let entries = (try? contentStore.entries(for: grade)) ?? []
-                if !entries.isEmpty || grade == .grade1 {
-                    loadedSections.append(
-                        KanjiGroupSection(
-                            id: grade.rawValue,
-                            title: grade.displayName,
-                            entries: entries
-                        )
-                    )
-                }
-            }
-        }
+        let system = activeLevelSystem
+        let loadedSections = await Task.detached {
+            buildSections(for: system, contentStore: contentStore)
+        }.value
+        guard !Task.isCancelled else { return }
 
         sections = loadedSections
 
@@ -314,4 +289,42 @@ private struct KanjiGroupSection: Identifiable {
     let id: String
     let title: String
     let entries: [KanjiEntry]
+}
+
+/// Decoding every record behind a level is heavy, so it runs off the main actor.
+private func buildSections(
+    for system: LevelSystem,
+    contentStore: KanjiContentStore
+) -> [KanjiGroupSection] {
+    var loadedSections: [KanjiGroupSection] = []
+
+    switch system {
+    case .jlpt:
+        for level in JLPTLevel.allCases {
+            let entries = (try? contentStore.entries(for: level)) ?? []
+            if !entries.isEmpty || level == .n5 {
+                loadedSections.append(
+                    KanjiGroupSection(
+                        id: level.rawValue,
+                        title: level.codeLabel,
+                        entries: entries
+                    )
+                )
+            }
+        }
+    case .joyo:
+        for grade in JoyoGrade.allCases {
+            let entries = (try? contentStore.entries(for: grade)) ?? []
+            if !entries.isEmpty || grade == .grade1 {
+                loadedSections.append(
+                    KanjiGroupSection(
+                        id: grade.rawValue,
+                        title: grade.displayName,
+                        entries: entries
+                    )
+                )
+            }
+        }
+    }
+    return loadedSections
 }

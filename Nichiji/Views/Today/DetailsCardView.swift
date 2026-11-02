@@ -8,6 +8,7 @@ public struct DetailsCardView: View {
     public let radical: String
     public let strokeCount: Int
     public let jlptLevel: String?
+    public let isJLPTLevelEstimated: Bool
     public let joyoGrade: String?
     public let showsRomaji: Bool
     @Environment(\.sizeCategory) private var sizeCategory
@@ -18,6 +19,7 @@ public struct DetailsCardView: View {
         radical: String = "",
         strokeCount: Int = 0,
         jlptLevel: String? = nil,
+        isJLPTLevelEstimated: Bool = false,
         joyoGrade: String? = nil,
         showsRomaji: Bool = true
     ) {
@@ -26,6 +28,7 @@ public struct DetailsCardView: View {
         self.radical = radical
         self.strokeCount = strokeCount
         self.jlptLevel = jlptLevel
+        self.isJLPTLevelEstimated = isJLPTLevelEstimated
         self.joyoGrade = joyoGrade
         self.showsRomaji = showsRomaji
     }
@@ -45,7 +48,7 @@ public struct DetailsCardView: View {
                 detailRow(label: "Strokes", value: "\(strokeCount)")
                 if let jlptLevel {
                     Divider().background(Color.nichijiHairline)
-                    detailRow(label: "JLPT", value: jlptLevel.uppercased())
+                    detailRow(label: "JLPT", value: isJLPTLevelEstimated ? "\(jlptLevel.uppercased()) (est.)" : jlptLevel.uppercased())
                 }
                 if let joyoGrade {
                     Divider().background(Color.nichijiHairline)

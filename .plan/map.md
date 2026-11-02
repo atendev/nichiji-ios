@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Load the generated dataset in the app and widget](closed/038-load-the-generated-bundle.md): The store reads the index once, decodes records on demand and reads SVGs lazily in the app, throwing `contentMissing` for any missing file; models drop `strokePaths` and the `max*` fields, counts come from a new `count(for:)`, the seed moved to tests, and the Level footer and "(est.)" label are in.
 - [Build the dataset generator and pin its first output](closed/037-build-the-dataset-generator.md): `tools/dataset/` (stdlib Python, `make dataset-fetch` / `dataset` / `dataset-test`) builds the committed `Dataset/` offline and deterministically: 2,383 kanji matching every pinned grade and N-level count, stroke-path-only SVGs, 2.2 MB shared and 7.0 MB app; 18,195 common words and 11 kanji with no example differ from the dataset ticket's figures.
 - [Settle the bundled dataset scope and schema](closed/036-bundled-dataset-scope-and-schema.md): Ship 2,383 kanji (2,136 Jōyō plus 247 Waller N1 jinmeiyō; 172 estimated levels flagged); `KanjiEntry` drops `strokePaths` and gains `isJLPTLevelEstimated`; up to 3 JMdict examples each plus an app-only 17.7k-word index; stdlib-Python generator in `tools/dataset/` with output committed to `Dataset/`; budgets 3 MB widget and 8 MB app; refresh every release; Jōyō counts verified.
 - [Register the nichiji URL scheme](closed/053-register-the-nichiji-url-scheme.md): `project.yml` adds an `info:` block on the Nichiji target (`Config/Nichiji-Info.plist`, `CFBundleURLTypes`) that Xcode merges with the generated keys, so Safari and Shortcuts reach `nichiji://today` through the existing `onOpenURL`; a device check is still due.
@@ -50,6 +51,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Load the generated dataset in the app and widget](tickets/038-load-the-generated-bundle.md) (task, AFK)
+- [Build the Practice sheet](tickets/042-practice-sheet.md) (task, AFK)
 - [Decide how Dictionary search matches and ranks](tickets/044-dictionary-search-rules.md) (grilling)
 - [Decide the streak and stats rules](tickets/047-streak-and-stats-rules.md) (grilling)
+- [Build the lock-screen widgets](tickets/051-lock-screen-widgets.md) (task, AFK)
+- [Build the Sources screen](tickets/052-sources-screen.md) (task, AFK)
