@@ -288,9 +288,8 @@ concrete problems.
 ### CI
 
 If the repo has remote CI (`.github/workflows/ci.yml`), push the feature
-branch (never force). CI starts automatically only on push to `main` or on
-a version tag, or manually through `workflow_dispatch`, so a branch push
-alone starts nothing. The agent has standing permission to trigger the run
+branch (never force). CI runs only manually through `workflow_dispatch`, so
+no push or tag starts it. The agent has standing permission to trigger the run
 for the feature branch with `gh workflow run ci.yml --ref <branch>`. Then
 find the run with `gh run list --workflow ci.yml --branch <branch> --limit 1`
 and watch it with `gh run watch <id> --exit-status` until it finishes.
