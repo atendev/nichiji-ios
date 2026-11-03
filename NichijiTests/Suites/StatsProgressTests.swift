@@ -55,7 +55,7 @@ struct StatsProgressTests {
         #expect(stats.milestones.map(\.kind) == [
             .firstKanji, .tenKanji, .twentyFiveKanji, .hundredReviews, .sevenDayStreak, .thirtyDayStreak, .finishLevel(.jlpt(.n5))
         ])
-        #expect(stats.milestones.allSatisfy(\.isEarned))
+        #expect(stats.milestones.allSatisfy { $0.isEarned })
     }
 
     @Test("Locked milestones report progress toward their target")

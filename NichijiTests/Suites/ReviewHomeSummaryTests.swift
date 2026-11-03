@@ -120,7 +120,7 @@ struct ReviewHomeSummaryTests {
         #expect(week.count == 7)
         #expect(week.first?.calendarDay == "2023-11-13")
         #expect(week.map(\.isStudyDay) == [true, true, true, false, false, false, false])
-        #expect(week.firstIndex(where: \.isToday) == 2)
+        #expect(week.firstIndex { $0.isToday } == 2)
     }
 
     @Test("An empty stored day counts under its timestamp's day")
@@ -136,6 +136,6 @@ struct ReviewHomeSummaryTests {
         dayProvider.simulatedCalendar.firstWeekday = 1
         let week = summary([], log: [(action: .gotItReview, calendarDay: "2023-11-13")]).week
         #expect(week.first?.calendarDay == "2023-11-12")
-        #expect(week.firstIndex(where: \.isStudyDay) == 1)
+        #expect(week.firstIndex { $0.isStudyDay } == 1)
     }
 }
