@@ -24,7 +24,8 @@ struct ReviewHomeSummaryTests {
         log: [(action: StudyAction, calendarDay: String)] = [],
         size: ReviewSessionSize = .ten
     ) -> ReviewHomeSummary {
-        ReviewHomeSummary(progress: progress, reviewLog: log, sessionSize: size, dayProvider: dayProvider)
+        let records = log.map { StudyLogRecord(kanjiID: "日", action: $0.action, timestamp: day(-400), calendarDay: $0.calendarDay) }
+        return ReviewHomeSummary(progress: progress, studyLog: records, sessionSize: size, dayProvider: dayProvider)
     }
 
     @Test("No progress shows nothing due")
@@ -104,21 +105,30 @@ struct ReviewHomeSummaryTests {
         #expect(result.count(for: .inThreeDays) == 0)
     }
 
-    @Test("This week marks days with review answers only")
-    func weekFromReviews() {
+    @Test("This week marks study days: learned or reviewed, never a reset alone")
+    func weekFromStudyDays() {
         dayProvider.simulatedCalendar.firstWeekday = 2
         let log: [(action: StudyAction, calendarDay: String)] = [
             (.gotItReview, "2023-11-13"),
-            (.forgotItReview, "2023-11-15"),
             (.learnedDaily, "2023-11-14"),
+            (.forgotItReview, "2023-11-15"),
+            (.resetToNew, "2023-11-16"),
             (.gotItReview, "2023-11-06"),
             (.gotItReview, "")
         ]
         let week = summary([], log: log).week
         #expect(week.count == 7)
         #expect(week.first?.calendarDay == "2023-11-13")
-        #expect(week.map(\.isReviewed) == [true, false, true, false, false, false, false])
-        #expect(week.firstIndex(where: \.isToday) == 2)
+        #expect(week.map(\.isStudyDay) == [true, true, true, false, false, false, false])
+        #expect(week.firstIndex { $0.isToday } == 2)
+    }
+
+    @Test("An empty stored day counts under its timestamp's day")
+    func weekResolvesEmptyDay() {
+        dayProvider.simulatedCalendar.firstWeekday = 2
+        let record = StudyLogRecord(kanjiID: "日", action: .learnedDaily, timestamp: day(-1, hour: 0, minute: 30), calendarDay: "")
+        let week = ReviewHomeSummary(progress: [], studyLog: [record], sessionSize: .ten, dayProvider: dayProvider).week
+        #expect(week.map(\.isStudyDay) == [false, true, false, false, false, false, false])
     }
 
     @Test("The week starts on the calendar's first weekday")
@@ -126,6 +136,6 @@ struct ReviewHomeSummaryTests {
         dayProvider.simulatedCalendar.firstWeekday = 1
         let week = summary([], log: [(action: .gotItReview, calendarDay: "2023-11-13")]).week
         #expect(week.first?.calendarDay == "2023-11-12")
-        #expect(week.firstIndex(where: \.isReviewed) == 1)
+        #expect(week.firstIndex { $0.isStudyDay } == 1)
     }
 }

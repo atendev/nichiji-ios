@@ -31,5 +31,7 @@ From [Decide the streak and stats rules](../closed/047-streak-and-stats-rules.md
 
 From [Build kanji detail and the Dictionary browse grid](../closed/045-kanji-detail-and-dictionary-browse.md): open the shared `KanjiDetailView(kanjiID:)` from You Learned. Forget it comes with it, which covers the You Learned entry point the review-rules decision lists.
 
+From "Build the study log and stats service": read `services.statsService`. `stats(preferences:)` gives every number. `history()` loads apart from it for the lazy History list. `historyExport()` gives the `ShareLink` file. `levelComplete(level:)` runs only when `LevelSequence.current(preferences:)` is non-nil, and `LevelSequence.next(after:)` names the "Start <next level>" target. Copy for the freeze row and milestones (apart from `StudyLevel.finishLabel`) is yours. The Review tab's This week dots now mark study days, but their VoiceOver label still says "reviewed"; change it to match.
+
 ## Resolution
 

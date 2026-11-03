@@ -98,6 +98,16 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
             .map { KanjiProgressSnapshot(kanjiID: $0.key, stage: $0.value, nextReviewAt: nextReviewAt[$0.key]) }
     }
 
+    func allProgress() async throws -> [KanjiProgressSnapshot] {
+        try checkForError()
+        return progress.map { KanjiProgressSnapshot(kanjiID: $0.key, stage: $0.value, nextReviewAt: nextReviewAt[$0.key]) }
+    }
+
+    func studyLog() async throws -> [StudyLogRecord] {
+        try checkForError()
+        return loggedActions.map { StudyLogRecord(kanjiID: $0.kanjiID, action: $0.action, timestamp: .distantPast, calendarDay: $0.calendarDay) }
+    }
+
     func recordReview(
         kanjiID: String,
         answer: ReviewAnswer,

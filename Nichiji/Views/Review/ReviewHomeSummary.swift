@@ -33,7 +33,8 @@ enum ReviewComingUpBucket: CaseIterable, Sendable {
 struct ReviewWeekDay: Equatable, Sendable {
     let label: String
     let calendarDay: String
-    let isReviewed: Bool
+    /// True on a study day: anything learned or reviewed.
+    let isStudyDay: Bool
     let isToday: Bool
 }
 
@@ -57,7 +58,7 @@ struct ReviewHomeSummary: Equatable, Sendable {
 
     init(
         progress: [KanjiProgressSnapshot],
-        reviewLog: [(action: StudyAction, calendarDay: String)],
+        studyLog: [StudyLogRecord],
         sessionSize: ReviewSessionSize,
         dayProvider: any DayProvider
     ) {
@@ -75,7 +76,7 @@ struct ReviewHomeSummary: Equatable, Sendable {
         estimatedMinutes = Self.minutes(dueCount: due.count, sessionSize: sessionSize)
         stageCounts = Dictionary(grouping: progress, by: \.stage).mapValues(\.count)
         comingUp = Self.comingUp(progress: progress, now: now, calendar: calendar)
-        week = Self.week(reviewLog: reviewLog, dayProvider: dayProvider)
+        week = Self.week(studyLog: studyLog, dayProvider: dayProvider)
     }
 
     func count(for stage: StudyStage) -> Int {
@@ -110,16 +111,12 @@ struct ReviewHomeSummary: Equatable, Sendable {
     }
 
     private static func week(
-        reviewLog: [(action: StudyAction, calendarDay: String)],
+        studyLog: [StudyLogRecord],
         dayProvider: any DayProvider
     ) -> [ReviewWeekDay] {
         let calendar = dayProvider.calendar
         let now = dayProvider.now
-        let reviewed = Set(
-            reviewLog
-                .filter { ($0.action == .gotItReview || $0.action == .forgotItReview) && !$0.calendarDay.isEmpty }
-                .map { $0.calendarDay }
-        )
+        let studyDays = StudyDay.days(in: studyLog, dayProvider: dayProvider)
         let today = dayProvider.calendarDay(for: now)
         let start = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? calendar.startOfDay(for: now)
         let symbols = calendar.veryShortWeekdaySymbols
@@ -131,7 +128,7 @@ struct ReviewHomeSummary: Equatable, Sendable {
             return ReviewWeekDay(
                 label: symbols[weekday - 1],
                 calendarDay: day,
-                isReviewed: reviewed.contains(day),
+                isStudyDay: studyDays.contains(day),
                 isToday: day == today
             )
         }

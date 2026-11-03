@@ -3,7 +3,7 @@ import SwiftUI
 
 /*---------------------------------review---------------------------------*/
 
-/// Review tab home: what is due, stage counts, what comes up next, and this week's review days.
+/// Review tab home: what is due, stage counts, what comes up next, and this week's study days.
 public struct ReviewView: View {
     public let onOpenSettings: () -> Void
 
@@ -47,7 +47,7 @@ public struct ReviewView: View {
         _ = refreshID
         return ReviewHomeSummary(
             progress: learnerProgress.map(\.snapshot),
-            reviewLog: studyLog.map { (action: $0.action, calendarDay: $0.calendarDay) },
+            studyLog: studyLog.map(\.record),
             sessionSize: sessionSize,
             dayProvider: services?.dayProvider ?? SystemDayProvider()
         )

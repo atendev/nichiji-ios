@@ -13,6 +13,11 @@ struct ServiceContainer: Sendable {
     let reviewService: any ReviewService
     var widgetRefresher: any WidgetRefresher = NoopWidgetRefresher()
 
+    /// Stats over the learner store; stateless, so it is built from the other services on demand.
+    var statsService: any StatsService {
+        DefaultStatsService(learnerStore: learnerStore, contentStore: contentStore, dayProvider: dayProvider)
+    }
+
     /// Refreshes Today rollover state and the reminder window after a clock or time-zone change.
     func handleTimeOrZoneChange(preferences: LearnerPreferencesSnapshot) async throws {
         _ = try await dailyKanjiService.assignment(for: dayProvider.calendarDay(for: dayProvider.now))

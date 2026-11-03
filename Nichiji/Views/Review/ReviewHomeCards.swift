@@ -212,7 +212,7 @@ struct ReviewWeekCard: View {
                     }
                     .frame(maxWidth: .infinity)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("\(day.label), \(day.isReviewed ? "reviewed" : "not yet")")
+                    .accessibilityLabel("\(day.label), \(day.isStudyDay ? "reviewed" : "not yet")")
                 }
             }
         }
@@ -222,15 +222,15 @@ struct ReviewWeekCard: View {
 
     private func dot(for day: ReviewWeekDay) -> some View {
         Circle()
-            .fill(day.isReviewed ? Color.nichijiMatchaWash : Color.clear)
+            .fill(day.isStudyDay ? Color.nichijiMatchaWash : Color.clear)
             .overlay(
                 Circle().stroke(
-                    day.isReviewed ? Color.nichijiMatcha : (day.isToday ? Color.nichijiInk : Color.nichijiHairline),
+                    day.isStudyDay ? Color.nichijiMatcha : (day.isToday ? Color.nichijiInk : Color.nichijiHairline),
                     lineWidth: 1
                 )
             )
             .overlay {
-                if day.isReviewed {
+                if day.isStudyDay {
                     Image(systemName: "checkmark")
                         .font(.nichijiCaption.weight(.medium))
                         .foregroundColor(.nichijiMatcha)
