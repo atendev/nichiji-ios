@@ -23,7 +23,7 @@ struct KanjiDetailContent: Equatable, Sendable {
 
 /*---------------------------------detail---------------------------------*/
 
-/// Shared kanji detail screen. Dictionary pushes it now; Review and You open it in their own tickets.
+/// Shared kanji detail screen, pushed from Dictionary and from You.
 struct KanjiDetailView: View {
     let kanjiID: String
 

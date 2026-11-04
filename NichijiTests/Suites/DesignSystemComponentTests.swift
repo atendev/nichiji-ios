@@ -14,6 +14,7 @@ struct DesignSystemComponentTests {
             Text("日")
         }
         _ = SealStamp(text: "Learned today")
+        _ = HeaderCaption(text: "4 DAY STREAK")
     }
 
     @Test("Interactive components retain Apple HIG sizing constants")
@@ -31,6 +32,19 @@ struct DesignSystemComponentTests {
             didRun = true
         }
 
+        button.action()
+        #expect(didRun)
+    }
+
+    @Test("Secondary button keeps its title and action")
+    @MainActor
+    func secondaryButtonAction() {
+        var didRun = false
+        let button = SecondaryButton(title: "Open Settings") {
+            didRun = true
+        }
+
+        #expect(button.title == "Open Settings")
         button.action()
         #expect(didRun)
     }
