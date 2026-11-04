@@ -75,9 +75,7 @@ public struct LevelSettingsView: View {
                     .padding(.horizontal, LayoutTokens.space8)
 
                 if activeLevelSystem == .jlpt {
-                    Text("JLPT levels are unofficial community lists.")
-                        .font(.nichijiCaption)
-                        .foregroundColor(.nichijiInkSubtle)
+                    SourcesFooterLink()
                         .padding(.horizontal, LayoutTokens.space8)
                 }
             }

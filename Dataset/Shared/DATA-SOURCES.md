@@ -29,8 +29,15 @@ The bundle holds 2383 kanji and 18195 common words for Dictionary search.
 
 ## Attribution
 
-- Kanji records: KANJIDIC2 and example words: JMdict, both from the Electronic Dictionary Research and Development Group (https://www.edrdg.org), used under CC BY-SA 4.0 (https://www.edrdg.org/edrdg/licence.html).
-- Stroke order: KanjiVG (https://kanjivg.tagaini.net) by Ulrich Apel, CC BY-SA 3.0. The bundled SVGs keep only each file's ordered stroke paths and are shared under the same licence.
-- JLPT N5-N1 kanji levels: Jonathan Waller's JLPT Resources (https://www.tanos.co.uk/jlpt/), CC BY. The JLPT has not published official kanji lists since 2010, so levels are an unofficial estimate.
-- Levels for 172 Joyo kanji not in those lists: OpenJLPT (https://github.com/evanclan/OpenJLPT), CC BY-SA 4.0, built from JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's JLPT lists, and Tatoeba. These levels carry `isJLPTLevelEstimated`.
+- Kanji records: KANJIDIC2 and example words: JMdict, both from the [Electronic Dictionary Research and Development Group](https://www.edrdg.org), used under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) and the [EDRDG licence](https://www.edrdg.org/edrdg/licence.html).
+- Stroke order: [KanjiVG](https://kanjivg.tagaini.net) by Ulrich Apel, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). The bundled SVGs keep only each file's ordered stroke paths and are shared under the same licence.
+- JLPT N5-N1 kanji levels, and the vocabulary lists that pick example words: [Jonathan Waller's JLPT Resources](https://www.tanos.co.uk/jlpt/), [CC BY](https://www.tanos.co.uk/jlpt/sharing/). Levels are an unofficial estimate.
+- Levels for 172 Jōyō kanji not in those lists: [OpenJLPT](https://github.com/evanclan/OpenJLPT), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), built from JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's JLPT lists, and Tatoeba.
 - Radical names and the selection, ordering and schema of this bundle are the app's own.
+
+## Snapshots
+
+- KANJIDIC2: 2026-10-31 (database version 2026-304)
+- JMdict: 2026-10-31
+- KanjiVG: 2026-07-14 (release r20260714)
+- Jonathan Waller's lists and OpenJLPT: 2026-10-02 (OpenJLPT commit 0d1d341)

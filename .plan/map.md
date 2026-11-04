@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the Sources screen](closed/052-sources-screen.md): Settings > About > Sources and the Level footer open `SourcesView`, which parses the bundled `DATA-SOURCES.md` into attribution cards with 44 pt link rows and dated snapshots; the generator writes the links, counts estimated levels and dates each snapshot. Waller's CC BY links the tanos sharing page (provisional, no version stated).
 - [Build the You tab](closed/049-you-tab.md): `YouView` shows the tiles, freeze row, activity grid, By level, milestones, Needs attention, and Learned / History with a `ShareLink` CSV export, all from `StatsService` through a tested `YouCopy`; every kanji opens detail. Level complete shows the level's figures and "Start <next level>"; the Review header shows the day streak.
 - [Build the study log and stats service](closed/048-study-log-and-stats-service.md): Every study action already logged; `StudyLogRecord.day(using:)` resolves old empty days. `StatsService` over a pure `StatsCalculator` computes every 047 number, with history, level-complete figures and the CSV as separate calls; rates come from log rows; the Review tab's dots use the shared `StudyDay` rule; the level milestone follows the level system with a Custom pool too.
 - [Decide the streak and stats rules](closed/047-streak-and-stats-rules.md): A study day is any learned kanji or review answer; streaks, the activity grid and the Review tab's This week dots all use it. The freeze forgives one miss per locale week and is recomputed, never stored. Time studying becomes Days studied. Milestones are sticky through lifetime counts. Needs attention ranks forgets (min 1). History and CSV list every log entry. Level-complete gets level figures and a "Start <next level>" button.
@@ -49,7 +50,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
-- Waller's list licence version: the tanos.co.uk page was only reachable through a Wayback copy and states no licence version. Revisit when the Sources screen is built.
+- Waller's list licence version: the Sources screen links the tanos.co.uk sharing page, read only through a Wayback copy, which states CC BY with no version. Recheck the live page before release.
+- Tatoeba's licence: OpenJLPT names Tatoeba as an upstream of the estimated levels, and the Sources screen names it without a link or licence, as 033 worded it. Confirm its licence and whether attribution needs a link before release.
 
 ## Out of scope
 
@@ -60,4 +62,4 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build the Sources screen](tickets/052-sources-screen.md) (task, AFK)
+- [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md) (task, HITL)

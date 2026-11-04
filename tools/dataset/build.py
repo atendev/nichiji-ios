@@ -1,9 +1,11 @@
 """Joins the parsed inputs into the committed Dataset/ bundle. Offline and deterministic."""
 
 import json
+import re
 import shutil
 import sys
 from dataclasses import dataclass
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import fetch
@@ -23,6 +25,11 @@ APP_BUDGET = 8 * 1024 * 1024
 MAX_EXAMPLES = 3
 LEVEL_RANK = {level: index for index, level in enumerate(sources.LEVELS)}
 JOYO_GRADES = set(kanjidic.GRADE_NAMES)
+EDRDG_URL = "https://www.edrdg.org"
+EDRDG_LICENCE_URL = "https://www.edrdg.org/edrdg/licence.html"
+CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
+CC_BY_SA_3 = "https://creativecommons.org/licenses/by-sa/3.0/"
+WALLER_TITLE = "Jonathan Waller's JLPT Resources"
 
 
 @dataclass
@@ -205,11 +212,47 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
     common = sorted({(w.sequence, w.headword): w for w in usable if w.is_common}.values(), key=lambda w: (w.sequence, w.headword))
     files["AppOnly/words.json"] = dump([search_word_record(w) for w in common])
     files["AppOnly/kanji-search.json"] = dump(search_kanji)
-    files["Shared/DATA-SOURCES.md"] = data_sources(lock, len(literals), len(common))
+    estimated_count = sum(1 for literal in literals if assign_level(literal, inputs)[1])
+    files["Shared/DATA-SOURCES.md"] = data_sources(lock, len(literals), len(common), estimated_count)
     return files
 
 
-def data_sources(lock: dict, kanji_count: int, word_count: int) -> str:
+def snapshot_date(version: str) -> str:
+    """ISO date for a lock version: YYYY-MM-DD, KANJIDIC2's YYYY-DDD, or KanjiVG's rYYYYMMDD."""
+    try:
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", version):
+            return date.fromisoformat(version).isoformat()
+        if re.fullmatch(r"\d{4}-\d{3}", version):
+            year, day = (int(part) for part in version.split("-"))
+            days_in_year = (date(year + 1, 1, 1) - date(year, 1, 1)).days
+            if 1 <= day <= days_in_year:
+                return (date(year, 1, 1) + timedelta(days=day - 1)).isoformat()
+        if re.fullmatch(r"r\d{8}", version):
+            return datetime.strptime(version[1:], "%Y%m%d").date().isoformat()
+    except ValueError:
+        pass
+    raise BuildError(f"cannot read a snapshot date from version {version!r}")
+
+
+def snapshots(lock: dict) -> list[str]:
+    def version(name: str) -> str:
+        if name not in lock:
+            raise BuildError(f"{name} is missing from sources.lock.json")
+        return lock[name]["version"]
+
+    kanjidic_version = version("kanjidic2.xml.gz")
+    jmdict_version = version("JMdict_e.gz")
+    kanjivg_version = version("kanjivg-main.zip")
+    commit = version("waller-kanji-n1.json")[:7]
+    return [
+        f"- KANJIDIC2: {snapshot_date(kanjidic_version)} (database version {kanjidic_version})",
+        f"- JMdict: {snapshot_date(jmdict_version)}",
+        f"- KanjiVG: {snapshot_date(kanjivg_version)} (release {kanjivg_version})",
+        f"- Jonathan Waller's lists and OpenJLPT: {sources.OPENJLPT_COMMIT_DATE} (OpenJLPT commit {commit})",
+    ]
+
+
+def data_sources(lock: dict, kanji_count: int, word_count: int, estimated_count: int) -> str:
     lines = [
         "# Data sources",
         "",
@@ -224,23 +267,33 @@ def data_sources(lock: dict, kanji_count: int, word_count: int) -> str:
     ]
     for name, item in sorted(lock.items()):
         lines.append(f"| {name} | {item['version']} | {item['licence']} | `{item['sha256']}` | {item['url']} |")
+    # Waller's sharing page states CC BY with no version, so the licence link points at that page.
     lines += [
         "",
         "## Attribution",
         "",
-        "- Kanji records: KANJIDIC2 and example words: JMdict, both from the Electronic Dictionary Research and "
-        "Development Group (https://www.edrdg.org), used under CC BY-SA 4.0 (https://www.edrdg.org/edrdg/licence.html).",
-        "- Stroke order: KanjiVG (https://kanjivg.tagaini.net) by Ulrich Apel, CC BY-SA 3.0. "
+        "- Kanji records: KANJIDIC2 and example words: JMdict, both from the "
+        f"{link('Electronic Dictionary Research and Development Group', EDRDG_URL)}, "
+        f"used under {link('CC BY-SA 4.0', CC_BY_SA_4)} and the {link('EDRDG licence', EDRDG_LICENCE_URL)}.",
+        f"- Stroke order: {link('KanjiVG', 'https://kanjivg.tagaini.net')} by Ulrich Apel, {link('CC BY-SA 3.0', CC_BY_SA_3)}. "
         "The bundled SVGs keep only each file's ordered stroke paths and are shared under the same licence.",
-        "- JLPT N5-N1 kanji levels: Jonathan Waller's JLPT Resources (https://www.tanos.co.uk/jlpt/), CC BY. "
-        "The JLPT has not published official kanji lists since 2010, so levels are an unofficial estimate.",
-        "- Levels for 172 Joyo kanji not in those lists: OpenJLPT (https://github.com/evanclan/OpenJLPT), "
-        "CC BY-SA 4.0, built from JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's JLPT lists, and Tatoeba. "
-        "These levels carry `isJLPTLevelEstimated`.",
+        "- JLPT N5-N1 kanji levels, and the vocabulary lists that pick example words: "
+        f"{link(WALLER_TITLE, 'https://www.tanos.co.uk/jlpt/')}, {link('CC BY', 'https://www.tanos.co.uk/jlpt/sharing/')}. "
+        "Levels are an unofficial estimate.",
+        f"- Levels for {estimated_count} Jōyō kanji not in those lists: {link('OpenJLPT', 'https://github.com/evanclan/OpenJLPT')}, "
+        f"{link('CC BY-SA 4.0', CC_BY_SA_4)}, built from JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's JLPT lists, and Tatoeba.",
         "- Radical names and the selection, ordering and schema of this bundle are the app's own.",
+        "",
+        "## Snapshots",
+        "",
+        *snapshots(lock),
         "",
     ]
     return "\n".join(lines)
+
+
+def link(title: str, url: str) -> str:
+    return f"[{title}]({url})"
 
 
 def check_budgets(files: dict[str, str]) -> None:
