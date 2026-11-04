@@ -19,9 +19,12 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 4. Dictionary: search rules, kanji detail and browse, search.
 5. You: stats rules, study log and stats service, You tab.
 6. Lock-screen widgets: design, then build.
-7. Release: App Store metadata, then the signed TestFlight build.
+7. Pro: the free/Pro boundary, the StoreKit 2 purchase service, the paywall.
+8. Release: App Store metadata, then the signed TestFlight build.
 
 ## Decisions so far
+
+- Freemium is in v1.0 scope (settled while grilling [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md)): a free app with a one-time Pro unlock, a non-consumable in-app purchase on StoreKit 2 with no server or third-party SDK. What Pro gates is open in [Decide the free/Pro boundary, price and unlock flow](tickets/057-decide-the-free-pro-boundary.md). The listing decisions so far are in the metadata ticket's Notes.
 
 - [Build the Sources screen](closed/052-sources-screen.md): Settings > About > Sources and the Level footer open `SourcesView`, which parses the bundled `DATA-SOURCES.md` into attribution cards with 44 pt link rows and dated snapshots; the generator writes the links, counts estimated levels and dates each snapshot. Waller's CC BY links the tanos sharing page (provisional, no version stated).
 - [Build the You tab](closed/049-you-tab.md): `YouView` shows the tiles, freeze row, activity grid, By level, milestones, Needs attention, and Learned / History with a `ShareLink` CSV export, all from `StatsService` through a tested `YouCopy`; every kanji opens detail. Level complete shows the level's figures and "Start <next level>"; the Review header shows the day streak.
@@ -62,4 +65,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md) (task, HITL)
+- [Decide the free/Pro boundary, price and unlock flow](tickets/057-decide-the-free-pro-boundary.md) (grilling, HITL)
+
+Blocked: [Build the Pro purchase service and feature gating](tickets/058-build-the-pro-purchase-service.md), [Build the paywall and locked states](tickets/059-build-the-paywall-and-locked-states.md), [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md), [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
