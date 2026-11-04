@@ -125,3 +125,30 @@ public struct SourcesView: View {
         }
     }
 }
+
+/// Footer row in the Level settings that opens `SourcesView`.
+struct SourcesFooterLink: View {
+    var body: some View {
+        NavigationLink {
+            SourcesView()
+        } label: {
+            HStack(spacing: LayoutTokens.space8) {
+                Text(SourcesCopy.levelFooter)
+                    .font(.nichijiCaption)
+                    .foregroundColor(.nichijiInkSubtle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text(SourcesCopy.title)
+                    .font(.nichijiCaption)
+                    .foregroundColor(.nichijiInk)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.nichijiInkSubtle)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
