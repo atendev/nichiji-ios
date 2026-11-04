@@ -2,6 +2,7 @@
 
 KANJIVG_TAG = "r20260714"
 OPENJLPT_COMMIT = "0d1d3410bec90bd4098a7c72de820543cb4f707c"
+OPENJLPT_COMMIT_DATE = "2026-10-02"
 _OPENJLPT_RAW = f"https://raw.githubusercontent.com/evanclan/OpenJLPT/{OPENJLPT_COMMIT}"
 LEVELS = ("n5", "n4", "n3", "n2", "n1")
 

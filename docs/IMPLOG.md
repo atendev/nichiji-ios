@@ -635,3 +635,21 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Scope Boundary**: Kept. No changes to `StatsService`, `StatsCalculator`, stored state, settings, widgets, or Sources. Every in-scope item is present: `YouView` and its sections, `YouCopy`, `StudyLevel.title`, `LevelSequence.preferences(starting:from:)`, `SecondaryButton` and `SecondaryButtonStyle`, `HeaderCaption` (in `HeaderBar.swift`), `LevelCompleteView`, the Review subtitle and label, `MainTabView`, tests, and docs. Outside the list: a doc comment edit in `KanjiDetailView.swift`, and the `.plan/` moves for 049 and the map. `docs/IMPLOG.md` is not yet updated, because the run logs it. `DESIGN.md` is untouched, and I did not check whether its You section is out of date. The untracked `.claude/` folder was already present and is not part of this diff.
 - **Unanticipated TODOs**: None. The three anticipated TODOs (`MainTabView`, `LevelCompleteView`, `ReviewView`) are gone, and no "You tab" TODO remains under `Nichiji/` or `NichijiTests/`. The remaining `PracticePad` TODO predates this ticket. No new gaps were found beyond the deviations above.
 - **Test Results**: Not run. CI is the check. `YouTabTests` has 23 tests, and `DesignSystemComponentTests` gained `secondaryButtonAction`. The planned pure-layer coverage is present. Gaps: "N of 7" is tested as "1 of 2" (the count logic, not the literal 7); `HeaderCaption` and the Review label change have no test. `activitySummaryFromCalculator` depends on the test day provider's Monday-first weeks and on 2026-11-04 being a Wednesday, which it is. The helpers the tests use (`StatsClock`, `StatsFixtures`, `StatsCalculator.stats` and `activityGrid`, `LearnerPreferencesSnapshot` defaults, `Milestone`, `LevelBar`) exist with matching signatures, but nothing was compiled.
+
+### Build the Sources screen (v0.19.0)
+
+#### Requirements Report
+
+- **Success Criteria**: Settings > About gets a Sources row below Privacy, and the Level screen's JLPT footer becomes a 44 pt row; both open `SourcesView`. The screen shows the official-lists note, one card per attribution bullet with a 44 pt link row per link, and dated snapshots, all parsed from the bundled `DATA-SOURCES.md`, or an error line when the file is absent or unreadable. The generator writes each title-and-URL link, links Waller's CC BY to the tanos sharing page, names the vocabulary lists, counts estimated levels from the records, drops the `isJLPTLevelEstimated` sentence and dates each snapshot. The file ships in both targets. Only `DATA-SOURCES.md` changes on regeneration. Minor bump to v0.19.0.
+- **Scope Boundary**: Generator, its tests and fixture lock, `project.yml`, the regenerated file, the Swift parser, loader and view, the two entry points, docs and map. No data, pins, widget UI or Tatoeba link.
+- **Anticipated TODOs**: Device check of the screens, targets, Dynamic Type and contrast; no automated check of the widget bundle; live recheck of the external links, the tanos page first; Tatoeba's licence.
+- **Planned Tests**: Python link pairs, vocabulary wording, estimated count, snapshot dates, missing-entry, bad-version and out-of-range day errors. Swift parsing, link stripping, the committed file, `SourcesState` for nil, invalid UTF-8 and bundles with and without the file.
+- **Audit**: Four haiku rounds. Rounds 1 to 3 asked for changes; after round 2 the run stopped and the user said proceed. Round 4's two findings (a `Data` seam, dropping the `isJLPTLevelEstimated` sentence) were applied without a fifth round.
+
+#### Deviation Report
+
+- **Success Criteria**: Python criteria met and tested. Swift criteria met in code but unbuilt, since the host has no toolchain. `SourcesState(data:)` also treats a file with no bulleted sections as missing, a guard the criteria did not ask for.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None beyond watching the regex literal and `String += Substring` in CI. Waller's lists share the OpenJLPT commit date because they come through that commit.
+- **Test Results**: `make dataset-test` 48 passed; `make dataset` from the cache changed only `DATA-SOURCES.md`. Swift tests run in CI.
+- **Audit**: Two haiku rounds. Round 1 caught `snapshot_date` accepting out-of-range days of the year; round 2 approved.

@@ -5,6 +5,7 @@ import build
 import jmdict
 import kanjidic
 import radicals
+import sources
 
 SVG = (
     '<svg viewBox="0 0 109 109"><g id="kvg:{h}"><path id="kvg:{h}-s1" d="M1,1"/>'
@@ -41,7 +42,16 @@ def make_inputs(**overrides):
     return inputs
 
 
-LOCK = {"a.json": {"version": "1", "licence": "L", "sha256": "abc", "url": "http://x"}}
+def lock_entry(version):
+    return {"version": version, "licence": "L", "sha256": "abc", "url": "http://x"}
+
+
+LOCK = {
+    "kanjidic2.xml.gz": lock_entry("2026-304"),
+    "JMdict_e.gz": lock_entry("2026-10-31"),
+    "kanjivg-main.zip": lock_entry("r20260714"),
+    "waller-kanji-n1.json": lock_entry("0d1d3410bec90bd4098a7c72de820543cb4f707c"),
+}
 
 
 class SelectionTests(unittest.TestCase):
@@ -155,6 +165,54 @@ class GenerateTests(unittest.TestCase):
         self.assertIn("`abc`", text)
         self.assertIn("Jonathan Waller", text)
         self.assertIn("KanjiVG", text)
+
+    def test_sources_file_links_each_title_to_its_page(self):
+        text = self.files["Shared/DATA-SOURCES.md"]
+        for link in (
+            "[Electronic Dictionary Research and Development Group](https://www.edrdg.org)",
+            "[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)",
+            "[EDRDG licence](https://www.edrdg.org/edrdg/licence.html)",
+            "[KanjiVG](https://kanjivg.tagaini.net)",
+            "[CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)",
+            "[Jonathan Waller's JLPT Resources](https://www.tanos.co.uk/jlpt/)",
+            "[CC BY](https://www.tanos.co.uk/jlpt/sharing/)",
+            "[OpenJLPT](https://github.com/evanclan/OpenJLPT)",
+        ):
+            self.assertIn(link, text)
+        self.assertIn("vocabulary lists", text)
+        self.assertNotIn("has not published official kanji lists", text)
+        self.assertNotIn("isJLPTLevelEstimated", text)
+
+    def test_sources_file_counts_estimated_levels_from_the_records(self):
+        records = [json.loads(text) for path, text in self.files.items() if path.startswith("Shared/kanji/")]
+        estimated = sum(1 for record in records if record["isJLPTLevelEstimated"])
+        self.assertEqual(estimated, 2)
+        self.assertIn(f"Levels for {estimated} Jōyō kanji not in those lists", self.files["Shared/DATA-SOURCES.md"])
+
+    def test_sources_file_dates_each_snapshot(self):
+        text = self.files["Shared/DATA-SOURCES.md"]
+        self.assertIn("## Snapshots", text)
+        self.assertIn("- KANJIDIC2: 2026-10-31 (database version 2026-304)", text)
+        self.assertIn("- JMdict: 2026-10-31", text)
+        self.assertIn("- KanjiVG: 2026-07-14 (release r20260714)", text)
+        self.assertIn(f"- Jonathan Waller's lists and OpenJLPT: {sources.OPENJLPT_COMMIT_DATE} (OpenJLPT commit 0d1d341)", text)
+
+    def test_sources_file_needs_every_snapshot_in_the_lock(self):
+        lock = dict(LOCK)
+        del lock["kanjivg-main.zip"]
+        with self.assertRaises(build.BuildError):
+            build.generate(make_inputs(), set(), lock)
+
+    def test_out_of_range_day_of_year_fails(self):
+        for version in ("2026-000", "2026-366", "2026-400"):
+            lock = dict(LOCK, **{"kanjidic2.xml.gz": lock_entry(version)})
+            with self.assertRaises(build.BuildError):
+                build.generate(make_inputs(), set(), lock)
+
+    def test_unreadable_snapshot_version_fails(self):
+        lock = dict(LOCK, **{"JMdict_e.gz": lock_entry("latest")})
+        with self.assertRaises(build.BuildError):
+            build.generate(make_inputs(), set(), lock)
 
 
 class GuardTests(unittest.TestCase):

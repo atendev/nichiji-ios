@@ -75,10 +75,28 @@ public struct LevelSettingsView: View {
                     .padding(.horizontal, LayoutTokens.space8)
 
                 if activeLevelSystem == .jlpt {
-                    Text("JLPT levels are unofficial community lists.")
-                        .font(.nichijiCaption)
-                        .foregroundColor(.nichijiInkSubtle)
-                        .padding(.horizontal, LayoutTokens.space8)
+                    NavigationLink {
+                        SourcesView()
+                    } label: {
+                        HStack(spacing: LayoutTokens.space8) {
+                            Text(SourcesCopy.levelFooter)
+                                .font(.nichijiCaption)
+                                .foregroundColor(.nichijiInkSubtle)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Text(SourcesCopy.title)
+                                .font(.nichijiCaption)
+                                .foregroundColor(.nichijiInk)
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.nichijiInkSubtle)
+                        }
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, LayoutTokens.space8)
                 }
             }
             .padding(.horizontal, LayoutTokens.screenMarginRegular)

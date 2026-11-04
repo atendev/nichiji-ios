@@ -19,6 +19,8 @@ targets:
       - Nichiji
       - path: Dataset/Shared/kanji-index.json
         buildPhase: resources
+      - path: Dataset/Shared/DATA-SOURCES.md
+        buildPhase: resources
       - path: Dataset/Shared/kanji
         type: folder
         buildPhase: resources
@@ -61,6 +63,8 @@ targets:
       - Nichiji/Widget
       - Nichiji/DesignSystem/Tokens
       - path: Dataset/Shared/kanji-index.json
+        buildPhase: resources
+      - path: Dataset/Shared/DATA-SOURCES.md
         buildPhase: resources
       - path: Dataset/Shared/kanji
         type: folder

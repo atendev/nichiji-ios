@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.19.0
+
+- Add the Sources screen: Settings > About gets a Sources row below Privacy, and the Level screen's JLPT footer opens the same screen. It shows the note that the JLPT has published no official kanji lists since 2010, one card per attribution with a 44 pt link row for each source and licence, and the snapshot dates, all read from the bundled `DATA-SOURCES.md`
+- `DATA-SOURCES.md` ships in the app and the widget. The generator now writes markdown links for every source and licence, links Waller's CC BY to the tanos sharing page because it states no version, names Waller's vocabulary lists, counts the OpenJLPT-estimated kanji from the built records and adds a Snapshots section with ISO dates
+- Close ticket 052
+
 ## v0.18.0
 
 - Add the You tab: a "LEARNING SINCE" caption, six stat tiles (day streak, longest streak, kanji learned, reviews done, got-it rate, days studied), the streak freeze row (ready or used this week, hidden when the setting is off), the 12-week activity grid, By level bars for the active level system, the seven milestones with a seal or a lock and progress bar, and Needs attention

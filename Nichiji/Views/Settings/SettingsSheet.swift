@@ -260,6 +260,19 @@ public struct SettingsSheet: View {
 
                 dividerLine
 
+                NavigationLink {
+                    SourcesView()
+                } label: {
+                    settingsNavigationRow(
+                        title: SourcesCopy.title,
+                        subtitle: nil,
+                        value: nil
+                    )
+                }
+                .buttonStyle(.plain)
+
+                dividerLine
+
                 HStack(spacing: LayoutTokens.space12) {
                     Text("Version")
                         .font(.nichijiBody)
