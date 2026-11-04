@@ -4,6 +4,15 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.18.0
+
+- Add the You tab: a "LEARNING SINCE" caption, six stat tiles (day streak, longest streak, kanji learned, reviews done, got-it rate, days studied), the streak freeze row (ready or used this week, hidden when the setting is off), the 12-week activity grid, By level bars for the active level system, the seven milestones with a seal or a lock and progress bar, and Needs attention
+- Add Your kanji: a Learned grid and a lazily loaded History list by day, both opening the shared `KanjiDetailView`, and an "Export history" `ShareLink` that shares the CSV from a temp file once it is ready
+- The level-complete screen shows "<level> complete", kanji learned, days taken and got-it rate, with "Start <next level>" switching the study pool in one tap and "Open Settings" beside it. Custom pools keep the old copy
+- The Review header shows "N DAY STREAK", and the This week dots read "studied" to VoiceOver
+- Add `SecondaryButton` and `SecondaryButtonStyle`, `HeaderCaption`, `StudyLevel.title` and `LevelSequence.preferences(starting:from:)`
+- Close ticket 049
+
 ## v0.17.0
 
 - Add the stats service: `StatsService` and a pure `StatsCalculator` compute every You tab number from the study log and progress. That covers the day streak and longest streak with the streak freeze (one forgiven miss per locale week, recomputed, never stored), the freeze row, kanji learned, reviews done, got-it rate, days studied, learning since, the 12-week activity grid, By level bars, the seven milestones, Needs attention and the learned list

@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the You tab](closed/049-you-tab.md): `YouView` shows the tiles, freeze row, activity grid, By level, milestones, Needs attention, and Learned / History with a `ShareLink` CSV export, all from `StatsService` through a tested `YouCopy`; every kanji opens detail. Level complete shows the level's figures and "Start <next level>"; the Review header shows the day streak.
 - [Build the study log and stats service](closed/048-study-log-and-stats-service.md): Every study action already logged; `StudyLogRecord.day(using:)` resolves old empty days. `StatsService` over a pure `StatsCalculator` computes every 047 number, with history, level-complete figures and the CSV as separate calls; rates come from log rows; the Review tab's dots use the shared `StudyDay` rule; the level milestone follows the level system with a Custom pool too.
 - [Decide the streak and stats rules](closed/047-streak-and-stats-rules.md): A study day is any learned kanji or review answer; streaks, the activity grid and the Review tab's This week dots all use it. The freeze forgives one miss per locale week and is recomputed, never stored. Time studying becomes Days studied. Milestones are sticky through lifetime counts. Needs attention ranks forgets (min 1). History and CSV list every log entry. Level-complete gets level figures and a "Start <next level>" button.
 - [Build the lock-screen widgets](closed/051-lock-screen-widgets.md): The circular, rectangular and inline accessory families join the daily kanji widget, sharing its provider, midnight timeline and refresh triggers; `AccessoryWidgetCopy` pins the text per state, taps open Today, and the Settings guide previews the three families with lock-screen steps.
@@ -59,5 +60,4 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build the You tab](tickets/049-you-tab.md) (task, AFK)
 - [Build the Sources screen](tickets/052-sources-screen.md) (task, AFK)

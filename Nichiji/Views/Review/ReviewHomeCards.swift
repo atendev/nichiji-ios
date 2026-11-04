@@ -212,7 +212,7 @@ struct ReviewWeekCard: View {
                     }
                     .frame(maxWidth: .infinity)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("\(day.label), \(day.isStudyDay ? "reviewed" : "not yet")")
+                    .accessibilityLabel("\(day.label), \(day.isStudyDay ? "studied" : "not yet")")
                 }
             }
         }

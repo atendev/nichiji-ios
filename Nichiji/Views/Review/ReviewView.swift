@@ -19,6 +19,11 @@ public struct ReviewView: View {
         store: UserDefaults(suiteName: AppStorageGroup.suiteName)
     )
     private var orderRaw: String = ReviewOrder.dueFirst.rawValue
+    @AppStorage(
+        LearnerPreferenceKey.streakFreezeEnabled.rawValue,
+        store: UserDefaults(suiteName: AppStorageGroup.suiteName)
+    )
+    private var streakFreezeEnabled: Bool = false
 
     @Query private var learnerProgress: [KanjiProgress]
     @Query private var studyLog: [StudyLogEntry]
@@ -27,6 +32,13 @@ public struct ReviewView: View {
     @State private var showsSessionOptions = false
     // Bumped on return to the foreground so due counts follow the date.
     @State private var refreshID = UUID()
+    @State private var streak = 0
+
+    private struct StreakRequest: Hashable {
+        let logCount: Int
+        let freezeEnabled: Bool
+        let refreshID: UUID
+    }
 
     public init(onOpenSettings: @escaping () -> Void) {
         self.onOpenSettings = onOpenSettings
@@ -67,6 +79,9 @@ public struct ReviewView: View {
                 ReviewSessionView(services: services)
             }
         }
+        .task(id: StreakRequest(logCount: studyLog.count, freezeEnabled: streakFreezeEnabled, refreshID: refreshID)) {
+            await loadStreak()
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { refreshID = UUID() }
         }
@@ -87,6 +102,10 @@ public struct ReviewView: View {
                 .accessibilityLabel("Open settings")
             }
 
+            if let subtitle = YouCopy.streakSubtitle(streak) {
+                HeaderCaption(text: subtitle)
+            }
+
             ScrollView(showsIndicators: false) {
                 VStack(spacing: LayoutTokens.space16) {
                     ReviewDueCard(
@@ -105,6 +124,14 @@ public struct ReviewView: View {
             }
         }
     }
+
+    private func loadStreak() async {
+        guard let services else { return }
+        let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
+        let preferences = LearnerPreferencesSnapshot.load(from: defaults)
+        guard let stats = try? await services.statsService.stats(preferences: preferences), !Task.isCancelled else { return }
+        streak = stats.streak.current
+    }
 }
 
 /*--------------------------------snapshot--------------------------------*/
@@ -122,7 +149,3 @@ extension KanjiProgress {
         )
     }
 }
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Show the "N DAY STREAK" subtitle under the header in "Build the You tab", from the stats service.

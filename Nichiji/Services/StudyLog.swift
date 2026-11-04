@@ -53,13 +53,18 @@ public enum StudyLevel: Hashable, Sendable {
     case jlpt(JLPTLevel)
     case joyo(JoyoGrade)
 
+    /// Short level name ("N5", "Grade 1", "Secondary").
+    public var title: String {
+        switch self {
+        case .jlpt(let level): level.codeLabel
+        case .joyo(.secondary): "Secondary"
+        case .joyo(let grade): "Grade \(grade.codeLabel)"
+        }
+    }
+
     /// Milestone title for finishing this level ("Finish N5", "Finish Grade 1").
     public var finishLabel: String {
-        switch self {
-        case .jlpt(let level): "Finish \(level.codeLabel)"
-        case .joyo(.secondary): "Finish Secondary"
-        case .joyo(let grade): "Finish Grade \(grade.codeLabel)"
-        }
+        "Finish \(title)"
     }
 
     func contains(_ entry: KanjiIndexEntry) -> Bool {
@@ -91,6 +96,21 @@ public enum LevelSequence {
         case nil:
             nil
         }
+    }
+
+    /// Preferences that study the given level, with the custom pool off and everything else kept.
+    public static func preferences(starting level: StudyLevel, from current: LearnerPreferencesSnapshot) -> LearnerPreferencesSnapshot {
+        var updated = current
+        updated.isCustomPoolActive = false
+        switch level {
+        case .jlpt(let jlpt):
+            updated.levelSystem = .jlpt
+            updated.selectedJLPTLevel = jlpt
+        case .joyo(let grade):
+            updated.levelSystem = .joyo
+            updated.selectedJoyoGrade = grade
+        }
+        return updated
     }
 
     /// The level a system starts on; the level milestone targets it.

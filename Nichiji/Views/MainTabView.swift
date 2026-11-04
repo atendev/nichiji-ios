@@ -28,13 +28,11 @@ public struct MainTabView: View {
                 }
                 .tag(AppTab.review)
 
-            PlaceholderTabView(kanjiTitle: "私", englishTitle: "You", systemImage: "person") {
-                isSettingsPresented = true
-            }
-            .tabItem {
-                Label("You", systemImage: "person")
-            }
-            .tag(AppTab.you)
+            YouView(onOpenSettings: { isSettingsPresented = true })
+                .tabItem {
+                    Label("You", systemImage: "person")
+                }
+                .tag(AppTab.you)
         }
         .tint(Color.nichijiVermilion)
         .sheet(isPresented: $isSettingsPresented) {
@@ -47,43 +45,3 @@ public struct MainTabView: View {
         }
     }
 }
-
-/*------------------------------placeholder-------------------------------*/
-
-struct PlaceholderTabView: View {
-    let kanjiTitle: String
-    let englishTitle: String
-    let systemImage: String
-    let onOpenSettings: () -> Void
-
-    var body: some View {
-        VStack(spacing: LayoutTokens.space16) {
-            HeaderBar(kanjiTitle: kanjiTitle, englishTitle: englishTitle) {
-                Button(action: onOpenSettings) {
-                    Image(systemName: "slider.horizontal.3")
-                        .foregroundColor(.nichijiInk)
-                        .frame(width: LayoutTokens.minHitTarget, height: LayoutTokens.minHitTarget)
-                }
-            }
-
-            Spacer()
-
-            VStack(spacing: LayoutTokens.space8) {
-                Image(systemName: systemImage)
-                    .font(.system(size: 40))
-                    .foregroundColor(.nichijiInkSubtle)
-
-                Text("\(englishTitle) will be available in a future update.")
-                    .font(.nichijiCallout)
-                    .foregroundColor(.nichijiInkMuted)
-            }
-
-            Spacer()
-        }
-        .background(Color.nichijiSurface.ignoresSafeArea())
-    }
-}
-
-/*----------------------------------TODO----------------------------------*/
-
-// TODO: Replace the You placeholder in "Build the You tab".
