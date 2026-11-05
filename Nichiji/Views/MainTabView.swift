@@ -58,8 +58,8 @@ public struct MainTabView: View {
     }
 
     private func showPendingPaywall() {
-        guard let pendingPaywallFeature else { return }
-        paywallFeature = pendingPaywallFeature
+        guard let feature = pendingPaywallFeature else { return }
+        paywallFeature = feature
         pendingPaywallFeature = nil
     }
 }
