@@ -1,0 +1,4 @@
+templates.js
+mlkit-harness/Pods/
+mlkit-harness/*.xcworkspace
+mlkit-harness/Podfile.lock

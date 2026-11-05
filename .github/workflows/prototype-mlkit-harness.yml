@@ -1,0 +1,36 @@
+# PROTOTYPE, throwaway. Lives on prototype/handwriting-recognizer only; never merge to main.
+name: Prototype ML Kit harness
+
+on:
+  push:
+    branches: [prototype/handwriting-recognizer]
+    paths:
+      - prototypes/handwriting-recognizer/mlkit-harness/**
+      - .github/workflows/prototype-mlkit-harness.yml
+  workflow_dispatch:
+
+jobs:
+  unsigned-ipa:
+    runs-on: xcode-27
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: prototypes/handwriting-recognizer/mlkit-harness
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install xcodegen cocoapods
+      - name: Generate project
+        run: xcodegen generate && pod install
+      - name: Build unsigned IPA
+        run: |
+          xcodebuild archive -workspace MLKitHarness.xcworkspace -scheme MLKitHarness -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/MLKitHarness.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          mkdir Payload
+          cp -R build/MLKitHarness.xcarchive/Products/Applications/MLKitHarness.app Payload/
+          zip -qr MLKitHarness.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MLKitHarness-unsigned-ipa
+          path: prototypes/handwriting-recognizer/mlkit-harness/MLKitHarness.ipa

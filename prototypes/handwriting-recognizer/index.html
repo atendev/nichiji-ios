@@ -1,0 +1,242 @@
+<!doctype html>
+<!-- PROTOTYPE, throwaway. Draw the handwriting test set and score the KanjiVG matcher. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>PROTOTYPE · Handwriting recognizer</title>
+<style>
+  :root { color-scheme: light dark; --line: #8884; --accent: #c0392b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 17px/22px -apple-system, system-ui, sans-serif; padding: 16px; max-width: 760px; margin-inline: auto; }
+  .banner { font-size: 13px; padding: 4px 8px; border-radius: 6px; background: #f1c40f33; margin-bottom: 8px; }
+  nav { display: flex; gap: 8px; margin-bottom: 16px; }
+  button, select, label.file { min-height: 44px; min-width: 44px; padding: 0 14px; font: inherit; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  nav button[aria-pressed="true"] { background: #8883; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+  .prompt { display: flex; align-items: center; gap: 16px; }
+  .prompt .glyph { font-size: 48px; line-height: 56px; }
+  canvas { display: block; border: 1px solid var(--line); border-radius: 12px; touch-action: none; background: #fff; }
+  @media (prefers-color-scheme: dark) { canvas { background: #1c1c1e; } }
+  .cands { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .cand { display: grid; place-items: center; min-width: 52px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; }
+  .cand b { font-size: 28px; line-height: 34px; font-weight: 400; }
+  .cand small { font-size: 11px; opacity: .7; }
+  .cand.hit { border-color: var(--accent); border-width: 2px; }
+  .grid4 { display: grid; grid-template-columns: 1fr; gap: 4px; }
+  .grid4 h4 { margin: 8px 0 0; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  td, th { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+  td:first-child, th:first-child { text-align: left; }
+  .miss { display: inline-grid; justify-items: center; margin: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+  .miss svg { width: 64px; height: 64px; }
+  .muted { opacity: .7; font-size: 13px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="banner">PROTOTYPE · throwaway · question: is a KanjiVG matcher accurate enough for handwriting search?</div>
+<nav>
+  <button data-tab="capture" aria-pressed="true">Draw test set</button>
+  <button data-tab="play" aria-pressed="false">Free play</button>
+  <button data-tab="score" aria-pressed="false">Score</button>
+</nav>
+
+<section id="capture">
+  <div class="prompt">
+    <span class="glyph" id="target"></span>
+    <div><div id="progress"></div><div class="muted">Draw it the way you'd write it, without tracing.</div></div>
+  </div>
+  <div class="canvas-slot"></div>
+  <div class="row">
+    <button id="undo">Undo</button>
+    <button id="clear">Clear</button>
+    <button id="skip">Skip</button>
+    <button id="back">Back</button>
+    <button id="save" class="primary">Save &amp; next</button>
+  </div>
+  <div class="row">
+    <select id="variant"></select>
+    <span class="muted" id="state"></span>
+  </div>
+  <div class="cands" id="liveCands"></div>
+  <div class="row">
+    <button id="export">Export test set</button>
+    <label class="file">Import<input type="file" id="import" accept="application/json" hidden></label>
+    <button id="reset">Delete all drawings</button>
+  </div>
+</section>
+
+<section id="play" hidden>
+  <div class="canvas-slot"></div>
+  <div class="row"><button id="playUndo">Undo</button><button id="playClear">Clear</button><span class="muted" id="playState"></span></div>
+  <div class="grid4" id="playCands"></div>
+</section>
+
+<section id="score" hidden>
+  <div class="row"><button id="run" class="primary">Score drawn samples</button><span class="muted" id="scoreState"></span></div>
+  <div id="scoreOut"></div>
+</section>
+
+<script src="templates.js"></script>
+<script src="matcher.js"></script>
+<script>
+const STORE_KEY = "PROTOTYPE-handwriting-testset";
+const index = Matcher.buildIndex(TEMPLATES);
+const targets = TEST_TARGETS;
+let saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+let cursor = targets.findIndex((t) => !saved[t]);
+if (cursor < 0) cursor = targets.length;
+
+function makePad(slot, onChange) {
+  const size = Math.min(slot.parentElement.clientWidth || 360, 360);
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.height = size * dpr;
+  canvas.style.width = canvas.style.height = size + "px";
+  slot.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const pad = { strokes: [], size, t0: null };
+  let current = null;
+  const pos = (e) => {
+    const r = canvas.getBoundingClientRect();
+    if (pad.t0 === null) pad.t0 = performance.now();
+    return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10, Math.round(performance.now() - pad.t0)];
+  };
+  pad.draw = () => {
+    ctx.clearRect(0, 0, size, size);
+    ctx.strokeStyle = "#8884"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(size / 2, 0); ctx.lineTo(size / 2, size); ctx.moveTo(0, size / 2); ctx.lineTo(size, size / 2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = matchMedia("(prefers-color-scheme: dark)").matches ? "#fff" : "#000";
+    ctx.lineWidth = 6; ctx.lineCap = ctx.lineJoin = "round";
+    for (const st of pad.strokes.concat(current ? [current] : [])) {
+      ctx.beginPath();
+      st.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      if (st.length === 1) ctx.lineTo(st[0][0] + 0.1, st[0][1]);
+      ctx.stroke();
+    }
+  };
+  canvas.addEventListener("pointerdown", (e) => { canvas.setPointerCapture(e.pointerId); current = [pos(e)]; pad.draw(); });
+  canvas.addEventListener("pointermove", (e) => { if (current) { current.push(pos(e)); pad.draw(); } });
+  const end = () => { if (current) { pad.strokes.push(current); current = null; pad.draw(); onChange(); } };
+  canvas.addEventListener("pointerup", end);
+  canvas.addEventListener("pointercancel", end);
+  pad.undo = () => { pad.strokes.pop(); if (!pad.strokes.length) pad.t0 = null; pad.draw(); onChange(); };
+  pad.clear = () => { pad.strokes = []; pad.t0 = null; pad.draw(); onChange(); };
+  pad.draw();
+  return pad;
+}
+
+function candsHTML(top, target) {
+  return top.map((r) => `<div class="cand${r.char === target ? " hit" : ""}"><b>${r.char}</b><small>${r.cost.toFixed(3)}</small></div>`).join("");
+}
+
+// Capture
+const $ = (id) => document.getElementById(id);
+for (const [i, v] of Matcher.VARIANTS.entries()) $("variant").add(new Option(v.name, i));
+const capture = makePad(document.querySelector("#capture .canvas-slot"), refreshCapture);
+function refreshCapture() {
+  const target = targets[cursor];
+  $("target").textContent = target ?? "✓";
+  $("progress").textContent = target ? `${cursor + 1} of ${targets.length} · ${Object.keys(saved).length} saved` : `All ${targets.length} visited · ${Object.keys(saved).length} saved. Export, then Score.`;
+  const v = Matcher.VARIANTS[$("variant").value];
+  const t0 = performance.now();
+  const top = Matcher.recognize(index, capture.strokes, { norm: v.norm, order: v.order });
+  $("state").textContent = `${capture.strokes.length} strokes (template ${target ? TEMPLATES[target].length : "-"}) · ${Math.round(performance.now() - t0)} ms`;
+  $("liveCands").innerHTML = candsHTML(top, target);
+}
+function go(to) {
+  cursor = Math.max(0, Math.min(targets.length, to));
+  capture.strokes = saved[targets[cursor]]?.slice() ?? [];
+  capture.t0 = null;
+  capture.draw();
+  refreshCapture();
+}
+$("variant").onchange = refreshCapture;
+$("undo").onclick = capture.undo;
+$("clear").onclick = capture.clear;
+$("skip").onclick = () => go(cursor + 1);
+$("back").onclick = () => go(cursor - 1);
+$("save").onclick = () => {
+  const target = targets[cursor];
+  if (!target || !capture.strokes.length) return;
+  saved[target] = capture.strokes;
+  localStorage.setItem(STORE_KEY, JSON.stringify(saved));
+  go(cursor + 1);
+};
+function testSet() {
+  return {
+    version: 1,
+    canvas: { width: capture.size, height: capture.size },
+    note: "Points are [x, y, t] in CSS px, t in ms from the sample's first touch. pool is every kanji the app ships.",
+    pool: Object.keys(TEMPLATES).join(""),
+    samples: targets.filter((t) => saved[t]).map((t) => ({ target: t, strokes: saved[t] })),
+  };
+}
+$("export").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(testSet())], { type: "application/json" }));
+  a.download = "handwriting-testset.json";
+  a.click();
+};
+$("import").onchange = async (e) => {
+  const data = JSON.parse(await e.target.files[0].text());
+  for (const s of data.samples) saved[s.target] = s.strokes;
+  localStorage.setItem(STORE_KEY, JSON.stringify(saved));
+  go(targets.findIndex((t) => !saved[t]) < 0 ? targets.length : targets.findIndex((t) => !saved[t]));
+};
+$("reset").onclick = () => {
+  if (!confirm("Delete every saved drawing?")) return;
+  saved = {};
+  localStorage.removeItem(STORE_KEY);
+  go(0);
+};
+
+// Free play
+const play = makePad(document.querySelector("#play .canvas-slot"), () => {
+  const t0 = performance.now();
+  $("playCands").innerHTML = Matcher.VARIANTS.map((v) =>
+    `<h4>${v.name}</h4><div class="cands">${candsHTML(Matcher.recognize(index, play.strokes, { norm: v.norm, order: v.order }))}</div>`).join("");
+  $("playState").textContent = `${play.strokes.length} strokes · ${Math.round(performance.now() - t0)} ms for all four`;
+});
+$("playUndo").onclick = play.undo;
+$("playClear").onclick = play.clear;
+
+// Score
+function thumb(strokes) {
+  const xs = strokes.flat().map((p) => p[0]), ys = strokes.flat().map((p) => p[1]);
+  const pad = 8, minX = Math.min(...xs) - pad, minY = Math.min(...ys) - pad;
+  const size = Math.max(Math.max(...xs) - minX, Math.max(...ys) - minY) + pad;
+  const paths = strokes.map((st) => `<polyline points="${st.map((p) => p[0] + "," + p[1]).join(" ")}" fill="none" stroke="currentColor" stroke-width="${size / 30}" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
+  return `<svg viewBox="${minX} ${minY} ${size} ${size}">${paths}</svg>`;
+}
+$("run").onclick = () => {
+  const samples = testSet().samples;
+  if (!samples.length) { $("scoreState").textContent = "Draw some samples first."; return; }
+  $("scoreState").textContent = "Scoring…";
+  setTimeout(() => {
+    const pct = (x) => (x * 100).toFixed(1) + "%";
+    const results = Matcher.VARIANTS.map((v) => Matcher.score(index, samples, v));
+    const byTarget = Object.fromEntries(samples.map((s) => [s.target, s.strokes]));
+    $("scoreOut").innerHTML =
+      `<p class="muted">Primary variant, fixed before drawing: ${results[0].variant}. The other rows are for reference only.</p><table><tr><th>Variant</th><th>Top 1</th><th>Top 5</th><th>Top 10</th></tr>` +
+      results.map((r) => `<tr><td>${r.variant}</td><td>${pct(r.top1)}</td><td>${pct(r.top5)}</td><td>${pct(r.top10)}</td></tr>`).join("") +
+      `</table>` +
+      results.map((r) => `<h4>${r.variant}: ${r.misses.length} misses</h4>` +
+        r.misses.map((m) => `<span class="miss">${thumb(byTarget[m.target])}<span>${m.target} → ${m.got} · ${m.rank ? "#" + m.rank : "not in top 10"}</span></span>`).join("")).join("");
+    $("scoreState").textContent = `${samples.length} samples`;
+  }, 20);
+};
+
+// Tabs
+document.querySelectorAll("nav button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  for (const id of ["capture", "play", "score"]) $(id).hidden = id !== b.dataset.tab;
+});
+go(cursor);
+</script>
+</body>
+</html>

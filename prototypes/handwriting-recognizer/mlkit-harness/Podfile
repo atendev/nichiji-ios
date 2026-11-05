@@ -1,0 +1,6 @@
+# PROTOTYPE, throwaway.
+platform :ios, '17.0'
+
+target 'MLKitHarness' do
+  pod 'GoogleMLKit/DigitalInkRecognition'
+end
