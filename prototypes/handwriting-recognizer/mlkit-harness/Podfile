@@ -4,3 +4,12 @@ platform :ios, '17.0'
 target 'MLKitHarness' do
   pod 'GoogleMLKit/DigitalInkRecognition'
 end
+
+# ML Kit's dependencies declare iOS 9-12, below Xcode 27's minimum of 15.
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '17.0'
+    end
+  end
+end
