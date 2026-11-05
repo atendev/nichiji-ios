@@ -1,5 +1,6 @@
 import Testing
 import Foundation
+import WidgetKit
 @testable import Nichiji
 
 /*------------------------------widget-tests------------------------------*/
@@ -278,4 +279,42 @@ struct WidgetTimelineTests {
         #expect(AddWidgetCopy.steps.contains { $0.contains("Add Widget") })
         #expect(AddWidgetCopy.steps.contains { $0.contains("Nichiji") })
     }
+
+    /*----------------------------------pro---------------------------------*/
+
+    @Test("Entries carry the cached Pro access, locked by default")
+    func entriesCarryProAccess() async {
+        let fixture = Fixture()
+        let lockedPlan = await fixture.builder.build()
+        #expect(lockedPlan.entry.proAccess == .locked)
+
+        var builder = fixture.builder
+        builder.proAccessProvider = { .purchased }
+        let unlockedPlan = await builder.build()
+        #expect(unlockedPlan.entry.proAccess == .purchased)
+
+        let notOnboarded = Fixture(onboarded: false)
+        var openAppBuilder = notOnboarded.builder
+        openAppBuilder.proAccessProvider = { .purchased }
+        let openAppPlan = await openAppBuilder.build()
+        #expect(openAppPlan.entry.content == .openApp)
+        #expect(openAppPlan.entry.proAccess == .purchased)
+    }
+
+    #if DEBUG
+    @Test("A Debug widget unlocks from the dev key alone")
+    func devKeyUnlocksWidget() async {
+        let suite = ProTestSuite()
+        defer { suite.remove() }
+        ProEntitlementCache.setDevUnlocked(true, in: suite.defaults)
+        let suiteName = suite.name
+
+        var environment = Fixture().environment
+        environment.proAccessProvider = { ProEntitlementCache.load(from: UserDefaults(suiteName: suiteName) ?? .standard) }
+        let plan = await environment.timelineBuilder.build()
+
+        #expect(plan.entry.proAccess == ProAccess(isDevUnlocked: true))
+        #expect(!LockScreenWidgetGate.isLocked(family: .accessoryCircular, access: plan.entry.proAccess))
+    }
+    #endif
 }

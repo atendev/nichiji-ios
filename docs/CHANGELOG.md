@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.20.0
+
+- Add the Pro purchase service: `StoreKitPurchaseService` buys, restores and refreshes the "Nichiji Pro" non-consumable (`com.aten.nichiji.pro`) on StoreKit 2, with no server or SDK. Only verified, unrevoked entitlements unlock, family-shared ones included. Every refresh writes the result to App Group `UserDefaults`, so Pro holds offline and through relaunch, and the widget reads the same value
+- Add `ProAccessModel`, injected from `NichijiApp`: it starts from the cache, restores on launch, follows `Transaction.updates`, and reloads widget timelines when access changes. A Debug-only dev unlock sits on its own key
+- Gate the Pro features: without Pro, the three lock-screen families show a small locked placeholder and History's "Export history" stays disabled. `ProFeature` also names photo lookup and handwriting search for their build tickets. The paywall comes next
+- Add `Config/Nichiji.storekit` for local runs (scheme run action) and tests, including `SKTestSession` tests of purchase, clear, restore and outside purchases
+- Close ticket 058
+
 ## v0.19.0
 
 - Add the Sources screen: Settings > About gets a Sources row below Privacy, and the Level screen's JLPT footer opens the same screen. It shows the note that the JLPT has published no official kanji lists since 2010, one card per attribution with a 44 pt link row for each source and licence, and the snapshot dates, all read from the bundled `DATA-SOURCES.md`

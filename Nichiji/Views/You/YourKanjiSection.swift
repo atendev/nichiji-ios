@@ -22,6 +22,7 @@ struct YourKanjiSection: View {
     let logCount: Int
 
     @Environment(\.serviceContainer) private var services
+    @Environment(ProAccessModel.self) private var proAccess: ProAccessModel?
 
     @State private var mode: YourKanjiMode = .learned
     @State private var history: [HistoryDay]?
@@ -117,9 +118,10 @@ struct YourKanjiSection: View {
         note("Saves a CSV of your history. Nothing leaves your phone unless you share the file.")
     }
 
-    /// A disabled stand-in until the file is ready, so a stale or missing file is never shared.
+    // TODO: "Build the paywall and locked states" makes a locked export open the paywall instead of staying disabled.
+    /// A disabled stand-in until the file is ready or while Pro is locked, so a stale or missing file is never shared.
     @ViewBuilder private var exportControl: some View {
-        if YouCopy.canExport(logIsEmpty: logCount == 0, fileURL: exportURL), let exportURL {
+        if YouCopy.canExport(logIsEmpty: logCount == 0, fileURL: exportURL, access: proAccess?.access ?? .locked), let exportURL {
             ShareLink(item: exportURL) {
                 exportLabel
             }

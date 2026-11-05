@@ -188,12 +188,14 @@ struct YouTabTests {
         #expect(YouCopy.historyTime(clock.at("2026-11-04", hour: 21, minute: 30), calendar: calendar) == "9:30 pm")
     }
 
-    @Test("Export needs a non-empty log and a prepared file")
+    @Test("Export needs Pro, a non-empty log and a prepared file")
     func canExport() {
         let url = URL(fileURLWithPath: "/tmp/nichiji-history-2026-11-04.csv")
-        #expect(YouCopy.canExport(logIsEmpty: false, fileURL: url))
-        #expect(!YouCopy.canExport(logIsEmpty: true, fileURL: url))
-        #expect(!YouCopy.canExport(logIsEmpty: false, fileURL: nil))
+        #expect(YouCopy.canExport(logIsEmpty: false, fileURL: url, access: .purchased))
+        #expect(!YouCopy.canExport(logIsEmpty: true, fileURL: url, access: .purchased))
+        #expect(!YouCopy.canExport(logIsEmpty: false, fileURL: nil, access: .purchased))
+        #expect(!YouCopy.canExport(logIsEmpty: false, fileURL: url, access: .locked))
+        #expect(YouCopy.canExport(logIsEmpty: false, fileURL: url, access: ProAccess(isDevUnlocked: true)))
     }
 
     /*---------------------------level-complete---------------------------*/

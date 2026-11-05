@@ -24,6 +24,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the Pro purchase service and feature gating](closed/058-build-the-pro-purchase-service.md): `StoreKitPurchaseService` buys, restores and refreshes `com.aten.nichiji.pro` on StoreKit 2; verified, unrevoked entitlements unlock, family shared too. The result is cached in App Group `UserDefaults` for offline use and the widget. `ProAccessModel` restores on launch and follows updates. Lock-screen families and the CSV export are gated, with a minimal locked placeholder; the Debug dev unlock sits on its own key. `Config/Nichiji.storekit` drives local runs and tests.
 - [Decide the free/Pro boundary, price and unlock flow](closed/057-decide-the-free-pro-boundary.md): "Nichiji Pro" is a one-time $4.99 non-consumable on StoreKit 2, no server or SDK. Pro is lock-screen widgets, CSV export, photo lookup and handwriting search; everything else is free, including the whole You tab, Review, Practice and Custom pools. No trial; paywall only where a Pro feature is tapped; automatic restore plus a Restore button, Family Sharing on; a debug-only dev unlock and App Store offer codes, no self-issued codes. This reopens the v1.0 scope for photo and handwriting, and the value gets re-checked after the photo test. The listing decisions so far are in the metadata ticket's Notes.
 
 - [Build the Sources screen](closed/052-sources-screen.md): Settings > About > Sources and the Level footer open `SourcesView`, which parses the bundled `DATA-SOURCES.md` into attribution cards with 44 pt link rows and dated snapshots; the generator writes the links, counts estimated levels and dates each snapshot. Waller's CC BY links the tanos sharing page (provisional, no version stated).
@@ -53,7 +54,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
-- Photo lookup and handwriting search build tickets: graduate after [Choose the handwriting recognizer](tickets/060-choose-the-handwriting-recognizer.md) and [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) answer.
+- Photo lookup and handwriting search build tickets: graduate after [Choose the handwriting recognizer](tickets/060-choose-the-handwriting-recognizer.md) and [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) answer. Each gates its entry point on `ProFeature.photoLookup` or `.handwritingSearch` through `ProAccessModel`, and the handwriting one updates the `DESIGN.md` non-goal.
 - Waller's list licence version: the Sources screen links the tanos.co.uk sharing page, read only through a Wayback copy, which states CC BY with no version. Recheck the live page before release.
 - Tatoeba's licence: OpenJLPT names Tatoeba as an upstream of the estimated levels, and the Sources screen names it without a link or licence, as 033 worded it. Confirm its licence and whether attribution needs a link before release.
 
@@ -66,8 +67,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build the Pro purchase service and feature gating](tickets/058-build-the-pro-purchase-service.md) (task, AFK)
+- [Build the paywall and locked states](tickets/059-build-the-paywall-and-locked-states.md) (task, AFK)
 - [Choose the handwriting recognizer](tickets/060-choose-the-handwriting-recognizer.md) (prototype, HITL)
 - [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) (task, HITL)
 
-Blocked: [Build the paywall and locked states](tickets/059-build-the-paywall-and-locked-states.md), [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md), [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
+Blocked: [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md), [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).

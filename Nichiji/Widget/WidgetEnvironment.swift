@@ -11,12 +11,15 @@ struct WidgetEnvironment: Sendable {
     let reminderScheduler: any ReminderScheduler
     let widgetRefresher: any WidgetRefresher
     let preferencesProvider: @Sendable () -> LearnerPreferencesSnapshot
+    /// The extension reads the app's cached entitlement; it never asks StoreKit itself.
+    var proAccessProvider: @Sendable () -> ProAccess = { ProEntitlementCache.load() }
 
     var timelineBuilder: DailyKanjiTimelineBuilder {
         DailyKanjiTimelineBuilder(
             dailyKanjiService: dailyKanjiService,
             dayProvider: dayProvider,
-            preferencesProvider: preferencesProvider
+            preferencesProvider: preferencesProvider,
+            proAccessProvider: proAccessProvider
         )
     }
 
