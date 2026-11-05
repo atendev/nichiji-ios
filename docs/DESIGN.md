@@ -123,8 +123,9 @@ Settings sheet. Lock-screen widgets ship in all three accessory families: the
 circular family shows the kanji glyph (with a small checkmark once learned),
 the rectangular family adds the primary meaning and featured word, and the
 inline family shows one line of kanji and meaning. All are read-only; a tap
-opens Today. They need Pro; without it each family shows a small locked
-placeholder, while the home-screen widgets stay free. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+opens Today. They need Pro. Without it each family shows a locked placeholder
+("Nichiji Pro", "Tap to unlock"), and a tap opens `nichiji://pro`, which closes
+Settings and shows the paywall over Today. The home-screen widgets stay free. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
 kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed. Handwriting recognition is deferred.
 
@@ -137,6 +138,19 @@ result in App Group `UserDefaults`, so gating works offline and the widget
 extension reads the same value. `ProAccessModel` restores on every launch,
 follows transaction updates and reloads widget timelines when access changes.
 A Debug-only dev unlock sits on its own key.
+
+The paywall is a sheet that opens only when a locked Pro feature is tapped: a
+locked lock-screen widget, History's "Export history", the widget guide's
+"Unlock lock screen widgets" button, and later the photo and handwriting entry
+points. It never appears on Today, during onboarding, on a timer or when
+Settings opens. It names the tapped feature first, lists all four, says the
+rest of the app stays free, and offers "Unlock for <price>" with the StoreKit
+price, "Restore purchases" and a Family Sharing note. Pending (Ask to Buy), an
+unavailable product, an unverified transaction and other failures each get a
+one-line note; a cancelled purchase shows nothing. The sheet closes once Pro
+unlocks. Settings has a Nichiji Pro section with the status, "Restore
+purchases" and, in Debug builds only, a "Developer unlock" toggle. It shows
+status only and never opens the paywall.
 
 The data and navigation model leaves room for an iPhone Duo or iPad two-pane
 layout. The first pass implements the standard single-column phone layout.

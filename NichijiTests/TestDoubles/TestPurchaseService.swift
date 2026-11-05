@@ -10,6 +10,7 @@ final class TestPurchaseService: PurchaseService, @unchecked Sendable {
     var refreshed: ProAccess = .locked
     var purchaseResult: Result<PurchaseOutcome, TestPurchaseFailure> = .success(.cancelled)
     var restoreResult: Result<ProAccess, TestPurchaseFailure> = .success(.locked)
+    var productError: (any Error)?
     let updates: AsyncStream<ProAccess>
     let updateContinuation: AsyncStream<ProAccess>.Continuation
 
@@ -24,7 +25,8 @@ final class TestPurchaseService: PurchaseService, @unchecked Sendable {
     func refreshAccess() async -> ProAccess { refreshed }
 
     func productInfo() async throws -> ProProductInfo {
-        ProProductInfo(displayName: "Nichiji Pro", displayPrice: "$4.99")
+        if let productError { throw productError }
+        return ProProductInfo(displayName: "Nichiji Pro", displayPrice: "$4.99")
     }
 
     func purchase() async throws -> PurchaseOutcome { try purchaseResult.get() }

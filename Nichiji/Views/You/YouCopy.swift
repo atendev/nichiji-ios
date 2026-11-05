@@ -23,6 +23,14 @@ struct LevelBarRow: Equatable, Sendable {
     let fraction: Double
 }
 
+enum HistoryExportAction: Equatable, Sendable {
+    case share(URL)
+    /// Pro is locked, so the button opens the paywall.
+    case paywall
+    /// Nothing to share yet, or the file is still being written.
+    case unavailable
+}
+
 struct MilestoneRow: Equatable, Sendable {
     let title: String
     let note: String
@@ -180,7 +188,10 @@ enum YouCopy {
     }
 
     /// The CSV export needs Pro as well as a non-empty log and a written file.
-    static func canExport(logIsEmpty: Bool, fileURL: URL?, access: ProAccess) -> Bool {
-        access.allows(.csvExport) && !logIsEmpty && fileURL != nil
+    /// Locked export opens the paywall whatever the log holds; unlocked export shares once the file is ready.
+    static func exportAction(logIsEmpty: Bool, fileURL: URL?, access: ProAccess) -> HistoryExportAction {
+        guard access.allows(.csvExport) else { return .paywall }
+        guard !logIsEmpty, let fileURL else { return .unavailable }
+        return .share(fileURL)
     }
 }

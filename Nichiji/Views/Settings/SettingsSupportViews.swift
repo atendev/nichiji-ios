@@ -3,7 +3,14 @@ import SwiftUI
 /*-----------------------------widget-guide-------------------------------*/
 
 public struct WidgetGuideSettingsView: View {
+    @Environment(ProAccessModel.self) private var proAccess: ProAccessModel?
+    @State private var paywallFeature: ProFeature?
+
     public init() {}
+
+    private var isLockScreenLocked: Bool {
+        !(proAccess?.allows(.lockScreenWidgets) ?? false)
+    }
 
     public var body: some View {
         ScrollView(showsIndicators: false) {
@@ -49,6 +56,7 @@ public struct WidgetGuideSettingsView: View {
         .background(Color.nichijiSurface.ignoresSafeArea())
         .navigationTitle("Widgets")
         .navigationBarTitleDisplayMode(.inline)
+        .paywallSheet(feature: $paywallFeature)
     }
 
     private var mediumWidgetSection: some View {
@@ -193,9 +201,12 @@ public struct WidgetGuideSettingsView: View {
                     .font(.nichijiHeading)
                     .foregroundColor(.nichijiInk)
 
-                Text("The kanji at a glance. Tap to open Today.")
+                Text(isLockScreenLocked
+                     ? "The kanji at a glance, with Nichiji Pro. Until then, a tap opens the unlock screen."
+                     : "The kanji at a glance. Tap to open Today.")
                     .font(.nichijiCallout)
                     .foregroundColor(.nichijiInkMuted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             VStack(alignment: .leading, spacing: LayoutTokens.space12) {
@@ -233,6 +244,13 @@ public struct WidgetGuideSettingsView: View {
                     }
                     .accessibilityElement(children: .combine)
                 }
+            }
+
+            if isLockScreenLocked {
+                Button(action: { paywallFeature = .lockScreenWidgets }, label: {
+                    Label("Unlock lock screen widgets", systemImage: "lock")
+                })
+                .buttonStyle(SecondaryButtonStyle())
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

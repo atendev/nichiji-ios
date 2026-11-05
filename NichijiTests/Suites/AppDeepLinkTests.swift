@@ -25,10 +25,21 @@ struct AppDeepLinkTests {
         #expect(AppDeepLink(url: url) == .today)
     }
 
+    @Test("The pro link round-trips, ignores case and allows a trailing slash")
+    func proRoundTrips() throws {
+        #expect(AppDeepLink.pro.url.absoluteString == "nichiji://pro")
+        #expect(AppDeepLink(url: AppDeepLink.pro.url) == .pro)
+        #expect(AppDeepLink(url: try #require(URL(string: "NICHIJI://Pro"))) == .pro)
+        #expect(AppDeepLink(url: try #require(URL(string: "nichiji://pro/"))) == .pro)
+        #expect(AppDeepLink.pro.tab == .today)
+    }
+
     @Test("Unknown schemes, hosts and paths are rejected", arguments: [
         "https://today",
+        "https://pro",
         "nichiji://review",
         "nichiji://today/extra",
+        "nichiji://pro/extra",
         "nichiji:today"
     ])
     func rejectsOtherURLs(_ string: String) throws {

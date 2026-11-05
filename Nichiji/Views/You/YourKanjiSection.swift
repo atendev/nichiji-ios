@@ -29,6 +29,7 @@ struct YourKanjiSection: View {
     @State private var historyError: String?
     @State private var exportURL: URL?
     @State private var exportFailed = false
+    @State private var paywallFeature: ProFeature?
 
     init(learnedCount: Int, learnedKanjiIDs: [String], meanings: [String: String], logCount: Int) {
         self.learnedCount = learnedCount
@@ -68,6 +69,7 @@ struct YourKanjiSection: View {
         .task(id: HistoryRequest(isOpened: mode == .history || history != nil, logCount: logCount)) {
             await loadHistory()
         }
+        .paywallSheet(feature: $paywallFeature)
     }
 
     /*------------------------------learned-------------------------------*/
@@ -118,23 +120,29 @@ struct YourKanjiSection: View {
         note("Saves a CSV of your history. Nothing leaves your phone unless you share the file.")
     }
 
-    // TODO: "Build the paywall and locked states" makes a locked export open the paywall instead of staying disabled.
-    /// A disabled stand-in until the file is ready or while Pro is locked, so a stale or missing file is never shared.
+    /// Locked, the button opens the paywall. Unlocked, a disabled stand-in waits for the file, so a stale or missing file is never shared.
     @ViewBuilder private var exportControl: some View {
-        if YouCopy.canExport(logIsEmpty: logCount == 0, fileURL: exportURL, access: proAccess?.access ?? .locked), let exportURL {
-            ShareLink(item: exportURL) {
-                exportLabel
+        switch YouCopy.exportAction(logIsEmpty: logCount == 0, fileURL: exportURL, access: proAccess?.access ?? .locked) {
+        case .share(let url):
+            ShareLink(item: url) {
+                exportLabel(systemImage: "square.and.arrow.down")
             }
             .buttonStyle(SecondaryButtonStyle())
-        } else {
-            Button(action: {}, label: { exportLabel })
+        case .paywall:
+            Button(action: { paywallFeature = .csvExport }, label: {
+                exportLabel(systemImage: "lock")
+            })
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityHint("Needs Nichiji Pro")
+        case .unavailable:
+            Button(action: {}, label: { exportLabel(systemImage: "square.and.arrow.down") })
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(true)
         }
     }
 
-    private var exportLabel: some View {
-        Label("Export history", systemImage: "square.and.arrow.down")
+    private func exportLabel(systemImage: String) -> some View {
+        Label("Export history", systemImage: systemImage)
     }
 
     private func note(_ text: String) -> some View {

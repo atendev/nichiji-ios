@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.21.0
+
+- Add the paywall: `PaywallView` opens only when a locked Pro feature is tapped. It names that feature first, lists all four, notes what stays free, and offers "Unlock for <price>" from StoreKit, "Restore purchases" and a Family Sharing note. Pending, unavailable, unverified and failed purchases each get a one-line note, a cancelled purchase shows nothing, and the sheet closes once Pro unlocks. `PaywallModel` and `PaywallCopy` hold the state and the copy
+- Locked "Export history" now opens the paywall instead of staying disabled. The widget guide's Lock screen card gets "Unlock lock screen widgets" while locked
+- Locked lock-screen widgets read "Nichiji Pro" / "Tap to unlock" and open the new `nichiji://pro` link, which closes Settings and shows the paywall over Today. Unlocked widgets still open Today
+- Settings gets a Nichiji Pro section: status, "Restore purchases" with its result, and a Debug-only "Developer unlock" toggle. It never opens the paywall
+- Close ticket 059
+
 ## v0.20.0
 
 - Add the Pro purchase service: `StoreKitPurchaseService` buys, restores and refreshes the "Nichiji Pro" non-consumable (`com.aten.nichiji.pro`) on StoreKit 2, with no server or SDK. Only verified, unrevoked entitlements unlock, family-shared ones included. Every refresh writes the result to App Group `UserDefaults`, so Pro holds offline and through relaunch, and the widget reads the same value

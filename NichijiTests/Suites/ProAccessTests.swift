@@ -242,8 +242,20 @@ struct LockScreenWidgetGateTests {
     @Test("The locked placeholder copy is pinned")
     func lockedCopy() {
         #expect(AccessoryWidgetCopy.proLocked == "Nichiji Pro")
-        #expect(AccessoryWidgetCopy.proLockedDetail == "Unlock in the app")
-        #expect(AccessoryWidgetCopy.proLockedAccessibility == "Lock screen widgets need Nichiji Pro. Unlock it in the app.")
+        #expect(AccessoryWidgetCopy.proLockedDetail == "Tap to unlock")
+        #expect(AccessoryWidgetCopy.proLockedInline == "Unlock Nichiji Pro")
+        #expect(AccessoryWidgetCopy.proLockedAccessibility == "Lock screen widgets need Nichiji Pro. Tap to unlock it in the app.")
+    }
+
+    @Test("Locked lock-screen families open the paywall; every other tap opens Today")
+    func tapURLs() {
+        for family in [WidgetFamily.accessoryCircular, .accessoryRectangular, .accessoryInline] {
+            #expect(LockScreenWidgetGate.url(family: family, access: .locked) == AppDeepLink.pro.url)
+            #expect(LockScreenWidgetGate.url(family: family, access: .purchased) == AppDeepLink.today.url)
+        }
+        for family in [WidgetFamily.systemSmall, .systemMedium] {
+            #expect(LockScreenWidgetGate.url(family: family, access: .locked) == AppDeepLink.today.url)
+        }
     }
 
     @Test("The gallery sample shows the unlocked layout")
