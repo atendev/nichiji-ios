@@ -179,8 +179,8 @@ enum YouCopy {
         return String(format: "%d:%02d %@", displayHour, parts.minute ?? 0, hour >= 12 ? "pm" : "am")
     }
 
-    /// Sharing needs a prepared file and at least one log entry.
-    static func canExport(logIsEmpty: Bool, fileURL: URL?) -> Bool {
-        !logIsEmpty && fileURL != nil
+    /// The CSV export needs Pro as well as a non-empty log and a written file.
+    static func canExport(logIsEmpty: Bool, fileURL: URL?, access: ProAccess) -> Bool {
+        access.allows(.csvExport) && !logIsEmpty && fileURL != nil
     }
 }

@@ -1,0 +1,35 @@
+{
+  "identifier" : "6F3A9C21",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : true,
+      "internalID" : "6739420001",
+      "localizations" : [
+        {
+          "description" : "Lock-screen widgets, CSV export, photo lookup and handwriting search.",
+          "displayName" : "Nichiji Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.aten.nichiji.pro",
+      "referenceName" : "Nichiji Pro",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA"
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

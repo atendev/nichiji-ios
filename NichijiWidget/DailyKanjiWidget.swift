@@ -48,7 +48,7 @@ struct DailyKanjiProvider: TimelineProvider {
         guard let environment = try? WidgetEnvironment.live() else {
             let now = Date()
             return DailyKanjiTimelinePlan(
-                entry: DailyKanjiWidgetEntry(date: now, content: .openApp),
+                entry: DailyKanjiWidgetEntry(date: now, content: .openApp, proAccess: ProEntitlementCache.load()),
                 reloadDate: now.addingTimeInterval(DailyKanjiTimelineBuilder.retryInterval)
             )
         }
@@ -64,6 +64,15 @@ struct DailyKanjiWidgetEntryView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
+        if LockScreenWidgetGate.isLocked(family: family, access: entry.proAccess) {
+            // TODO: "Build the paywall and locked states" settles the final locked design and copy.
+            AccessoryLockedWidgetView(family: family)
+        } else {
+            familyView
+        }
+    }
+
+    @ViewBuilder private var familyView: some View {
         switch family {
         case .accessoryCircular:
             AccessoryCircularWidgetView(content: entry.content)

@@ -10,6 +10,9 @@ enum AccessoryWidgetCopy {
     static let levelComplete = "Level complete"
     static let levelCompleteDetail = "Every kanji learned."
     static let openApp = "Open Nichiji to start learning"
+    static let proLocked = "Nichiji Pro"
+    static let proLockedDetail = "Unlock in the app"
+    static let proLockedAccessibility = "Lock screen widgets need Nichiji Pro. Unlock it in the app."
 
     static func inline(for content: DailyKanjiWidgetEntry.Content) -> String {
         switch content {
@@ -33,6 +36,22 @@ enum AccessoryWidgetCopy {
                 : "\(snapshot.kanjiID), \(snapshot.primaryMeaning)."
         case .levelComplete: "\(levelComplete). \(levelCompleteDetail)"
         case .openApp: openApp
+        }
+    }
+}
+
+/*---------------------------------gate---------------------------------------*/
+
+/// Lock-screen families need Pro; the home-screen widgets stay free.
+enum LockScreenWidgetGate {
+    static func isLocked(family: WidgetFamily, access: ProAccess) -> Bool {
+        isLockScreen(family) && !access.allows(.lockScreenWidgets)
+    }
+
+    static func isLockScreen(_ family: WidgetFamily) -> Bool {
+        switch family {
+        case .accessoryCircular, .accessoryRectangular, .accessoryInline: true
+        default: false
         }
     }
 }
@@ -137,5 +156,37 @@ struct AccessoryInlineWidgetView: View {
     var body: some View {
         Text(AccessoryWidgetCopy.inline(for: content))
             .accessibilityLabel(AccessoryWidgetCopy.accessibilityLabel(for: content))
+    }
+}
+
+/*---------------------------------locked-------------------------------------*/
+
+/// A minimal stand-in shown on the lock screen until Pro is unlocked.
+struct AccessoryLockedWidgetView: View {
+    let family: WidgetFamily
+
+    var body: some View {
+        Group {
+            switch family {
+            case .accessoryCircular:
+                ZStack {
+                    AccessoryWidgetBackground()
+                    Image(systemName: "lock.fill")
+                        .font(.uiText(size: 20, weight: .medium))
+                }
+            case .accessoryRectangular:
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(AccessoryWidgetCopy.proLocked)
+                        .font(.uiText(size: 14, weight: .medium))
+                    Text(AccessoryWidgetCopy.proLockedDetail)
+                        .font(.uiText(size: 12))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            default:
+                Text(AccessoryWidgetCopy.proLocked)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(AccessoryWidgetCopy.proLockedAccessibility)
     }
 }

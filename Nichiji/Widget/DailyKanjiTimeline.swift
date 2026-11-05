@@ -16,11 +16,13 @@ struct DailyKanjiWidgetEntry: TimelineEntry, Equatable, Sendable {
 
     let date: Date
     let content: Content
+    /// The cached Pro state when the entry was built; it decides whether the lock-screen families unlock.
+    var proAccess: ProAccess = .locked
 }
 
 extension DailyKanjiWidgetEntry {
-    /// Static 学 sample used by widget placeholders and the onboarding preview.
-    static let sample = DailyKanjiWidgetEntry(date: Date(timeIntervalSince1970: 0), content: .today(.sample))
+    /// Static 学 sample used by widget placeholders, the widget gallery and the onboarding preview. It shows the unlocked layout.
+    static let sample = DailyKanjiWidgetEntry(date: Date(timeIntervalSince1970: 0), content: .today(.sample), proAccess: .purchased)
 }
 
 extension DailyKanjiWidgetSnapshot {
@@ -55,14 +57,16 @@ struct DailyKanjiTimelineBuilder: Sendable {
     let dailyKanjiService: any DailyKanjiService
     let dayProvider: any DayProvider
     let preferencesProvider: @Sendable () -> LearnerPreferencesSnapshot
+    var proAccessProvider: @Sendable () -> ProAccess = { .locked }
 
     func build() async -> DailyKanjiTimelinePlan {
         let now = dayProvider.now
         let midnight = dayProvider.nextMidnight(after: now)
+        let access = proAccessProvider()
 
         // Reading the snapshot would create today's assignment with default preferences, so wait for onboarding.
         guard preferencesProvider().hasCompletedOnboarding else {
-            return DailyKanjiTimelinePlan(entry: DailyKanjiWidgetEntry(date: now, content: .openApp), reloadDate: midnight)
+            return DailyKanjiTimelinePlan(entry: DailyKanjiWidgetEntry(date: now, content: .openApp, proAccess: access), reloadDate: midnight)
         }
 
         do {
@@ -73,10 +77,10 @@ struct DailyKanjiTimelineBuilder: Sendable {
             } else {
                 content = .levelComplete
             }
-            return DailyKanjiTimelinePlan(entry: DailyKanjiWidgetEntry(date: now, content: content), reloadDate: midnight)
+            return DailyKanjiTimelinePlan(entry: DailyKanjiWidgetEntry(date: now, content: content, proAccess: access), reloadDate: midnight)
         } catch {
             let retry = min(now.addingTimeInterval(Self.retryInterval), midnight)
-            return DailyKanjiTimelinePlan(entry: DailyKanjiWidgetEntry(date: now, content: .openApp), reloadDate: retry)
+            return DailyKanjiTimelinePlan(entry: DailyKanjiWidgetEntry(date: now, content: .openApp, proAccess: access), reloadDate: retry)
         }
     }
 }

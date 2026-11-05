@@ -86,7 +86,10 @@ targets:
   NichijiTests:
     type: bundle.unit-test
     platform: iOS
-    sources: [NichijiTests]
+    sources:
+      - NichijiTests
+      - path: Config/Nichiji.storekit
+        buildPhase: resources
     dependencies:
       - target: Nichiji
     settings:
@@ -109,6 +112,9 @@ schemes:
       targets:
         Nichiji: all
         NichijiUITests: [test]
+    # Local runs buy Pro against the StoreKit configuration instead of the App Store.
+    run:
+      storeKitConfiguration: Config/Nichiji.storekit
     test:
       targets:
         - NichijiTests

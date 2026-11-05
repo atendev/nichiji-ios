@@ -23,6 +23,9 @@ jobs:
         run: make dataset-test
       - name: Test
         run: make test
+        # xcodebuild passes TEST_RUNNER_ variables into the test process without the prefix.
+        env:
+          TEST_RUNNER_NICHIJI_SKIP_STOREKIT_TESTS: "1"
 
   unsigned-ipa:
     needs: build-test

@@ -18,6 +18,7 @@ struct NichijiApp: App {
 
     private let modelContainer: ModelContainer
     private let services: ServiceContainer
+    @State private var proAccess: ProAccessModel
 
     init() {
         let schema = Schema.nichijiLearner
@@ -48,6 +49,9 @@ struct NichijiApp: App {
                 ),
                 reviewService: reviewService,
                 widgetRefresher: SystemWidgetRefresher()
+            )
+            self._proAccess = State(
+                initialValue: ProAccessModel(service: StoreKitPurchaseService(), widgetRefresher: SystemWidgetRefresher())
             )
         } catch {
             fatalError("Unable to initialize the learner store: \(error)")
@@ -96,6 +100,10 @@ struct NichijiApp: App {
                 .preferredColorScheme(preferredColorScheme)
                 .modelContainer(modelContainer)
                 .environment(\.serviceContainer, services)
+                .environment(proAccess)
+                .task {
+                    await proAccess.start()
+                }
         }
     }
 }

@@ -123,9 +123,20 @@ Settings sheet. Lock-screen widgets ship in all three accessory families: the
 circular family shows the kanji glyph (with a small checkmark once learned),
 the rectangular family adds the primary meaning and featured word, and the
 inline family shows one line of kanji and meaning. All are read-only; a tap
-opens Today. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
+opens Today. They need Pro; without it each family shows a small locked
+placeholder, while the home-screen widgets stay free. Audio uses `AVSpeechSynthesizer` on `@MainActor` with `ja-JP`, speaking
 kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed. Handwriting recognition is deferred.
+
+Pro is a one-time "Nichiji Pro" non-consumable bought through StoreKit 2, with
+no server and no third-party SDK. It unlocks lock-screen widgets, CSV export,
+photo lookup and handwriting search (`ProFeature`); everything else is free.
+`StoreKitPurchaseService` reads the device's entitlements, accepting only
+verified, unrevoked transactions, purchased or family shared. It caches the
+result in App Group `UserDefaults`, so gating works offline and the widget
+extension reads the same value. `ProAccessModel` restores on every launch,
+follows transaction updates and reloads widget timelines when access changes.
+A Debug-only dev unlock sits on its own key.
 
 The data and navigation model leaves room for an iPhone Duo or iPad two-pane
 layout. The first pass implements the standard single-column phone layout.
@@ -149,6 +160,8 @@ The app separates immutable bundled content from mutable learner state:
   `learning`, `familiar`, `known`), review timestamps and answer counts.
 - `CustomKanjiSelection` and `StudyLogEntry`: SwiftData records for custom
   study-pool picks and day-by-day study activity.
+- `ProAccess`: the `Sendable` Pro state (purchased, Debug dev unlock) cached in
+  shared `UserDefaults` and checked per `ProFeature`.
 
 ## UI/UX
 
