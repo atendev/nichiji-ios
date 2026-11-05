@@ -113,6 +113,12 @@ _Avoid_: Wrong, fail, missed
 The explicit learner action that resets a learned kanji back to the `new` study stage and returns it to the study pool.
 _Avoid_: Reset, unlearn, delete progress
 
+### Access
+
+**Pro**:
+The one-time, non-consumable unlock that adds lock-screen widgets, CSV export, photo lookup and handwriting search. Everything else in the app is free, including the full You tab, Review, Practice, Dictionary and Custom pools.
+_Avoid_: Premium, subscription, paid version, plan
+
 ### Stats
 
 **Study day**:
