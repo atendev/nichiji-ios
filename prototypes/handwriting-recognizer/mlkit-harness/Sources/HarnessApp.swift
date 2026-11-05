@@ -37,7 +37,8 @@ final class Harness: ObservableObject {
     @Published var modelReady = false
     @Published var running = false
     @Published var testSet: TestSet?
-    @Published var pooled = Tally(), raw = Tally()
+    @Published var pooled = Tally()
+    @Published var raw = Tally()
     @Published var done = 0
     @Published var msPerSample = 0.0
 
