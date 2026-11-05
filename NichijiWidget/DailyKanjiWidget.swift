@@ -8,9 +8,7 @@ struct DailyKanjiWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: Self.kind, provider: DailyKanjiProvider()) { entry in
-            // The medium widget's Got it button keeps its AppIntent; every other tap, lock screen included, opens Today.
             DailyKanjiWidgetEntryView(entry: entry)
-                .widgetURL(AppDeepLink.today.url)
                 .containerBackground(for: .widget) {
                     Color.nichijiSurfaceRaised
                 }
@@ -63,13 +61,16 @@ struct DailyKanjiWidgetEntryView: View {
 
     @Environment(\.widgetFamily) private var family
 
+    /// The medium widget's Got it button keeps its AppIntent. Every other tap opens Today, or the paywall on a locked lock-screen family.
     var body: some View {
-        if LockScreenWidgetGate.isLocked(family: family, access: entry.proAccess) {
-            // TODO: "Build the paywall and locked states" settles the final locked design and copy.
-            AccessoryLockedWidgetView(family: family)
-        } else {
-            familyView
+        Group {
+            if LockScreenWidgetGate.isLocked(family: family, access: entry.proAccess) {
+                AccessoryLockedWidgetView(family: family)
+            } else {
+                familyView
+            }
         }
+        .widgetURL(LockScreenWidgetGate.url(family: family, access: entry.proAccess))
     }
 
     @ViewBuilder private var familyView: some View {

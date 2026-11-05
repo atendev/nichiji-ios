@@ -12,33 +12,29 @@ public enum AppTab: String, Codable, CaseIterable, Sendable {
 
 /// App URLs from the widgets (`widgetURL`) and from outside the app, such as Safari or
 /// Shortcuts. The scheme is registered in `project.yml` and received in `onOpenURL`.
-public enum AppDeepLink: Equatable, Sendable {
+public enum AppDeepLink: String, Equatable, Sendable {
     case today
+    /// Opened by a locked lock-screen widget; the app shows the paywall over Today.
+    case pro
 
     public static let scheme = "nichiji"
 
     public var url: URL {
-        switch self {
-        case .today:
-            return URL(string: "\(Self.scheme)://today")!
-        }
+        URL(string: "\(Self.scheme)://\(rawValue)")!
     }
 
     /// The tab the app selects when it opens this link.
     public var tab: AppTab {
-        switch self {
-        case .today:
-            return .today
-        }
+        .today
     }
 
     public init?(url: URL) {
         guard url.scheme?.lowercased() == Self.scheme,
-              url.host()?.lowercased() == "today",
+              let link = url.host().flatMap({ Self(rawValue: $0.lowercased()) }),
               url.path().isEmpty || url.path() == "/" else {
             return nil
         }
-        self = .today
+        self = link
     }
 }
 

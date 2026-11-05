@@ -124,6 +124,8 @@ public struct SettingsSheet: View {
 
                     learningSection
 
+                    SettingsProSection()
+
                     helpSection
 
                     aboutSection

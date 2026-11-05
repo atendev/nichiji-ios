@@ -188,14 +188,15 @@ struct YouTabTests {
         #expect(YouCopy.historyTime(clock.at("2026-11-04", hour: 21, minute: 30), calendar: calendar) == "9:30 pm")
     }
 
-    @Test("Export needs Pro, a non-empty log and a prepared file")
-    func canExport() {
+    @Test("Locked export opens the paywall; unlocked export shares once the file is ready")
+    func exportAction() {
         let url = URL(fileURLWithPath: "/tmp/nichiji-history-2026-11-04.csv")
-        #expect(YouCopy.canExport(logIsEmpty: false, fileURL: url, access: .purchased))
-        #expect(!YouCopy.canExport(logIsEmpty: true, fileURL: url, access: .purchased))
-        #expect(!YouCopy.canExport(logIsEmpty: false, fileURL: nil, access: .purchased))
-        #expect(!YouCopy.canExport(logIsEmpty: false, fileURL: url, access: .locked))
-        #expect(YouCopy.canExport(logIsEmpty: false, fileURL: url, access: ProAccess(isDevUnlocked: true)))
+        #expect(YouCopy.exportAction(logIsEmpty: false, fileURL: url, access: .purchased) == .share(url))
+        #expect(YouCopy.exportAction(logIsEmpty: true, fileURL: url, access: .purchased) == .unavailable)
+        #expect(YouCopy.exportAction(logIsEmpty: false, fileURL: nil, access: .purchased) == .unavailable)
+        #expect(YouCopy.exportAction(logIsEmpty: false, fileURL: url, access: .locked) == .paywall)
+        #expect(YouCopy.exportAction(logIsEmpty: true, fileURL: nil, access: .locked) == .paywall)
+        #expect(YouCopy.exportAction(logIsEmpty: false, fileURL: url, access: ProAccess(isDevUnlocked: true)) == .share(url))
     }
 
     /*---------------------------level-complete---------------------------*/

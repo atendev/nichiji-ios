@@ -11,8 +11,9 @@ enum AccessoryWidgetCopy {
     static let levelCompleteDetail = "Every kanji learned."
     static let openApp = "Open Nichiji to start learning"
     static let proLocked = "Nichiji Pro"
-    static let proLockedDetail = "Unlock in the app"
-    static let proLockedAccessibility = "Lock screen widgets need Nichiji Pro. Unlock it in the app."
+    static let proLockedDetail = "Tap to unlock"
+    static let proLockedInline = "Unlock Nichiji Pro"
+    static let proLockedAccessibility = "Lock screen widgets need Nichiji Pro. Tap to unlock it in the app."
 
     static func inline(for content: DailyKanjiWidgetEntry.Content) -> String {
         switch content {
@@ -46,6 +47,11 @@ enum AccessoryWidgetCopy {
 enum LockScreenWidgetGate {
     static func isLocked(family: WidgetFamily, access: ProAccess) -> Bool {
         isLockScreen(family) && !access.allows(.lockScreenWidgets)
+    }
+
+    /// A locked family opens the paywall; everything else opens Today.
+    static func url(family: WidgetFamily, access: ProAccess) -> URL {
+        isLocked(family: family, access: access) ? AppDeepLink.pro.url : AppDeepLink.today.url
     }
 
     static func isLockScreen(_ family: WidgetFamily) -> Bool {
@@ -161,7 +167,7 @@ struct AccessoryInlineWidgetView: View {
 
 /*---------------------------------locked-------------------------------------*/
 
-/// A minimal stand-in shown on the lock screen until Pro is unlocked.
+/// Shown on the lock screen until Pro is unlocked. A tap opens the paywall.
 struct AccessoryLockedWidgetView: View {
     let family: WidgetFamily
 
@@ -183,7 +189,7 @@ struct AccessoryLockedWidgetView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             default:
-                Text(AccessoryWidgetCopy.proLocked)
+                Label(AccessoryWidgetCopy.proLockedInline, systemImage: "lock.fill")
             }
         }
         .accessibilityElement(children: .ignore)

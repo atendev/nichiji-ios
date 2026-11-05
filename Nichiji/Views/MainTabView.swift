@@ -5,6 +5,11 @@ import SwiftUI
 public struct MainTabView: View {
     @State private var selectedTab: AppTab = .today
     @State private var isSettingsPresented: Bool = false
+    @State private var paywallFeature: ProFeature?
+    /// Held while Settings closes, since one view cannot swap sheets in a single update.
+    @State private var pendingPaywallFeature: ProFeature?
+
+    @Environment(ProAccessModel.self) private var proAccess: ProAccessModel?
 
     public init() {}
 
@@ -35,13 +40,26 @@ public struct MainTabView: View {
                 .tag(AppTab.you)
         }
         .tint(Color.nichijiVermilion)
-        .sheet(isPresented: $isSettingsPresented) {
+        .sheet(isPresented: $isSettingsPresented, onDismiss: showPendingPaywall) {
             SettingsSheet()
         }
+        .paywallSheet(feature: $paywallFeature)
         .onOpenURL { url in
             guard let link = AppDeepLink(url: url) else { return }
-            isSettingsPresented = false
             selectedTab = link.tab
+            let feature = link.paywallFeature(access: proAccess?.access ?? .locked)
+            if isSettingsPresented {
+                pendingPaywallFeature = feature
+                isSettingsPresented = false
+            } else {
+                paywallFeature = feature
+            }
         }
+    }
+
+    private func showPendingPaywall() {
+        guard let feature = pendingPaywallFeature else { return }
+        paywallFeature = feature
+        pendingPaywallFeature = nil
     }
 }
