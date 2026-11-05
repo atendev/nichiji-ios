@@ -10,11 +10,13 @@ Question (ticket "Choose the handwriting recognizer"): which reads a learner's d
 python3 -I -B prototypes/handwriting-recognizer/build_templates.py   # writes templates.js (gitignored, 5 MB)
 ```
 
-Open `index.html` in a browser. To draw with a finger on a phone, serve the folder on your LAN and open it from the phone:
+Open `index.html` in a browser. To draw with a finger on a phone, serve the folder on your Tailscale address and open it from the phone:
 
 ```sh
-python3 -m http.server -d prototypes/handwriting-recognizer 8000
+python3 -I -B prototypes/handwriting-recognizer/serve.py "$(tailscale ip -4)" 8000
 ```
+
+**Send to laptop** posts the test set to `serve.py`, which saves it as `handwriting-testset.json` in this folder. It refuses a set smaller than the saved one.
 
 - **Draw test set** walks 104 targets: 80 spread across the frequency list, plus 24 confusables (土士, 未末, 人入, 大犬太…). Save & next stores each drawing in this browser's `localStorage`. **Export test set** downloads `handwriting-testset.json`, which ML Kit also reads.
 - **Free play** shows the top 10 from all four matcher variants as you draw.

@@ -62,6 +62,7 @@
   </div>
   <div class="cands" id="liveCands"></div>
   <div class="row">
+    <button id="send" class="primary">Send to laptop</button>
     <button id="export">Export test set</button>
     <label class="file">Import<input type="file" id="import" accept="application/json" hidden></label>
     <button id="reset">Delete all drawings</button>
@@ -181,6 +182,15 @@ $("export").onclick = () => {
   a.href = URL.createObjectURL(new Blob([JSON.stringify(testSet())], { type: "application/json" }));
   a.download = "handwriting-testset.json";
   a.click();
+};
+$("send").onclick = async () => {
+  $("state").textContent = "Sending…";
+  try {
+    const res = await fetch("upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(testSet()) });
+    $("state").textContent = res.ok ? `Sent ${(await res.json()).saved} drawings to the laptop.` : `Send failed: HTTP ${res.status}`;
+  } catch (e) {
+    $("state").textContent = `Send failed: ${e.message}`;
+  }
 };
 $("import").onchange = async (e) => {
   const data = JSON.parse(await e.target.files[0].text());
