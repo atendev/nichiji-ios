@@ -9,7 +9,7 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 - Add the Pro purchase service: `StoreKitPurchaseService` buys, restores and refreshes the "Nichiji Pro" non-consumable (`com.aten.nichiji.pro`) on StoreKit 2, with no server or SDK. Only verified, unrevoked entitlements unlock, family-shared ones included. Every refresh writes the result to App Group `UserDefaults`, so Pro holds offline and through relaunch, and the widget reads the same value
 - Add `ProAccessModel`, injected from `NichijiApp`: it starts from the cache, restores on launch, follows `Transaction.updates`, and reloads widget timelines when access changes. A Debug-only dev unlock sits on its own key
 - Gate the Pro features: without Pro, the three lock-screen families show a small locked placeholder and History's "Export history" stays disabled. `ProFeature` also names photo lookup and handwriting search for their build tickets. The paywall comes next
-- Add `Config/Nichiji.storekit` for local runs (scheme run action) and tests, including `SKTestSession` tests of purchase, clear, restore and outside purchases
+- Add `Config/Nichiji.storekit` for local runs (scheme run action) and tests, including `SKTestSession` tests of product info, purchase, clear, restore and outside purchases. CI sets `TEST_RUNNER_NICHIJI_SKIP_STOREKIT_TESTS` to skip that suite, because the session returned no products there (cause unknown). The StoreKit-backed source has no CI coverage
 - Close ticket 058
 
 ## v0.19.0
