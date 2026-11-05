@@ -24,7 +24,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
-- Freemium is in v1.0 scope (settled while grilling [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md)): a free app with a one-time Pro unlock, a non-consumable in-app purchase on StoreKit 2 with no server or third-party SDK. What Pro gates is open in [Decide the free/Pro boundary, price and unlock flow](tickets/057-decide-the-free-pro-boundary.md). The listing decisions so far are in the metadata ticket's Notes.
+- [Decide the free/Pro boundary, price and unlock flow](closed/057-decide-the-free-pro-boundary.md): "Nichiji Pro" is a one-time $4.99 non-consumable on StoreKit 2, no server or SDK. Pro is lock-screen widgets, CSV export, photo lookup and handwriting search; everything else is free, including the whole You tab, Review, Practice and Custom pools. No trial; paywall only where a Pro feature is tapped; automatic restore plus a Restore button, Family Sharing on; a debug-only dev unlock and App Store offer codes, no self-issued codes. This reopens the v1.0 scope for photo and handwriting, and the value gets re-checked after the photo test. The listing decisions so far are in the metadata ticket's Notes.
 
 - [Build the Sources screen](closed/052-sources-screen.md): Settings > About > Sources and the Level footer open `SourcesView`, which parses the bundled `DATA-SOURCES.md` into attribution cards with 44 pt link rows and dated snapshots; the generator writes the links, counts estimated levels and dates each snapshot. Waller's CC BY links the tanos sharing page (provisional, no version stated).
 - [Build the You tab](closed/049-you-tab.md): `YouView` shows the tiles, freeze row, activity grid, By level, milestones, Needs attention, and Learned / History with a `ShareLink` CSV export, all from `StatsService` through a tested `YouCopy`; every kanji opens detail. Level complete shows the level's figures and "Start <next level>"; the Review header shows the day streak.
@@ -53,18 +53,21 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
+- Photo lookup and handwriting search build tickets: graduate after [Choose the handwriting recognizer](tickets/060-choose-the-handwriting-recognizer.md) and [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) answer.
 - Waller's list licence version: the Sources screen links the tanos.co.uk sharing page, read only through a Wayback copy, which states CC BY with no version. Recheck the live page before release.
 - Tatoeba's licence: OpenJLPT names Tatoeba as an upstream of the estimated levels, and the Sources screen names it without a link or licence, as 033 worded it. Confirm its licence and whether attribution needs a link before release.
 
 ## Out of scope
 
 - Accounts, sync, analytics and any backend service (`DESIGN.md` constraints).
-- Handwriting recognition for "Draw to search" and stroke-order checking on the Practice pad: both need a stroke-matching core tuned on a corpus of drawn strokes that does not exist — the only unknown-quality item on the map ([Fix the v1.0 scope](closed/034-fix-the-v1-scope.md)). Dictionary ships without the draw button; the pad records only.
+- Stroke-order checking on the Practice pad: the pad records only. Handwriting search for Dictionary is now in v1.0 as a Pro feature, which reopens [Fix the v1.0 scope](closed/034-fix-the-v1-scope.md) for it.
 - iPhone Duo / iPad two-pane layout and configurable widgets: v1.0 ships the single-column phone layout and today-mirroring widgets; the architecture still leaves room for both ([Fix the v1.0 scope](closed/034-fix-the-v1-scope.md)).
 - "Customize your kanji" in onboarding, the daily review cap and the furigana toggle: the Settings Custom path and the existing reminder window cover them ([Fix the v1.0 scope](closed/034-fix-the-v1-scope.md)).
 
 ## Frontier
 
-- [Decide the free/Pro boundary, price and unlock flow](tickets/057-decide-the-free-pro-boundary.md) (grilling, HITL)
+- [Build the Pro purchase service and feature gating](tickets/058-build-the-pro-purchase-service.md) (task, AFK)
+- [Choose the handwriting recognizer](tickets/060-choose-the-handwriting-recognizer.md) (prototype, HITL)
+- [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) (task, HITL)
 
-Blocked: [Build the Pro purchase service and feature gating](tickets/058-build-the-pro-purchase-service.md), [Build the paywall and locked states](tickets/059-build-the-paywall-and-locked-states.md), [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md), [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
+Blocked: [Build the paywall and locked states](tickets/059-build-the-paywall-and-locked-states.md), [Write the App Store metadata](tickets/055-write-the-app-store-metadata.md), [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
