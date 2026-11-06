@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.24.2
+- Git-ignore the `.claude/` folder, so Claude Code's local worktrees and settings stay out of commits.
+
 ## v0.24.1
 - Start the sideloaded IPA with Pro already unlocked. The dev unlock defaulted to off, so the toggle had to be flipped by hand. The Settings toggle still turns it off, and Debug builds keep the old default.
 
