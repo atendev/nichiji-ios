@@ -19,6 +19,13 @@ enum HandwritingSearchEntry {
     }
 }
 
+/// The open "Draw to search" sheet. Presenting it with `.sheet(item:)` hands the model to the sheet directly.
+struct DrawSearchPresentation: Identifiable {
+    let model: HandwritingSearchModel
+
+    var id: ObjectIdentifier { ObjectIdentifier(model) }
+}
+
 /*----------------------------------copy----------------------------------*/
 
 enum HandwritingSearchCopy {

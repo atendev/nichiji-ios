@@ -31,7 +31,7 @@ struct KnownKanjiStepView: View {
         }
         .sheet(isPresented: $isPicking) {
             NavigationStack {
-                KnownKanjiPickerView(scope: .activeLevel)
+                KnownKanjiPickerView()
             }
         }
     }

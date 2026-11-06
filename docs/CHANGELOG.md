@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.23.1
+
+- Fix "Draw a kanji to search" opening an empty sheet on the first tap once Pro is unlocked. `DictionaryView` now presents the sheet with `.sheet(item:)` over `DrawSearchPresentation`, so the sheet gets the model as its argument instead of reading separate optional state
+- The Known kanji picker lists the learner's level and every easier one, in onboarding and in Settings alike: JLPT N3 lists N5, N4 and N3, and Jōyō grade 3 lists grades 1 to 3. With the custom pool active it lists every group. Typed search still reaches every level. `KnownKanjiScope` is now one rule, and `KnownKanjiPickerView` has no `scope` parameter
+- Close ticket 066
+
 ## v0.23.0
 
 - Add known kanji. A learner can mark kanji they already read, so Today starts at the first kanji they do not know. A marked kanji is stored as stage known with no review date and no log row, so it never makes a study day or a streak. `KanjiProgress.declaredKnownAt` tells it apart from a kanji that graduated through review

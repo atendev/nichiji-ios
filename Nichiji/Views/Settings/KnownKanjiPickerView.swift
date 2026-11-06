@@ -4,8 +4,6 @@ import SwiftUI
 
 /// Turn on the kanji the learner already knows. They leave the daily pool and the review queue.
 struct KnownKanjiPickerView: View {
-    let scope: KnownKanjiScope
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.serviceContainer) private var services
 
@@ -173,7 +171,7 @@ struct KnownKanjiPickerView: View {
                 let studied = try await services?.learnerStore.nonNewKanjiIDs() ?? []
                 system = loadedSystem
                 model = KnownKanjiPickerModel(
-                    sections: scope.sections(from: all, preferences: preferences),
+                    sections: KnownKanjiScope.sections(from: all, preferences: preferences),
                     declared: declared,
                     studied: studied
                 )

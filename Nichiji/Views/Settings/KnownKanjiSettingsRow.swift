@@ -9,7 +9,7 @@ struct KnownKanjiSettingsRow: View {
 
     var body: some View {
         NavigationLink {
-            KnownKanjiPickerView(scope: .allLevels)
+            KnownKanjiPickerView()
         } label: {
             settingsNavigationRow(
                 title: "Known kanji",

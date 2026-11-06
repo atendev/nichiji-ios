@@ -113,11 +113,41 @@ struct KnownKanjiPickerTests {
         #expect(KnownKanjiPickerModel.levelLabel(for: bare, system: .joyo) == "Name kanji")
     }
 
-    @Test("Onboarding lists the chosen level, Settings lists every group")
-    func scopes() {
-        let preferences = LearnerPreferencesSnapshot(selectedJLPTLevel: .n4)
+    /*-------------------------------scope--------------------------------*/
 
-        #expect(KnownKanjiScope.activeLevel.sections(from: [n5, n4], preferences: preferences).map(\.id) == [n4.id])
-        #expect(KnownKanjiScope.allLevels.sections(from: [n5, n4], preferences: preferences).map(\.id) == [n5.id, n4.id])
+    private static func groups(_ ids: [String]) -> [KanjiBrowseSection] {
+        ids.map { KanjiBrowseSection(id: $0, title: $0, entries: []) }
+    }
+
+    private static let jlptGroups = groups(JLPTLevel.allCases.map(\.rawValue) + ["unleveled"])
+    private static let joyoGroups = groups(JoyoGrade.allCases.map(\.rawValue) + ["name-kanji"])
+
+    private static func scopedIDs(_ all: [KanjiBrowseSection], _ preferences: LearnerPreferencesSnapshot) -> [String] {
+        KnownKanjiScope.sections(from: all, preferences: preferences).map(\.id)
+    }
+
+    @Test("JLPT lists the learner's level and every easier one, without Other kanji")
+    func jlptScope() {
+        let n3 = LearnerPreferencesSnapshot(levelSystem: .jlpt, selectedJLPTLevel: .n3, isCustomPoolActive: false)
+        let n5 = LearnerPreferencesSnapshot(levelSystem: .jlpt, selectedJLPTLevel: .n5, isCustomPoolActive: false)
+
+        #expect(Self.scopedIDs(Self.jlptGroups, n3) == ["n5", "n4", "n3"])
+        #expect(Self.scopedIDs(Self.jlptGroups, n5) == ["n5"])
+    }
+
+    @Test("Jōyō lists grades up to the learner's, with Secondary after grade 6 and no name kanji")
+    func joyoScope() {
+        let grade3 = LearnerPreferencesSnapshot(levelSystem: .joyo, selectedJoyoGrade: .grade3, isCustomPoolActive: false)
+        let secondary = LearnerPreferencesSnapshot(levelSystem: .joyo, selectedJoyoGrade: .secondary, isCustomPoolActive: false)
+
+        #expect(Self.scopedIDs(Self.joyoGroups, grade3) == ["grade1", "grade2", "grade3"])
+        #expect(Self.scopedIDs(Self.joyoGroups, secondary) == JoyoGrade.allCases.map(\.rawValue))
+    }
+
+    @Test("The custom pool lists every group")
+    func customPoolScope() {
+        let custom = LearnerPreferencesSnapshot(levelSystem: .jlpt, selectedJLPTLevel: .n5, isCustomPoolActive: true)
+
+        #expect(Self.scopedIDs(Self.jlptGroups, custom) == Self.jlptGroups.map(\.id))
     }
 }

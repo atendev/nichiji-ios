@@ -32,7 +32,7 @@ public struct DictionaryView: View {
     @State private var paywallFeature: ProFeature?
     /// Kept across sheet opens, so the templates load and the model download is requested once per run.
     @State private var handwriting: HandwritingSearchModel?
-    @State private var showsDrawSearch = false
+    @State private var drawSearch: DrawSearchPresentation?
 
     private let searchSource: any DictionarySearchSource
 
@@ -105,12 +105,10 @@ public struct DictionaryView: View {
                 path.append(KanjiDetailRoute(kanjiID: kanjiID))
             }
         }
-        .sheet(isPresented: $showsDrawSearch) {
-            if let handwriting {
-                DrawSearchSheet(model: handwriting) { kanji in
-                    query = kanji
-                    showsDrawSearch = false
-                }
+        .sheet(item: $drawSearch) { presentation in
+            DrawSearchSheet(model: presentation.model) { kanji in
+                query = kanji
+                drawSearch = nil
             }
         }
         .paywallSheet(feature: $paywallFeature)
@@ -252,7 +250,7 @@ private extension DictionaryView {
             paywallFeature = feature
         case .pad(let model):
             handwriting = model
-            showsDrawSearch = true
+            drawSearch = DrawSearchPresentation(model: model)
         }
     }
 
