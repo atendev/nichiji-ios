@@ -24,6 +24,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Find what ML Kit sends to Google](closed/064-find-what-ml-kit-sends-to-google.md): ML Kit keeps ink on device but sends Google diagnostics and a per-install ID by default, with no documented iOS opt-out, so "Data Not Collected" no longer holds. The label becomes Data Collected (Diagnostics, Device ID), not tracking; five in-app privacy lines, the policy, the listing and `DESIGN.md` are stale. Findings in `assets/ml-kit-privacy.md`; the keep-or-drop call is [Decide whether handwriting search keeps ML Kit](tickets/068-decide-whether-handwriting-search-keeps-ml-kit.md), and the copy fixes are [Update the privacy copy and label](tickets/069-update-the-privacy-copy-and-label.md).
 - [Decide the Japanese localization](closed/062-decide-the-japanese-localization.md): The Japanese-language user is an English-reading learner shopping in the Japan storefront; a native Japanese reader is a non-goal. v1.0 ships English only, and Japanese work never holds it up: the listing, IAP name, UI, widget, notification and paywall copy and the support and privacy pages come after v1.0. The Sources screen's title localizes with the UI, and its body stays English. Later Japanese follows the system language with no in-app switch, starts with a string catalog, and needs a native reviewer. The grilling surfaced [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md), which blocks the release build in this ticket's place.
 - [Mark kanji the learner already knows](closed/065-mark-known-kanji.md): Learners mark known kanji from a skippable onboarding step, a Settings > Learning row and kanji detail. A marked kanji is stage known with a `declaredKnownAt` date, no review date and no log row, so it makes no study day; Today skips it, and it counts apart from Learned (tiles, bars, Needs attention, level-complete) while milestones keep counting logged learning. The picker's text field shows typed kanji or searches every level. This reopens the onboarding Custom item from the v1.0 scope.
 - [Fix known kanji levels and the blank draw sheet](closed/066-fix-known-kanji-levels-and-draw-sheet.md): The Known kanji picker lists the learner's level and every easier one (every group with the custom pool), and a level pick marks the easier levels known on its own. `wasHandKnown` keeps hand marks when a later pick removes automatic ones. The draw sheet uses `.sheet(item:)` so its first open is never empty, and its pad clears on close.
@@ -76,7 +77,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 ## Frontier
 
 - [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) (task, HITL)
-- [Find what ML Kit sends to Google](tickets/064-find-what-ml-kit-sends-to-google.md) (research, AFK)
+- [Decide whether handwriting search keeps ML Kit](tickets/068-decide-whether-handwriting-search-keeps-ml-kit.md) (grilling, HITL)
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
+Blocked: [Update the privacy copy and label](tickets/069-update-the-privacy-copy-and-label.md), [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
