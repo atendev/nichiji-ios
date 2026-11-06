@@ -75,8 +75,11 @@ public enum ProEntitlementCache {
         from defaults: UserDefaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
     ) -> ProAccess {
         let isPurchased = defaults.bool(forKey: ProEntitlementKey.isPurchased.rawValue)
-        #if DEBUG || DEV_UNLOCK
+        #if DEBUG
         let isDevUnlocked = defaults.bool(forKey: ProEntitlementKey.isDevUnlocked.rawValue)
+        #elseif DEV_UNLOCK
+        // Sideloaded builds start unlocked; the Settings toggle can still turn it off.
+        let isDevUnlocked = defaults.object(forKey: ProEntitlementKey.isDevUnlocked.rawValue) as? Bool ?? true
         #else
         let isDevUnlocked = false
         #endif

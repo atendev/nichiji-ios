@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.22.2
+- Start the sideloaded IPA with Pro already unlocked. The dev unlock defaulted to off, so the toggle had to be flipped by hand. The Settings toggle still turns it off, and Debug builds keep the old default.
+
 ## v0.22.1
 - Build the unsigned IPA with a `DEV_UNLOCK` flag so the sideloaded artifact shows the Settings dev unlock toggle. Debug builds keep it too; a signed App Store archive does not set the flag.
 
