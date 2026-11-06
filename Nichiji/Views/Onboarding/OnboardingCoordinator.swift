@@ -120,6 +120,8 @@ private struct OnboardingStepHost: View {
             FlashcardDemoView(onNext: { flow.advance() })
         case .levelSelection:
             LevelSelectView(flow: flow)
+        case .knownKanji:
+            KnownKanjiStepView(onNext: { flow.advance() })
         case .reminder:
             ReminderSetupView(flow: flow, isActive: step == flow.step)
         case .widgetIntro:

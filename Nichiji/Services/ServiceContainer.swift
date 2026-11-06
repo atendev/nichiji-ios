@@ -57,6 +57,25 @@ struct ServiceContainer: Sendable {
         try? await rebuildReminders(preferences: preferences)
     }
 
+    /// Marks and unmarks already-known kanji, then refreshes what depends on today's pool.
+    /// The store write throws; the reminder rebuild never does. A first run creates no assignment, since Today's rollover picks from the updated pool later.
+    func setKnown(declare: Set<String>, undeclare: Set<String>, preferences: LearnerPreferencesSnapshot) async throws {
+        guard !declare.isEmpty || !undeclare.isEmpty else { return }
+        try await learnerStore.undeclareKnown(undeclare)
+        try await learnerStore.declareKnown(declare, at: dayProvider.now)
+
+        let day = dayProvider.calendarDay(for: dayProvider.now)
+        if try await learnerStore.assignment(for: day) != nil {
+            _ = try await dailyKanjiService.refreshAssignmentAfterPreferenceChange(for: day, preferences: preferences)
+        } else if preferences.hasCompletedOnboarding {
+            _ = try await dailyKanjiService.assignment(for: day)
+        } else {
+            return
+        }
+        widgetRefresher.reloadTimelines()
+        try? await rebuildReminders(preferences: preferences)
+    }
+
     /// Rebuilds or cancels the reminder window without ever prompting for permission.
     func rebuildReminders(preferences: LearnerPreferencesSnapshot) async throws {
         try await ReminderRefresher.refresh(preferences: preferences, scheduler: reminderScheduler)

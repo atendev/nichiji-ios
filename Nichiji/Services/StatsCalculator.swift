@@ -22,7 +22,7 @@ enum StatsCalculator {
         return LearnerStats(
             streak: streak,
             streakFreeze: streak.freeze,
-            kanjiLearned: progress.filter { $0.stage != .new }.count,
+            kanjiLearned: progress.filter(\.isLearned).count,
             reviewsDone: reviewsDone,
             gotItRate: gotItRate(in: log),
             daysStudied: studyDays.count,
@@ -37,7 +37,8 @@ enum StatsCalculator {
                 system: preferences.levelSystem
             ),
             needsAttention: needsAttention(progress: progress, log: log),
-            learnedKanjiIDs: learnedKanjiIDs(progress: progress)
+            learnedKanjiIDs: learnedKanjiIDs(progress: progress),
+            kanjiKnown: progress.filter(\.declaredKnown).count
         )
     }
 

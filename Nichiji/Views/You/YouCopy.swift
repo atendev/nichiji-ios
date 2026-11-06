@@ -162,6 +162,11 @@ enum YouCopy {
         "\(count) learned"
     }
 
+    /// The learned count, with the kanji marked known counted apart once there are any.
+    static func learnedCaption(learned: Int, known: Int) -> String {
+        known == 0 ? learnedCount(learned) : "\(learnedCount(learned)) · \(known) known"
+    }
+
     static func learnedMessage(_ kanjiIDs: [String]) -> String? {
         kanjiIDs.isEmpty ? learnedEmpty : nil
     }

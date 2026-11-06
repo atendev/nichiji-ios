@@ -27,6 +27,13 @@ public struct KanjiProgressSnapshot: Equatable, Sendable {
     public let nextReviewAt: Date?
     public let gotItCount: Int
     public let forgotItCount: Int
+    public let declaredKnownAt: Date?
+
+    /// Marked known by the learner rather than learned here; counted apart from Learned.
+    public var declaredKnown: Bool { stage == .known && declaredKnownAt != nil }
+
+    /// Past new and learned through Today or Review, so it counts toward Learned.
+    public var isLearned: Bool { stage != .new && !declaredKnown }
 
     public init(
         kanjiID: String,
@@ -35,7 +42,8 @@ public struct KanjiProgressSnapshot: Equatable, Sendable {
         lastReviewedAt: Date? = nil,
         nextReviewAt: Date? = nil,
         gotItCount: Int = 0,
-        forgotItCount: Int = 0
+        forgotItCount: Int = 0,
+        declaredKnownAt: Date? = nil
     ) {
         self.kanjiID = kanjiID
         self.stage = stage
@@ -44,6 +52,7 @@ public struct KanjiProgressSnapshot: Equatable, Sendable {
         self.nextReviewAt = nextReviewAt
         self.gotItCount = gotItCount
         self.forgotItCount = forgotItCount
+        self.declaredKnownAt = declaredKnownAt
     }
 }
 

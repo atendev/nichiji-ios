@@ -91,6 +91,7 @@ public struct YouView: View {
                     NeedsAttentionCard(items: stats.needsAttention, meanings: meanings)
                     YourKanjiSection(
                         learnedCount: stats.kanjiLearned,
+                        knownCount: stats.kanjiKnown,
                         learnedKanjiIDs: stats.learnedKanjiIDs,
                         meanings: meanings,
                         logCount: studyLog.count

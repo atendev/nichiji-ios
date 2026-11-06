@@ -708,3 +708,21 @@ Running log of phase history and slices. Each slice gets its Requirements Report
 - **Unanticipated TODOs**: None. The accuracy test runs its samples in a task group to keep the Debug run short.
 - **Test Results**: Not run; CI is the check. Every planned test exists. The pad and layout suites share files with the matcher and entry suites. Added tests cover model reuse, failed template loading, the default shipped set and the Debug footnote.
 - **Audit**: Two sonnet rounds, since the haiku subagent's own model check rejected haiku for this slice. Round 1 found that the report's VoiceOver step named "Undo" and "Clear" while the sheet reads "Undo last stroke" and "Clear all strokes", as Practice does. The report now names the shipped labels. Round 2 returned `APPROVE`.
+
+### Mark kanji the learner already knows (v0.23.0)
+
+#### Requirements Report
+
+- **Success Criteria**: A learner can mark kanji they already read from a skippable onboarding step, a Settings > Learning row and kanji detail. A marked kanji is stage known with `declaredKnownAt`, no review date and no log row. It never makes a study day, Today skips it, and Learning, Forget it and review clear the mark. Marked kanji count apart from Learned, the picker's text field shows typed kanji or searches every level, and the first run creates no assignment.
+- **Scope Boundary**: In: the model field, three store methods, `ServiceContainer.setKnown`, the picker and its value type, the onboarding step, the Settings row, the detail control, the stats separation, tests and docs. Out: a new `StudyAction`, file import, a Known figure in By level bars, level-complete rewording, marking from Today.
+- **Anticipated TODOs**: Level-complete shows Kanji learned 0 after a whole level is marked and Finish level stays at 0, because milestones count logged learning. Text search shows at most 20 kanji. The 44 pt targets and the Settings count refresh are checked by reading and CI only.
+- **Planned Tests**: Store declare, undeclare and clearing paths; stats exclusions and `kanjiKnown`; the daily pool; `setKnown` on a first run, after onboarding, on today's kanji, with empty sets, with a failing reminder and after a whole level; the picker value type; the detail choice rule; the step's button rule; the You caption; the eight-step onboarding.
+- **Audit**: Seven haiku rounds. Rounds 1 to 6 found, among others, the `TestLearnerStore` and `OnboardingStep` compile breaks, stale marks on the learn and review paths, the first-run assignment rule, Forget it reaching marked kanji, lint limits and the widget target's source folders. The user asked to keep auditing past the two-round stop, and round 7 approved.
+
+#### Deviation Report
+
+- **Success Criteria**: Met in code, with two differences. The Settings count refreshes from the row's `.task`, which runs on every appear, instead of `onAppear`, and the detail rule is `KnownKanjiControl.choice(stage:isDeclared:)` returning an optional. Nothing in Swift was built or run, because the host is Linux with no toolchain.
+- **Scope Boundary**: Kept. `DictionarySearchBar` gained a placeholder and an accessibility name so the picker reuses it, and the picker's cell, group header and bottom bar are separate views to stay under `type_body_length`.
+- **Unanticipated TODOs**: None in code. `StatsFixtures.progress` kept five parameters for `function_parameter_count`, so marked fixtures use a new `declared` helper.
+- **Test Results**: Not run; CI is the check. The planned tests exist except two thin ones: no test asserts that milestones ignore marked kanji, and nothing tests that Forget it is hidden for a marked kanji, which is a one-line view condition. There is no separate streak test, since marking writes no log row and the store test asserts that, and no test forces a failed save in the picker.
+

@@ -4,6 +4,14 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.23.0
+
+- Add known kanji. A learner can mark kanji they already read, so Today starts at the first kanji they do not know. A marked kanji is stored as stage known with no review date and no log row, so it never makes a study day or a streak. `KanjiProgress.declaredKnownAt` tells it apart from a kanji that graduated through review
+- Add the Known kanji picker: a skippable onboarding step after level selection (current level only), a "Known kanji" row in Settings > Learning (every group), and a text field that shows typed kanji exactly, or searches readings and meanings across every level so kanji outside the learner's level can be picked. Kanji already in study are dimmed
+- Kanji detail gets "I know this" for new kanji and "Not known after all" for marked ones, which replaces Forget it for them
+- Known counts apart from Learned: the You tiles, By level bars, Learned grid, Needs attention and the level-complete figure leave marked kanji out, and "Your kanji" shows "N learned · M known". Milestones still count logged learning only
+- Close ticket 065
+
 ## v0.22.1
 - Build the unsigned IPA with a `DEV_UNLOCK` flag so the sideloaded artifact shows the Settings dev unlock toggle. Debug builds keep it too; a signed App Store archive does not set the flag.
 
