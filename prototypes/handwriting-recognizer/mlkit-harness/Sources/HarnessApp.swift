@@ -60,7 +60,31 @@ final class Harness: ObservableObject {
         }
     }
 
-    func say(_ line: String) { log.append(line) }
+    func say(_ line: String) {
+        log.append(line)
+        print("HARNESS: \(line)")
+        fflush(stdout)
+    }
+
+    // CI mode: HARNESS_TESTSET=<path> loads the set, downloads the model, runs, prints the report and exits.
+    func autorun(_ path: String) async {
+        load(URL(fileURLWithPath: path))
+        guard testSet != nil else { exit(2) }
+        if !modelReady {
+            download()
+            for _ in 0..<600 where !modelReady {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+        }
+        guard modelReady else {
+            say("model not ready after 300 s")
+            exit(3)
+        }
+        await run()
+        print("HARNESS-REPORT-BEGIN\n\(report)\nHARNESS-REPORT-END")
+        fflush(stdout)
+        exit(0)
+    }
 
     func download() {
         say("downloading ja model…")
@@ -154,6 +178,11 @@ struct HarnessView: View {
                 }
             }
             .navigationTitle("ML Kit Harness")
+            .task {
+                if let path = ProcessInfo.processInfo.environment["HARNESS_TESTSET"] {
+                    await harness.autorun(path)
+                }
+            }
             .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
                 if case let .success(url) = result { harness.load(url) }
             }

@@ -6,6 +6,7 @@ on:
     branches: [prototype/handwriting-recognizer]
     paths:
       - prototypes/handwriting-recognizer/mlkit-harness/**
+      - prototypes/handwriting-recognizer/handwriting-testset.json
       - .github/workflows/prototype-mlkit-harness.yml
   workflow_dispatch:
 
@@ -34,3 +35,61 @@ jobs:
         with:
           name: MLKitHarness-unsigned-ipa
           path: prototypes/handwriting-recognizer/mlkit-harness/MLKitHarness.ipa
+
+  # Runs the harness on the committed test set in the Simulator and records DNS lookups meanwhile.
+  simulator-run:
+    runs-on: xcode-27
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: prototypes/handwriting-recognizer/mlkit-harness
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install xcodegen cocoapods
+      - name: Generate project
+        run: xcodegen generate && pod install
+      - name: Build for Simulator
+        run: |
+          SIM=$(xcrun simctl list devices available | grep -m1 'iPhone' | grep -oE '[0-9A-F]{8}(-[0-9A-F]{4}){3}-[0-9A-F]{12}')
+          echo "SIM=$SIM" >> "$GITHUB_ENV"
+          xcodebuild build -workspace MLKitHarness.xcworkspace -scheme MLKitHarness -configuration Debug \
+            -destination "id=$SIM" -derivedDataPath build/sim CODE_SIGNING_ALLOWED=NO
+      - name: Run test set with DNS capture
+        run: |
+          mkdir -p out
+          limit() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+          domains() { { grep -oE '(A|AAAA|HTTPS)\? [A-Za-z0-9.-]+' "$1" || true; } | awk '{print $2}' | sort -u; }
+          xcrun simctl boot "$SIM" || true
+          limit 300 xcrun simctl bootstatus "$SIM"
+          xcrun simctl install "$SIM" build/sim/Build/Products/Debug-iphonesimulator/MLKitHarness.app
+          IF=$(route -n get default | awk '/interface:/{print $2}')
+          echo "capturing DNS on $IF"
+          # Baseline: the runner's own lookups while idle, so they can be told apart from the harness's.
+          sudo tcpdump -i "$IF" -n -l 'udp port 53' > out/dns-baseline.txt 2> out/tcpdump-baseline.err &
+          sleep 60
+          sudo pkill tcpdump || true
+          sleep 2
+          sudo tcpdump -i "$IF" -n -l 'udp port 53' > out/dns-run.txt 2> out/tcpdump-run.err &
+          sleep 3
+          SIMCTL_CHILD_HARNESS_TESTSET="$GITHUB_WORKSPACE/prototypes/handwriting-recognizer/handwriting-testset.json" \
+            limit 900 xcrun simctl launch --console-pty --terminate-running-process "$SIM" com.aten.nichiji.prototype.MLKitHarness \
+            | tee out/run.log || true
+          sleep 3
+          sudo pkill tcpdump || true
+          cat out/tcpdump-baseline.err out/tcpdump-run.err
+          domains out/dns-baseline.txt > out/dns-baseline-domains.txt
+          domains out/dns-run.txt > out/dns-run-domains.txt
+          comm -13 out/dns-baseline-domains.txt out/dns-run-domains.txt > out/dns-run-only.txt
+          echo "--- Rough cross-check only: host-wide DNS lookups seen during the run and not in the idle baseline."
+          echo "--- The device App Privacy Report is the authority on what the harness contacts."
+          cat out/dns-run-only.txt
+          echo "--- All lookups during the run"; cat out/dns-run-domains.txt
+          sed -n '/HARNESS-REPORT-BEGIN/,/HARNESS-REPORT-END/p' out/run.log > out/report.txt
+          cat out/report.txt
+          test -s out/report.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MLKitHarness-simulator-run
+          path: prototypes/handwriting-recognizer/mlkit-harness/out
