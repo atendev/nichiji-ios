@@ -3,9 +3,9 @@ id: "063"
 title: Build handwriting search
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: []
-claimed: false
+claimed: true
 ---
 
 ## Question
@@ -25,3 +25,12 @@ Decided in [Choose the handwriting recognizer](../closed/060-choose-the-handwrit
 - The privacy label follows [Find what ML Kit sends to Google](064-find-what-ml-kit-sends-to-google.md), which must close before release, not before this build.
 
 ## Resolution
+
+Yes. Dictionary has a Pro "Draw a kanji to search" button under the search bar. Locked, it opens `paywallSheet(feature:)` for `.handwritingSearch`, and no recognizer is made. The "Draw to search" sheet has a pad, five matches after each finished stroke, Undo and Clear. A match fills the search bar.
+
+- `HandwritingTemplateMatcher` ports the prototype's "bbox + free order" variant. `HandwritingTemplateBuilder` builds its templates at runtime from the bundled stroke SVGs, so no data file ships. A CI test holds it to at least 76% top-1 and 89% top-5 on the 104 drawings in `NichijiTests/Fixtures/handwriting-testset.json`.
+- `OnDeviceHandwritingModel` is the seam. `MLKitHandwritingModel` (ML Kit Digital Ink `ja`, CocoaPods 8.0.0) compiles for devices only, and the Simulator factory returns none. `HandwritingSearchModel` requests the download when the sheet opens and the model is missing, one request at a time, and asks again on the next open after a failure. It keeps ML Kit output to single shipped kanji, and falls back to the matcher on an error or an empty filtered result.
+- The root `Podfile` strips the pods' Simulator `EXCLUDED_ARCHS` and makes their linker flags `iphoneos`-only. `make generate` runs `pod install`, builds use `Nichiji.xcworkspace`, and CI installs CocoaPods.
+- DESIGN drops the handwriting non-goal and names ML Kit as the one third-party SDK and network exception.
+- CI: pending; see the Final Report. Left for release: the privacy label and in-app privacy copy (064), a committed `Podfile.lock`, and an on-device ML Kit check (054).
+

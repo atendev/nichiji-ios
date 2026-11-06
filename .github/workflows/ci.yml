@@ -16,7 +16,7 @@ jobs:
       - name: Show toolchain
         run: xcodebuild -version
       - name: Install tools
-        run: brew install xcodegen swiftlint
+        run: brew install xcodegen swiftlint cocoapods
       - name: Lint
         run: make lint
       - name: Dataset generator tests
@@ -26,6 +26,10 @@ jobs:
         # xcodebuild passes TEST_RUNNER_ variables into the test process without the prefix.
         env:
           TEST_RUNNER_NICHIJI_SKIP_STOREKIT_TESTS: "1"
+      # Podfile.lock is not committed yet; this prints the resolved pods so it can be.
+      - name: Show resolved pods
+        if: always()
+        run: cat Podfile.lock || true
 
   unsigned-ipa:
     needs: build-test
@@ -34,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
-        run: brew install xcodegen
+        run: brew install xcodegen cocoapods
       - name: Build unsigned IPA
         run: make ipa
       - uses: actions/upload-artifact@v4

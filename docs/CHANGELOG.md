@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.22.0
+
+- Add handwriting search. A Pro "Draw a kanji to search" button under the Dictionary search bar opens the "Draw to search" sheet (pad, five matches, Undo, Clear), and a match fills the search bar. Locked, the button opens the paywall
+- `HandwritingTemplateMatcher` ports the prototype KanjiVG matcher, with templates built at runtime from the bundled stroke SVGs. A CI test holds it to 76% top-1 and 89% top-5 on 104 drawn samples
+- On device, ML Kit Digital Ink (`ja`) takes over once its model downloads, kept to shipped kanji, with the matcher as fallback. ML Kit comes through CocoaPods for devices only: `make generate` runs `pod install`, builds use `Nichiji.xcworkspace`, and CI installs CocoaPods
+
 ## v0.21.0
 
 - Add the paywall: `PaywallView` opens only when a locked Pro feature is tapped. It names that feature first, lists all four, notes what stays free, and offers "Unlock for <price>" from StoreKit, "Restore purchases" and a Family Sharing note. Pending, unavailable, unverified and failed purchases each get a one-line note, a cancelled purchase shows nothing, and the sheet closes once Pro unlocks. `PaywallModel` and `PaywallCopy` hold the state and the copy
