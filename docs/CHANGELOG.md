@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.22.1
+- Build the unsigned IPA with a `DEV_UNLOCK` flag so the sideloaded artifact shows the Settings dev unlock toggle. Debug builds keep it too; a signed App Store archive does not set the flag.
+
 ## v0.22.0
 
 - Add handwriting search. A Pro "Draw a kanji to search" button under the Dictionary search bar opens the "Draw to search" sheet (pad, five matches, Undo, Clear), and a match fills the search bar. Locked, the button opens the paywall

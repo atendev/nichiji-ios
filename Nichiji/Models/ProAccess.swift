@@ -75,7 +75,7 @@ public enum ProEntitlementCache {
         from defaults: UserDefaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
     ) -> ProAccess {
         let isPurchased = defaults.bool(forKey: ProEntitlementKey.isPurchased.rawValue)
-        #if DEBUG
+        #if DEBUG || DEV_UNLOCK
         let isDevUnlocked = defaults.bool(forKey: ProEntitlementKey.isDevUnlocked.rawValue)
         #else
         let isDevUnlocked = false
@@ -91,7 +91,7 @@ public enum ProEntitlementCache {
         defaults.set(isPurchased, forKey: ProEntitlementKey.isPurchased.rawValue)
     }
 
-    #if DEBUG
+    #if DEBUG || DEV_UNLOCK
     public static func setDevUnlocked(
         _ isOn: Bool,
         in defaults: UserDefaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard

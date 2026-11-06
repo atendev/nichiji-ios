@@ -48,7 +48,7 @@ final class ProAccessModel {
         apply(try await service.restorePurchases())
     }
 
-    #if DEBUG
+    #if DEBUG || DEV_UNLOCK
     func setDevUnlocked(_ isOn: Bool) {
         apply(service.setDevUnlocked(isOn))
     }

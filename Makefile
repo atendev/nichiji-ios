@@ -21,7 +21,8 @@ ipa: generate
 	rm -rf build Payload Nichiji.ipa
 	xcodebuild archive -workspace Nichiji.xcworkspace -scheme $(SCHEME) -configuration Release \
 		-destination 'generic/platform=iOS' -archivePath build/Nichiji.xcarchive \
-		CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+		CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) DEV_UNLOCK'
 	mkdir Payload
 	cp -R build/Nichiji.xcarchive/Products/Applications/Nichiji.app Payload/
 	zip -qr Nichiji.ipa Payload

@@ -33,7 +33,7 @@ struct SettingsProSection: View {
                     statusRow(proAccess.access)
                     dividerLine
                     restoreRow(proAccess)
-                    #if DEBUG
+                    #if DEBUG || DEV_UNLOCK
                     dividerLine
                     settingsToggleRow(
                         title: SettingsProCopy.devUnlockTitle,
