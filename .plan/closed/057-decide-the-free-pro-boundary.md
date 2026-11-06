@@ -3,7 +3,7 @@ id: "057"
 title: Decide the free/Pro boundary, price and unlock flow
 type: grilling
 mode: HITL
-status: open
+status: closed
 blocked_by: []
 claimed: false
 ---

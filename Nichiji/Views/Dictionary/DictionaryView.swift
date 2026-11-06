@@ -6,6 +6,7 @@ public struct DictionaryView: View {
     public let onOpenSettings: () -> Void
 
     @Environment(\.serviceContainer) private var services
+    @Environment(ProAccessModel.self) private var proAccess: ProAccessModel?
     @AppStorage(
         LearnerPreferenceKey.levelSystem.rawValue,
         store: UserDefaults(suiteName: AppStorageGroup.suiteName)
@@ -28,6 +29,10 @@ public struct DictionaryView: View {
     @State private var searchFailure: String?
     @State private var results: DictionarySearchResults?
     @State private var chosenWord: WordResult?
+    @State private var paywallFeature: ProFeature?
+    /// Kept across sheet opens, so the templates load and the model download is requested once per run.
+    @State private var handwriting: HandwritingSearchModel?
+    @State private var showsDrawSearch = false
 
     private let searchSource: any DictionarySearchSource
 
@@ -64,6 +69,7 @@ public struct DictionaryView: View {
                 }
 
                 DictionarySearchBar(text: $query)
+                DrawSearchButton(action: openDrawSearch)
 
                 if isSearching {
                     searchContent
@@ -99,6 +105,15 @@ public struct DictionaryView: View {
                 path.append(KanjiDetailRoute(kanjiID: kanjiID))
             }
         }
+        .sheet(isPresented: $showsDrawSearch) {
+            if let handwriting {
+                DrawSearchSheet(model: handwriting) { kanji in
+                    query = kanji
+                    showsDrawSearch = false
+                }
+            }
+        }
+        .paywallSheet(feature: $paywallFeature)
     }
 
     @ViewBuilder private var searchContent: some View {
@@ -158,43 +173,6 @@ public struct DictionaryView: View {
                     .accessibilityHint("Opens kanji details")
                 }
             }
-        }
-    }
-
-    private func messageView(title: String, message: String) -> some View {
-        VStack(spacing: LayoutTokens.space16) {
-            Spacer()
-            Text(title)
-                .font(.nichijiTitle)
-                .foregroundColor(.nichijiInk)
-                .multilineTextAlignment(.center)
-            Text(message)
-                .font(.nichijiCallout)
-                .foregroundColor(.nichijiInkMuted)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, LayoutTokens.space32)
-            Spacer()
-        }
-    }
-
-    private func retryView(message: String) -> some View {
-        VStack(spacing: LayoutTokens.space16) {
-            Spacer()
-            Text("Could not load the dictionary")
-                .font(.nichijiTitle)
-                .foregroundColor(.nichijiInk)
-                .multilineTextAlignment(.center)
-            Text(message)
-                .font(.nichijiCallout)
-                .foregroundColor(.nichijiInkMuted)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, LayoutTokens.space32)
-            PrimaryButton(title: "Retry") {
-                errorMessage = nil
-                reloadID = UUID()
-            }
-            .padding(.horizontal, LayoutTokens.space32)
-            Spacer()
         }
     }
 
@@ -259,5 +237,59 @@ public struct DictionaryView: View {
         let found = await Task.detached(priority: .userInitiated) { index.search(text) }.value
         guard !Task.isCancelled else { return }
         results = found
+    }
+}
+
+/*-----------------------------dictionary-parts-----------------------------*/
+
+private extension DictionaryView {
+    func openDrawSearch() {
+        let entry = HandwritingSearchEntry.open(access: proAccess?.access ?? .locked, existing: handwriting) {
+            HandwritingSearchModel.live(contentStore: services?.contentStore ?? BundledKanjiContentStore())
+        }
+        switch entry {
+        case .paywall(let feature):
+            paywallFeature = feature
+        case .pad(let model):
+            handwriting = model
+            showsDrawSearch = true
+        }
+    }
+
+    func messageView(title: String, message: String) -> some View {
+        VStack(spacing: LayoutTokens.space16) {
+            Spacer()
+            Text(title)
+                .font(.nichijiTitle)
+                .foregroundColor(.nichijiInk)
+                .multilineTextAlignment(.center)
+            Text(message)
+                .font(.nichijiCallout)
+                .foregroundColor(.nichijiInkMuted)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, LayoutTokens.space32)
+            Spacer()
+        }
+    }
+
+    func retryView(message: String) -> some View {
+        VStack(spacing: LayoutTokens.space16) {
+            Spacer()
+            Text("Could not load the dictionary")
+                .font(.nichijiTitle)
+                .foregroundColor(.nichijiInk)
+                .multilineTextAlignment(.center)
+            Text(message)
+                .font(.nichijiCallout)
+                .foregroundColor(.nichijiInkMuted)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, LayoutTokens.space32)
+            PrimaryButton(title: "Retry") {
+                errorMessage = nil
+                reloadID = UUID()
+            }
+            .padding(.horizontal, LayoutTokens.space32)
+            Spacer()
+        }
     }
 }

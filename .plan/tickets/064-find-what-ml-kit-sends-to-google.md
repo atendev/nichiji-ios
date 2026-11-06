@@ -18,5 +18,6 @@ Skills: `research`.
 On device, the harness in [Choose the handwriting recognizer](../closed/060-choose-the-handwriting-recognizer.md) contacted dl.google.com once (model download), then play.googleapis.com and www.googleapis.com once each, a minute later. That is one logging contact per session; the App Privacy Report doesn't show what was sent.
 Use Google's ML Kit privacy and data disclosure pages and the iOS SDK docs as primary sources. Check whether drawn ink or recognition results ever leave the device.
 Output: what is sent and when, any opt-out, and the exact label answers for `.plan/assets/app-store-listing.md` and the App Store Connect questionnaire.
+From [Build handwriting search](../closed/063-build-handwriting-search.md): the in-app privacy copy is yours too. Welcome says "No account needed. Nichiji does not collect any data." (`WelcomeView.swift`), and Settings says "Data not collected" (`SettingsSheet.swift`, `SettingsSupportViews.swift`) and "The app does not collect any data about you." Say whether each line still holds with ML Kit, and the replacement if not.
 
 ## Resolution

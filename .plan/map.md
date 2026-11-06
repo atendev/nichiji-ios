@@ -24,6 +24,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build handwriting search](closed/063-build-handwriting-search.md): Pro learners draw a kanji in Dictionary's "Draw to search" sheet and get five matches. ML Kit answers on device once its model downloads, and the KanjiVG matcher (at least 76% top-1 and 89% top-5 in CI) answers everywhere else and as fallback. ML Kit comes through CocoaPods for device builds only. The privacy label and copy, `Podfile.lock` and an on-device check remain for release.
 - [Choose the handwriting recognizer](closed/060-choose-the-handwriting-recognizer.md): ML Kit Digital Ink (`ja`) reads handwriting on device, with the KanjiVG matcher in the Simulator, in tests and until the model downloads. On the user's 104 drawings, ML Kit scored 89.4% top-1 and 99.0% top-5, and the matcher 79.8% and 92.3%. ML Kit comes through CocoaPods, links for device builds only, and makes one logging contact with Google per session, so the "Data Not Collected" label goes to research.
 - [Write the App Store metadata](closed/055-write-the-app-store-metadata.md): The English (U.S.) listing is approved and saved in `assets/app-store-listing.md`: "Nichiji - Daily Kanji" (fallback "Nichiji"), subtitle "Learn Japanese writing daily", Education and Reference, 4+, "Data Not Collected", keywords, description, Pro purchase strings and review notes. The support and privacy pages go in a new `atendev/nichiji-site` repo that the release wizard publishes. The support email and legal name are placeholders. The app goes on sale in Japan too, and "Decide the Japanese localization" decides what gets translated.
 - [Build the paywall and locked states](closed/059-build-the-paywall-and-locked-states.md): `PaywallView` opens only from a tapped locked Pro feature (History export, the widget guide's unlock button, locked lock-screen widgets through `nichiji://pro`), lists the four features with the tapped one first, buys at the StoreKit price, restores, and closes once Pro unlocks; each purchase failure gets a note. Locked lock-screen taps now open the paywall instead of Today. Settings shows Pro status, Restore purchases and a Debug-only developer unlock, and never opens the paywall.
@@ -57,7 +58,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
-- Photo lookup build ticket: graduates after [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) answers. It gates its entry point on `ProFeature.photoLookup` through `ProAccessModel` and opens `paywallSheet(feature:)` when locked. Handwriting search graduated to [Build handwriting search](tickets/063-build-handwriting-search.md).
+- Photo lookup build ticket: graduates after [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) answers. It gates its entry point on `ProFeature.photoLookup` through `ProAccessModel` and opens `paywallSheet(feature:)` when locked. Handwriting search shipped in [Build handwriting search](closed/063-build-handwriting-search.md).
 - Waller's list licence version: the Sources screen links the tanos.co.uk sharing page, read only through a Wayback copy, which states CC BY with no version. Recheck the live page before release.
 - Tatoeba's licence: OpenJLPT names Tatoeba as an upstream of the estimated levels, and the Sources screen names it without a link or licence, as 033 worded it. Confirm its licence and whether attribution needs a link before release.
 
@@ -72,7 +73,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 - [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) (task, HITL)
 - [Decide the Japanese localization](tickets/062-decide-the-japanese-localization.md) (grilling, HITL)
-- [Build handwriting search](tickets/063-build-handwriting-search.md) (task, AFK)
 - [Find what ML Kit sends to Google](tickets/064-find-what-ml-kit-sends-to-google.md) (research, AFK)
 
 Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
