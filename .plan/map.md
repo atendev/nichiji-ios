@@ -24,6 +24,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Decide the Japanese localization](closed/062-decide-the-japanese-localization.md): The Japanese-language user is an English-reading learner shopping in the Japan storefront; a native Japanese reader is a non-goal. v1.0 ships English only, and Japanese work never holds it up: the listing, IAP name, UI, widget, notification and paywall copy and the support and privacy pages come after v1.0. The Sources screen's title localizes with the UI, and its body stays English. Later Japanese follows the system language with no in-app switch, starts with a string catalog, and needs a native reviewer. The grilling surfaced [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md), which blocks the release build in this ticket's place.
 - [Mark kanji the learner already knows](closed/065-mark-known-kanji.md): Learners mark known kanji from a skippable onboarding step, a Settings > Learning row and kanji detail. A marked kanji is stage known with a `declaredKnownAt` date, no review date and no log row, so it makes no study day; Today skips it, and it counts apart from Learned (tiles, bars, Needs attention, level-complete) while milestones keep counting logged learning. The picker's text field shows typed kanji or searches every level. This reopens the onboarding Custom item from the v1.0 scope.
 - [Fix known kanji levels and the blank draw sheet](closed/066-fix-known-kanji-levels-and-draw-sheet.md): The Known kanji picker lists the learner's level and every easier one (every group with the custom pool), and a level pick marks the easier levels known on its own. `wasHandKnown` keeps hand marks when a later pick removes automatic ones. The draw sheet uses `.sheet(item:)` so its first open is never empty, and its pad clears on close.
 - [Build handwriting search](closed/063-build-handwriting-search.md): Pro learners draw a kanji in Dictionary's "Draw to search" sheet and get five matches. ML Kit answers on device once its model downloads, and the KanjiVG matcher (at least 76% top-1 and 89% top-5 in CI) answers everywhere else and as fallback. ML Kit comes through CocoaPods for device builds only. The privacy label and copy, `Podfile.lock` and an on-device check remain for release.
@@ -70,11 +71,12 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 - Stroke-order checking on the Practice pad: the pad records only. Handwriting search for Dictionary is now in v1.0 as a Pro feature, which reopens [Fix the v1.0 scope](closed/034-fix-the-v1-scope.md) for it.
 - iPhone Duo / iPad two-pane layout and configurable widgets: v1.0 ships the single-column phone layout and today-mirroring widgets; the architecture still leaves room for both ([Fix the v1.0 scope](closed/034-fix-the-v1-scope.md)).
 - The daily review cap and the furigana toggle: the existing reminder window covers them ([Fix the v1.0 scope](closed/034-fix-the-v1-scope.md)). The onboarding "Customize your kanji" option is still out; the known-kanji step shipped instead ([Mark kanji the learner already knows](closed/065-mark-known-kanji.md)).
+- Japanese localization: after v1.0 ([Decide the Japanese localization](closed/062-decide-the-japanese-localization.md)). In order: the ja App Store listing and the Nichiji Pro ja name; then the UI, widget, notification and paywall copy, starting with a string catalog (development region `en`) and String-typed copy moved to `String(localized:)`; then the support page, and the privacy page with a reviewed translation. A native reviewer is named before any Japanese ships. The Sources body and `DATA-SOURCES.md` stay English. Native Japanese readers are a non-goal, since the dataset has no Japanese definitions.
 
 ## Frontier
 
 - [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) (task, HITL)
-- [Decide the Japanese localization](tickets/062-decide-the-japanese-localization.md) (grilling, HITL)
 - [Find what ML Kit sends to Google](tickets/064-find-what-ml-kit-sends-to-google.md) (research, AFK)
+- [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 
 Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).

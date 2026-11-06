@@ -81,6 +81,10 @@ _Avoid_: Repeating notification, push campaign
 
 ### Learner progress and review
 
+**Learner**:
+A person who reads English and is learning to read and write Japanese kanji. A native Japanese reader is not a learner in this sense, since every meaning and gloss is English.
+_Avoid_: User, student
+
 **Kanji progress**:
 The mutable learner state for a specific kanji entry, tracking its study stage, review schedule, and answer counts.
 _Avoid_: User kanji, card state
