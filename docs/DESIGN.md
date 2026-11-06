@@ -23,8 +23,9 @@ and the in-app privacy copy before release. The initial implementation targets o
 
 The first implementation includes:
 
-- Seven-screen onboarding: welcome, daily kanji, flashcards, level selection,
-  reminder, widget introduction and ready.
+- Eight-screen onboarding: welcome, daily kanji, flashcards, level selection,
+  an optional step for kanji the learner already knows, reminder, widget
+  introduction and ready.
 - Today: the daily kanji, readings, meaning, details, example words, stroke
   order and the "Got it" action.
 - Local learner settings for level, daily order, reminder time, appearance and
@@ -193,7 +194,9 @@ The app separates immutable bundled content from mutable learner state:
   local calendar day (`yyyy-MM-dd`) with status `assigned`, `learned` or
   `missed`.
 - `KanjiProgress`: the SwiftData record tracking a kanji's study stage (`new`,
-  `learning`, `familiar`, `known`), review timestamps and answer counts.
+  `learning`, `familiar`, `known`), review timestamps and answer counts. A kanji
+  the learner marked as already known is stage `known` with a `declaredKnownAt`
+  date, no review date and no log row, and counts apart from Learned.
 - `CustomKanjiSelection` and `StudyLogEntry`: SwiftData records for custom
   study-pool picks and day-by-day study activity.
 - `ProAccess`: the `Sendable` Pro state (purchased, Debug dev unlock) cached in
@@ -251,10 +254,10 @@ respect Reduce Motion.
 ## Non-goals
 
 Version 1.0 ships the single-column phone layout and does not include
-stroke-order checking on the Practice pad (the pad records strokes only), configurable widgets, a daily review cap, a furigana toggle, a Custom
-option in onboarding, account sync or backend services. It does not implement
-the iPhone Duo or iPad two-pane layout, but the architecture must leave room
-for it.
+stroke-order checking on the Practice pad (the pad records strokes only),
+configurable widgets, a daily review cap, a furigana toggle, account sync or
+backend services. It does not implement the iPhone Duo or iPad two-pane
+layout, but the architecture must leave room for it.
 
 ## Open questions
 

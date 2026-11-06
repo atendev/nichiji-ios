@@ -91,6 +91,8 @@ public struct LearnerStats: Equatable, Sendable {
     public let needsAttention: [NeedsAttentionItem]
     /// Learned kanji, newest first.
     public let learnedKanjiIDs: [String]
+    /// Kanji the learner marked as already known, counted apart from Learned.
+    public var kanjiKnown: Int = 0
 }
 
 /// One day of history: entries in the order they happened.

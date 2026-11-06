@@ -7,6 +7,7 @@ struct KanjiDetailContent: Equatable, Sendable {
     let entry: KanjiEntry
     let strokePaths: [String]
     let stage: StudyStage?
+    let isDeclaredKnown: Bool
 
     /// A missing record throws `contentMissing`; missing strokes or progress only hide their parts.
     static func load(
@@ -16,8 +17,13 @@ struct KanjiDetailContent: Equatable, Sendable {
     ) async throws -> KanjiDetailContent {
         let entry = try contentStore.entry(for: kanjiID)
         let strokePaths = (try? contentStore.strokePaths(for: kanjiID)) ?? []
-        let stage = try? await learnerStore.progress(for: kanjiID)?.stage
-        return KanjiDetailContent(entry: entry, strokePaths: strokePaths, stage: stage)
+        let progress = try? await learnerStore.progress(for: kanjiID)
+        return KanjiDetailContent(
+            entry: entry,
+            strokePaths: strokePaths,
+            stage: progress?.stage,
+            isDeclaredKnown: progress?.declaredKnown ?? false
+        )
     }
 }
 
@@ -36,6 +42,7 @@ struct KanjiDetailView: View {
 
     @State private var content: KanjiDetailContent?
     @State private var stage: StudyStage?
+    @State private var isDeclaredKnown = false
     @State private var errorMessage: String?
     @State private var practiceTarget: PracticeTarget?
 
@@ -103,8 +110,15 @@ struct KanjiDetailView: View {
                     onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: content.strokePaths) }
                 )
 
-                ForgetItControl(kanjiID: kanji.id, stage: stage) {
-                    stage = .new
+                KnownKanjiControl(kanjiID: kanji.id, stage: stage, isDeclared: isDeclaredKnown) {
+                    await refreshStage()
+                }
+
+                // A marked kanji is unmarked above, so Forget it would only leave a reset in History.
+                if !isDeclaredKnown {
+                    ForgetItControl(kanjiID: kanji.id, stage: stage) {
+                        stage = .new
+                    }
                 }
             }
             .padding(.bottom, LayoutTokens.space32)
@@ -124,6 +138,7 @@ struct KanjiDetailView: View {
             )
             content = loaded
             stage = loaded.stage
+            isDeclaredKnown = loaded.isDeclaredKnown
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -132,7 +147,9 @@ struct KanjiDetailView: View {
 
     private func refreshStage() async {
         guard let services else { return }
-        stage = try? await services.learnerStore.progress(for: kanjiID)?.stage
+        let progress = try? await services.learnerStore.progress(for: kanjiID)
+        stage = progress?.stage
+        isDeclaredKnown = progress?.declaredKnown ?? false
     }
 
     private func speak(_ text: String, reading: String?) {

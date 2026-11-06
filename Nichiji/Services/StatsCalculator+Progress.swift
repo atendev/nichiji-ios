@@ -5,7 +5,7 @@ import Foundation
 extension StatsCalculator {
     /// Learned out of total per level group of the learner's level system, custom pool or not.
     static func levelBars(progress: [KanjiProgressSnapshot], index: [KanjiIndexEntry], system: LevelSystem) -> [LevelBar] {
-        let learned = Set(progress.filter { $0.stage != .new }.map(\.kanjiID))
+        let learned = Set(progress.filter(\.isLearned).map(\.kanjiID))
         return levelGroups(index: index, system: system)
             .filter { !$0.ids.isEmpty }
             .map { group in
@@ -39,7 +39,7 @@ extension StatsCalculator {
     static func needsAttention(progress: [KanjiProgressSnapshot], log: [StudyLogRecord]) -> [NeedsAttentionItem] {
         let tally = AnswerTally(log: log)
         return progress
-            .filter { $0.stage != .new && $0.forgotItCount >= 1 }
+            .filter { $0.isLearned && $0.forgotItCount >= 1 }
             .sorted(by: tally.ranksBefore)
             .prefix(needsAttentionLimit)
             .map { NeedsAttentionItem(kanjiID: $0.kanjiID, forgotCount: $0.forgotItCount) }
@@ -47,7 +47,7 @@ extension StatsCalculator {
 
     static func learnedKanjiIDs(progress: [KanjiProgressSnapshot]) -> [String] {
         progress
-            .filter { $0.stage != .new }
+            .filter(\.isLearned)
             .sorted { lhs, rhs in
                 let left = lhs.firstLearnedAt ?? .distantPast
                 let right = rhs.firstLearnedAt ?? .distantPast
@@ -69,7 +69,7 @@ extension StatsCalculator {
         let levelLog = log.filter { ids.contains($0.kanjiID) }
         let learnedDays = levelLog.filter { $0.action == .learnedDaily }.map { $0.day(using: dayProvider) }
         return LevelCompleteFigures(
-            kanjiLearned: progress.filter { $0.stage != .new && ids.contains($0.kanjiID) }.count,
+            kanjiLearned: progress.filter { $0.isLearned && ids.contains($0.kanjiID) }.count,
             daysTaken: inclusiveDays(from: learnedDays.min(), to: learnedDays.max(), dayProvider: dayProvider),
             gotItRate: gotItRate(in: levelLog)
         )
