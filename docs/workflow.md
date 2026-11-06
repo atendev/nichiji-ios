@@ -51,6 +51,13 @@ wrong.
 - Audit subagents default to `haiku`. The agent may use `sonnet` for a
   ticket that needs more reasoning (a tricky or cross-cutting slice, a
   design-heavy grilling ticket) and says so in the Final Report.
+- Every spawn names its model. A subagent never inherits the parent's model.
+- One auditor per ticket. The same subagent audits the Requirements Report
+  and the implementation, and every re-check, continued with `SendMessage`.
+  It keeps its own earlier objections, so verdicts stay consistent and each
+  round skips a cold start.
+- The user gates here win over a generic runner skill. Commit after
+  `APPROVE` without asking, then ask the merge question after CI.
 - Implementation is audited by an independent subagent before every commit.
   The audit gets the diff and the ticket's question, never the
   implementer's own verdict.
@@ -206,15 +213,16 @@ that used to wait on the user.
    open blocker. Refer to tickets by name, never by number. The map's
    `## Notes` are the standing instructions for how to implement. If the
    ticket is HITL and not a grilling ticket, stop and tell the user.
-3. **Requirements Report.** Write it from the ticket, the map, and the
-   design docs (`DESIGN.md`, `IMPLEMENTATION.md`, `PROGRESS.md`), or spawn a
-   subagent to. See "Requirements Report" below. Grilling tickets get the
+3. **Requirements Report.** The main thread writes it from the ticket, the
+   map, and the design docs (`DESIGN.md`, `IMPLEMENTATION.md`,
+   `PROGRESS.md`). See "Requirements Report" below. Grilling tickets get the
    same report, covering what the grilling must settle.
-4. **Audit the report.** Spawn a fresh subagent (`haiku` by default) to audit the report
-   against the ticket and design docs. It is audit-only: `APPROVE` or a list
-   of concrete changes. Apply the changes and re-audit with a fresh
-   subagent. After two rounds with no `APPROVE`, stop and report. Only an
-   approved report becomes the requirements.
+4. **Audit the report.** Spawn the ticket's auditor (`haiku` by default) to
+   audit the report against the ticket and design docs. It is audit-only:
+   `APPROVE` or a list of concrete changes. Apply the changes and send the
+   same auditor only the changed parts and its open objections. After two
+   rounds with no `APPROVE`, stop and report. Only an approved report
+   becomes the requirements.
 5. **Implement.** Use TDD where it fits. Run the linter, the build, and the
    relevant tests as you go. For a grilling ticket, this step is the
    grilling run instead (see "Grilling tickets" below).
@@ -230,7 +238,7 @@ that used to wait on the user.
    map's Decisions so far, update the Frontier, and add or graduate any
    newly surfaced tickets. CI has not run yet, so the resolution notes CI as
    "pending; see Final Report". The Final Report carries the real CI result.
-9. **Deviation Report.** Spawn a subagent to write it from the diff, the
+9. **Deviation Report.** The main thread writes it from the diff, the
    ticket, and the Requirements Report (see below). Log the Requirements
    Report and Deviation Report into `IMPLOG.md`.
 10. **Audit.** See "Audit" below. Commit only after `APPROVE`.
@@ -263,8 +271,8 @@ Written before implementation begins, then audited (step 4). It covers:
 
 ### Deviation Report
 
-Written by a subagent after the slice implementation is complete but before
-the audit. Covers whether the implementation matched the Success Criteria,
+Written by the main thread after the slice implementation is complete but
+before the audit. Covers whether the implementation matched the Success Criteria,
 stayed within the Scope Boundary, and hit the Anticipated TODOs (or turned
 up new ones).
 
@@ -273,16 +281,19 @@ into `IMPLOG.md` for the slice.
 
 ### Audit
 
-Spawn a fresh subagent on `haiku` (Agent tool, `model: "haiku"`) by
+Continue the ticket's auditor from step 4 with `SendMessage` (load it with
+ToolSearch first). It runs on `haiku` (Agent tool, `model: "haiku"`) by
 default, or `sonnet` when the ticket needs more reasoning. If the chosen
 model is unavailable, use `deepseek-v4.1-flash` through `delegate_task`. Give it
-the diff, the ticket's question, and the Requirements Report — not the
-implementer's own verdict. It is audit-only and never edits files. Besides
-reviewing the diff, it runs the build and the test suite and confirms the
-slice's Success Criteria actually hold. It answers `APPROVE` or a list of
-concrete problems.
+the diff and the ticket's question, not the implementer's own verdict. It
+already has the Requirements Report. It is audit-only and never edits
+files. It reads only files that appear in the diff, makes at most 5 tool
+calls, and checks the slice's Success Criteria against the diff and the
+main thread's build and test output, which it does not rerun. CI reruns
+the suite. It answers `APPROVE` or a list of concrete problems.
 
-- On problems, fix them and re-audit with a fresh subagent.
+- On problems, fix them and send the same auditor only the changed hunks
+  and its open objections.
 - After two rounds with no `APPROVE`, stop and report.
 
 ### CI
@@ -295,8 +306,8 @@ find the run with `gh run list --workflow ci.yml --branch <branch> --limit 1`
 and watch it with `gh run watch <id> --exit-status` until it finishes.
 Never trigger runs for `main`.
 
-On CI failure, spawn a subagent with the failing job logs and the branch
-diff. It finds the cause and fixes it. The fix goes through the audit,
+On CI failure, spawn a subagent on `sonnet` with the failing job logs and
+the branch diff. It finds the cause and fixes it. The fix goes through the audit,
 then commit, push, and watch again. CI-fix commits share the run's version
 entry (see Versioning). After three failed attempts, stop and report. If the
 run ends with CI red, the Final Report says so plainly, since the ticket was
@@ -307,8 +318,8 @@ already closed in the audited commit and the user may need to reopen it.
 A grilling ticket's output is decisions, not code. Steps 1–4 run as normal
 (branch, claim, Requirements Report, report audit). Then:
 
-1. Spawn a subagent (`sonnet` by default here, since the work is design
-   reasoning) to run the grilling. It works through the ticket's questions
+1. Spawn a subagent (`sonnet`, since the work is design reasoning) to run
+   the grilling. It works through the ticket's questions
    against the map and design docs, challenges weak assumptions, and returns
    each question with its proposed answer and a one-line rationale. It does
    not edit files.
@@ -349,8 +360,8 @@ Written when the run ends, whether it finished or stopped. It lists:
 - the report audit and the implementation audit verdicts and rounds,
 - the CI result,
 - the merge outcome (merged and branch deleted, or left open),
-- every delegated gate (Requirements Report and its audit, Deviation Report,
-  implementation audit) so the user can review its output,
+- every delegated gate (the auditor's report and implementation verdicts)
+  so the user can review its output,
 - any concerns raised, and anything left for the user.
 
 Tagging stays the user's decision: raise it in the report, never tag.
