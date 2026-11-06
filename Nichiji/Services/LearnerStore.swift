@@ -61,6 +61,10 @@ public protocol LearnerStore: Sendable {
     /// Returns the identifiers the learner marked as already known.
     func declaredKnownIDs() async throws -> Set<String>
 
+    /// Makes the automatic marks match `kanjiIDs`: new kanji in it are marked, automatic marks outside it return to new.
+    /// Hand marks and kanji past new are left alone.
+    func syncAutoKnown(_ kanjiIDs: Set<String>, at date: Date) async throws
+
     /// Resets a kanji to the new stage and clears its schedule, logging the reset under the given day.
     func forgetIt(kanjiID: String, calendarDay: String) async throws
 
@@ -205,6 +209,7 @@ public actor SwiftDataLearnerStore: LearnerStore {
         progress.stage = .learning
         progress.nextReviewAt = nextReviewAt
         progress.declaredKnownAt = nil
+        progress.wasHandKnown = true
         progress.gotItCount += 1
 
         let logEntry = StudyLogEntry(
@@ -227,6 +232,7 @@ public actor SwiftDataLearnerStore: LearnerStore {
         progress.nextReviewAt = nil
         progress.lastReviewedAt = nil
         progress.declaredKnownAt = nil
+        progress.wasHandKnown = true
 
         let logEntry = StudyLogEntry(
             kanjiID: kanjiID,
@@ -282,6 +288,7 @@ public actor SwiftDataLearnerStore: LearnerStore {
             progress.nextReviewAt = outcome.nextReviewAt
             progress.lastReviewedAt = reviewedAt
             progress.declaredKnownAt = nil
+            progress.wasHandKnown = true
         }
 
         let logEntry = StudyLogEntry(

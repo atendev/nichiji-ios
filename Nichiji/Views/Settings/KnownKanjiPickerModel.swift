@@ -101,25 +101,28 @@ struct KnownKanjiPickerModel: Equatable {
 
 /*------------------------------scope-----------------------------------------*/
 
-/// Which groups the picker lists before the learner types anything.
-enum KnownKanjiScope: Equatable, Sendable {
-    /// Onboarding: only the level just chosen.
-    case activeLevel
-    /// Settings: every group of the level system.
-    case allLevels
-
-    func sections(
+/// Which groups the picker lists before the learner types anything: the learner's level and every easier one.
+enum KnownKanjiScope {
+    /// A custom pool has no level of its own, so it lists every group. "Other kanji" and name kanji are never easier.
+    static func sections(
         from all: [KanjiBrowseSection],
         preferences: LearnerPreferencesSnapshot
     ) -> [KanjiBrowseSection] {
-        switch self {
-        case .allLevels:
-            return all
-        case .activeLevel:
-            let id = preferences.levelSystem == .jlpt
-                ? preferences.selectedJLPTLevel.rawValue
-                : preferences.selectedJoyoGrade.rawValue
-            return all.filter { $0.id == id }
+        guard !preferences.isCustomPoolActive else { return all }
+        let ids: [String]
+        switch preferences.levelSystem {
+        case .jlpt:
+            ids = throughLevel(preferences.selectedJLPTLevel).map(\.rawValue)
+        case .joyo:
+            ids = throughLevel(preferences.selectedJoyoGrade).map(\.rawValue)
         }
+        return all.filter { ids.contains($0.id) }
+    }
+
+    /// Both level enums list their cases easiest first.
+    private static func throughLevel<Level: CaseIterable & Equatable>(_ level: Level) -> [Level] {
+        let levels = Array(Level.allCases)
+        guard let index = levels.firstIndex(of: level) else { return levels }
+        return Array(levels[...index])
     }
 }

@@ -197,6 +197,9 @@ The app separates immutable bundled content from mutable learner state:
   `learning`, `familiar`, `known`), review timestamps and answer counts. A kanji
   the learner marked as already known is stage `known` with a `declaredKnownAt`
   date, no review date and no log row, and counts apart from Learned.
+  `wasHandKnown` is false only on a mark the app made: a level pick marks every
+  new kanji in the easier levels, and the next pick removes those automatic marks
+  outside its own easier levels. Hand marks stay.
 - `CustomKanjiSelection` and `StudyLogEntry`: SwiftData records for custom
   study-pool picks and day-by-day study activity.
 - `ProAccess`: the `Sendable` Pro state (purchased, Debug dev unlock) cached in

@@ -40,6 +40,9 @@ public final class KanjiProgress {
     public var forgotItCount: Int
     /// Set when the learner said they already know this kanji; learning, reviewing and Forget it clear it.
     public var declaredKnownAt: Date?
+    /// False only on a mark the app made from the learner's level, which a later level pick may undo.
+    /// The default migrates marks made before this field as hand marks.
+    public var wasHandKnown: Bool = true
 
     public var stage: StudyStage {
         get { StudyStage(rawValue: stageRaw) ?? .new }

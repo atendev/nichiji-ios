@@ -14,9 +14,9 @@ struct KnownKanjiServiceTests {
         let day: String
     }
 
-    private func makeRig() -> Rig {
+    private func makeRig(entries: [KanjiEntry] = SeedKanjiDataset.entries) -> Rig {
         let dayProvider = TestDayProvider()
-        let contentStore = TestKanjiContentStore(entries: SeedKanjiDataset.entries)
+        let contentStore = TestKanjiContentStore(entries: entries)
         let learnerStore = TestLearnerStore()
         let widgets = TestWidgetRefresher()
         let scheduler = TestReminderScheduler()
@@ -144,5 +144,63 @@ struct KnownKanjiServiceTests {
         #expect(try await store.declaredKnownIDs().isEmpty)
         #expect(store.progress["山"] == .new)
         #expect(store.progress["川"] == .new)
+    }
+
+    /*------------------------------level-pick------------------------------*/
+
+    private static func leveled(_ id: String, _ level: JLPTLevel, listIndex: Int) -> KanjiEntry {
+        KanjiEntry(
+            id: id,
+            meanings: [id],
+            onyomi: [],
+            kunyomi: [],
+            radical: KanjiRadical(character: id, meaning: id),
+            strokeCount: 1,
+            jlptLevel: level,
+            joyoGrade: nil,
+            frequencyRank: nil,
+            listIndex: listIndex,
+            exampleWords: []
+        )
+    }
+
+    private static let ladder = [
+        leveled("日", .n5, listIndex: 0),
+        leveled("月", .n5, listIndex: 1),
+        leveled("会", .n4, listIndex: 2),
+        leveled("社", .n4, listIndex: 3),
+        leveled("新", .n3, listIndex: 4)
+    ]
+
+    @Test("A level pick marks the easier levels, and moving down frees automatic marks but keeps hand marks")
+    func levelPickSyncsAutomaticMarks() async throws {
+        let rig = makeRig(entries: Self.ladder)
+        try await rig.learnerStore.declareKnown(["社"], at: Date())
+        var preferences = completed()
+        preferences.selectedJLPTLevel = .n3
+
+        try await rig.container.applyLevelPick(preferences: preferences)
+
+        #expect(rig.learnerStore.declaredKnown == ["日", "月", "会", "社"])
+        #expect(rig.learnerStore.autoKnown == ["日", "月", "会"])
+        #expect(rig.learnerStore.assignments[rig.day]?.kanjiID == "新")
+
+        preferences.selectedJLPTLevel = .n4
+        try await rig.container.applyLevelPick(preferences: preferences)
+
+        #expect(rig.learnerStore.declaredKnown == ["日", "月", "社"])
+        #expect(rig.learnerStore.progress["会"] == .new)
+        #expect(rig.learnerStore.assignments[rig.day]?.kanjiID == "会")
+    }
+
+    @Test("A daily order change is not a level pick and marks nothing")
+    func levelChangeLeavesMarks() async throws {
+        let rig = makeRig(entries: Self.ladder)
+        var preferences = completed()
+        preferences.selectedJLPTLevel = .n3
+
+        try await rig.container.applyLevelChange(preferences: preferences)
+
+        #expect(rig.learnerStore.declaredKnown.isEmpty)
     }
 }

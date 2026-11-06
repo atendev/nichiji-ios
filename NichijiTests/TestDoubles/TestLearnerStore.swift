@@ -10,6 +10,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     var nextReviewAt: [String: Date] = [:]
     var loggedActions: [(kanjiID: String, action: StudyAction, calendarDay: String)] = []
     var declaredKnown: Set<String> = []
+    /// Marks made by `syncAutoKnown`; every other mark in `declaredKnown` is a hand mark.
+    var autoKnown: Set<String> = []
     var shouldThrow = false
     static let declaredDate = Date(timeIntervalSince1970: 1_793_000_000)
 
@@ -76,6 +78,7 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         assignments[day] = learned
         progress[existing.kanjiID] = .learning
         declaredKnown.remove(existing.kanjiID)
+        autoKnown.remove(existing.kanjiID)
         self.nextReviewAt[existing.kanjiID] = nextReviewAt
         loggedActions.append((kanjiID: existing.kanjiID, action: .learnedDaily, calendarDay: day))
         return learned
@@ -85,6 +88,7 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         try checkForError()
         progress[kanjiID] = .new
         declaredKnown.remove(kanjiID)
+        autoKnown.remove(kanjiID)
         nextReviewAt[kanjiID] = nil
         loggedActions.append((kanjiID: kanjiID, action: .resetToNew, calendarDay: calendarDay))
     }
@@ -123,6 +127,7 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         if let outcome {
             progress[kanjiID] = outcome.stage
             declaredKnown.remove(kanjiID)
+            autoKnown.remove(kanjiID)
             nextReviewAt[kanjiID] = outcome.nextReviewAt
         }
         loggedActions.append((kanjiID: kanjiID, action: answer.logAction, calendarDay: calendarDay))
@@ -167,12 +172,29 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         }
     }
 
+    func syncAutoKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
+        try checkForError()
+        for id in autoKnown.subtracting(kanjiIDs) {
+            progress[id] = .new
+            nextReviewAt[id] = nil
+            declaredKnown.remove(id)
+            autoKnown.remove(id)
+        }
+        for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
+            progress[id] = .known
+            nextReviewAt[id] = nil
+            declaredKnown.insert(id)
+            autoKnown.insert(id)
+        }
+    }
+
     func undeclareKnown(_ kanjiIDs: Set<String>) async throws {
         try checkForError()
         for id in kanjiIDs.intersection(declaredKnown) {
             progress[id] = .new
             nextReviewAt[id] = nil
             declaredKnown.remove(id)
+            autoKnown.remove(id)
         }
     }
 
