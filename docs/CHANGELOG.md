@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.24.5
+- Decide whether handwriting search keeps ML Kit: v1.0 drops ML Kit, runs handwriting search on the KanjiVG matcher alone and keeps "Data Not Collected". New tickets: "Remove ML Kit from handwriting search" (blocks the privacy copy ticket and the release build), "Improve the handwriting matcher's accuracy" and "Collect handwriting drawings from other learners". The copy and release build tickets drop their ML Kit work.
+- Close ticket 068
+
 ## v0.24.4
 - Find what ML Kit sends to Google: the SDK keeps ink on the device but sends Google diagnostics and a per-install ID by default, with no documented iOS opt-out, so "Data Not Collected" no longer holds. Findings and the replacement privacy label and copy are in `.plan/assets/ml-kit-privacy.md`. New tickets: "Decide whether handwriting search keeps ML Kit" and "Update the privacy copy and label".
 - Close ticket 064
