@@ -145,7 +145,8 @@ extension KanjiProgress {
             lastReviewedAt: lastReviewedAt,
             nextReviewAt: nextReviewAt,
             gotItCount: gotItCount,
-            forgotItCount: forgotItCount
+            forgotItCount: forgotItCount,
+            declaredKnownAt: declaredKnownAt
         )
     }
 }

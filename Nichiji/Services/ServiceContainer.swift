@@ -38,6 +38,19 @@ struct ServiceContainer: Sendable {
         )
     }
 
+    /// A level pick: marks the easier levels known, then re-picks today's kanji. A failed mark never blocks the re-pick.
+    @discardableResult
+    func applyLevelPick(preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot? {
+        try? await markEasierLevelsKnown(preferences: preferences)
+        return try await applyLevelChange(preferences: preferences)
+    }
+
+    /// Makes the automatic known marks match the learner's level. Hand marks stay.
+    func markEasierLevelsKnown(preferences: LearnerPreferencesSnapshot) async throws {
+        guard let ids = AutoKnownLevels.kanjiIDs(in: try contentStore.indexEntries(), preferences: preferences) else { return }
+        try await learnerStore.syncAutoKnown(ids, at: dayProvider.now)
+    }
+
     /// Marks the day learned, then rebuilds reminders and reloads widget timelines.
     @discardableResult
     func markLearned(day: String, preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot {
@@ -54,6 +67,25 @@ struct ServiceContainer: Sendable {
     func forgetIt(kanjiID: String, preferences: LearnerPreferencesSnapshot) async throws {
         try await reviewService.forgetIt(kanjiID: kanjiID)
         // The reset already saved, so a reminder failure must not surface as a Forget it error.
+        try? await rebuildReminders(preferences: preferences)
+    }
+
+    /// Marks and unmarks already-known kanji, then refreshes what depends on today's pool.
+    /// The store write throws; the reminder rebuild never does. A first run creates no assignment, since Today's rollover picks from the updated pool later.
+    func setKnown(declare: Set<String>, undeclare: Set<String>, preferences: LearnerPreferencesSnapshot) async throws {
+        guard !declare.isEmpty || !undeclare.isEmpty else { return }
+        try await learnerStore.undeclareKnown(undeclare)
+        try await learnerStore.declareKnown(declare, at: dayProvider.now)
+
+        let day = dayProvider.calendarDay(for: dayProvider.now)
+        if try await learnerStore.assignment(for: day) != nil {
+            _ = try await dailyKanjiService.refreshAssignmentAfterPreferenceChange(for: day, preferences: preferences)
+        } else if preferences.hasCompletedOnboarding {
+            _ = try await dailyKanjiService.assignment(for: day)
+        } else {
+            return
+        }
+        widgetRefresher.reloadTimelines()
         try? await rebuildReminders(preferences: preferences)
     }
 

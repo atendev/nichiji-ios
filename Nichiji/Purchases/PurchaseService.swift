@@ -37,7 +37,7 @@ protocol PurchaseService: Sendable {
     func restorePurchases() async throws -> ProAccess
     /// A refreshed access after every transaction update: other devices, Ask to Buy, refunds.
     func accessUpdates() -> AsyncStream<ProAccess>
-    #if DEBUG
+    #if DEBUG || DEV_UNLOCK
     func setDevUnlocked(_ isOn: Bool) -> ProAccess
     #endif
 }
@@ -152,7 +152,7 @@ struct StoreKitPurchaseService: PurchaseService {
         }
     }
 
-    #if DEBUG
+    #if DEBUG || DEV_UNLOCK
     func setDevUnlocked(_ isOn: Bool) -> ProAccess {
         ProEntitlementCache.setDevUnlocked(isOn, in: defaults())
         return cachedAccess()

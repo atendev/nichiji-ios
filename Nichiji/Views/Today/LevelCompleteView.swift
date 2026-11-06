@@ -161,7 +161,7 @@ public struct LevelCompleteView: View {
         let updated = LevelSequence.preferences(starting: level, from: LearnerPreferencesSnapshot.load(from: defaults))
         updated.save(to: defaults)
         Task {
-            _ = try? await services.applyLevelChange(preferences: updated)
+            _ = try? await services.applyLevelPick(preferences: updated)
             isSwitching = false
         }
     }

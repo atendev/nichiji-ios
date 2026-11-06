@@ -17,6 +17,7 @@ enum YourKanjiMode: CaseIterable, Sendable {
 /// Learned grid or day-by-day history, with the CSV export under History.
 struct YourKanjiSection: View {
     let learnedCount: Int
+    let knownCount: Int
     let learnedKanjiIDs: [String]
     let meanings: [String: String]
     let logCount: Int
@@ -31,8 +32,9 @@ struct YourKanjiSection: View {
     @State private var exportFailed = false
     @State private var paywallFeature: ProFeature?
 
-    init(learnedCount: Int, learnedKanjiIDs: [String], meanings: [String: String], logCount: Int) {
+    init(learnedCount: Int, knownCount: Int = 0, learnedKanjiIDs: [String], meanings: [String: String], logCount: Int) {
         self.learnedCount = learnedCount
+        self.knownCount = knownCount
         self.learnedKanjiIDs = learnedKanjiIDs
         self.meanings = meanings
         self.logCount = logCount
@@ -52,7 +54,7 @@ struct YourKanjiSection: View {
                     .foregroundColor(.nichijiInk)
                     .accessibilityAddTraits(.isHeader)
                 Spacer()
-                Text(YouCopy.learnedCount(learnedCount))
+                Text(YouCopy.learnedCaption(learned: learnedCount, known: knownCount))
                     .font(.nichijiCaption)
                     .foregroundColor(.nichijiInkSubtle)
             }

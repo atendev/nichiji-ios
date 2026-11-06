@@ -218,7 +218,7 @@ struct PracticePadView: View {
 
 /*--------------------------------controls--------------------------------*/
 
-private struct PracticeControlStyle: ButtonStyle {
+struct PracticeControlStyle: ButtonStyle {
     let isEnabled: Bool
 
     func makeBody(configuration: Configuration) -> some View {

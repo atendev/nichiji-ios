@@ -175,6 +175,10 @@ public struct SettingsSheet: View {
 
                 dividerLine
 
+                KnownKanjiSettingsRow()
+
+                dividerLine
+
                 NavigationLink {
                     ReminderSettingsView()
                 } label: {

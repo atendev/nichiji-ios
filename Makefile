@@ -6,21 +6,23 @@ DESTINATION ?= platform=iOS Simulator,id=$(SIM_ID)
 
 generate:
 	xcodegen generate
+	pod install
 
 build: generate
-	xcodebuild build -project Nichiji.xcodeproj -scheme $(SCHEME) -destination '$(DESTINATION)'
+	xcodebuild build -workspace Nichiji.xcworkspace -scheme $(SCHEME) -destination '$(DESTINATION)'
 
 test: generate
-	xcodebuild test -project Nichiji.xcodeproj -scheme $(SCHEME) -destination '$(DESTINATION)'
+	xcodebuild test -workspace Nichiji.xcworkspace -scheme $(SCHEME) -destination '$(DESTINATION)'
 
 lint:
 	swiftlint --strict
 
 ipa: generate
 	rm -rf build Payload Nichiji.ipa
-	xcodebuild archive -project Nichiji.xcodeproj -scheme $(SCHEME) -configuration Release \
+	xcodebuild archive -workspace Nichiji.xcworkspace -scheme $(SCHEME) -configuration Release \
 		-destination 'generic/platform=iOS' -archivePath build/Nichiji.xcarchive \
-		CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+		CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) DEV_UNLOCK'
 	mkdir Payload
 	cp -R build/Nichiji.xcarchive/Products/Applications/Nichiji.app Payload/
 	zip -qr Nichiji.ipa Payload
