@@ -22,6 +22,12 @@ struct KnownKanjiControlTests {
         #expect(!KnownKanjiStepView.showsChooseButton(hasServices: false))
     }
 
+    @Test("The onboarding step only says easier levels are marked when there are some")
+    func stepSubtitle() {
+        #expect(KnownKanjiStepView.subtitle(hasEasierLevels: true).contains("already marked"))
+        #expect(!KnownKanjiStepView.subtitle(hasEasierLevels: false).contains("already marked"))
+    }
+
     @Test("The You caption counts known kanji apart once there are any")
     func youCaption() {
         #expect(YouCopy.learnedCaption(learned: 16, known: 0) == "16 learned")

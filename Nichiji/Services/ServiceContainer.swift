@@ -38,6 +38,19 @@ struct ServiceContainer: Sendable {
         )
     }
 
+    /// A level pick: marks the easier levels known, then re-picks today's kanji. A failed mark never blocks the re-pick.
+    @discardableResult
+    func applyLevelPick(preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot? {
+        try? await markEasierLevelsKnown(preferences: preferences)
+        return try await applyLevelChange(preferences: preferences)
+    }
+
+    /// Makes the automatic known marks match the learner's level. Hand marks stay.
+    func markEasierLevelsKnown(preferences: LearnerPreferencesSnapshot) async throws {
+        guard let ids = AutoKnownLevels.kanjiIDs(in: try contentStore.indexEntries(), preferences: preferences) else { return }
+        try await learnerStore.syncAutoKnown(ids, at: dayProvider.now)
+    }
+
     /// Marks the day learned, then rebuilds reminders and reloads widget timelines.
     @discardableResult
     func markLearned(day: String, preferences: LearnerPreferencesSnapshot) async throws -> DailyAssignmentSnapshot {

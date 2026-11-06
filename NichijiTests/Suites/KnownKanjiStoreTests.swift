@@ -10,9 +10,20 @@ struct KnownKanjiStoreTests {
     private let day = "2026-10-28"
 
     private func makeStore() throws -> SwiftDataLearnerStore {
+        try makeStoreAndContainer().store
+    }
+
+    private func makeStoreAndContainer() throws -> (store: SwiftDataLearnerStore, container: ModelContainer) {
         let schema = Schema([KanjiProgress.self, DailyAssignment.self, CustomKanjiSelection.self, StudyLogEntry.self])
         let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-        return SwiftDataLearnerStore(modelContainer: container)
+        return (SwiftDataLearnerStore(modelContainer: container), container)
+    }
+
+    /// The flag is not in the snapshot, so tests read the row through a fresh context on the same container.
+    private func wasHandKnown(_ kanjiID: String, in container: ModelContainer) throws -> Bool? {
+        let context = ModelContext(container)
+        let rows = try context.fetch(FetchDescriptor<KanjiProgress>(predicate: #Predicate { $0.kanjiID == kanjiID }))
+        return rows.first?.wasHandKnown
     }
 
     @Test("Declaring a new kanji makes it known with no review date and no log row")
@@ -86,6 +97,79 @@ struct KnownKanjiStoreTests {
             calendarDay: day
         )
         #expect(try await store.progress(for: "日")?.declaredKnownAt == nil)
+        #expect(try await store.declaredKnownIDs().isEmpty)
+    }
+
+    /*-------------------------------auto-----------------------------------*/
+
+    @Test("Syncing marks new kanji as automatic and leaves kanji in study alone")
+    func syncMarksNewKanji() async throws {
+        let (store, container) = try makeStoreAndContainer()
+        _ = try await store.createAssignment(calendarDay: day, kanjiID: "学", assignedAt: Date())
+        _ = try await store.markLearned(day: day, nextReviewAt: Date())
+        let context = ModelContext(container)
+        context.insert(KanjiProgress(kanjiID: "月", stage: .familiar))
+        context.insert(KanjiProgress(kanjiID: "火", stage: .known))
+        try context.save()
+
+        try await store.syncAutoKnown(["山", "学", "月", "火"], at: Date())
+
+        #expect(try await store.declaredKnownIDs() == ["山"])
+        #expect(try wasHandKnown("山", in: container) == false)
+        #expect(try await store.progress(for: "学")?.stage == .learning)
+        #expect(try await store.progress(for: "月")?.stage == .familiar)
+        #expect(try await store.progress(for: "火")?.declaredKnownAt == nil)
+        #expect(try await store.studyLog().count == 1)
+    }
+
+    @Test("Syncing drops automatic marks outside the set and keeps hand marks")
+    func syncKeepsHandMarks() async throws {
+        let (store, container) = try makeStoreAndContainer()
+        try await store.declareKnown(["川"], at: Date())
+        try await store.syncAutoKnown(["山", "日"], at: Date())
+
+        try await store.syncAutoKnown(["日"], at: Date())
+
+        #expect(try await store.declaredKnownIDs() == ["川", "日"])
+        #expect(try await store.progress(for: "山")?.stage == .new)
+        #expect(try wasHandKnown("川", in: container) == true)
+        #expect(try wasHandKnown("日", in: container) == false)
+        #expect(try wasHandKnown("山", in: container) == true)
+    }
+
+    @Test("A mark saved before the flag existed counts as a hand mark")
+    func oldMarksStayHandMarks() async throws {
+        let (store, container) = try makeStoreAndContainer()
+        let context = ModelContext(container)
+        context.insert(KanjiProgress(kanjiID: "川", stage: .known, declaredKnownAt: Date()))
+        try context.save()
+
+        try await store.syncAutoKnown([], at: Date())
+
+        #expect(try await store.declaredKnownIDs() == ["川"])
+        #expect(try wasHandKnown("川", in: container) == true)
+    }
+
+    @Test("Learning, review, Forget it and unmarking reset the flag")
+    func clearingResetsTheFlag() async throws {
+        let (store, container) = try makeStoreAndContainer()
+        try await store.syncAutoKnown(["山", "川", "日", "月"], at: Date())
+
+        try await store.forgetIt(kanjiID: "山", calendarDay: day)
+        _ = try await store.createAssignment(calendarDay: day, kanjiID: "川", assignedAt: Date())
+        _ = try await store.markLearned(day: day, nextReviewAt: Date())
+        try await store.recordReview(
+            kanjiID: "日",
+            answer: .gotIt,
+            outcome: ReviewOutcome(stage: .learning, nextReviewAt: Date()),
+            reviewedAt: Date(),
+            calendarDay: day
+        )
+        try await store.undeclareKnown(["月"])
+
+        for id in ["山", "川", "日", "月"] {
+            #expect(try wasHandKnown(id, in: container) == true)
+        }
         #expect(try await store.declaredKnownIDs().isEmpty)
     }
 }

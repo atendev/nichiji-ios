@@ -4,9 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
-## v0.23.1
+## v0.24.0
 
-- Fix "Draw a kanji to search" opening an empty sheet on the first tap once Pro is unlocked. `DictionaryView` now presents the sheet with `.sheet(item:)` over `DrawSearchPresentation`, so the sheet gets the model as its argument instead of reading separate optional state
+- Fix "Draw a kanji to search" opening an empty sheet on the first tap once Pro is unlocked. `DictionaryView` now presents the sheet with `.sheet(item:)` over `DrawSearchPresentation`, so the sheet gets the model as its argument instead of reading separate optional state. The pad clears when the sheet closes, so the next open starts empty
+- Picking a level marks every still-new kanji in the easier levels as known: JLPT N3 marks N5 and N4, and Jōyō grade 3 marks grades 1 and 2. Level picks are the onboarding Known kanji step, a level or system change in Settings, and Start on the level-complete screen. A daily order change or a custom pool edit marks nothing
+- `KanjiProgress.wasHandKnown` tells hand marks from automatic ones. It defaults to true, so marks from v0.23 stay hand marks. Each level pick removes automatic marks outside its easier levels, so moving down frees the new level's kanji for Today. Hand marks stay. `LearnerStore.syncAutoKnown` and `AutoKnownLevels` do the work, and `ServiceContainer.applyLevelPick` runs it before the re-pick
+- The onboarding step says easier levels are already marked, and its buttons wait until the marks are saved
 - The Known kanji picker lists the learner's level and every easier one, in onboarding and in Settings alike: JLPT N3 lists N5, N4 and N3, and Jōyō grade 3 lists grades 1 to 3. With the custom pool active it lists every group. Typed search still reaches every level. `KnownKanjiScope` is now one rule, and `KnownKanjiPickerView` has no `scope` parameter
 - Close ticket 066
 

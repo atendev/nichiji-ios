@@ -36,6 +36,8 @@ public struct LevelSettingsView: View {
     private var isCustomPoolActive: Bool = false
 
     @State private var customCount: Int = 0
+    /// The last reassignment; each new one waits for it, so quick taps apply in tap order.
+    @State private var reassignment: Task<Void, Never>?
 
     private var activeLevelSystem: LevelSystem { LevelSystem(rawValue: levelSystemRaw) ?? .jlpt }
 
@@ -148,19 +150,19 @@ public struct LevelSettingsView: View {
         case .joyo:
             selectedJoyoGradeRaw = JoyoGrade.grade1.rawValue
         }
-        triggerPoolReassignment()
+        triggerPoolReassignment(isLevelPick: true)
     }
 
     private func selectJLPTLevel(_ level: JLPTLevel) {
         selectedJLPTLevelRaw = level.rawValue
         isCustomPoolActive = false
-        triggerPoolReassignment()
+        triggerPoolReassignment(isLevelPick: true)
     }
 
     private func selectJoyoGrade(_ grade: JoyoGrade) {
         selectedJoyoGradeRaw = grade.rawValue
         isCustomPoolActive = false
-        triggerPoolReassignment()
+        triggerPoolReassignment(isLevelPick: true)
     }
 
     private func selectDailyOrder(_ order: DailyOrder) {
@@ -168,12 +170,18 @@ public struct LevelSettingsView: View {
         triggerPoolReassignment()
     }
 
-    private func triggerPoolReassignment() {
+    private func triggerPoolReassignment(isLevelPick: Bool = false) {
         guard let services else { return }
         let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
         let preferences = LearnerPreferencesSnapshot.load(from: defaults)
-        Task {
-            try? await services.applyLevelChange(preferences: preferences)
+        let previous = reassignment
+        reassignment = Task {
+            await previous?.value
+            if isLevelPick {
+                try? await services.applyLevelPick(preferences: preferences)
+            } else {
+                try? await services.applyLevelChange(preferences: preferences)
+            }
         }
     }
 
