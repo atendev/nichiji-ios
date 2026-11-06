@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.24.1
+- Start the sideloaded IPA with Pro already unlocked. The dev unlock defaulted to off, so the toggle had to be flipped by hand. The Settings toggle still turns it off, and Debug builds keep the old default.
+
 ## v0.24.0
 
 - Fix "Draw a kanji to search" opening an empty sheet on the first tap once Pro is unlocked. `DictionaryView` now presents the sheet with `.sheet(item:)` over `DrawSearchPresentation`, so the sheet gets the model as its argument instead of reading separate optional state. The pad clears when the sheet closes, so the next open starts empty
