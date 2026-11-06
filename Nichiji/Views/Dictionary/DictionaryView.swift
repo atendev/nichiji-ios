@@ -105,12 +105,12 @@ public struct DictionaryView: View {
                 path.append(KanjiDetailRoute(kanjiID: kanjiID))
             }
         }
-        .sheet(item: $drawSearch, onDismiss: { handwriting?.clear() }) { presentation in
+        .sheet(item: $drawSearch, onDismiss: { handwriting?.clear() }, content: { presentation in
             DrawSearchSheet(model: presentation.model) { kanji in
                 query = kanji
                 drawSearch = nil
             }
-        }
+        })
         .paywallSheet(feature: $paywallFeature)
     }
 
