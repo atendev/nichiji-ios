@@ -9,7 +9,11 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     var customSelections: [LevelSystem: Set<String>] = [:]
     var nextReviewAt: [String: Date] = [:]
     var loggedActions: [(kanjiID: String, action: StudyAction, calendarDay: String)] = []
+    var declaredKnown: Set<String> = []
+    /// Marks made by `syncAutoKnown`; every other mark in `declaredKnown` is a hand mark.
+    var autoKnown: Set<String> = []
     var shouldThrow = false
+    static let declaredDate = Date(timeIntervalSince1970: 1_793_000_000)
 
     func assignment(for calendarDay: String) async throws -> DailyAssignmentSnapshot? {
         try checkForError()
@@ -73,6 +77,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         )
         assignments[day] = learned
         progress[existing.kanjiID] = .learning
+        declaredKnown.remove(existing.kanjiID)
+        autoKnown.remove(existing.kanjiID)
         self.nextReviewAt[existing.kanjiID] = nextReviewAt
         loggedActions.append((kanjiID: existing.kanjiID, action: .learnedDaily, calendarDay: day))
         return learned
@@ -81,6 +87,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     func forgetIt(kanjiID: String, calendarDay: String) async throws {
         try checkForError()
         progress[kanjiID] = .new
+        declaredKnown.remove(kanjiID)
+        autoKnown.remove(kanjiID)
         nextReviewAt[kanjiID] = nil
         loggedActions.append((kanjiID: kanjiID, action: .resetToNew, calendarDay: calendarDay))
     }
@@ -88,19 +96,19 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     func progress(for kanjiID: String) async throws -> KanjiProgressSnapshot? {
         try checkForError()
         guard let stage = progress[kanjiID] else { return nil }
-        return KanjiProgressSnapshot(kanjiID: kanjiID, stage: stage, nextReviewAt: nextReviewAt[kanjiID])
+        return snapshot(kanjiID, stage)
     }
 
     func reviewableProgress() async throws -> [KanjiProgressSnapshot] {
         try checkForError()
         return progress
             .filter { $0.value == .learning || $0.value == .familiar }
-            .map { KanjiProgressSnapshot(kanjiID: $0.key, stage: $0.value, nextReviewAt: nextReviewAt[$0.key]) }
+            .map { snapshot($0.key, $0.value) }
     }
 
     func allProgress() async throws -> [KanjiProgressSnapshot] {
         try checkForError()
-        return progress.map { KanjiProgressSnapshot(kanjiID: $0.key, stage: $0.value, nextReviewAt: nextReviewAt[$0.key]) }
+        return progress.map { snapshot($0.key, $0.value) }
     }
 
     func studyLog() async throws -> [StudyLogRecord] {
@@ -118,6 +126,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         try checkForError()
         if let outcome {
             progress[kanjiID] = outcome.stage
+            declaredKnown.remove(kanjiID)
+            autoKnown.remove(kanjiID)
             nextReviewAt[kanjiID] = outcome.nextReviewAt
         }
         loggedActions.append((kanjiID: kanjiID, action: answer.logAction, calendarDay: calendarDay))
@@ -151,6 +161,55 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
             guard let first = pool.first else { return nil }
             return try await createAssignment(calendarDay: day, kanjiID: first.id, assignedAt: Date())
         }
+    }
+
+    func declareKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
+        try checkForError()
+        for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
+            progress[id] = .known
+            nextReviewAt[id] = nil
+            declaredKnown.insert(id)
+        }
+    }
+
+    func syncAutoKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
+        try checkForError()
+        for id in autoKnown.subtracting(kanjiIDs) {
+            progress[id] = .new
+            nextReviewAt[id] = nil
+            declaredKnown.remove(id)
+            autoKnown.remove(id)
+        }
+        for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
+            progress[id] = .known
+            nextReviewAt[id] = nil
+            declaredKnown.insert(id)
+            autoKnown.insert(id)
+        }
+    }
+
+    func undeclareKnown(_ kanjiIDs: Set<String>) async throws {
+        try checkForError()
+        for id in kanjiIDs.intersection(declaredKnown) {
+            progress[id] = .new
+            nextReviewAt[id] = nil
+            declaredKnown.remove(id)
+            autoKnown.remove(id)
+        }
+    }
+
+    func declaredKnownIDs() async throws -> Set<String> {
+        try checkForError()
+        return declaredKnown
+    }
+
+    private func snapshot(_ kanjiID: String, _ stage: StudyStage) -> KanjiProgressSnapshot {
+        KanjiProgressSnapshot(
+            kanjiID: kanjiID,
+            stage: stage,
+            nextReviewAt: nextReviewAt[kanjiID],
+            declaredKnownAt: declaredKnown.contains(kanjiID) ? Self.declaredDate : nil
+        )
     }
 
     private func checkForError() throws {

@@ -38,6 +38,11 @@ public final class KanjiProgress {
     public var nextReviewAt: Date?
     public var gotItCount: Int
     public var forgotItCount: Int
+    /// Set when the learner said they already know this kanji; learning, reviewing and Forget it clear it.
+    public var declaredKnownAt: Date?
+    /// False only on a mark the app made from the learner's level, which a later level pick may undo.
+    /// The default migrates marks made before this field as hand marks.
+    public var wasHandKnown: Bool = true
 
     public var stage: StudyStage {
         get { StudyStage(rawValue: stageRaw) ?? .new }
@@ -51,7 +56,8 @@ public final class KanjiProgress {
         lastReviewedAt: Date? = nil,
         nextReviewAt: Date? = nil,
         gotItCount: Int = 0,
-        forgotItCount: Int = 0
+        forgotItCount: Int = 0,
+        declaredKnownAt: Date? = nil
     ) {
         self.kanjiID = kanjiID
         self.stageRaw = stage.rawValue
@@ -60,6 +66,7 @@ public final class KanjiProgress {
         self.nextReviewAt = nextReviewAt
         self.gotItCount = gotItCount
         self.forgotItCount = forgotItCount
+        self.declaredKnownAt = declaredKnownAt
     }
 }
 

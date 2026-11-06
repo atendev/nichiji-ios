@@ -5,6 +5,8 @@ import SwiftUI
 /// Search field above the browse grid. Typing is read by `DictionaryView`, which debounces and searches.
 struct DictionarySearchBar: View {
     @Binding var text: String
+    var placeholder = "Search kanji, words, readings"
+    var accessibilityName = "Search the dictionary"
 
     @FocusState private var isFocused: Bool
 
@@ -14,7 +16,7 @@ struct DictionarySearchBar: View {
                 .foregroundColor(.nichijiInkMuted)
                 .accessibilityHidden(true)
 
-            TextField("Search kanji, words, readings", text: $text)
+            TextField(placeholder, text: $text)
                 .font(.nichijiBody)
                 .foregroundColor(.nichijiInk)
                 .focused($isFocused)
@@ -22,7 +24,7 @@ struct DictionarySearchBar: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .onSubmit { isFocused = false }
-                .accessibilityLabel("Search the dictionary")
+                .accessibilityLabel(accessibilityName)
 
             if !text.isEmpty {
                 Button {

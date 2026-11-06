@@ -4,8 +4,25 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
-## v0.22.2
+## v0.24.1
 - Start the sideloaded IPA with Pro already unlocked. The dev unlock defaulted to off, so the toggle had to be flipped by hand. The Settings toggle still turns it off, and Debug builds keep the old default.
+
+## v0.24.0
+
+- Fix "Draw a kanji to search" opening an empty sheet on the first tap once Pro is unlocked. `DictionaryView` now presents the sheet with `.sheet(item:)` over `DrawSearchPresentation`, so the sheet gets the model as its argument instead of reading separate optional state. The pad clears when the sheet closes, so the next open starts empty
+- Picking a level marks every still-new kanji in the easier levels as known: JLPT N3 marks N5 and N4, and Jōyō grade 3 marks grades 1 and 2. Level picks are the onboarding Known kanji step, a level or system change in Settings, and Start on the level-complete screen. A daily order change or a custom pool edit marks nothing
+- `KanjiProgress.wasHandKnown` tells hand marks from automatic ones. It defaults to true, so marks from v0.23 stay hand marks. Each level pick removes automatic marks outside its easier levels, so moving down frees the new level's kanji for Today. Hand marks stay. `LearnerStore.syncAutoKnown` and `AutoKnownLevels` do the work, and `ServiceContainer.applyLevelPick` runs it before the re-pick
+- The onboarding step says easier levels are already marked, and its buttons wait until the marks are saved
+- The Known kanji picker lists the learner's level and every easier one, in onboarding and in Settings alike: JLPT N3 lists N5, N4 and N3, and Jōyō grade 3 lists grades 1 to 3. With the custom pool active it lists every group. Typed search still reaches every level. `KnownKanjiScope` is now one rule, and `KnownKanjiPickerView` has no `scope` parameter
+- Close ticket 066
+
+## v0.23.0
+
+- Add known kanji. A learner can mark kanji they already read, so Today starts at the first kanji they do not know. A marked kanji is stored as stage known with no review date and no log row, so it never makes a study day or a streak. `KanjiProgress.declaredKnownAt` tells it apart from a kanji that graduated through review
+- Add the Known kanji picker: a skippable onboarding step after level selection (current level only), a "Known kanji" row in Settings > Learning (every group), and a text field that shows typed kanji exactly, or searches readings and meanings across every level so kanji outside the learner's level can be picked. Kanji already in study are dimmed
+- Kanji detail gets "I know this" for new kanji and "Not known after all" for marked ones, which replaces Forget it for them
+- Known counts apart from Learned: the You tiles, By level bars, Learned grid, Needs attention and the level-complete figure leave marked kanji out, and "Your kanji" shows "N learned · M known". Milestones still count logged learning only
+- Close ticket 065
 
 ## v0.22.1
 - Build the unsigned IPA with a `DEV_UNLOCK` flag so the sideloaded artifact shows the Settings dev unlock toggle. Debug builds keep it too; a signed App Store archive does not set the flag.
