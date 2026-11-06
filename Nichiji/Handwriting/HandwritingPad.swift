@@ -66,7 +66,8 @@ public struct HandwritingPad: Equatable, Sendable {
 
     public mutating func extend(to point: CGPoint, time: TimeInterval) {
         guard currentStroke != nil else { return }
-        currentStroke?.append(sample(point, time: time))
+        let sampled = sample(point, time: time)
+        currentStroke?.append(sampled)
     }
 
     public mutating func end() {
