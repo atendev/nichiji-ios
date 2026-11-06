@@ -771,3 +771,22 @@ The user answered the merge question with two changes and asked for CI before as
 - **Test Results**: Not run; CI is the check. `AutoKnownLevelsTests` is new. `KnownKanjiStoreTests` gained sync, hand-mark, migration-default and flag-reset cases. `KnownKanjiServiceTests` gained the N3 to N4 level pick and the order change, and `KnownKanjiControlTests` gained the subtitle test. The sync test now covers familiar and reviewed-known rows, and the migration-default test asserts the flag, after the deviation subagent noted both gaps. The clear on dismiss, the disabled buttons and the real migration stay device checks.
 - **Audit**: One sonnet round on the addendum diff. It returned `APPROVE`.
 - **CI**: The first run on the addendum failed lint: `multiple_closures_with_trailing_closure` on the draw sheet's `.sheet(item:onDismiss:)`. The content closure is now passed as a labelled `content:` argument.
+
+### Decide the Japanese localization (v0.24.3)
+
+#### Requirements Report
+
+- **Success Criteria**: The resolution gives one answer per surface, each "v1.0", "after v1.0" or "not planned": the ja App Store listing, app UI strings, the Sources screen and `DATA-SOURCES.md`, widget copy, notification copy, paywall copy, the "Nichiji Pro" ja name and description, the support page and the privacy page. The privacy page answer holds whether or not "Find what ML Kit sends to Google" closes first. It defines the Japanese-language user, picks system language or an in-app switch, and names who translates and reviews, or says it doesn't apply. If any app strings ship in Japanese, it settles or hands off the storage format and the `project.yml` regions.
+- **Scope Boundary**: Decisions only: no string catalog, code or translation. Other languages and the privacy label are out. A Japanese App Store localization is in scope, and the approved English (U.S.) listing copy stays unchanged.
+- **Closing checks**: The ticket gets a Resolution, status closed, claimed false, and moves to `closed/`. The map gets a Decisions line, Frontier changes, new tickets and Out of scope or Not yet specified lines. Ticket 054's `blocked_by` swaps this ticket for any v1.0 build ticket, or drops it. `DESIGN.md` changes only if Japanese UI ships, and `CONTEXT.md` only if a term settles.
+- **Facts**: No `.xcstrings`, `.strings` or `.lproj` files, no development region in `project.yml`, and no `String(localized:)`. String-typed copy sits in `YouCopy`, `AccessoryWidgetCopy`, `AddWidgetCopy`, `PaywallModel`, `ReminderPlanBuilder`, `SettingsProSection`, `HandwritingSearchEntry` and `DataSourcesDocument`. The IAP has one `en_US` localization.
+- **Planned Tests**: None, since nothing in code changes. CI runs through `workflow_dispatch` on the branch.
+- **Audit**: One haiku auditor, the first audit and two re-checks. Round 1 raised ten points: per-surface answers, the 054 bookkeeping, `DESIGN.md`, regions and CI wording. Round 2 asked to restore the `CONTEXT.md` condition and to put the ja listing in scope. Round 3 returned `APPROVE`.
+
+#### Deviation Report
+
+- **Success Criteria**: Met. Auto-mode grilling with one sonnet subagent over three rounds, approved by the user. Nothing Japanese ships in v1.0, and the user is an English-reading learner in the Japan storefront. The Sources body is not planned, and every other surface comes after v1.0. Language follows the system, a native reviewer is named later, and the string catalog is the first later step.
+- **Scope Boundary**: Kept. No code changed. `DESIGN.md` is unchanged, because no language behaviour ships.
+- **Unanticipated TODOs**: The glyph risk. Round 2 first framed it as covering every kanji view. Then `TypographyTokens.swift` showed the bundled Shippori Mincho and Zen Kaku Gothic New fonts, so the new ticket "Check kanji glyphs outside the bundled fonts" covers only system-font text and the widget bundle. It blocks 054.
+- **Test Results**: Not run; CI is the check.
+- **Audit**: The same haiku auditor, two rounds. Round 1 asked to stop saying the Japan storefront already sells the app and to give the Sources title its own row. Round 2 returned `APPROVE`.

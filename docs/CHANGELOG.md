@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.24.3
+- Decide the Japanese localization: v1.0 ships in English only, for an English-reading learner in the Japan storefront, and every Japanese surface moves past v1.0. `CONTEXT.md` gains a Learner entry. A new ticket, "Check kanji glyphs outside the bundled fonts", blocks the release build in its place.
+- Close ticket 062
+
 ## v0.24.2
 - Git-ignore the `.claude/` folder, so Claude Code's local worktrees and settings stay out of commits.
 
