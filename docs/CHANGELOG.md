@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.24.4
+- Find what ML Kit sends to Google: the SDK keeps ink on the device but sends Google diagnostics and a per-install ID by default, with no documented iOS opt-out, so "Data Not Collected" no longer holds. Findings and the replacement privacy label and copy are in `.plan/assets/ml-kit-privacy.md`. New tickets: "Decide whether handwriting search keeps ML Kit" and "Update the privacy copy and label".
+- Close ticket 064
+
 ## v0.24.3
 - Decide the Japanese localization: v1.0 ships in English only, for an English-reading learner in the Japan storefront, and every Japanese surface moves past v1.0. `CONTEXT.md` gains a Learner entry. A new ticket, "Check kanji glyphs outside the bundled fonts", blocks the release build in its place.
 - Close ticket 062

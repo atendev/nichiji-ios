@@ -4,7 +4,7 @@ title: Prepare the v1.0 release build
 type: task
 mode: HITL
 status: open
-blocked_by: ["051", "052", "053", "055", "058", "059", "063", "064", "067"]
+blocked_by: ["051", "052", "053", "055", "058", "059", "063", "064", "067", "068", "069"]
 claimed: false
 ---
 

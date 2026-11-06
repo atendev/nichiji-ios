@@ -790,3 +790,11 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: The glyph risk. Round 2 first framed it as covering every kanji view. Then `TypographyTokens.swift` showed the bundled Shippori Mincho and Zen Kaku Gothic New fonts, so the new ticket "Check kanji glyphs outside the bundled fonts" covers only system-font text and the widget bundle. It blocks 054.
 - **Test Results**: Not run; CI is the check.
 - **Audit**: The same haiku auditor, two rounds. Round 1 asked to stop saying the Japan storefront already sells the app and to give the Sources title its own row. Round 2 returned `APPROVE`.
+
+### Find what ML Kit sends to Google (v0.24.4)
+
+- **Success Criteria**: What the SDK sends and when, any opt-out, the label and questionnaire answers, and a verdict plus replacement for each in-app privacy line. Research only; no app code changes.
+- **Findings**: Ink stays on the device by Google's statement. Diagnostics, device and app information and a per-install ID go to Google by default, with no documented opt-out. The label becomes Data Collected (Diagnostics and Device ID), not tracking. Five in-app lines, the policy, the listing and `DESIGN.md` are stale; none was edited.
+- **Unconfirmed**: The Device ID and linkage calls are judgment. The host-to-purpose mapping, ink never leaving the device and the pods' privacy manifests were not checked on the wire.
+- **Audit**: One sonnet research subagent, then one haiku auditor over two rounds. Round 1 raised seven points (hedged copy, bare ticket ids, one listing cell, a fuller Resolution, sourcing and the mode of the copy ticket). Round 2 returned `APPROVE`.
+- **Test Results**: Not run; nothing in code changes.
