@@ -1,6 +1,6 @@
 # ML Kit Digital Ink Recognition: what it sends to Google (Find what ML Kit sends to Google)
 
-Researched 2026-11-06. The app pins `MLKitDigitalInkRecognition` 8.0.0 (`Podfile`). All pages below were fetched on 2026-11-06.
+Researched 2026-11-06. Outcome: [Decide whether handwriting search keeps ML Kit](../closed/068-decide-whether-handwriting-search-keeps-ml-kit.md) dropped ML Kit for v1.0, so the replacement label and copy below are not applied. They stay here in case ML Kit returns. The app pins `MLKitDigitalInkRecognition` 8.0.0 (`Podfile`). All pages below were fetched on 2026-11-06.
 
 ## Short answer
 
@@ -102,7 +102,7 @@ Replace with (it asserts Device ID linked, as in the answers above):
 
 ## In-app lines checked against the findings
 
-None of these hold. The replacements apply only if [Decide whether handwriting search keeps ML Kit](../tickets/068-decide-whether-handwriting-search-keeps-ml-kit.md) keeps ML Kit, and "No tracking" and "drawings stay on your device" are only as sure as the unconfirmed points below; confirm both before the copy ships. ML Kit sends diagnostics and usage data to Google, so "collects nothing" and "no data" are false. What still holds: no account, no ads, no tracking (subject to the tracking caveat above), and drawings stay on the device.
+None of these hold. The replacements apply only if [Decide whether handwriting search keeps ML Kit](../closed/068-decide-whether-handwriting-search-keeps-ml-kit.md) keeps ML Kit, and "No tracking" and "drawings stay on your device" are only as sure as the unconfirmed points below; confirm both before the copy ships. ML Kit sends diagnostics and usage data to Google, so "collects nothing" and "no data" are false. What still holds: no account, no ads, no tracking (subject to the tracking caveat above), and drawings stay on the device.
 
 The on-device test in the recognizer ticket saw the logging contact once per session when ML Kit ran. I did not verify whether the app calls ML Kit only when a user opens handwriting search (a Pro feature). Apple's label is per app, so even if only some users trigger it, the label must declare it.
 

@@ -798,3 +798,20 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unconfirmed**: The Device ID and linkage calls are judgment. The host-to-purpose mapping, ink never leaving the device and the pods' privacy manifests were not checked on the wire.
 - **Audit**: One sonnet research subagent, then one haiku auditor over two rounds. Round 1 raised seven points (hedged copy, bare ticket ids, one listing cell, a fuller Resolution, sourcing and the mode of the copy ticket). Round 2 returned `APPROVE`.
 - **Test Results**: Not run; nothing in code changes.
+
+### Decide whether handwriting search keeps ML Kit (v0.24.5)
+
+#### Requirements Report
+
+- **Success Criteria**: The resolution states KEEP or DROP for v1.0 and rejects the other with a reason. It weighs the top-1 gap (89.4 against 79.8) and the top-5 gap (99.0 against 92.3), since matches show best first and a tap on any fills the search bar. It notes that all 104 drawings are one person's and the matcher sits about 4 points above its 76% CI floor. It also weighs the label and the listing's promise, the `DESIGN.md` no-analytics rule and the SDK cost. The opt-in toggle and deferring past v1.0 are each accepted or rejected. It says yes or no to a Google opt-out inquiry, and whether the decision waits on a reply. On KEEP it settles the Device ID and Product Interaction calls and names who owns `DESIGN.md`, the listing text and the App Store Connect entry. On DROP it names the removal work as a ticket. The Pro boundary and price stay unchanged. The user approves before anything is recorded.
+- **Scope Boundary**: Decisions and `.plan/` bookkeeping only. No app code, Podfile, privacy copy, App Store Connect entry, contact with Google or `DESIGN.md` edits.
+- **Anticipated TODOs**: None in code. Follow-ups become tickets.
+- **Planned Tests**: None. Closing checks are conditional: on KEEP the copy ticket reaches the Frontier; on DROP the removal ticket blocks the copy ticket and the release build. CI runs on the branch through `workflow_dispatch`.
+- **Audit**: One haiku auditor. Round 1 raised eight points: unstated answers, top-1, the one-person sample, the conditional closing check, the label calls, `DESIGN.md` and listing owners, the Pro boundary and the version. The first point was answered: the report sets what the grilling settles, not the answers. Round 2 returned `APPROVE`.
+
+#### Deviation Report
+
+- **Success Criteria**: Met. One sonnet grilling subagent, approved by the user with the Approve button. DROP: v1.0 runs on the KanjiVG matcher and keeps "Data Not Collected". The main reason is that the risk runs one way. The opt-in toggle was rejected, and deferring past v1.0 was accepted. No Google inquiry. The KEEP label calls are recorded in case ML Kit returns. Pro and $4.99 are unchanged, with a flag for the photo lookup price check.
+- **Scope Boundary**: Kept. No app code changed. `DESIGN.md` still names ML Kit, and "Remove ML Kit from handwriting search" owns that edit. `ml-kit-privacy.md` gained a one-line outcome pointer.
+- **Unanticipated TODOs**: Beyond the removal ticket, the grilling added "Improve the handwriting matcher's accuracy" and "Collect handwriting drawings from other learners". Neither blocks v1.0. The copy ticket shrank to a check, and the release build lost its `Podfile.lock` and ML Kit device checks.
+- **Test Results**: Not run; nothing in code changes. CI is the check.
