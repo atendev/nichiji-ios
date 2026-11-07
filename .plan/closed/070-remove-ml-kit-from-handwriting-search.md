@@ -3,7 +3,7 @@ id: "070"
 title: Remove ML Kit from handwriting search
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: []
 claimed: false
 ---
@@ -26,3 +26,13 @@ Decided in [Decide whether handwriting search keeps ML Kit](../closed/068-decide
 This is a Phase 5 run.
 
 ## Resolution
+
+Yes. Handwriting search runs on the KanjiVG matcher alone, and opening the sheet only loads its templates.
+
+- Code: `MLKitHandwritingModel.swift` and `OnDeviceHandwritingModel.swift` are deleted, with no protocol kept. `HandwritingRecognizerSource`, `HandwritingRecognitionError`, the factory and `TestOnDeviceHandwritingModel` went with them. `HandwritingSearchModel` takes only `loadMatcher` and lost the download, the ML Kit filtering and candidate limit, and the `source` property. The Debug "Recognizer" footnote and its copy are gone.
+- Kept: `HandwritingTemplateMatcher`, `HandwritingTemplateBuilder`, the shipped-kanji filter, the 104-drawing fixture and the CI floor (76% top-1, 89% top-5). `HandwritingInk` and the point timestamps stay too, since the pad and its tests use them.
+- Tests: the download, model-switch, filtering, throwing-model, Simulator-factory and footnote tests are deleted. `staleResultDropped` now drops a matcher result, and `templatesLoadOnce` and `liveLoadsBundledTemplates` are new.
+- Build: the `Podfile` is deleted, `make generate` runs only XcodeGen, `build`, `test` and `ipa` use `-project Nichiji.xcodeproj`, `.gitignore` drops `*.xcworkspace` and `Pods/`, and CI installs no CocoaPods and no longer prints `Podfile.lock`.
+- Docs: `DESIGN.md` drops the ML Kit privacy exception, the on-device seam, the model download, the device-only CocoaPods note, the third-party SDK line and the constraint's exception. `PROGRESS.md` describes the matcher-only feature. `.plan/assets/ml-kit-privacy.md` stays as the record of why.
+- CI: pending; see Final Report. The host is Linux, so nothing was built or run locally.
+- Unblocked: "Update the privacy copy and label", "Improve the handwriting matcher's accuracy" and "Collect handwriting drawings from other learners". "Prepare the v1.0 release build" stays blocked by other tickets.

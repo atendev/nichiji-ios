@@ -4,6 +4,12 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.24.6
+- Remove ML Kit from handwriting search. The KanjiVG matcher is now the only recognizer, so opening "Draw to search" only loads its templates and nothing downloads. `MLKitHandwritingModel`, the `OnDeviceHandwritingModel` seam and its factory, the recognizer source and the Debug "Recognizer" footnote are gone, along with their tests and test double. New tests check that the templates load once and that the app's model loads the bundled templates
+- Remove CocoaPods. The `Podfile` is gone, `make generate` runs only XcodeGen, `make build`, `test` and `ipa` use `Nichiji.xcodeproj` again, and CI no longer installs CocoaPods or prints `Podfile.lock`
+- `DESIGN.md` drops the ML Kit privacy exception, the model download and the third-party SDK line. The matcher's accuracy floor stays at 76% top-1 and 89% top-5
+- Close ticket 070
+
 ## v0.24.5
 - Decide whether handwriting search keeps ML Kit: v1.0 drops ML Kit, runs handwriting search on the KanjiVG matcher alone and keeps "Data Not Collected". New tickets: "Remove ML Kit from handwriting search" (blocks the privacy copy ticket and the release build), "Improve the handwriting matcher's accuracy" and "Collect handwriting drawings from other learners". The copy and release build tickets drop their ML Kit work.
 - Close ticket 068

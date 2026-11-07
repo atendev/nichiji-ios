@@ -815,3 +815,38 @@ The user answered the merge question with two changes and asked for CI before as
 - **Scope Boundary**: Kept. No app code changed. `DESIGN.md` still names ML Kit, and "Remove ML Kit from handwriting search" owns that edit. `ml-kit-privacy.md` gained a one-line outcome pointer.
 - **Unanticipated TODOs**: Beyond the removal ticket, the grilling added "Improve the handwriting matcher's accuracy" and "Collect handwriting drawings from other learners". Neither blocks v1.0. The copy ticket shrank to a check, and the release build lost its `Podfile.lock` and ML Kit device checks.
 - **Test Results**: Not run; nothing in code changes. CI is the check.
+
+### Remove ML Kit from handwriting search (v0.24.6)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. Handwriting search runs on the KanjiVG matcher alone. Opening the sheet only loads the matcher's templates; nothing downloads and nothing contacts the network.
+  2. `MLKitHandwritingModel.swift` and `OnDeviceHandwritingModel.swift` are deleted, with no replacement protocol. `HandwritingRecognizerSource`, `HandwritingRecognitionError`, `OnDeviceHandwritingModelFactory` and the test double `TestOnDeviceHandwritingModel` go with them.
+  3. `HandwritingSearchModel` loses the on-device model, the download request (`isRequestingModel`, `prepareOnDeviceModelIfNeeded`), `onDeviceCandidateLimit`, `shippedCandidates`, `onDeviceMatches` and the `source` property. Its init takes only `loadMatcher`. `live(contentStore:)` builds it from the bundled templates. Stale-result dropping, refresh after a finished stroke, Undo, Clear, `choose` and the preparing, unavailable, waiting and matches states behave as before.
+  4. The Debug "Recognizer" footnote leaves `DrawSearchSheet` and `HandwritingSearchCopy.recognizerNote` is deleted.
+  5. Build: the `Podfile` is deleted. It is the only tracked CocoaPods file (`git ls-files`); `Podfile.lock`, `Pods/` and the workspace were never committed; `make generate` runs only `xcodegen generate`; `build`, `test` and `ipa` use `-project Nichiji.xcodeproj`; `.gitignore` drops `*.xcworkspace` and `Pods/`; CI installs no CocoaPods and drops the "Show resolved pods" step.
+  6. Docs: `docs/DESIGN.md` drops, by the ticket's v0.24.5 line ranges: 16-20 the ML Kit exception in the overview; 48-51 the `OnDeviceHandwritingModel` seam; 63-64 the model download as the one network exception; 89-97 the on-device recognizer, its download, filtering, fallback and device-only CocoaPods note (the matcher becomes the recognizer); 155 "ML Kit is the app's one third-party SDK"; 249-251 the constraint's ML Kit exception. `docs/PROGRESS.md` describes the matcher-only feature. `CHANGELOG.md` gets v0.24.6 and `IMPLOG.md` gets this report and the Deviation Report. `.plan/assets/ml-kit-privacy.md` stays.
+  7. `git grep -i 'mlkit\|ml kit\|cocoapods\|podfile\|xcworkspace\|OnDeviceHandwriting\|RecognizerSource\|recognizerNote\|RecognitionError'` finds nothing in code, build files, CI, `DESIGN.md` or `PROGRESS.md`. History logs (`CHANGELOG.md`, `IMPLOG.md`) and `.plan/` keep their mentions. The repo has no string catalogs or `.strings` files (Japanese was deferred past v1.0), so there is no localized copy to remove.
+  8. `.plan/`: the ticket gets its Resolution (CI noted as "pending; see Final Report"), `status: closed`, `claimed: false`, and moves to `closed/`. The map gains its Decisions so far line, and the Frontier drops it. "Update the privacy copy and label", "Improve the handwriting matcher's accuracy" and "Collect handwriting drawings from other learners" join the Frontier, since this ticket was their last open blocker. "Prepare the v1.0 release build" stays blocked.
+  9. The app's `MARKETING_VERSION` in `project.yml` stays "1.0". Repo semver lives only in `CHANGELOG.md`, per `docs/workflow.md`.
+- **Scope Boundary**:
+  - In: the deletions and edits above, the tests that covered the removed paths, and the `.plan/` resolution.
+  - Out: the privacy copy and label (the "Update the privacy copy and label" ticket), matcher accuracy work ("Improve the handwriting matcher's accuracy"), the release build, and the `HandwritingPoint`/`HandwritingInk` timestamp fields. The ticket says to keep the rest, and the pad's own tests use them.
+  - Kept untouched: `HandwritingTemplateMatcher`, `HandwritingTemplateBuilder`, the shipped-kanji filter inside the matcher, the 104-drawing fixture and the CI accuracy floor (76% top-1, 89% top-5).
+- **Anticipated TODOs**: none in code. `HandwritingInk` now has one reader (the matcher call in `HandwritingSearchModel`); simplifying it is left alone because the ticket keeps the rest.
+- **Planned Tests**:
+  - `HandwritingSearchModelTests`: keep preparing-then-waiting, templates-fail, refresh-on-stroke-end, undo-and-clear, choosing-a-match. Delete the download, model-switch, filtering and throwing-model tests. Rewrite the stale-result test (`staleResultDropped`) so the matcher's result is dropped when the drawing is cleared before the task finishes. Add a test in `HandwritingSearchModelTests` that opening twice loads the templates once. It differs from the entry test that reuses the model: that one checks the entry hands back the same model, and this one checks the model doesn't reload its templates.
+  - Each kept state already has a test: `preparingThenWaiting` covers preparing and waiting, `templatesFail` covers unavailable, and `refreshesOnStrokeEnd` and `undoAndClear` cover matches.
+  - `live(contentStore:)` is one call to `HandwritingTemplateBuilder.matcher(contentStore:)`. The existing matcher accuracy test exercises that builder over the bundled SVGs. A new test, `liveLoadsBundledTemplates`, opens `live(contentStore: BundledKanjiContentStore())` and expects `.waiting`.
+  - `HandwritingSearchEntryTests`: keep the locked, unlocked and reuse tests using a model-made counter in place of the fake's `prepareCalls`. Delete the Simulator factory test and the recognizer note test.
+  - The matcher accuracy test and the full suite run in CI. The host is Linux, so CI is the build check.
+- **Version**: PATCH, v0.24.5 to v0.24.6. It removes a dependency and adds no capability.
+- **Audit**: One haiku auditor, three rounds. Round 1 raised nine points: untracked pod files, string catalogs, the grep terms, the `DESIGN.md` line ranges, the `.plan/` resolution, `MARKETING_VERSION`, the `live` wiring, per-state tests and the load-once test's overlap with the reuse test. Round 2 cleared eight of them. It flagged the stale-result test as missing, though the line was there; the test now has its name. Round 3 returned `APPROVE`.
+
+#### Deviation Report
+
+- **Success Criteria**: Met as far as reading the code can check. The deletions, the `HandwritingSearchModel` trim, the footnote removal, the build and CI edits and the docs match criteria 1-9. The criterion 7 grep finds nothing outside `.plan/`, `CHANGELOG.md` and `IMPLOG.md`. `DESIGN.md` keeps "the widget target compiles none of it", which `project.yml` confirms.
+- **Scope Boundary**: Kept. The matcher, the builder, the fixture, the accuracy test, `HandwritingInk` and the privacy copy are untouched. `PROGRESS.md` no longer lists an on-device check before release, because the Simulator and a device now run the same code.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: The same haiku auditor read the full diff and returned `APPROVE` in round 1. Its notes: the privacy copy reminder now lives only in "Update the privacy copy and label", and CI is the only build check.

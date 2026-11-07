@@ -6,17 +6,16 @@ import Testing
 @MainActor
 @Suite("Handwriting Search Entry Tests")
 struct HandwritingSearchEntryTests {
-    private func makeModel(_ onDevice: TestOnDeviceHandwritingModel) -> HandwritingSearchModel {
-        HandwritingSearchModel(onDevice: onDevice) { HandwritingTemplateMatcher(templates: []) }
+    private func makeModel() -> HandwritingSearchModel {
+        HandwritingSearchModel { HandwritingTemplateMatcher(templates: []) }
     }
 
-    @Test("A locked tap opens the paywall and never makes a model, so nothing downloads")
+    @Test("A locked tap opens the paywall and never makes a model")
     func lockedOpensPaywall() {
-        let onDevice = TestOnDeviceHandwritingModel()
         var made = 0
         let entry = HandwritingSearchEntry.open(access: .locked, existing: nil) {
             made += 1
-            return makeModel(onDevice)
+            return makeModel()
         }
 
         guard case .paywall(let feature) = entry else {
@@ -25,13 +24,12 @@ struct HandwritingSearchEntryTests {
         }
         #expect(feature == .handwritingSearch)
         #expect(made == 0)
-        #expect(onDevice.prepareCalls == 0)
     }
 
     @Test("A Pro tap, bought or dev unlocked, opens the pad")
     func unlockedOpensPad() {
         for access in [ProAccess.purchased, ProAccess(isDevUnlocked: true)] {
-            let created = makeModel(TestOnDeviceHandwritingModel())
+            let created = makeModel()
             let entry = HandwritingSearchEntry.open(access: access, existing: nil) { created }
 
             guard case .pad(let model) = entry else {
@@ -44,10 +42,10 @@ struct HandwritingSearchEntryTests {
 
     @Test("A later Pro tap reuses the existing model")
     func reusesModel() {
-        let existing = makeModel(TestOnDeviceHandwritingModel())
+        let existing = makeModel()
         let entry = HandwritingSearchEntry.open(access: .purchased, existing: existing) {
             Issue.record("A second model was made")
-            return makeModel(TestOnDeviceHandwritingModel())
+            return makeModel()
         }
 
         guard case .pad(let model) = entry else {
@@ -55,13 +53,6 @@ struct HandwritingSearchEntryTests {
             return
         }
         #expect(model === existing)
-    }
-
-    @Test("The Simulator has no on-device model")
-    func simulatorFactory() {
-        #if targetEnvironment(simulator)
-        #expect(OnDeviceHandwritingModelFactory.make() == nil)
-        #endif
     }
 }
 
@@ -88,11 +79,5 @@ struct HandwritingSearchLayoutTests {
         #expect(HandwritingSearchCopy.padLabel(strokeCount: 1) == "Drawing pad, 1 stroke")
         #expect(HandwritingSearchCopy.padLabel(strokeCount: 3) == "Drawing pad, 3 strokes")
         #expect(HandwritingSearchCopy.buttonTitle == "Draw a kanji to search")
-    }
-
-    @Test("The Debug footnote names the recognizer")
-    func recognizerNote() {
-        #expect(HandwritingSearchCopy.recognizerNote(.matcher) == "Recognizer: matcher")
-        #expect(HandwritingSearchCopy.recognizerNote(.onDevice) == "Recognizer: ML Kit")
     }
 }
