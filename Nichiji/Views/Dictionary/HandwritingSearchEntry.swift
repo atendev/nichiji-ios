@@ -7,7 +7,7 @@ enum HandwritingSearchEntry {
     case paywall(ProFeature)
     case pad(HandwritingSearchModel)
 
-    /// Locked, the paywall opens and no model is made, so nothing downloads. Unlocked, the existing model is reused.
+    /// Locked, the paywall opens and no model is made. Unlocked, the existing model is reused.
     @MainActor
     static func open(
         access: ProAccess,
@@ -44,14 +44,6 @@ enum HandwritingSearchCopy {
 
     static func padLabel(strokeCount: Int) -> String {
         strokeCount == 1 ? "Drawing pad, 1 stroke" : "Drawing pad, \(strokeCount) strokes"
-    }
-
-    /// Debug builds show which recognizer answered, for the on-device check.
-    static func recognizerNote(_ source: HandwritingRecognizerSource) -> String {
-        switch source {
-        case .matcher: "Recognizer: matcher"
-        case .onDevice: "Recognizer: ML Kit"
-        }
     }
 }
 

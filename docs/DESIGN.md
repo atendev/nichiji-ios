@@ -14,10 +14,7 @@ optional review. The app uses a quiet, book-like interface built around the
 kanji rather than gamification.
 
 The app does not require an account and does not collect analytics or personal
-data. The one exception under review is ML Kit, which handwriting search uses on
-device: it downloads its Japanese model and makes a logging contact with Google.
-"Find what ML Kit sends to Google" decides what that means for the privacy label
-and the in-app privacy copy before release. The initial implementation targets onboarding and the Today tab.
+data. The initial implementation targets onboarding and the Today tab.
 
 ## Feature overview
 
@@ -45,11 +42,7 @@ The app uses SwiftUI with feature-oriented views, shared design-system
 components, and six `Sendable` service protocols (`KanjiContentStore`,
 `LearnerStore`, `DailyKanjiService`, `PronunciationService`,
 `ReminderScheduler` and `ReviewService`) plus an injected `DayProvider` passed through a
-`ServiceContainer` in the SwiftUI environment. Handwriting search adds one more
-seam outside that set: `OnDeviceHandwritingModel`, a `@MainActor` protocol in
-`Nichiji/Handwriting/` that ML Kit implements on device. `HandwritingSearchModel`
-gets it from `OnDeviceHandwritingModelFactory`, not from the `ServiceContainer`,
-and the widget target compiles none of it. The first pass implements
+`ServiceContainer` in the SwiftUI environment. The first pass implements
 onboarding and Today without locking future Dictionary, Review or You screens
 out of the navigation model.
 
@@ -60,8 +53,7 @@ for the in-app Sources screen. Both the main app and widget extension bundle
 `kanji-index.json` and per-character JSON records so either process can perform
 daily rollover offline, while stroke-order SVGs are bundled only in the main
 app and loaded lazily on demand. Runtime network access is not part of the
-design, with one exception: on device, ML Kit downloads its handwriting model
-(about 20 MB) the first time a Pro learner opens handwriting search. The dataset is version-pinned per release and regenerated from
+design. The dataset is version-pinned per release and regenerated from
 upstream at each release; there is no automated update process.
 
 Dictionary opens on a browse grid of every bundled kanji, grouped by the
@@ -86,15 +78,11 @@ the first time Dictionary opens, from the app-only `words.json` and
 A full-width "Draw a kanji to search" button sits under the search bar. It
 needs Pro; locked, it opens the paywall. The "Draw to search" sheet has a pad,
 five matches refreshed after each finished stroke, Undo and Clear, and a match
-tap puts that kanji in the search bar. On device, ML Kit Digital Ink (`ja`)
-recognizes the drawing once its model has downloaded. The download starts the
-first time a Pro learner opens the sheet, and a failed download is requested
-again on the next open. Until then, and always in the Simulator and in tests, a
-KanjiVG template matcher answers: it builds templates at runtime from the
-bundled stroke SVGs and compares strokes in any order. ML Kit output is kept
-only for single kanji the app ships, and an ML Kit error or an empty filtered
-result falls back to the matcher. ML Kit comes through CocoaPods and is linked
-and compiled for devices only, because its pods have no arm64 Simulator slice.
+tap puts that kanji in the search bar. A KanjiVG template matcher in
+`Nichiji/Handwriting/` recognizes the drawing on device, with no download and
+no network: it builds templates at runtime from the bundled stroke SVGs, the
+first time the sheet opens, and compares strokes in any order. The widget
+target compiles none of it.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
@@ -152,8 +140,7 @@ kana readings when available and disabling speaker buttons with a footnote when
 no Japanese voice is installed.
 
 Pro is a one-time "Nichiji Pro" non-consumable bought through StoreKit 2, with
-no server and no third-party purchase SDK. ML Kit, for handwriting search, is
-the app's one third-party SDK. It unlocks lock-screen widgets, CSV export,
+no server and no third-party SDK. It unlocks lock-screen widgets, CSV export,
 photo lookup and handwriting search (`ProFeature`); everything else is free.
 `StoreKitPurchaseService` reads the device's entitlements, accepting only
 verified, unrevoked transactions, purchased or family shared. It caches the
@@ -246,9 +233,7 @@ respect Reduce Motion.
   availability checks.
 - The core onboarding and Today experience must work offline.
 - Bundled data must be verified and legally redistributable.
-- The app must not require authentication, analytics, or a backend. ML Kit's
-  model download and its Google logging are the one exception, pending "Find
-  what ML Kit sends to Google".
+- The app must not require authentication, analytics, or a backend.
 - Dynamic Type and accessibility labels are required for interface controls.
 - The app must respect the system Reduce Motion setting.
 - The generated Xcode project remains uncommitted and is created with

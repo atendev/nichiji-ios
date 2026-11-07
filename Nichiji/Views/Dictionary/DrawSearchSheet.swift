@@ -35,13 +35,6 @@ struct DrawSearchSheet: View {
                     .padding(.horizontal, LayoutTokens.screenMarginRegular)
 
                     controls
-
-                    #if DEBUG
-                    Text(HandwritingSearchCopy.recognizerNote(model.source))
-                        .font(.nichijiCaption)
-                        .foregroundColor(.nichijiInkMuted)
-                        .padding(.horizontal, LayoutTokens.screenMarginRegular)
-                    #endif
                 }
                 .padding(.top, LayoutTokens.space16)
                 .padding(.bottom, LayoutTokens.space32)
