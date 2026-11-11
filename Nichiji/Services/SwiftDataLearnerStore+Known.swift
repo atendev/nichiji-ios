@@ -67,13 +67,14 @@ extension SwiftDataLearnerStore {
     }
 
     /// A mark keeps the kanji out of Today but puts it in the review queue. Kanji marked together come due
-    /// `marksPerDay` at a time from the next day, so marking a whole level does not bury one day.
+    /// `marksPerDay` at a time starting today, so a learner finishing onboarding has reviews on day one
+    /// and marking a whole level does not bury one day.
     static let marksPerDay = 10
 
     private static func mark(_ row: KanjiProgress, at date: Date, byHand: Bool, position: Int) {
         row.stage = .learning
         row.nextReviewAt = ReviewScheduler.dueDate(
-            addingDays: ReviewScheduler.learningIntervalDays + position / marksPerDay,
+            addingDays: position / marksPerDay,
             to: date,
             calendar: .current
         )

@@ -52,7 +52,7 @@ public protocol LearnerStore: Sendable {
     /// Marks the given day's assignment as learned from Today or the interactive widget, scheduling its first review.
     func markLearned(day: String, nextReviewAt: Date) async throws -> DailyAssignmentSnapshot
 
-    /// Marks new kanji as already known: stage learning, no log row, first review the next day and staggered ten a day for a batch. Kanji past new are left alone.
+    /// Marks new kanji as already known: stage learning, no log row, first review today and staggered ten a day for a batch. Kanji past new are left alone.
     func declareKnown(_ kanjiIDs: Set<String>, at date: Date) async throws
 
     /// Returns declared kanji to new and logs nothing. Kanji the learner did not declare are left alone.

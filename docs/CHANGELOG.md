@@ -5,7 +5,7 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 ---
 
 ## v0.25.0
-- Marked-known kanji now go into your reviews. A mark stores the kanji as learning, so it skips Today but joins flashcards. Kanji marked together come due ten a day starting the next day, so marking a whole level does not bury one day; its first review clears the mark and it is then ordinary learning
+- Marked-known kanji now go into your reviews. A mark stores the kanji as learning, so it skips Today but joins flashcards. Kanji marked together come due ten a day starting today, so there is something to review on the first launch after onboarding, so marking a whole level does not bury one day; its first review clears the mark and it is then ordinary learning
 - Kanji detail: "I know this kanji" is now a large full-width button above the details, and a marked kanji shows "Known" with an Undo button there
 - Known-kanji copy in Settings and onboarding says marked kanji join your reviews
 
