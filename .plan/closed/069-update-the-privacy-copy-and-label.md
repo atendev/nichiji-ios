@@ -3,9 +3,9 @@ id: "069"
 title: Update the privacy copy and label
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["068", "070"]
-claimed: true
+claimed: false
 ---
 
 ## Question
