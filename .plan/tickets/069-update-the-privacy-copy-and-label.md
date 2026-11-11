@@ -5,7 +5,7 @@ type: task
 mode: AFK
 status: open
 blocked_by: ["068", "070"]
-claimed: false
+claimed: true
 ---
 
 ## Question
@@ -19,3 +19,5 @@ Skills: `unslop`, `apple`.
 This is a Phase 5 run. Repo text only: entering the label in App Store Connect belongs to [Prepare the v1.0 release build](054-prepare-the-v1-release-build.md).
 
 ## Resolution
+
+No copy changes. With ML Kit removed, the five in-app lines (Settings > Privacy row and screen, Welcome footnote, You export note), the listing's `Privacy label` row ("Data Not Collected") and PRIVACY paragraph, and the privacy policy in `assets/support-site.md` all still match the shipped app: the matcher runs on device, nothing downloads, and the app has no SDK. A search of app code, listing, policy and live docs found no ML Kit, Google or CocoaPods mention except one stale comment in `DictionaryView.swift` about a model download, now reworded. History logs (`CHANGELOG.md`, `IMPLOG.md`) and closed tickets keep their ML Kit text as record. Entering the label in App Store Connect stays with [Prepare the v1.0 release build](054-prepare-the-v1-release-build.md). Version v0.24.7.

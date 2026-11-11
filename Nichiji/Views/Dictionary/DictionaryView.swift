@@ -30,7 +30,7 @@ public struct DictionaryView: View {
     @State private var results: DictionarySearchResults?
     @State private var chosenWord: WordResult?
     @State private var paywallFeature: ProFeature?
-    /// Kept across sheet opens, so the templates load and the model download is requested once per run.
+    /// Kept across sheet opens, so the templates load once per run.
     @State private var handwriting: HandwritingSearchModel?
     @State private var drawSearch: DrawSearchPresentation?
 
