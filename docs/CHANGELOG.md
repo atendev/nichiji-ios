@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.25.0
+- Marked-known kanji now go into your reviews. A mark stores the kanji as learning, so it skips Today but joins flashcards. Kanji marked together come due ten a day starting the next day, so marking a whole level does not bury one day; its first review clears the mark and it is then ordinary learning
+- Kanji detail: "I know this kanji" is now a large full-width button above the details, and a marked kanji shows "Known" with an Undo button there
+- Known-kanji copy in Settings and onboarding says marked kanji join your reviews
+
 ## v0.24.6
 - Remove ML Kit from handwriting search. The KanjiVG matcher is now the only recognizer, so opening "Draw to search" only loads its templates and nothing downloads. `MLKitHandwritingModel`, the `OnDeviceHandwritingModel` seam and its factory, the recognizer source and the Debug "Recognizer" footnote are gone, along with their tests and test double. New tests check that the templates load once and that the app's model loads the bundled templates
 - Remove CocoaPods. The `Podfile` is gone, `make generate` runs only XcodeGen, `make build`, `test` and `ipa` use `Nichiji.xcodeproj` again, and CI no longer installs CocoaPods or prints `Podfile.lock`

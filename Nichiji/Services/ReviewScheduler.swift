@@ -29,8 +29,9 @@ public struct KanjiProgressSnapshot: Equatable, Sendable {
     public let forgotItCount: Int
     public let declaredKnownAt: Date?
 
-    /// Marked known by the learner rather than learned here; counted apart from Learned.
-    public var declaredKnown: Bool { stage == .known && declaredKnownAt != nil }
+    /// Marked known by the learner rather than learned here; counted apart from Learned. It sits in the review
+    /// queue as learning, and its first review clears the mark.
+    public var declaredKnown: Bool { declaredKnownAt != nil }
 
     /// Past new and learned through Today or Review, so it counts toward Learned.
     public var isLearned: Bool { stage != .new && !declaredKnown }

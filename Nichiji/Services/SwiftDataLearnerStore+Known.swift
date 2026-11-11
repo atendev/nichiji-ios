@@ -9,11 +9,13 @@ extension SwiftDataLearnerStore {
         let context = modelExecutor.modelContext
         var rows = try progressRows(in: context)
 
-        for id in kanjiIDs {
+        var marked = 0
+        for id in kanjiIDs.sorted() {
             let row = Self.row(for: id, in: &rows, context: context)
             // Learning, familiar and known kanji already have progress that marking must not overwrite.
             guard row.stage == .new else { continue }
-            Self.mark(row, at: date, byHand: true)
+            Self.mark(row, at: date, byHand: true, position: marked)
+            marked += 1
         }
         try context.save()
     }
@@ -39,10 +41,12 @@ extension SwiftDataLearnerStore {
         for row in rows.values where row.declaredKnownAt != nil && !row.wasHandKnown && !kanjiIDs.contains(row.kanjiID) {
             Self.unmark(row)
         }
-        for id in kanjiIDs {
+        var marked = 0
+        for id in kanjiIDs.sorted() {
             let row = Self.row(for: id, in: &rows, context: context)
             guard row.stage == .new else { continue }
-            Self.mark(row, at: date, byHand: false)
+            Self.mark(row, at: date, byHand: false, position: marked)
+            marked += 1
         }
         try context.save()
     }
@@ -62,9 +66,17 @@ extension SwiftDataLearnerStore {
         return row
     }
 
-    private static func mark(_ row: KanjiProgress, at date: Date, byHand: Bool) {
-        row.stage = .known
-        row.nextReviewAt = nil
+    /// A mark keeps the kanji out of Today but puts it in the review queue. Kanji marked together come due
+    /// `marksPerDay` at a time from the next day, so marking a whole level does not bury one day.
+    static let marksPerDay = 10
+
+    private static func mark(_ row: KanjiProgress, at date: Date, byHand: Bool, position: Int) {
+        row.stage = .learning
+        row.nextReviewAt = ReviewScheduler.dueDate(
+            addingDays: ReviewScheduler.learningIntervalDays + position / marksPerDay,
+            to: date,
+            calendar: .current
+        )
         row.declaredKnownAt = date
         row.wasHandKnown = byHand
     }

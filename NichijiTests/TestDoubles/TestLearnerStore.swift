@@ -166,8 +166,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
     func declareKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
         try checkForError()
         for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
-            progress[id] = .known
-            nextReviewAt[id] = nil
+            progress[id] = .learning
+            nextReviewAt[id] = Self.declaredDate
             declaredKnown.insert(id)
         }
     }
@@ -181,8 +181,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
             autoKnown.remove(id)
         }
         for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
-            progress[id] = .known
-            nextReviewAt[id] = nil
+            progress[id] = .learning
+            nextReviewAt[id] = Self.declaredDate
             declaredKnown.insert(id)
             autoKnown.insert(id)
         }

@@ -87,6 +87,10 @@ struct KanjiDetailView: View {
                     onPlayAudio: { speak(kanji.id, reading: kanji.onyomi.first?.kana ?? kanji.kunyomi.first?.kana) }
                 )
 
+                KnownKanjiControl(kanjiID: kanji.id, stage: stage, isDeclared: isDeclaredKnown) {
+                    await refreshStage()
+                }
+
                 DetailsCardView(
                     onyomi: kanji.onyomi,
                     kunyomi: kanji.kunyomi,
@@ -110,11 +114,7 @@ struct KanjiDetailView: View {
                     onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: content.strokePaths) }
                 )
 
-                KnownKanjiControl(kanjiID: kanji.id, stage: stage, isDeclared: isDeclaredKnown) {
-                    await refreshStage()
-                }
-
-                // A marked kanji is unmarked above, so Forget it would only leave a reset in History.
+                // A marked kanji is unmarked at the top, so Forget it would only leave a reset in History.
                 if !isDeclaredKnown {
                     ForgetItControl(kanjiID: kanji.id, stage: stage) {
                         stage = .new

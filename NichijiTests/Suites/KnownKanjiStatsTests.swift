@@ -57,11 +57,11 @@ struct KnownKanjiStatsTests {
         #expect(figures.kanjiLearned == 1)
     }
 
-    @Test("Known needs a stage of known and a declared date")
+    @Test("Known needs a declared date, and a review clears it")
     func declaredFlag() {
         #expect(StatsFixtures.declared("日", at: Date()).declaredKnown)
         #expect(!StatsFixtures.progress("日", .known).declaredKnown)
-        #expect(!KanjiProgressSnapshot(kanjiID: "日", stage: .new, declaredKnownAt: Date()).declaredKnown)
+        #expect(!KanjiProgressSnapshot(kanjiID: "日", stage: .learning).declaredKnown)
         #expect(StatsFixtures.progress("日", .known).isLearned)
         #expect(!StatsFixtures.progress("日", .new).isLearned)
     }

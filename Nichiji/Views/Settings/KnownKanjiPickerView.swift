@@ -2,7 +2,7 @@ import SwiftUI
 
 /*------------------------------known-kanji-------------------------------*/
 
-/// Turn on the kanji the learner already knows. They leave the daily pool and the review queue.
+/// Turn on the kanji the learner already knows. They leave the daily pool and join the review queue.
 struct KnownKanjiPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.serviceContainer) private var services
@@ -31,7 +31,7 @@ struct KnownKanjiPickerView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: LayoutTokens.space24) {
-                    Text("Turn on the kanji you already know. They stay out of your daily kanji and your reviews.")
+                    Text("Turn on the kanji you already know. They skip your daily kanji and go into your reviews.")
                         .font(.nichijiBody)
                         .foregroundColor(.nichijiInkMuted)
                         .padding(.top, LayoutTokens.space8)

@@ -2,7 +2,7 @@ import SwiftUI
 
 /*--------------------------------known-kanji-----------------------------*/
 
-/// Quiet control beside Forget it: mark a new kanji as already known, or take the mark back.
+/// Top of the kanji detail: mark a new kanji as already known, or show that it is and let the mark be taken back.
 struct KnownKanjiControl: View {
     enum Choice: Equatable {
         case declare
@@ -10,15 +10,15 @@ struct KnownKanjiControl: View {
 
         var title: String {
             switch self {
-            case .declare: "I know this"
-            case .undeclare: "Not known after all"
+            case .declare: "I know this kanji"
+            case .undeclare: "Undo"
             }
         }
 
         var hint: String {
             switch self {
-            case .declare: "Marks this kanji as known, so it leaves your daily kanji and reviews"
-            case .undeclare: "Returns this kanji to new"
+            case .declare: "Marks this kanji as known. It skips your daily kanji and goes into your reviews"
+            case .undeclare: "Returns this kanji to new and takes it out of your reviews"
             }
         }
     }
@@ -43,26 +43,48 @@ struct KnownKanjiControl: View {
 
     var body: some View {
         if let choice = Self.choice(stage: stage, isDeclared: isDeclared) {
-            VStack(spacing: LayoutTokens.space4) {
-                Button(choice.title) {
-                    apply(choice)
+            VStack(spacing: LayoutTokens.space8) {
+                switch choice {
+                case .declare:
+                    Button {
+                        apply(choice)
+                    } label: {
+                        Label(choice.title, systemImage: "checkmark.circle")
+                            .padding(.vertical, LayoutTokens.space8)
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(isWorking)
+                    .accessibilityHint(choice.hint)
+                case .undeclare:
+                    HStack(spacing: LayoutTokens.space8) {
+                        Label("Known", systemImage: "checkmark.circle.fill")
+                            .font(.nichijiCallout.weight(.medium))
+                            .foregroundColor(.nichijiMatcha)
+
+                        Spacer(minLength: LayoutTokens.space8)
+
+                        Button(choice.title) {
+                            apply(choice)
+                        }
+                        .font(.nichijiCallout)
+                        .foregroundColor(.nichijiInkMuted)
+                        .minTouchTarget()
+                        .disabled(isWorking)
+                        .accessibilityHint(choice.hint)
+                    }
+                    .padding(.horizontal, LayoutTokens.space16)
+                    .frame(minHeight: LayoutTokens.minHitTarget + LayoutTokens.space8)
+                    .accessibilityElement(children: .contain)
                 }
-                .font(.nichijiCallout)
-                .foregroundColor(.nichijiInkMuted)
-                .padding(.horizontal, LayoutTokens.space16)
-                .minTouchTarget()
-                .disabled(isWorking)
-                .accessibilityHint(choice.hint)
 
                 if let errorMessage {
                     Text(errorMessage)
                         .font(.nichijiCaption)
                         .foregroundColor(.nichijiInkMuted)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, LayoutTokens.space32)
                 }
             }
-            .frame(maxWidth: .infinity)
+            .padding(.horizontal, LayoutTokens.screenMarginCompact)
         }
     }
 

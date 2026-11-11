@@ -103,7 +103,7 @@ struct KnownKanjiBottomBar: View {
                     .font(.nichijiBody)
                     .foregroundColor(.nichijiInk)
 
-                Text("Kanji you study or review stay as they are.")
+                Text("Kanji you already study stay as they are.")
                     .font(.nichijiCaption)
                     .foregroundColor(.nichijiInkMuted)
             }

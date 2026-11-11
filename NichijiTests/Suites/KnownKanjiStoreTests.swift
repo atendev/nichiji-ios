@@ -26,7 +26,7 @@ struct KnownKanjiStoreTests {
         return rows.first?.wasHandKnown
     }
 
-    @Test("Declaring a new kanji makes it known with no review date and no log row")
+    @Test("Declaring a new kanji puts it in learning, due the next day, with no log row")
     func declareMarksKnown() async throws {
         let store = try makeStore()
         let date = Date(timeIntervalSince1970: 1_793_000_000)
@@ -34,13 +34,27 @@ struct KnownKanjiStoreTests {
         try await store.declareKnown(["山", "川"], at: date)
 
         let progress = try #require(try await store.progress(for: "山"))
-        #expect(progress.stage == .known)
-        #expect(progress.nextReviewAt == nil)
+        #expect(progress.stage == .learning)
+        #expect(progress.nextReviewAt == ReviewScheduler.firstReviewDate(learnedOn: date, calendar: .current))
         #expect(progress.declaredKnownAt == date)
         #expect(progress.declaredKnown)
         #expect(try await store.studyLog().isEmpty)
         #expect(try await store.declaredKnownIDs() == ["山", "川"])
         #expect(try await store.nonNewKanjiIDs() == ["山", "川"])
+    }
+
+    @Test("Kanji marked together come due ten a day from the next day")
+    func declareStaggersDueDates() async throws {
+        let store = try makeStore()
+        let date = Date(timeIntervalSince1970: 1_793_000_000)
+        let ids = Set((0..<25).map { "k\(String(format: "%02d", $0))" })
+
+        try await store.declareKnown(ids, at: date)
+
+        for (index, id) in ids.sorted().enumerated() {
+            let expected = ReviewScheduler.dueDate(addingDays: 1 + index / 10, to: date, calendar: .current)
+            #expect(try await store.progress(for: id)?.nextReviewAt == expected)
+        }
     }
 
     @Test("Declaring leaves kanji that are already in study alone")
