@@ -17,6 +17,7 @@ struct TrialDetailView: View {
                     }
                 }
                 recognizedSection(trial)
+                liveTextSection(trial)
                 rateSection(trial)
             }
             .navigationTitle("Photo")
@@ -45,7 +46,36 @@ struct TrialDetailView: View {
         } header: {
             Text("Recognized")
         } footer: {
-            Text("Read in \(trial.seconds, format: .number.precision(.fractionLength(2))) s")
+            Text(visionFooter(trial))
+        }
+    }
+
+    private func visionFooter(_ trial: Trial) -> String {
+        let seconds = trial.seconds.formatted(.number.precision(.fractionLength(2)))
+        guard let attempts = trial.attempts else { return "Read in \(seconds) s" }
+        let counts = attempts.map(String.init).joined(separator: ", ")
+        let turned = trial.rotation.map { $0 == 0 ? "" : ", read turned \($0)°" } ?? ""
+        return "Read in \(seconds) s. Lines found per try (upright, 90° right, 90° left): \(counts)\(turned)"
+    }
+
+    private func liveTextSection(_ trial: Trial) -> some View {
+        Section {
+            if let live = trial.liveText {
+                if let error = live.error {
+                    Text(error).foregroundStyle(.red)
+                } else if live.lines.isEmpty {
+                    Text("No text found").foregroundStyle(.secondary)
+                }
+                ForEach(Array(live.lines.enumerated()), id: \.offset) { _, line in
+                    JapaneseText(text: line).textSelection(.enabled)
+                }
+            } else {
+                Text("Not read").foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("Live Text")
+        } footer: {
+            Text("Apple's Photos engine, shown for comparison. Rate the better of the two.")
         }
     }
 

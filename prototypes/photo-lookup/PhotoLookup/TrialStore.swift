@@ -37,6 +37,9 @@ struct Trial: Codable, Identifiable, Sendable {
     var lines: [RecognizedLine] = []
     var seconds: Double = 0
     var error: String?
+    var attempts: [Int]?
+    var rotation: Int?
+    var liveText: LiveTextResult?
 }
 
 struct SummaryRow: Identifiable {
@@ -103,9 +106,12 @@ final class TrialStore {
                     let result = try await Recognizer.recognize(imageData: data)
                     trial.lines = result.lines
                     trial.seconds = result.seconds
+                    trial.attempts = result.attempts
+                    trial.rotation = result.rotation
                 } catch {
                     trial.error = String(describing: error)
                 }
+                trial.liveText = await LiveTextReader.read(imageData: data)
             } else {
                 trial.error = "Photo could not be loaded"
             }
@@ -144,7 +150,7 @@ final class TrialStore {
     }
 
     var csv: String {
-        let header = "date,kind,layout,verdict,seconds,notes,recognized_text"
+        let header = "date,kind,layout,verdict,seconds,notes,recognized_text,live_text"
         let rows = trials.map { trial -> String in
             let text = trial.lines.map(\.text).joined(separator: " / ")
             let fields = [
@@ -154,7 +160,8 @@ final class TrialStore {
                 trial.verdict?.rawValue ?? "",
                 String(format: "%.2f", trial.seconds),
                 trial.notes,
-                text
+                text,
+                trial.liveText?.lines.joined(separator: " / ") ?? ""
             ]
             return fields.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",")
         }

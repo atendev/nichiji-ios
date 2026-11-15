@@ -106,6 +106,9 @@ private struct TrialRow: View {
                     Text(error).foregroundStyle(.red)
                 } else if let first = trial.lines.first {
                     JapaneseText(text: first.text).lineLimit(1)
+                } else if let live = trial.liveText?.lines.first {
+                    JapaneseText(text: live).lineLimit(1)
+                    Text("Live Text only").font(.caption).foregroundStyle(.orange)
                 } else {
                     Text("No text found").foregroundStyle(.secondary)
                 }

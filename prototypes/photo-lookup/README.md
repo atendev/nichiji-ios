@@ -14,3 +14,5 @@ There is no Mac in the loop. The `Photo lookup harness` workflow builds an unsig
 4. Open Summary for the success rate per photo type and per layout, and export the CSV.
 
 Results save to the app's Documents folder, so quitting the app loses nothing. The photos themselves are not saved.
+
+Each photo is also read with Live Text (VisionKit) so the two engines can be compared. If Vision finds nothing upright, it retries the photo turned 90° each way.
