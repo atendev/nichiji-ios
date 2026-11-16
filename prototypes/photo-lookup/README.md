@@ -15,4 +15,4 @@ There is no Mac in the loop. The `Photo lookup harness` workflow builds an unsig
 
 Results save to the app's Documents folder, so quitting the app loses nothing. The photos themselves are not saved.
 
-Each photo is also read with Live Text (VisionKit) so the two engines can be compared. If Vision finds nothing upright, it retries the photo turned 90° each way.
+Each photo is also read with Live Text (VisionKit) so the two engines can be compared. When Vision finds fewer than 4 characters, the CSV's `combined_text` column uses Live Text instead, and `kanji_found` lists the distinct kanji in it.

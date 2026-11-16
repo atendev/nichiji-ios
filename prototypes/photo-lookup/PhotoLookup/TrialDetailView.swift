@@ -52,10 +52,8 @@ struct TrialDetailView: View {
 
     private func visionFooter(_ trial: Trial) -> String {
         let seconds = trial.seconds.formatted(.number.precision(.fractionLength(2)))
-        guard let attempts = trial.attempts else { return "Read in \(seconds) s" }
-        let counts = attempts.map(String.init).joined(separator: ", ")
-        let turned = trial.rotation.map { $0 == 0 ? "" : ", read turned \($0)°" } ?? ""
-        return "Read in \(seconds) s. Lines found per try (upright, 90° right, 90° left): \(counts)\(turned)"
+        let note = trial.visionIsSparse ? " Vision found little, so Live Text stands in." : ""
+        return "Read in \(seconds) s.\(note)"
     }
 
     private func liveTextSection(_ trial: Trial) -> some View {

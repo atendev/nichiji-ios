@@ -37,9 +37,27 @@ struct Trial: Codable, Identifiable, Sendable {
     var lines: [RecognizedLine] = []
     var seconds: Double = 0
     var error: String?
-    var attempts: [Int]?
-    var rotation: Int?
     var liveText: LiveTextResult?
+}
+
+extension Trial {
+    /// Vision reads fewer than this many characters in total counts as sparse, and Live Text stands in for it.
+    static let sparseThreshold = 4
+
+    var visionIsSparse: Bool { lines.reduce(0) { $0 + $1.text.count } < Trial.sparseThreshold }
+
+    /// What the shipped feature would use: Vision, or Live Text when Vision found next to nothing.
+    var combinedText: [String] {
+        visionIsSparse && !(liveText?.lines.isEmpty ?? true) ? liveText?.lines ?? [] : lines.map(\.text)
+    }
+
+    /// Distinct kanji in the combined text.
+    var kanjiFound: [Character] {
+        var seen = Set<Character>()
+        return combinedText.joined().filter { character in
+            character.unicodeScalars.allSatisfy { (0x3400...0x9FFF).contains($0.value) } && seen.insert(character).inserted
+        }.map { $0 }
+    }
 }
 
 struct SummaryRow: Identifiable {
@@ -106,8 +124,6 @@ final class TrialStore {
                     let result = try await Recognizer.recognize(imageData: data)
                     trial.lines = result.lines
                     trial.seconds = result.seconds
-                    trial.attempts = result.attempts
-                    trial.rotation = result.rotation
                 } catch {
                     trial.error = String(describing: error)
                 }
@@ -150,7 +166,7 @@ final class TrialStore {
     }
 
     var csv: String {
-        let header = "date,kind,layout,verdict,seconds,notes,recognized_text,live_text,vision_rotation,vision_attempts"
+        let header = "date,kind,layout,verdict,seconds,notes,recognized_text,live_text,combined_text,kanji_found"
         let rows = trials.map { trial -> String in
             let text = trial.lines.map(\.text).joined(separator: " / ")
             let fields = [
@@ -162,8 +178,8 @@ final class TrialStore {
                 trial.notes,
                 text,
                 trial.liveText?.lines.joined(separator: " / ") ?? "",
-                trial.rotation.map(String.init) ?? "",
-                trial.attempts?.map(String.init).joined(separator: "/") ?? ""
+                trial.combinedText.joined(separator: " / "),
+                String(trial.kanjiFound)
             ]
             return fields.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",")
         }
