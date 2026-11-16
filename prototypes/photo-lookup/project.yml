@@ -1,0 +1,22 @@
+name: PhotoLookup
+options:
+  bundleIdPrefix: com.aten
+  deploymentTarget:
+    iOS: "27.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    DEVELOPMENT_TEAM: ""
+targets:
+  PhotoLookup:
+    type: application
+    platform: iOS
+    sources:
+      - PhotoLookup
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji.photolookup
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Photo Lookup Test
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES

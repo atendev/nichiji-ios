@@ -24,6 +24,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Test photo lookup on real signage](closed/061-test-photo-lookup-on-real-signage.md): Go. 30 on-device photos read 80% Good and 93% Good or Partial; vertical text was the weak spot (50% Good). Photo lookup is capture-then-grid, no live scanning, with Vision first and Live Text when Vision reads under 4 characters. The $4.99 price holds. Graduates "Build photo lookup".
+
 - [Update the privacy copy and label](closed/069-update-the-privacy-copy-and-label.md): No copy changes. The five in-app lines, the listing's "Data Not Collected" row and description, and the privacy policy all still match the matcher-only app; one stale model-download comment in `DictionaryView` was reworded. Entering the label in App Store Connect stays with the release build.
 - [Remove ML Kit from handwriting search](closed/070-remove-ml-kit-from-handwriting-search.md): Handwriting search runs on the KanjiVG matcher alone. The ML Kit model, the on-device seam and factory, the recognizer source and the Debug footnote are gone, and so are CocoaPods and the `Podfile`. Builds use the XcodeGen `.xcodeproj` again. The matcher, its builder, the 104-drawing fixture and the 76%/89% CI floor stay. `DESIGN.md` drops the ML Kit privacy exception.
 - [Decide whether handwriting search keeps ML Kit](closed/068-decide-whether-handwriting-search-keeps-ml-kit.md): Drop ML Kit. v1.0 runs handwriting search on the KanjiVG matcher alone and keeps "Data Not Collected", since adding ML Kit later costs nothing and walking back a "Data Collected" label does. ML Kit's lead (89.4/99.0 against 79.8/92.3, one person's drawings) is real but not conclusive. No Google opt-out inquiry. Pro and $4.99 are unchanged. Surfaced [Remove ML Kit from handwriting search](tickets/070-remove-ml-kit-from-handwriting-search.md), which blocks the copy ticket and the release build, plus [Improve the handwriting matcher's accuracy](tickets/071-improve-the-handwriting-matchers-accuracy.md) and [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md).
@@ -65,7 +67,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Not yet specified
 
-- Photo lookup build ticket: graduates after [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) answers. It gates its entry point on `ProFeature.photoLookup` through `ProAccessModel` and opens `paywallSheet(feature:)` when locked. Handwriting search shipped in [Build handwriting search](closed/063-build-handwriting-search.md).
 - Waller's list licence version: the Sources screen links the tanos.co.uk sharing page, read only through a Wayback copy, which states CC BY with no version. Recheck the live page before release.
 - Tatoeba's licence: OpenJLPT names Tatoeba as an upstream of the estimated levels, and the Sources screen names it without a link or licence, as 033 worded it. Confirm its licence and whether attribution needs a link before release.
 
@@ -80,7 +81,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Test photo lookup on real signage](tickets/061-test-photo-lookup-on-real-signage.md) (task, HITL)
+- [Build photo lookup](tickets/073-build-photo-lookup.md) (task, AFK)
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Improve the handwriting matcher's accuracy](tickets/071-improve-the-handwriting-matchers-accuracy.md) (task, AFK)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)

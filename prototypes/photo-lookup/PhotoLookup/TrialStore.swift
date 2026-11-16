@@ -1,0 +1,193 @@
+import Observation
+import PhotosUI
+import SwiftUI
+
+enum PhotoKind: String, Codable, CaseIterable, Identifiable {
+    case shopSign = "Shop sign"
+    case printedPage = "Printed page"
+    case menuOrLabel = "Menu or label"
+    case other = "Other"
+
+    var id: String { rawValue }
+}
+
+enum TextLayout: String, Codable, CaseIterable, Identifiable {
+    case horizontal = "Horizontal"
+    case vertical = "Vertical"
+    case mixed = "Mixed"
+
+    var id: String { rawValue }
+}
+
+enum Verdict: String, Codable, CaseIterable, Identifiable {
+    case good = "Good"
+    case partial = "Partial"
+    case failed = "Failed"
+
+    var id: String { rawValue }
+}
+
+struct Trial: Codable, Identifiable, Sendable {
+    var id = UUID()
+    var date = Date()
+    var kind: PhotoKind = .shopSign
+    var layout: TextLayout = .horizontal
+    var verdict: Verdict?
+    var notes = ""
+    var lines: [RecognizedLine] = []
+    var seconds: Double = 0
+    var error: String?
+    var liveText: LiveTextResult?
+}
+
+extension Trial {
+    /// Vision reads fewer than this many characters in total counts as sparse, and Live Text stands in for it.
+    static let sparseThreshold = 4
+
+    var visionIsSparse: Bool { lines.reduce(0) { $0 + $1.text.count } < Trial.sparseThreshold }
+
+    /// What the shipped feature would use: Vision, or Live Text when Vision found next to nothing.
+    var combinedText: [String] {
+        visionIsSparse && !(liveText?.lines.isEmpty ?? true) ? liveText?.lines ?? [] : lines.map(\.text)
+    }
+
+    /// Distinct kanji in the combined text.
+    var kanjiFound: [Character] {
+        var seen = Set<Character>()
+        return combinedText.joined().filter { character in
+            character.unicodeScalars.allSatisfy { (0x3400...0x9FFF).contains($0.value) } && seen.insert(character).inserted
+        }.map { $0 }
+    }
+}
+
+struct SummaryRow: Identifiable {
+    var label: String
+    var good = 0
+    var partial = 0
+    var failed = 0
+
+    var id: String { label }
+    var total: Int { good + partial + failed }
+    var goodRate: Double { total == 0 ? 0 : Double(good) / Double(total) }
+    var usableRate: Double { total == 0 ? 0 : Double(good + partial) / Double(total) }
+}
+
+@MainActor
+@Observable
+final class TrialStore {
+    private(set) var trials: [Trial] = []
+    private(set) var thumbnails: [UUID: UIImage] = [:]
+    private(set) var pending = 0
+    let supportedLanguages = Recognizer.supportedLanguages()
+
+    var hasJapanese: Bool { supportedLanguages.contains { $0.hasPrefix("ja") } }
+
+    private let fileURL = URL.documentsDirectory.appending(path: "trials.json")
+
+    init() {
+        if let data = try? Data(contentsOf: fileURL),
+           let saved = try? JSONDecoder().decode([Trial].self, from: data) {
+            trials = saved
+        }
+    }
+
+    func trial(_ id: UUID) -> Trial? { trials.first { $0.id == id } }
+
+    func update(_ trial: Trial) {
+        guard let index = trials.firstIndex(where: { $0.id == trial.id }) else { return }
+        trials[index] = trial
+        save()
+    }
+
+    func remove(at offsets: IndexSet) {
+        for index in offsets { thumbnails[trials[index].id] = nil }
+        trials.remove(atOffsets: offsets)
+        save()
+    }
+
+    func removeAll() {
+        trials = []
+        thumbnails = [:]
+        save()
+    }
+
+    func add(_ items: [PhotosPickerItem]) async {
+        pending += items.count
+        for item in items {
+            defer { pending -= 1 }
+            var trial = Trial()
+            if let data = try? await item.loadTransferable(type: Data.self) {
+                if let image = UIImage(data: data) {
+                    thumbnails[trial.id] = image.preparingThumbnail(of: CGSize(width: 900, height: 900))
+                }
+                do {
+                    let result = try await Recognizer.recognize(imageData: data)
+                    trial.lines = result.lines
+                    trial.seconds = result.seconds
+                } catch {
+                    trial.error = String(describing: error)
+                }
+                trial.liveText = await LiveTextReader.read(imageData: data)
+            } else {
+                trial.error = "Photo could not be loaded"
+            }
+            trials.insert(trial, at: 0)
+            save()
+        }
+    }
+
+    // MARK: Summary
+
+    var unrated: Int { trials.filter { $0.verdict == nil && $0.error == nil }.count }
+
+    var summaryByKind: [SummaryRow] {
+        summary(PhotoKind.allCases.map(\.rawValue)) { $0.kind.rawValue }
+    }
+
+    var summaryByLayout: [SummaryRow] {
+        summary(TextLayout.allCases.map(\.rawValue)) { $0.layout.rawValue }
+    }
+
+    var summaryAll: SummaryRow {
+        summary(["All rated photos"]) { _ in "All rated photos" }[0]
+    }
+
+    private func summary(_ labels: [String], key: (Trial) -> String) -> [SummaryRow] {
+        var rows = labels.map { SummaryRow(label: $0) }
+        for trial in trials {
+            guard let verdict = trial.verdict, let index = rows.firstIndex(where: { $0.label == key(trial) }) else { continue }
+            switch verdict {
+            case .good: rows[index].good += 1
+            case .partial: rows[index].partial += 1
+            case .failed: rows[index].failed += 1
+            }
+        }
+        return rows
+    }
+
+    var csv: String {
+        let header = "date,kind,layout,verdict,seconds,notes,recognized_text,live_text,combined_text,kanji_found"
+        let rows = trials.map { trial -> String in
+            let text = trial.lines.map(\.text).joined(separator: " / ")
+            let fields = [
+                trial.date.formatted(.iso8601),
+                trial.kind.rawValue,
+                trial.layout.rawValue,
+                trial.verdict?.rawValue ?? "",
+                String(format: "%.2f", trial.seconds),
+                trial.notes,
+                text,
+                trial.liveText?.lines.joined(separator: " / ") ?? "",
+                trial.combinedText.joined(separator: " / "),
+                String(trial.kanjiFound)
+            ]
+            return fields.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",")
+        }
+        return ([header] + rows).joined(separator: "\n")
+    }
+
+    private func save() {
+        guard let data = try? JSONEncoder().encode(trials) else { return }
+        try? data.write(to: fileURL, options: .atomic)
+    }
+}
