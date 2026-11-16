@@ -150,7 +150,7 @@ final class TrialStore {
     }
 
     var csv: String {
-        let header = "date,kind,layout,verdict,seconds,notes,recognized_text,live_text"
+        let header = "date,kind,layout,verdict,seconds,notes,recognized_text,live_text,vision_rotation,vision_attempts"
         let rows = trials.map { trial -> String in
             let text = trial.lines.map(\.text).joined(separator: " / ")
             let fields = [
@@ -161,7 +161,9 @@ final class TrialStore {
                 String(format: "%.2f", trial.seconds),
                 trial.notes,
                 text,
-                trial.liveText?.lines.joined(separator: " / ") ?? ""
+                trial.liveText?.lines.joined(separator: " / ") ?? "",
+                trial.rotation.map(String.init) ?? "",
+                trial.attempts?.map(String.init).joined(separator: "/") ?? ""
             ]
             return fields.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",")
         }

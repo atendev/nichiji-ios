@@ -52,17 +52,25 @@ enum Recognizer {
         attempts.append(upright.count)
         best.lines = upright
 
-        // Vision finds horizontal lines far more readily, so a photo of vertical text can come back empty. Retry turned.
-        if upright.isEmpty {
+        // Vision finds horizontal lines far more readily, so a photo of vertical text can come back empty or with a lone
+        // character. Retry turned whenever the upright pass found next to nothing.
+        if characterCount(upright) < sparseThreshold {
             let turned = CIImage(cgImage: image).oriented(orientation)
             for (degrees, turn) in [(90, CGImagePropertyOrientation.right), (270, .left)] {
                 let lines = try read(VNImageRequestHandler(ciImage: turned.oriented(turn), orientation: .up))
                 attempts.append(lines.count)
-                if lines.count > best.lines.count { best = (lines, degrees) }
+                if characterCount(lines) > characterCount(best.lines) { best = (lines, degrees) }
             }
         }
         let seconds = Date().timeIntervalSince(start)
         return Recognition(lines: best.lines, seconds: seconds, attempts: attempts, rotation: best.rotation)
+    }
+
+    /// Fewer characters than this across all lines counts as "found next to nothing".
+    private static let sparseThreshold = 4
+
+    private static func characterCount(_ lines: [RecognizedLine]) -> Int {
+        lines.reduce(0) { $0 + $1.text.count }
     }
 
     private static func read(_ handler: VNImageRequestHandler) throws -> [RecognizedLine] {
