@@ -51,6 +51,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Nichiji
+        INFOPLIST_KEY_NSCameraUsageDescription: Nichiji uses the camera to take a photo and find the kanji in it. The photo is read on your device and never leaves it.
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
   NichijiWidget:
     type: app-extension

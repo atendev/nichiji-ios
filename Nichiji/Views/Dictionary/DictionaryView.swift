@@ -33,6 +33,7 @@ public struct DictionaryView: View {
     /// Kept across sheet opens, so the templates load once per run.
     @State private var handwriting: HandwritingSearchModel?
     @State private var drawSearch: DrawSearchPresentation?
+    @State private var photoLookup: PhotoLookupPresentation?
 
     private let searchSource: any DictionarySearchSource
 
@@ -70,6 +71,7 @@ public struct DictionaryView: View {
 
                 DictionarySearchBar(text: $query)
                 DrawSearchButton(action: openDrawSearch)
+                PhotoLookupButton(action: openPhotoLookup)
 
                 if isSearching {
                     searchContent
@@ -111,6 +113,12 @@ public struct DictionaryView: View {
                 drawSearch = nil
             }
         })
+        .sheet(item: $photoLookup) { presentation in
+            PhotoLookupSheet(model: presentation.model) { kanjiID in
+                photoLookup = nil
+                path.append(KanjiDetailRoute(kanjiID: kanjiID))
+            }
+        }
         .paywallSheet(feature: $paywallFeature)
     }
 
@@ -251,6 +259,19 @@ private extension DictionaryView {
         case .pad(let model):
             handwriting = model
             drawSearch = DrawSearchPresentation(model: model)
+        }
+    }
+
+    func openPhotoLookup() {
+        switch PhotoLookupEntry.open(access: proAccess?.access ?? .locked) {
+        case .paywall(let feature):
+            paywallFeature = feature
+        case .sheet:
+            photoLookup = PhotoLookupPresentation(model: PhotoLookupModel(
+                reader: SystemPhotoTextReader(),
+                contentStore: services?.contentStore ?? BundledKanjiContentStore(),
+                learnerStore: services?.learnerStore
+            ))
         }
     }
 

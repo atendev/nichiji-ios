@@ -84,6 +84,16 @@ no network: it builds templates at runtime from the bundled stroke SVGs, the
 first time the sheet opens, and compares strokes in any order. The widget
 target compiles none of it.
 
+A second button, "Look up kanji in a photo", sits under it and needs Pro too.
+It opens a sheet that takes a photo with the camera or picks one from the
+library; there is no live scanning. `Nichiji/PhotoLookup/` reads the photo on
+device with Vision (accurate, Japanese then English) and falls back to Live
+Text when Vision reads fewer than four characters. The sheet lists every
+bundled kanji found, once each, in a grid under the photo and its found
+count; a tile closes the sheet and opens kanji detail. A "New to you" toggle, off by default, hides
+kanji the learner has started. Nothing is saved or sent: the photo lives only
+in the open sheet.
+
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
 local store. SwiftData stores learner-owned records (`KanjiProgress`,
@@ -151,7 +161,7 @@ A Debug-only dev unlock sits on its own key.
 
 The paywall is a sheet that opens only when a locked Pro feature is tapped: a
 locked lock-screen widget, History's "Export history", the widget guide's
-"Unlock lock screen widgets" button, and later the photo and handwriting entry
+"Unlock lock screen widgets" button, and the photo and handwriting entry
 points. It never appears on Today, during onboarding, on a timer or when
 Settings opens. It names the tapped feature first, lists all four, says the
 rest of the app stays free, and offers "Unlock for <price>" with the StoreKit
