@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.25.0
+- Build photo lookup. A Pro button under "Draw a kanji to search" opens a sheet that takes a photo or picks one, reads it on device with Vision and falls back to Live Text under four characters, and lists each bundled kanji found once in a grid under the photo. A tile opens kanji detail, and "New to you" hides started kanji. Locked taps open the paywall. `project.yml` gains the camera usage string
+- Close ticket 073
+
 ## v0.24.7
 - Update the privacy copy and label: with ML Kit gone, the five in-app lines, the listing's "Data Not Collected" row and description, and the privacy policy all stay true, so none change. The only leftover was a stale model-download comment in `DictionaryView`, now reworded
 - Close ticket 069

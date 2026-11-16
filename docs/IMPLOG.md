@@ -850,3 +850,25 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: The same haiku auditor read the full diff and returned `APPROVE` in round 1. Its notes: the privacy copy reminder now lives only in "Update the privacy copy and label", and CI is the only build check.
+
+### Build photo lookup (v0.25.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. A "Look up kanji in a photo" button sits under "Draw a kanji to search". Locked, it opens the paywall for `ProFeature.photoLookup`; unlocked, it opens a sheet.
+  2. The sheet takes a photo with the camera (where one exists) or picks one from the library, with no live scanning.
+  3. Vision reads it (accurate, `ja-JP` then `en-US`); Live Text reads it too when Vision found fewer than 4 characters, and its text stands in when it found any.
+  4. Only bundled kanji are kept, once each, in order of first appearance, and shown in a `KanjiGridTile` grid under the photo and its found count. A tile closes the sheet and opens kanji detail.
+  5. "New to you" is off by default and hides kanji past `new`.
+  6. `NSCameraUsageDescription` is set. Nothing is saved or sent.
+- **Scope Boundary**: In: the reader, extractor, model, sheet, button, camera picker, tests and docs. Out: Guideline 2.3.1 and the listing line (release build), screenshots, any change to the privacy label.
+- **Anticipated TODOs**: None in code. The Vision and Live Text readers need a device to check.
+- **Planned Tests**: Pure text rules (sparse threshold, fallback, bundled-only de-duplicated extraction), the model (found, no kanji, failed, filter, filter hides everything) and the entry gate, in `PhotoLookupTests`.
+- **Version**: MINOR, v0.24.7 to v0.25.0.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. The thumbnail sits left of the found count and toggle; the grid sits under them rather than to the right, to keep 44 pt tiles on a phone.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See the Final Report. The report and the implementation went to the auditor together.

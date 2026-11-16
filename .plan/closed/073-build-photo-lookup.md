@@ -3,7 +3,7 @@ id: "073"
 title: Build photo lookup
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: []
 claimed: false
 ---
@@ -18,3 +18,7 @@ Skills: apple. Decided in [Test photo lookup on real signage](../closed/061-test
 Before release, follow Guideline 2.3.1 in `assets/app-store-listing.md`, and check the privacy copy still holds for on-device recognition.
 
 ## Resolution
+
+Yes. A Pro button under "Draw a kanji to search" opens the photo lookup sheet; locked, it opens the paywall. The sheet takes a photo with the camera or picks one from the library, reads it on device with Vision (`ja-JP` then `en-US`, accurate), and uses Live Text when Vision reads under 4 characters. It lists each bundled kanji found once, in order of first appearance, in a grid under the photo and its found count, and a tile opens kanji detail. "New to you" is off by default and hides kanji past `new`. The photo is never saved. `project.yml` gains `NSCameraUsageDescription`. Pure text rules and the model are tested; the Vision and Live Text readers run only on a device. CI: pending; see Final Report.
+
+Left for the release build: Guideline 2.3.1 and the listing's "point the camera at a sign" line (capture-then-grid, not live), which still reads true enough but is worth rewording. The privacy copy still holds: the photo is read on device and nothing is stored or sent.

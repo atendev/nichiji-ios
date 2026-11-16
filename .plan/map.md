@@ -24,6 +24,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build photo lookup](closed/073-build-photo-lookup.md): A Pro button under "Draw a kanji to search" opens a sheet that takes or picks a photo, reads it on device with Vision and Live Text under four characters, and lists each bundled kanji found once in a grid under the photo; a tile opens kanji detail and "New to you" hides started kanji. Locked taps open the paywall. The readers need a device check; Guideline 2.3.1 and the listing line stay with the release build.
+
 - [Test photo lookup on real signage](closed/061-test-photo-lookup-on-real-signage.md): Go. 30 on-device photos read 80% Good and 93% Good or Partial; vertical text was the weak spot (50% Good). Photo lookup is capture-then-grid, no live scanning, with Vision first and Live Text when Vision reads under 4 characters. The $4.99 price holds. Graduates "Build photo lookup".
 
 - [Update the privacy copy and label](closed/069-update-the-privacy-copy-and-label.md): No copy changes. The five in-app lines, the listing's "Data Not Collected" row and description, and the privacy policy all still match the matcher-only app; one stale model-download comment in `DictionaryView` was reworded. Entering the label in App Store Connect stays with the release build.
@@ -81,7 +83,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Build photo lookup](tickets/073-build-photo-lookup.md) (task, AFK)
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Improve the handwriting matcher's accuracy](tickets/071-improve-the-handwriting-matchers-accuracy.md) (task, AFK)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
