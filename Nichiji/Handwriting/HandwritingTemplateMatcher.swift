@@ -9,7 +9,8 @@ import Foundation
 public struct HandwritingTemplateMatcher: Sendable {
     static let pointsPerStroke = 12
     static let strokeWindow = 2
-    static let missingStrokeCost = 0.6
+    /// Cost of a stroke with no partner. Low, so a drawing with a stroke too many or too few still ranks its kanji.
+    static let missingStrokeCost = 0.35
     static let reversedStrokeExtra = 0.08
 
     struct Template: Sendable {
