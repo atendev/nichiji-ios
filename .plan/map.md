@@ -25,6 +25,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Decide the camera scan open questions](closed/075-decide-the-camera-scan-open-questions.md): The scan pushes onto the Dictionary stack with a custom peek/half/full overlay and hides the tab bar until full. Detail opens with "< Scan results". Save stays, using add-only access to save the plain photo or the crop; it is hidden for uncropped library photos and the privacy copy changes. Only Vision draws boxes, so Highlights is hidden after a Live Text read. The sweep loops until the read is done. Green means any stage past new, and the switch is "New only". 074's copy covers the missing states. Tiles show one line of meaning. A crop replaces the photo and rescans. Both entry buttons stay Pro and look unchanged. Every kanji found gets its own tile, words are out of scope, and vertical text gets nothing special. The user delegated the later rounds ("auto mode").
 - [Build the photo lookup camera](closed/074-build-the-photo-lookup-camera.md): Photo lookup opens Nichiji's own full-screen AVFoundation camera, not the system picker. One shutter tap reads the shot with no "Use Photo" step. The frozen shot sits behind a results panel with Retake, and the camera adds tap to focus, a flashlight, a library button, and states for denied access and no camera. The camera needs a device check.
 - [Build photo lookup](closed/073-build-photo-lookup.md): A Pro button under "Draw a kanji to search" opens a sheet that takes or picks a photo, reads it on device with Vision and Live Text under four characters, and lists each bundled kanji found once in a grid under the photo; a tile opens kanji detail and "New to you" hides started kanji. Locked taps open the paywall. The readers need a device check; Guideline 2.3.1 and the listing line stay with the release build.
 
@@ -76,6 +77,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Out of scope
 
+- Word results in camera scan (入口 as a word tile) for v1.0. Camera scan lists kanji only ([Decide the camera scan open questions](closed/075-decide-the-camera-scan-open-questions.md)).
 - Accounts, sync, analytics and any backend service (`DESIGN.md` constraints).
 - Stroke-order checking on the Practice pad: the pad records only. Handwriting search for Dictionary is now in v1.0 as a Pro feature, which reopens [Fix the v1.0 scope](closed/034-fix-the-v1-scope.md) for it.
 - iPhone Duo / iPad two-pane layout and configurable widgets: v1.0 ships the single-column phone layout and today-mirroring widgets; the architecture still leaves room for both ([Fix the v1.0 scope](closed/034-fix-the-v1-scope.md)).
@@ -88,7 +90,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Improve the handwriting matcher's accuracy](tickets/071-improve-the-handwriting-matchers-accuracy.md) (task, AFK)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
-- [Decide the camera scan open questions](tickets/075-decide-the-camera-scan-open-questions.md) (grilling, HITL)
+- [Build the scan entry and viewfinder](tickets/076-build-the-scan-entry-and-viewfinder.md) (task, AFK)
+- [Find each kanji's box in the photo](tickets/077-find-each-kanjis-box-in-the-photo.md) (task, AFK)
 
 Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), now also behind Crop, Save and the results sheet.
-Blocked on 075: [Build the scan entry and viewfinder](tickets/076-build-the-scan-entry-and-viewfinder.md), [Find each kanji's box in the photo](tickets/077-find-each-kanjis-box-in-the-photo.md). Then [Build the frozen photo, scan sweep and highlights](tickets/078-build-the-frozen-photo-and-highlights.md), which unblocks [Build the scan results sheet](tickets/079-build-the-scan-results-sheet.md), [Build Crop for the scanned photo](tickets/080-build-scan-crop.md) and [Build Save to Photos for the scanned photo](tickets/081-build-save-to-photos.md).
+Camera scan, still blocked: [Build the frozen photo, scan sweep and highlights](tickets/078-build-the-frozen-photo-and-highlights.md), which unblocks [Build the scan results sheet](tickets/079-build-the-scan-results-sheet.md), [Build Crop for the scanned photo](tickets/080-build-scan-crop.md) and [Build Save to Photos for the scanned photo](tickets/081-build-save-to-photos.md).
