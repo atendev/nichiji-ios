@@ -227,7 +227,7 @@ struct CameraPreview: UIViewRepresentable {
     final class PreviewView: UIView {
         weak var camera: CameraSession?
 
-        override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
+        override static var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
 
         override func layoutSubviews() {
             super.layoutSubviews()
