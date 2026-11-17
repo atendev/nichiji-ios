@@ -872,3 +872,25 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See the Final Report. The report and the implementation went to the auditor together.
+
+### Build the photo lookup camera (v0.26.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. The Pro button opens `PhotoLookupScreen` as a full-screen cover: a live rear-camera preview with Close, a flashlight toggle (when the device has one), a shutter, a library button and tap to focus.
+  2. One shutter tap captures and starts the read, with no confirm step, a haptic and a short flash.
+  3. The shot stays frozen behind a results panel: reading, then the found count, "New to you" and the grid, or the no-kanji or failed note. Retake returns to the live camera. A tile closes the camera and opens kanji detail.
+  4. `CameraAccess` asks on first open. Denied or restricted shows Open Settings and the library button, and no camera (the Simulator) shows the library button.
+  5. The session stops while a result shows and when the camera closes. Nothing is saved. Every control is at least 44 pt and labelled.
+  6. `retake()` bumps the generation, sets `.empty`, clears photo, kanji and started IDs, and keeps `showsNewOnly`.
+- **Scope Boundary**: In: `CameraSession.swift`, `PhotoLookupScreen.swift` (which replaces `PhotoLookupSheet.swift` and its `UIImagePickerController` wrapper), `retake()`, the cover in `DictionaryView`, tests and docs. Out: pinch zoom, live scanning, the front camera, and any change to the readers, extractor, Pro gate or listing.
+- **Anticipated TODOs**: None in code. The camera, focus, flashlight and rotation need a device.
+- **Planned Tests**: Retake from found, no kanji and failed. A read that finishes after a retake is dropped. `CameraAccess` maps every status. All in `PhotoLookupTests`.
+- **Version**: MINOR, v0.25.0 to v0.26.0.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. The panel hugs a short grid with `ViewThatFits` and scrolls a long one, up to 55% of the screen. The status bar is hidden on the camera screen. The frozen shot is an `@State` image decoded whenever `model.photoData` changes, not decoded on every render, so a retake still clears it. The shutter blinks black like the system camera, and a failed capture swaps the aim hint for "The photo didn't take. Try again."
+- **Scope Boundary**: Kept. `PhotoLookupEntry.sheet` keeps its name, since it only means "open photo lookup".
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: One haiku auditor. The report was approved in round 2 after six fixes. The implementation was approved in round 2 after fixes for the flash render, a device read across threads, and a silent failed capture. The black flash was kept to match the system camera.

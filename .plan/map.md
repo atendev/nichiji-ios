@@ -24,6 +24,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the photo lookup camera](closed/074-build-the-photo-lookup-camera.md): Photo lookup opens Nichiji's own full-screen AVFoundation camera, not the system picker. One shutter tap reads the shot with no "Use Photo" step. The frozen shot sits behind a results panel with Retake, and the camera adds tap to focus, a flashlight, a library button, and states for denied access and no camera. The camera needs a device check.
 - [Build photo lookup](closed/073-build-photo-lookup.md): A Pro button under "Draw a kanji to search" opens a sheet that takes or picks a photo, reads it on device with Vision and Live Text under four characters, and lists each bundled kanji found once in a grid under the photo; a tile opens kanji detail and "New to you" hides started kanji. Locked taps open the paywall. The readers need a device check; Guideline 2.3.1 and the listing line stay with the release build.
 
 - [Test photo lookup on real signage](closed/061-test-photo-lookup-on-real-signage.md): Go. 30 on-device photos read 80% Good and 93% Good or Partial; vertical text was the weak spot (50% Good). Photo lookup is capture-then-grid, no live scanning, with Vision first and Live Text when Vision reads under 4 characters. The $4.99 price holds. Graduates "Build photo lookup".

@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.26.0
+- Build the photo lookup camera. Photo lookup now opens Nichiji's own full-screen camera in place of the system picker, so one shutter tap reads the photo with no "Use Photo" step. The shot stays frozen behind a results panel with Retake, and the camera has tap to focus, a flashlight, a library button, and states for denied access and no camera
+- Close ticket 074
+
 ## v0.25.0
 - Build photo lookup. A Pro button under "Draw a kanji to search" opens a sheet that takes a photo or picks one, reads it on device with Vision and falls back to Live Text under four characters, and lists each bundled kanji found once in a grid under the photo. A tile opens kanji detail, and "New to you" hides started kanji. Locked taps open the paywall. `project.yml` gains the camera usage string
 - Close ticket 073
