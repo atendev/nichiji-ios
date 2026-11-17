@@ -2,7 +2,7 @@ import SwiftUI
 
 /*-------------------------------controls---------------------------------*/
 
-/// A round button on dark material, for controls that sit over the camera.
+/// A round button on the camera overlay's dark ink, for controls that sit over the feed.
 struct CameraChromeButton: View {
     let systemName: String
     let label: String
@@ -11,35 +11,37 @@ struct CameraChromeButton: View {
 
     var body: some View {
         Button(action: action) {
-            CameraChromeIcon(systemName: systemName, side: LayoutTokens.minHitTarget, isActive: isActive)
+            Image(systemName: systemName)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundStyle(Color.cameraText)
+                .frame(width: LayoutTokens.minHitTarget, height: LayoutTokens.minHitTarget)
+                .background(Circle().fill(Color.cameraInk))
+                .overlay(Circle().stroke(Color.cameraOutline, lineWidth: 1))
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+        .accessibilityAddTraits(isActive ? .isSelected : [])
     }
 }
 
-struct CameraChromeIcon: View {
-    let systemName: String
-    let side: CGFloat
-    var isActive = false
-
+/// The library button's face: a rounded square, as in the design.
+struct CameraLibraryIcon: View {
     var body: some View {
-        Image(systemName: systemName)
-            .font(.system(size: 17, weight: .semibold))
-            .foregroundStyle(isActive ? Color.black : Color.white)
-            .frame(width: side, height: side)
-            .background {
-                if isActive {
-                    Circle().fill(Color.white)
-                } else {
-                    Circle().fill(.ultraThinMaterial)
-                }
-            }
-            .environment(\.colorScheme, .dark)
-            .contentShape(Circle())
+        Image(systemName: "photo")
+            .font(.system(size: 20, weight: .regular))
+            .foregroundStyle(Color.cameraText)
+            .frame(width: PhotoLookupLayout.controlSide, height: PhotoLookupLayout.controlSide)
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.cameraInk))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.cameraText.opacity(0.3), lineWidth: 1)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
+/// The neutral shutter: a light ring around a light disc.
 struct ShutterButton: View {
     let isBusy: Bool
     let action: () -> Void
@@ -48,10 +50,10 @@ struct ShutterButton: View {
         Button(action: action) {
             ZStack {
                 Circle()
-                    .stroke(Color.white, lineWidth: PhotoLookupLayout.shutterRing)
+                    .stroke(Color.cameraText, lineWidth: PhotoLookupLayout.shutterRing)
                     .frame(width: PhotoLookupLayout.shutterOuter, height: PhotoLookupLayout.shutterOuter)
                 Circle()
-                    .fill(Color.white)
+                    .fill(Color.cameraText)
                     .frame(width: PhotoLookupLayout.shutterInner, height: PhotoLookupLayout.shutterInner)
             }
             .contentShape(Circle())
@@ -95,37 +97,5 @@ struct FocusSquare: View {
                 withAnimation(.easeOut(duration: 0.3)) { opacity = 0 }
             }
             .accessibilityHidden(true)
-    }
-}
-
-/*---------------------------------button---------------------------------*/
-
-/// The full-width button under "Draw a kanji to search".
-struct PhotoLookupButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: LayoutTokens.space8) {
-                Image(systemName: "camera.viewfinder")
-                    .accessibilityHidden(true)
-                Text(PhotoLookupCopy.buttonTitle)
-            }
-            .font(.uiText(size: 14, weight: .medium))
-            .foregroundColor(.nichijiInk)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: LayoutTokens.minHitTarget)
-            .padding(.horizontal, LayoutTokens.space16)
-            .contentShape(Rectangle())
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(Color.nichijiBorderControl, lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(PhotoLookupCopy.buttonTitle)
-        .accessibilityHint(PhotoLookupCopy.buttonHint)
-        .padding(.horizontal, LayoutTokens.screenMarginCompact)
-        .padding(.bottom, LayoutTokens.space8)
     }
 }

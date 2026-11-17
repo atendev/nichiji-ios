@@ -23,7 +23,7 @@ public struct DictionaryView: View {
     @State private var errorMessage: String?
     @State private var isLoaded = false
     @State private var reloadID = UUID()
-    @State private var path: [KanjiDetailRoute] = []
+    @State private var path = NavigationPath()
     @State private var query = ""
     @State private var searchIndex: DictionarySearchIndex?
     @State private var searchFailure: String?
@@ -33,7 +33,6 @@ public struct DictionaryView: View {
     /// Kept across sheet opens, so the templates load once per run.
     @State private var handwriting: HandwritingSearchModel?
     @State private var drawSearch: DrawSearchPresentation?
-    @State private var photoLookup: PhotoLookupPresentation?
 
     private let searchSource: any DictionarySearchSource
 
@@ -70,8 +69,7 @@ public struct DictionaryView: View {
                 }
 
                 DictionarySearchBar(text: $query)
-                DrawSearchButton(action: openDrawSearch)
-                PhotoLookupButton(action: openPhotoLookup)
+                DictionaryActionButtons(onDraw: openDrawSearch, onScan: openPhotoLookup)
 
                 if isSearching {
                     searchContent
@@ -90,6 +88,11 @@ public struct DictionaryView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: KanjiDetailRoute.self) { route in
                 KanjiDetailView(kanjiID: route.kanjiID)
+            }
+            .navigationDestination(for: PhotoLookupPresentation.self) { presentation in
+                PhotoLookupScreen(model: presentation.model) { kanjiID in
+                    path.append(KanjiDetailRoute(kanjiID: kanjiID))
+                }
             }
         }
         .task(id: "\(levelSystemRaw)-\(reloadID)") {
@@ -113,12 +116,6 @@ public struct DictionaryView: View {
                 drawSearch = nil
             }
         })
-        .fullScreenCover(item: $photoLookup) { presentation in
-            PhotoLookupScreen(model: presentation.model) { kanjiID in
-                photoLookup = nil
-                path.append(KanjiDetailRoute(kanjiID: kanjiID))
-            }
-        }
         .paywallSheet(feature: $paywallFeature)
     }
 
@@ -267,11 +264,11 @@ private extension DictionaryView {
         case .paywall(let feature):
             paywallFeature = feature
         case .sheet:
-            photoLookup = PhotoLookupPresentation(model: PhotoLookupModel(
+            path.append(PhotoLookupPresentation(model: PhotoLookupModel(
                 reader: SystemPhotoTextReader(),
                 contentStore: services?.contentStore ?? BundledKanjiContentStore(),
                 learnerStore: services?.learnerStore
-            ))
+            )))
         }
     }
 
