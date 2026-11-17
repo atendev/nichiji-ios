@@ -99,6 +99,13 @@ kanji detail. A "New to you" toggle, off by default, hides kanji the learner
 has started. Nothing is saved or sent: the photo lives only on the open
 camera screen.
 
+This camera is being rebuilt to the design in `docs/ui-reference/camera/`:
+"Scan a kanji" beside "Draw a kanji", a reticle viewfinder, a scan sweep with
+red (new) and green (learned) boxes on each kanji, a peek, half and full
+results sheet, Crop, and possibly Save to Photos. "Decide the camera scan
+open questions" in `.plan/` settles what the design leaves open, and this
+section changes as those tickets land.
+
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same
 local store. SwiftData stores learner-owned records (`KanjiProgress`,

@@ -48,10 +48,16 @@ input::placeholder{color:#74695a;opacity:1}
 </button>
 </sc-if>
 </div>
-<button class="drawbtn" onClick="{{ openDraw }}" aria-haspopup="dialog" style="box-sizing: border-box; width: 100%; min-height: 44px; margin-top: 8px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #8c8068; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<div style="display: flex; gap: 8px; margin-top: 8px">
+<button class="drawbtn" onClick="{{ openDraw }}" aria-haspopup="dialog" style="box-sizing: border-box; flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #8c8068; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M13 14l-1 3.5 3.5-1L21 11a1.8 1.8 0 0 0-2.5-2.5z"></path><path d="M17 10.5l1.5 1.5"></path><path d="M3 20c1.8-2.6 3.2-2.6 5 0s3.2 2.6 4.5.5"></path></svg>
-<span>Draw a kanji to search</span>
+<span>Draw a kanji</span>
 </button>
+<button class="drawbtn" onClick="{{ openCamera }}" aria-haspopup="dialog" style="box-sizing: border-box; flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #8c8068; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f1b16" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2a2 2 0 0 0 1.6-.8l.6-.9A2 2 0 0 1 11.6 3.5h.8a2 2 0 0 1 1.7.9l.6.9a2 2 0 0 0 1.6.8h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"></path><circle cx="12" cy="12.5" r="3.25"></circle></svg>
+<span>Scan a kanji</span>
+</button>
+</div>
 </div>
 <div class="scroll" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px 24px">
 <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
@@ -121,6 +127,11 @@ input::placeholder{color:#74695a;opacity:1}
 <dc-import name="KanjiDetail" kanji="{{ openCh }}" on-back="{{ closeDetail }}" hint-size="390px,844px"></dc-import>
 </div>
 </sc-if>
+<sc-if value="{{ camOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="Camera" on-close="{{ closeCamera }}" on-tab="{{ camTab }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
 <sc-if value="{{ drawOpen }}" hint-placeholder-val="{{ false }}">
 <dc-import name="DrawSearchSheet" demo="{{ drawDemo }}" on-pick="{{ pickDrawn }}" on-close="{{ closeDraw }}" hint-size="390px,844px"></dc-import>
 </sc-if>
@@ -130,7 +141,7 @@ input::placeholder{color:#74695a;opacity:1}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { query: (props && props.startQuery) || '', open: null, drawOpen: !!(props && props.startDraw) };
+    this.state = { query: (props && props.startQuery) || '', open: null, drawOpen: !!(props && props.startDraw), camOpen: false };
   }
   renderVals() {
     const st = this.state || {};
@@ -165,6 +176,10 @@ class Component extends DCLogic {
       })),
       drawOpen: !!st.drawOpen,
       drawDemo: !!(this.props && this.props.startDraw),
+      camOpen: !!st.camOpen,
+      openCamera: () => this.setState({ camOpen: true }),
+      closeCamera: () => this.setState({ camOpen: false }),
+      camTab: (t) => { if (this.props.onTab) this.props.onTab(t); },
       openDraw: () => this.setState({ drawOpen: true }),
       closeDraw: () => this.setState({ drawOpen: false }),
       pickDrawn: (ch) => this.setState({ query: ch, drawOpen: false }),

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Camera: viewfinder</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px; overflow: hidden">
+<dc-import name="Camera" start="viewfinder" still="yes" hint-size="390px,844px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
