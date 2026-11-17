@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.26.2
+- Improve the handwriting matcher's accuracy. A stroke with no partner now costs 0.35 instead of 0.6, so a drawing with a stroke too many or too few ranks its kanji higher. On the 104 drawn samples the matcher moves from 79.8% to about 85.6% top-1 and from 92.3% to 94.2% top-5, and on the 30 whose stroke count differs from KanjiVG from 53% to 77% top-1. Each search does the same work per drawing, since the stroke window and assignment size are unchanged. The CI floor rises to 82% top-1 and 91% top-5, with a second floor of 70% and 80% for the mismatched drawings (30 drawings, so each is 3.3 points). The constant was picked on that one learner's fixture and sits on a plateau from 0.3 to 0.45, and no drawings from other learners exist yet to confirm it
+- Close ticket 071
+
 ## v0.26.1
 - Add the camera scan design package to `docs/ui-reference/camera/`, and replace the Dictionary and kanji detail reference sources with the package's edited copies
 - Open tickets 075 to 081 to rebuild photo lookup to that design, with the release build now behind them

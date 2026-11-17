@@ -61,6 +61,17 @@ struct HandwritingMatcherTests {
         #expect(abs(HandwritingTemplateMatcher.strokeCost(forward, at: 0, reversed, at: 0) - 0.08) < 1e-9)
     }
 
+    @Test("A stroke with no partner costs the missing-stroke cost, shared across the larger stroke count")
+    func missingStrokeCost() {
+        let line = HandwritingTemplateMatcher.resample(horizontal, count: 12).flatMap { [Double($0.x), Double($0.y)] }
+        let far = HandwritingTemplateMatcher.resample([CGPoint(x: 5, y: 5), CGPoint(x: 6, y: 6)], count: 12)
+            .flatMap { [Double($0.x), Double($0.y)] }
+
+        let cost = HandwritingTemplateMatcher.characterCost(line, count: 1, line + far, count: 2)
+
+        #expect(abs(cost - HandwritingTemplateMatcher.missingStrokeCost / 2) < 1e-9)
+    }
+
     @Test("Templates more than two strokes away are skipped")
     func strokeWindow() {
         let five = Array(repeating: horizontal, count: 5)

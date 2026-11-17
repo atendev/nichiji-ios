@@ -27,13 +27,9 @@ struct HandwritingAccuracyTests {
         return try JSONDecoder().decode(HandwritingTestSet.self, from: Data(contentsOf: url))
     }
 
-    @Test("The matcher scores at least 76% top-1 and 89% top-5 on the drawn test set")
-    func accuracyGate() async throws {
-        let samples = try loadTestSet().samples
-        #expect(samples.count == 104)
-        let matcher = try Self.matcher.get()
-
-        let ranks = await withTaskGroup(of: Int?.self) { group in
+    /// Each sample's index among the top five, or nil when its kanji is not there.
+    private static func ranks(of samples: [HandwritingTestSet.Sample], matcher: HandwritingTemplateMatcher) async -> [Int?] {
+        await withTaskGroup(of: Int?.self) { group in
             for sample in samples {
                 group.addTask {
                     let strokes = sample.strokes.map { stroke in stroke.map { CGPoint(x: $0[0], y: $0[1]) } }
@@ -42,11 +38,35 @@ struct HandwritingAccuracyTests {
             }
             return await group.reduce(into: [Int?]()) { $0.append($1) }
         }
+    }
+
+    @Test("The matcher scores at least 82% top-1 and 91% top-5 on the drawn test set")
+    func accuracyGate() async throws {
+        let samples = try loadTestSet().samples
+        #expect(samples.count == 104)
+        let matcher = try Self.matcher.get()
+        let ranks = await Self.ranks(of: samples, matcher: matcher)
+
         let top1 = Double(ranks.filter { $0 == 0 }.count) / Double(samples.count)
         let top5 = Double(ranks.filter { $0 != nil }.count) / Double(samples.count)
 
-        #expect(top1 >= 0.76, "top-1 was \(top1)")
-        #expect(top5 >= 0.89, "top-5 was \(top5)")
+        #expect(top1 >= 0.82, "top-1 was \(top1)")
+        #expect(top5 >= 0.91, "top-5 was \(top5)")
+    }
+
+    @Test("Drawings whose stroke count differs from KanjiVG score at least 70% top-1 and 80% top-5")
+    func strokeCountMismatchGate() async throws {
+        let matcher = try Self.matcher.get()
+        let counts = Dictionary(uniqueKeysWithValues: matcher.templates.map { ($0.kanji, $0.strokeCount) })
+        let samples = try loadTestSet().samples.filter { counts[$0.target] != $0.strokes.count }
+        #expect(samples.count == 30)
+        let ranks = await Self.ranks(of: samples, matcher: matcher)
+
+        let top1 = Double(ranks.filter { $0 == 0 }.count) / Double(samples.count)
+        let top5 = Double(ranks.filter { $0 != nil }.count) / Double(samples.count)
+
+        #expect(top1 >= 0.70, "top-1 was \(top1)")
+        #expect(top5 >= 0.80, "top-5 was \(top5)")
     }
 
     @Test("Every matcher candidate is a kanji the app ships")
