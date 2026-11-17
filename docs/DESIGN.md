@@ -75,8 +75,8 @@ row opens a small "Which kanji?" sheet. The search index is built in memory
 the first time Dictionary opens, from the app-only `words.json` and
 `kanji-search.json`.
 
-A full-width "Draw a kanji to search" button sits under the search bar. It
-needs Pro; locked, it opens the paywall. The "Draw to search" sheet has a pad,
+"Draw a kanji" and "Scan a kanji" sit side by side under the search bar and
+stack at accessibility text sizes. "Draw a kanji" needs Pro; locked, it opens the paywall. The "Draw to search" sheet has a pad,
 five matches refreshed after each finished stroke, Undo and Clear, and a match
 tap puts that kanji in the search bar. A KanjiVG template matcher in
 `Nichiji/Handwriting/` recognizes the drawing on device, with no download and
@@ -84,25 +84,29 @@ no network: it builds templates at runtime from the bundled stroke SVGs, the
 first time the sheet opens, and compares strokes in any order. The widget
 target compiles none of it.
 
-A second button, "Look up kanji in a photo", sits under it and needs Pro too.
-It opens Nichiji's own full-screen camera (AVFoundation, rear camera), not the
-system picker. The camera has a close button, a flashlight toggle, tap to
-focus, a library button and a shutter. One shutter tap reads the shot with no
+"Scan a kanji" needs Pro too, and locked it looks the same and opens the
+paywall. It pushes Nichiji's own full-screen camera (AVFoundation, rear camera)
+onto the Dictionary's navigation stack, with the nav bar and tab bar hidden,
+not the system picker. The viewfinder follows the design: Close top left, a
+flash toggle top right, a corner-bracket reticle, the hint "Point at a kanji,
+then tap the shutter", a library button and a neutral shutter, all on the
+dark overlay colors. The shutter flashes white for about 0.2 s, and Reduce
+Motion turns the flash off. The camera also has tap to focus. One shutter tap reads the shot with no
 "Use Photo" step, and there is no live scanning. The shot stays frozen behind a
 results panel, and Retake goes back to the live camera. If camera access is
 off, the screen points to Settings, and with no camera it offers only the
 library. `Nichiji/PhotoLookup/` reads the photo on device with Vision
 (accurate, Japanese then English) and falls back to Live Text when Vision
 reads fewer than four characters. The panel lists every bundled kanji found,
-once each, in a grid under the found count. A tile closes the camera and opens
-kanji detail. A "New to you" toggle, off by default, hides kanji the learner
+once each, in a grid under the found count. A tile opens kanji detail on the same stack,
+with "Scan results" as its back label. A "New to you" toggle, off by default, hides kanji the learner
 has started. Nothing is saved or sent: the photo lives only on the open
 camera screen.
 
-This camera is being rebuilt to the design in `docs/ui-reference/camera/`:
-"Scan a kanji" beside "Draw a kanji", a reticle viewfinder, a scan sweep with
+This camera is being rebuilt to the design in `docs/ui-reference/camera/`. The
+entry buttons and the viewfinder are done; still to come are a scan sweep with
 red (new) and green (learned) boxes on each kanji, a peek, half and full
-results sheet, Crop, and possibly Save to Photos. "Decide the camera scan
+results sheet, Crop, and Save to Photos. "Decide the camera scan
 open questions" in `.plan/` settles what the design leaves open, and this
 section changes as those tickets land.
 

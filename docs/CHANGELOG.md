@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.27.0
+- Build the scan entry and viewfinder. "Scan a kanji" now sits beside "Draw a kanji" under the Dictionary search bar (stacked at accessibility text sizes), and opens the camera by pushing it onto the Dictionary's navigation stack with the nav and tab bars hidden, instead of a full-screen cover. The viewfinder gets the design's corner-bracket reticle, hint pill, neutral shutter, library button, flash toggle and dark overlay colors, and the shutter flashes white for about 0.2 s (off under Reduce Motion). Kanji detail opened from a result keeps "Scan results" as its back label
+- Close ticket 076
+
 ## v0.26.1
 - Add the camera scan design package to `docs/ui-reference/camera/`, and replace the Dictionary and kanji detail reference sources with the package's edited copies
 - Open tickets 075 to 081 to rebuild photo lookup to that design, with the release build now behind them

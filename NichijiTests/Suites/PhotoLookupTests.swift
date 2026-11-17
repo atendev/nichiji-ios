@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import SwiftUI
 import Testing
 @testable import Nichiji
 
@@ -343,5 +344,52 @@ struct PhotoLookupModelTests {
         #expect(CameraAccess.from(status: .restricted, hasCamera: true) == .denied)
         #expect(CameraAccess.from(status: .authorized, hasCamera: false) == .unavailable)
         #expect(CameraAccess.from(status: .denied, hasCamera: false) == .unavailable)
+    }
+}
+
+@MainActor
+@Suite("Scan Entry And Viewfinder Tests")
+struct ScanEntryTests {
+    @Test("The entry buttons and the viewfinder hint use the design's words")
+    func copy() {
+        #expect(HandwritingSearchCopy.buttonTitle == "Draw a kanji")
+        #expect(PhotoLookupCopy.buttonTitle == "Scan a kanji")
+        #expect(PhotoLookupCopy.aimHint == "Point at a kanji, then tap the shutter")
+        #expect(PhotoLookupCopy.backTitle == "Scan results")
+    }
+
+    @Test("Each push of the scan screen is its own route, equal only to itself")
+    func presentationIdentity() {
+        func makeModel() -> PhotoLookupModel {
+            PhotoLookupModel(
+                reader: StubPhotoReader(reading: nil),
+                contentStore: TestKanjiContentStore(entries: SeedKanjiDataset.entries),
+                learnerStore: nil
+            )
+        }
+        let first = PhotoLookupPresentation(model: makeModel())
+        let second = PhotoLookupPresentation(model: makeModel())
+
+        #expect(first == first)
+        #expect(first != second)
+        #expect(Set([first, second]).count == 2)
+    }
+
+    @Test("The reticle's brackets stay inside the frame and fill only the corners")
+    func reticleStaysInFrame() {
+        let frame = CGRect(x: 0, y: 0, width: 332, height: 360)
+        let path = ViewfinderReticle().path(in: frame)
+
+        #expect(!path.isEmpty)
+        #expect(frame.contains(path.boundingRect))
+        #expect(!path.contains(CGPoint(x: 166, y: 180)))
+        #expect(!path.contains(CGPoint(x: 166, y: 2)))
+    }
+
+    @Test("The shutter is the design's 76 pt ring around a 58 pt disc, and the flash lasts about 0.2 s")
+    func shutterMetrics() {
+        #expect(PhotoLookupLayout.shutterOuter == 76)
+        #expect(PhotoLookupLayout.shutterInner == 58)
+        #expect(PhotoLookupLayout.flashDuration == 0.2)
     }
 }
