@@ -27,3 +27,5 @@ Yes. The photo read now returns each bundled kanji with every box it appears in 
 - **Model.** `PhotoLookupModel` stores `scanned`; `kanji` is derived, so existing views read as before.
 - **Tests.** Ordering, repeats, a nil box, short box rows, Live Text, the flip and the model are unit-tested. Vision's per-character boxes themselves need a device check, and nothing was compiled locally (no Swift toolchain here); CI built and tested it.
 - **Version.** No bump; tagging stays with the user.
+
+Timing: wall 56m, active 3m, user 0s, wait 52m, blocked 0s | setup 56m | tools 34 | limits 0, compactions 0, handoffs 0
