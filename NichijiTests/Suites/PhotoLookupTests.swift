@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Testing
 @testable import Nichiji
@@ -9,6 +10,33 @@ private struct StubPhotoReader: PhotoTextReader {
 
     func read(imageData: Data) async throws -> PhotoTextReading {
         guard let reading else { throw PhotoTextError.unreadableImage }
+        return reading
+    }
+}
+
+/// Holds a read until the test opens it, so a retake can land mid-read.
+private actor ReadGate {
+    private var waiter: CheckedContinuation<Void, Never>?
+    private var isOpen = false
+
+    func wait() async {
+        guard !isOpen else { return }
+        await withCheckedContinuation { waiter = $0 }
+    }
+
+    func open() {
+        isOpen = true
+        waiter?.resume()
+        waiter = nil
+    }
+}
+
+private struct GatedPhotoReader: PhotoTextReader {
+    let gate: ReadGate
+    let reading: PhotoTextReading
+
+    func read(imageData: Data) async throws -> PhotoTextReading {
+        await gate.wait()
         return reading
     }
 }
@@ -147,5 +175,58 @@ struct PhotoLookupModelTests {
     func foundCount() {
         #expect(PhotoLookupCopy.foundCount(1) == "1 kanji found")
         #expect(PhotoLookupCopy.foundCount(12) == "12 kanji found")
+    }
+
+    @Test("Retake returns to the camera from every result and keeps New to you", arguments: [
+        PhotoTextReading(visionLines: ["日本"], liveTextLines: []),
+        PhotoTextReading(visionLines: ["EXIT"], liveTextLines: []),
+        nil
+    ])
+    func retakeClearsResult(reading: PhotoTextReading?) async {
+        let model = makeModel(reading: reading)
+        model.showsNewOnly = true
+        await model.lookUp(imageData: Data([1]))
+        #expect(model.state != .empty)
+
+        model.retake()
+
+        #expect(model.state == .empty)
+        #expect(model.photoData == nil)
+        #expect(model.kanji.isEmpty)
+        #expect(model.visibleKanji.isEmpty)
+        #expect(model.showsNewOnly)
+    }
+
+    @Test("A read that finishes after a retake is dropped")
+    func retakeDropsInFlightRead() async {
+        let gate = ReadGate()
+        let model = PhotoLookupModel(
+            reader: GatedPhotoReader(gate: gate, reading: PhotoTextReading(visionLines: ["日本"], liveTextLines: [])),
+            contentStore: TestKanjiContentStore(entries: SeedKanjiDataset.entries),
+            learnerStore: TestLearnerStore()
+        )
+        let read = Task { await model.lookUp(imageData: Data([1])) }
+        for _ in 0..<100 where model.state != .reading {
+            await Task.yield()
+        }
+        #expect(model.state == .reading)
+
+        model.retake()
+        await gate.open()
+        await read.value
+
+        #expect(model.state == .empty)
+        #expect(model.kanji.isEmpty)
+        #expect(model.photoData == nil)
+    }
+
+    @Test("Camera access maps every status, and no camera wins")
+    func cameraAccess() {
+        #expect(CameraAccess.from(status: .authorized, hasCamera: true) == .authorized)
+        #expect(CameraAccess.from(status: .notDetermined, hasCamera: true) == .notDetermined)
+        #expect(CameraAccess.from(status: .denied, hasCamera: true) == .denied)
+        #expect(CameraAccess.from(status: .restricted, hasCamera: true) == .denied)
+        #expect(CameraAccess.from(status: .authorized, hasCamera: false) == .unavailable)
+        #expect(CameraAccess.from(status: .denied, hasCamera: false) == .unavailable)
     }
 }

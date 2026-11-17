@@ -85,14 +85,19 @@ first time the sheet opens, and compares strokes in any order. The widget
 target compiles none of it.
 
 A second button, "Look up kanji in a photo", sits under it and needs Pro too.
-It opens a sheet that takes a photo with the camera or picks one from the
-library; there is no live scanning. `Nichiji/PhotoLookup/` reads the photo on
-device with Vision (accurate, Japanese then English) and falls back to Live
-Text when Vision reads fewer than four characters. The sheet lists every
-bundled kanji found, once each, in a grid under the photo and its found
-count; a tile closes the sheet and opens kanji detail. A "New to you" toggle, off by default, hides
-kanji the learner has started. Nothing is saved or sent: the photo lives only
-in the open sheet.
+It opens Nichiji's own full-screen camera (AVFoundation, rear camera), not the
+system picker. The camera has a close button, a flashlight toggle, tap to
+focus, a library button and a shutter. One shutter tap reads the shot with no
+"Use Photo" step, and there is no live scanning. The shot stays frozen behind a
+results panel, and Retake goes back to the live camera. If camera access is
+off, the screen points to Settings, and with no camera it offers only the
+library. `Nichiji/PhotoLookup/` reads the photo on device with Vision
+(accurate, Japanese then English) and falls back to Live Text when Vision
+reads fewer than four characters. The panel lists every bundled kanji found,
+once each, in a grid under the found count. A tile closes the camera and opens
+kanji detail. A "New to you" toggle, off by default, hides kanji the learner
+has started. Nothing is saved or sent: the photo lives only on the open
+camera screen.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same

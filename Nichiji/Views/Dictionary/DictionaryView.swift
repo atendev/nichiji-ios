@@ -113,8 +113,8 @@ public struct DictionaryView: View {
                 drawSearch = nil
             }
         })
-        .sheet(item: $photoLookup) { presentation in
-            PhotoLookupSheet(model: presentation.model) { kanjiID in
+        .fullScreenCover(item: $photoLookup) { presentation in
+            PhotoLookupScreen(model: presentation.model) { kanjiID in
                 photoLookup = nil
                 path.append(KanjiDetailRoute(kanjiID: kanjiID))
             }

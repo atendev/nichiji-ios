@@ -78,6 +78,15 @@ final class PhotoLookupModel {
             state = .failed
         }
     }
+
+    /// Back to the live camera. A read still running drops its result, and the "New to you" choice stays.
+    func retake() {
+        generation += 1
+        photoData = nil
+        kanji = []
+        startedIDs = []
+        state = .empty
+    }
 }
 
 /*---------------------------------entry----------------------------------*/
@@ -92,7 +101,7 @@ enum PhotoLookupEntry: Equatable {
     }
 }
 
-/// The open photo lookup sheet. Each open gets a fresh model, so a new photo never shows the last one's grid.
+/// The open photo lookup camera. Each open gets a fresh model, so a new photo never shows the last one's grid.
 struct PhotoLookupPresentation: Identifiable {
     let model: PhotoLookupModel
 
