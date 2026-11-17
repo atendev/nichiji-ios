@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.26.1
+- Add the camera scan design package to `docs/ui-reference/camera/`, and replace the Dictionary and kanji detail reference sources with the package's edited copies
+- Open tickets 075 to 081 to rebuild photo lookup to that design, with the release build now behind them
+
 ## v0.26.0
 - Build the photo lookup camera. Photo lookup now opens Nichiji's own full-screen camera in place of the system picker, so one shutter tap reads the photo with no "Use Photo" step. The shot stays frozen behind a results panel with Retake, and the camera has tap to focus, a flashlight, a library button, and states for denied access and no camera
 - Close ticket 074

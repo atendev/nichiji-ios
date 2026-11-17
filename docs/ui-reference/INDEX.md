@@ -56,6 +56,10 @@ Every screenshot is 780 x 1688 px (390 x 844 pt at 2x, iPhone size). Screens wit
 | 50 | `screens/50-you-history-d.png` | You: history (scrolled 3) |  |
 | 51 | `screens/51-you-history-e.png` | You: history (end) | Export history button (mocked, saves a CSV). |
 
+## Camera scan
+
+The camera scan screens are in `camera/screens/`, numbered `0-` to `8-` in flow order: the Dictionary entry, viewfinder, frozen photo while scanning, highlights, results at half height, New only, the full-screen grid, kanji detail and Crop. `camera/camera-design-notes.md` describes each one. Screen 32 above predates the Scan button. `source/Dictionary.dc.html` now has it.
+
 ## Flow, in one paragraph
 
 Onboarding (7 screens) leads to Today. The app has four tabs: Today, Dictionary, Review, You. The gear button on every tab opens one shared Settings sheet, whose rows push in sub-screens (Level, Customize, Reminder, Review, Widgets, Privacy). Practice is not a tab: it is a bottom sheet opened from "Practice this kanji" on Today, on a kanji's detail screen, or on a flipped review card.

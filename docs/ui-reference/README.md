@@ -10,6 +10,7 @@ An iOS kanji-learning app: one kanji a day, plus review, dictionary and practice
 4. `screens/`: the full-size screenshots (390 x 844 pt at 2x), numbered in flow order. Screens that scroll are shown in several frames.
 5. `tokens/tokens.json` and `tokens/ADDITIONS.md`: exact colors, type, spacing, radius, shadow, motion and layout numbers.
 6. `source/`: the screen source files, for exact styles. See `source/README.md`.
+7. `camera/`: the camera scan flow (photo lookup), a separate package with its own notes, screens and sources. Start with `camera/README.md`.
 
 ## Things to know
 

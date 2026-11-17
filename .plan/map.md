@@ -21,6 +21,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 6. Lock-screen widgets: design, then build.
 7. Pro: the free/Pro boundary, the StoreKit 2 purchase service, the paywall.
 8. Release: App Store metadata, then the signed TestFlight build.
+9. Camera scan: rebuild photo lookup to the design in `docs/ui-reference/camera/`. Decide the open questions, then build the entry and viewfinder, kanji boxes, frozen photo and highlights, results sheet, Crop and Save. This stage comes before the release build (numbered later only because it came up later).
 
 ## Decisions so far
 
@@ -87,5 +88,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Improve the handwriting matcher's accuracy](tickets/071-improve-the-handwriting-matchers-accuracy.md) (task, AFK)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
+- [Decide the camera scan open questions](tickets/075-decide-the-camera-scan-open-questions.md) (grilling, HITL)
 
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md).
+Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), now also behind Crop, Save and the results sheet.
+Blocked on 075: [Build the scan entry and viewfinder](tickets/076-build-the-scan-entry-and-viewfinder.md), [Find each kanji's box in the photo](tickets/077-find-each-kanjis-box-in-the-photo.md). Then [Build the frozen photo, scan sweep and highlights](tickets/078-build-the-frozen-photo-and-highlights.md), which unblocks [Build the scan results sheet](tickets/079-build-the-scan-results-sheet.md), [Build Crop for the scanned photo](tickets/080-build-scan-crop.md) and [Build Save to Photos for the scanned photo](tickets/081-build-save-to-photos.md).

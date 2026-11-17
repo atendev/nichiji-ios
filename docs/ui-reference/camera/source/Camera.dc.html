@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Camera: scan kanji</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+html,body{margin:0;overflow:hidden;scrollbar-width:none}
+::-webkit-scrollbar{display:none}
+button{-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .12s ease,opacity .18s ease}
+button:focus-visible{outline:2px solid #8faad0;outline-offset:2px}
+button:active{transform:scale(.95)}
+.dk:hover{background:rgba(21,19,15,.78) !important}
+.shutter:active{transform:scale(.92)}
+.tile:hover{background:#eae2d1 !important}
+.ghost:hover{background:#eae2d1 !important}
+.outline:hover{background:#eae2d1 !important}
+.scroll{scrollbar-width:none;-ms-overflow-style:none}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes flash{from{opacity:.9}to{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes drift{from{transform:translate(-3px,2px)}to{transform:translate(3px,-2px)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet-in{animation:sheetIn .32s cubic-bezier(.2,.8,.2,1) both}
+.flash{animation:flash .22s ease-out both}
+.spin{animation:spin .9s linear infinite}
+.drift{animation:drift 5s ease-in-out infinite alternate}
+.toast{animation:toastIn .2s ease-out both}
+.fade{animation:fadeIn .2s ease-out both}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px; overflow: hidden; user-select: none; -webkit-user-select: none; background: #15130f; color: #efe8d8; font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif">
+<div style="{{ sceneStyle }}">
+<div class="{{ driftClass }}" style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="CameraScene" boxes="{{ boxes }}" tilt="{{ tilt }}" blur="{{ blur }}" hide="{{ hideBoxes }}" scan-at="{{ scanAt }}" on-pick="{{ pickBox }}" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<sc-if value="{{ frozen }}" hint-placeholder-val="{{ false }}">
+<div aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 132px; background: linear-gradient(rgba(21, 19, 15, 0.62), rgba(21, 19, 15, 0)); pointer-events: none"></div>
+</sc-if>
+<sc-if value="{{ isViewfinder }}" hint-placeholder-val="{{ true }}">
+<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none">
+<div aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 50% 42%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.5) 100%)"></div>
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 120px; background: linear-gradient(rgba(21, 19, 15, 0.6), rgba(21, 19, 15, 0))"></div>
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 250px; background: linear-gradient(rgba(21, 19, 15, 0), rgba(21, 19, 15, 0.78))"></div>
+<svg aria-hidden="true" width="332" height="360" viewBox="0 0 332 360" fill="none" stroke="#efe8d8" stroke-width="3" stroke-linecap="round" style="position: absolute; left: 29px; top: 160px">
+<path d="M2 36V12a10 10 0 0 1 10-10h24"></path>
+<path d="M296 2h24a10 10 0 0 1 10 10v24"></path>
+<path d="M330 324v24a10 10 0 0 1-10 10h-24"></path>
+<path d="M36 358H12a10 10 0 0 1-10-10v-24"></path>
+</svg>
+<div style="position: absolute; left: 0; right: 0; bottom: 150px; display: flex; justify-content: center">
+<div style="box-sizing: border-box; height: 36px; padding: 0 16px; display: flex; align-items: center; border-radius: 999px; background: rgba(21, 19, 15, 0.55); border: 1px solid rgba(239, 232, 216, 0.25); font-size: 14px; line-height: 20px; color: #efe8d8">Point at a kanji, then tap the shutter</div>
+</div>
+<button class="dk" onClick="{{ close }}" aria-label="Close camera" style="pointer-events: auto; position: absolute; top: 52px; left: 16px; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(239, 232, 216, 0.25); background: rgba(21, 19, 15, 0.55); display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+<button class="dk" onClick="{{ toggleTorch }}" aria-pressed="{{ torch }}" aria-label="Flash" style="{{ torchStyle }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="{{ torchFill }}" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"></path></svg>
+</button>
+<div style="position: absolute; left: 0; right: 0; bottom: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 36px">
+<button class="dk" onClick="{{ shoot }}" aria-label="Choose a photo from your library" style="pointer-events: auto; width: 52px; height: 52px; padding: 0; border-radius: 12px; border: 1px solid rgba(239, 232, 216, 0.3); background: rgba(21, 19, 15, 0.55); display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"></path></svg>
+</button>
+<button class="shutter" onClick="{{ shoot }}" aria-label="Take photo" style="pointer-events: auto; width: 76px; height: 76px; padding: 0; border-radius: 50%; border: 4px solid #efe8d8; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<span style="display: block; width: 58px; height: 58px; border-radius: 50%; background: #efe8d8"></span>
+</button>
+<span aria-hidden="true" style="width: 52px; height: 52px"></span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ showBar }}" hint-placeholder-val="{{ false }}">
+<div class="fade" style="position: absolute; top: 52px; left: 16px; right: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<button class="dk" onClick="{{ retake }}" aria-label="Remove photo and go back to the camera" style="width: 44px; height: 44px; flex: none; padding: 0; border-radius: 50%; border: 1px solid rgba(239, 232, 216, 0.25); background: rgba(21, 19, 15, 0.55); display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+<div style="display: flex; gap: 8px">
+<button class="dk" onClick="{{ startCrop }}" style="{{ pillStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v14h14"></path><path d="M3 7h14v14"></path></svg>
+<span>Crop</span>
+</button>
+<button class="dk" onClick="{{ save }}" style="{{ pillStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7.5 11L12 15.5 16.5 11"></path><path d="M5 20h14"></path></svg>
+<span>Save</span>
+</button>
+<button class="dk" onClick="{{ toggleBoxes }}" aria-pressed="{{ boxesOn }}" style="{{ pillStyle }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#efe8d8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.75"></circle><path d="M4 4l16 16" style="{{ slashStyle }}"></path></svg>
+<span>Highlights</span>
+</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div class="toast" role="status" style="position: absolute; top: 108px; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none">
+<div style="box-sizing: border-box; height: 36px; padding: 0 14px; display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(21, 19, 15, 0.78); border: 1px solid rgba(239, 232, 216, 0.25); font-size: 14px; line-height: 20px; color: #efe8d8">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8db483" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+<span>{{ toastText }}</span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ isScanning }}" hint-placeholder-val="{{ false }}">
+<div class="fade" role="status" style="position: absolute; left: 0; right: 0; bottom: 56px; display: flex; justify-content: center">
+<div style="box-sizing: border-box; height: 44px; padding: 0 18px; display: flex; align-items: center; gap: 10px; border-radius: 999px; background: rgba(21, 19, 15, 0.7); border: 1px solid rgba(239, 232, 216, 0.25); font-size: 14px; line-height: 20px; font-weight: 500; color: #efe8d8">
+<svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8603f" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"></path></svg>
+<span>Scanning for kanji…</span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ cropping }}" hint-placeholder-val="{{ false }}">
+<div class="fade" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden">
+<div style="position: absolute; left: 20px; top: 160px; width: 350px; height: 360px; box-sizing: border-box; border: 1.5px solid #efe8d8; box-shadow: 0 0 0 1000px rgba(21, 19, 15, 0.62)">
+<div aria-hidden="true" style="position: absolute; left: 33.33%; top: 0; bottom: 0; border-left: 1px solid rgba(239, 232, 216, 0.3)"></div>
+<div aria-hidden="true" style="position: absolute; left: 66.66%; top: 0; bottom: 0; border-left: 1px solid rgba(239, 232, 216, 0.3)"></div>
+<div aria-hidden="true" style="position: absolute; top: 33.33%; left: 0; right: 0; border-top: 1px solid rgba(239, 232, 216, 0.3)"></div>
+<div aria-hidden="true" style="position: absolute; top: 66.66%; left: 0; right: 0; border-top: 1px solid rgba(239, 232, 216, 0.3)"></div>
+<svg aria-hidden="true" width="350" height="360" viewBox="0 0 350 360" fill="none" stroke="#efe8d8" stroke-width="5" stroke-linecap="round" style="position: absolute; left: -1.5px; top: -1.5px"><path d="M3 30V3h27"></path><path d="M320 3h27v27"></path><path d="M347 330v27h-27"></path><path d="M30 357H3v-27"></path></svg>
+</div>
+<div style="position: absolute; top: 60px; left: 0; right: 0; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: #efe8d8">Crop</div>
+<div style="position: absolute; top: 540px; left: 0; right: 0; text-align: center; font-size: 14px; line-height: 20px; color: #efe8d8">Drag the corners to choose the part to scan</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 48px; display: flex; gap: 12px">
+<button class="dk" onClick="{{ cancelCrop }}" style="flex: 1; min-height: 52px; border-radius: 8px; border: 1px solid rgba(239, 232, 216, 0.35); background: rgba(21, 19, 15, 0.55); font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #efe8d8; cursor: pointer">Cancel</button>
+<button class="cta" onClick="{{ doneCrop }}" style="flex: 1; min-height: 52px; border-radius: 8px; border: 0; background: #e8603f; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #15130f; cursor: pointer">Done</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ hasSheet }}" hint-placeholder-val="{{ false }}">
+<div class="sheet-in" role="region" aria-label="Recognized kanji" style="{{ sheetStyle }}">
+<div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerCancel="{{ dragEnd }}" style="flex: none; touch-action: none; cursor: grab">
+<sc-if value="{{ modeFull }}" hint-placeholder-val="{{ false }}">
+<div style="position: relative; padding: 56px 16px 0">
+<h1 style="margin: 0; display: flex; align-items: center; gap: 12px; font-size: 28px; line-height: 34px; font-weight: 500">
+<span lang="ja" style="font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-weight: 500">写</span>
+<span aria-hidden="true" style="width: 1.5px; height: 22px; background: #74695a"></span>
+<span>Scan</span>
+</h1>
+<button data-noswipe="1" class="ghost" onClick="{{ toPeek }}" aria-label="Back to photo" style="position: absolute; top: 51px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"></path></svg>
+</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 16px 16px 0">
+<div aria-hidden="true" style="position: relative; width: 64px; height: 64px; flex: none; overflow: hidden; border-radius: 8px; border: 1px solid #d9cfbc; background: #1a1510">
+<div style="position: absolute; left: -3px; top: -29px; width: 390px; height: 844px; transform: scale(0.18); transform-origin: 0 0; pointer-events: none">
+<dc-import name="CameraScene" boxes="all" tilt="-2" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16">Your photo</div>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">Scanned just now</div>
+</div>
+<button data-noswipe="1" class="outline" onClick="{{ toPeek }}" style="box-sizing: border-box; min-height: 44px; padding: 0 14px; border: 1px solid #8c8068; border-radius: 8px; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">View photo</button>
+</div>
+</sc-if>
+<sc-if value="{{ modePeek }}" hint-placeholder-val="{{ false }}">
+<div aria-hidden="true" style="width: 36px; height: 4px; margin: 8px auto 0; border-radius: 999px; background: #d9cfbc"></div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px 24px 0">
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 16px; line-height: 24px; font-weight: 500; color: #1f1b16">{{ foundLine }}</div>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">{{ newLine }}</div>
+</div>
+<span style="font-size: 12px; line-height: 16px; color: #5e5548">Swipe up</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5e5548" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"></path></svg>
+</div>
+</sc-if>
+<sc-if value="{{ modeHalf }}" hint-placeholder-val="{{ true }}">
+<div aria-hidden="true" style="width: 36px; height: 4px; margin: 8px auto 0; border-radius: 999px; background: #d9cfbc"></div>
+</sc-if>
+<sc-if value="{{ showTitleRow }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: center; gap: 12px; padding: 4px 16px 0 24px">
+<div style="flex: 1; min-width: 0">
+<h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 500; color: #1f1b16">{{ foundLine }}</h2>
+<div style="font-size: 12px; line-height: 16px; color: #5e5548">{{ subLine }}</div>
+</div>
+<button data-noswipe="1" role="switch" aria-checked="{{ newOnly }}" aria-label="Show only kanji that are new to me" onClick="{{ toggleNew }}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0; border: 0; background: transparent; font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #1f1b16; cursor: pointer">
+<span>New only</span>
+<span style="{{ trackStyle }}"><span style="{{ thumbStyle }}"></span></span>
+</button>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ showBody }}" hint-placeholder-val="{{ true }}">
+<div class="scroll" onScroll="{{ bodyScroll }}" style="{{ bodyStyle }}">
+<sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+<div style="padding: 32px 16px; text-align: center; font-size: 14px; line-height: 20px; color: #5e5548">Nothing new here. You have already learned every kanji in this photo.</div>
+</sc-if>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ tiles }}" as="t" hint-placeholder-count="9">
+<button class="tile" onClick="{{ t.open }}" aria-label="{{ t.label }}" style="{{ t.style }}">
+<sc-if value="{{ t.isNew }}" hint-placeholder-val="{{ true }}">
+<span style="position: absolute; top: 8px; left: 8px; padding: 2px 6px; border-radius: 4px; background: #f7e6de; font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.06em; color: #b8321d">NEW</span>
+</sc-if>
+<sc-if value="{{ t.known }}" hint-placeholder-val="{{ false }}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3f6b3a" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Already learned" style="position: absolute; top: 8px; right: 8px"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+<span lang="ja" style="{{ t.chStyle }}">{{ t.ch }}</span>
+<span style="{{ t.meaningStyle }}">{{ t.meaning }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+<nav aria-label="Main" style="{{ navStyle }}">
+<button onClick="{{ goToday }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16"></path><path d="M8 3v4M16 3v4" stroke-linecap="round"></path></svg>
+<span>Today</span>
+</button>
+<button onClick="{{ goDictionary }}" aria-current="page" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #b8321d; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#b8321d" stroke="#b8321d" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"></path><path d="M5 20.5A2.5 2.5 0 0 0 7.5 23H19v-5" stroke="#b8321d" fill="none"></path><path d="M9 7.5h6" stroke="#fbf7ee"></path></svg>
+<span>Dictionary</span>
+</button>
+<button onClick="{{ goReview }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="8" width="13" height="11" rx="2.5"></rect><path d="M7.5 5h11a2 2 0 0 1 2 2v8"></path></svg>
+<span>Review</span>
+</button>
+<button onClick="{{ goYou }}" style="border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; font-size: 11px; line-height: 14px; font-weight: 500; color: #74695a; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#74695a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.75"></circle><path d="M4.5 20c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6"></path></svg>
+<span>You</span>
+</button>
+</nav>
+<sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; left: 0; width: 390px; height: 844px">
+<dc-import name="KanjiDetail" kanji="{{ detailCh }}" back-label="Scan results" on-back="{{ closeDetail }}" hint-size="390px,844px"></dc-import>
+</div>
+</sc-if>
+<sc-if value="{{ flash }}" hint-placeholder-val="{{ false }}">
+<div class="flash" aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; pointer-events: none"></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"select","options":["viewfinder","scanning","peek","half","full"],"default":"viewfinder"},"newOnly":{"editor":null},"detail":{"editor":null},"crop":{"editor":null},"still":{"editor":null},"onClose":{"editor":null},"onTab":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const pr = props || {};
+    const s = pr.start || 'viewfinder';
+    let stage = 'viewfinder';
+    let snap = 'half';
+    if (s === 'scanning') stage = 'scanning';
+    else if (s === 'peek' || s === 'half' || s === 'full') { stage = 'sheet'; snap = s; }
+    this.state = {
+      stage: stage, snap: snap, dragH: null, dragging: false,
+      newOnly: !!pr.newOnly, hideBoxes: false, cropping: !!pr.crop,
+      toast: null, detailCh: pr.detail || null, flash: false, torch: false
+    };
+    this.drag = null;
+    this.timers = [];
+  }
+  componentWillUnmount() {
+    this.timers.forEach((t) => clearTimeout(t));
+  }
+  later(fn, ms) {
+    const t = setTimeout(fn, ms);
+    this.timers.push(t);
+    return t;
+  }
+  // Kanji printed on the notice, in reading order. [kanji, short meaning, learned]. Keep in step with CameraScene.dc.html.
+  static found() {
+    return [
+      ['日', 'day, sun', 1], ['本', 'book, origin', 1], ['語', 'language', 0], ['学', 'study', 1], ['校', 'school', 1],
+      ['入', 'enter', 0], ['口', 'mouth', 0], ['受', 'receive', 0], ['付', 'attach', 0],
+      ['月', 'month, moon', 1], ['金', 'gold, money', 1]
+    ];
+  }
+  heightFor(snap) {
+    return snap === 'full' ? 844 : (snap === 'half' ? 456 : 112);
+  }
+  curH() {
+    const st = this.state;
+    return st.dragH !== null && st.dragH !== undefined ? st.dragH : this.heightFor(st.snap);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const pr = this.props || {};
+    const still = !!pr.still;
+    const stage = st.stage;
+    const h = this.curH();
+    const all = Component.found();
+    const newCount = all.filter((k) => !k[2]).length;
+    const learnedCount = all.length - newCount;
+    const list = st.newOnly ? all.filter((k) => !k[2]) : all;
+    const inSheet = stage === 'sheet' && !st.cropping;
+    const mode = inSheet ? (h >= 824 ? 'full' : (h >= 300 ? 'half' : 'peek')) : 'none';
+    // Photo moves up and shrinks as the sheet rises, so the highlights stay visible above it.
+    let sceneT = 'none';
+    if (inSheet) {
+      const t = Math.max(0, Math.min(1, (456 - h) / (456 - 112)));
+      sceneT = 'translateY(' + (-100 * (1 - t)) + 'px) scale(' + (0.8 + 0.2 * t) + ')';
+    }
+    const frozen = stage !== 'viewfinder';
+    const boxesMode = st.cropping ? 'none' : (stage === 'viewfinder' ? 'none' : (stage === 'scanning' ? 'scan' : 'all'));
+    const openDetail = (ch) => () => this.setState({ detailCh: ch });
+    const tiles = list.map((k) => {
+      const isNew = !k[2];
+      return {
+        ch: k[0], meaning: k[1], isNew: isNew, known: !isNew,
+        label: 'Kanji ' + k[0] + ', ' + k[1] + (isNew ? ', new to you' : ', already learned'),
+        open: openDetail(k[0]),
+        style: 'position: relative; box-sizing: border-box; height: 112px; padding: 22px 8px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; cursor: pointer; font-family: inherit; ' + (isNew ? 'background: #fbf7ee; border: 1px solid #8c8068;' : 'background: transparent; border: 1px solid #d9cfbc;'),
+        chStyle: "font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 44px; line-height: 1; font-weight: 500; color: " + (isNew ? '#1f1b16' : '#5e5548') + ';',
+        meaningStyle: 'font-size: 12px; line-height: 16px; color: ' + (isNew ? '#5e5548' : '#74695a') + '; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;'
+      };
+    });
+    const on = !!st.newOnly;
+    const radius = Math.round(20 * Math.max(0, Math.min(1, (844 - h) / 40)));
+    return {
+      isViewfinder: stage === 'viewfinder',
+      isScanning: stage === 'scanning' && !st.cropping,
+      frozen: frozen,
+      hasSheet: stage === 'sheet' && !st.cropping,
+      cropping: !!st.cropping,
+      showBar: frozen && !st.cropping && mode !== 'full',
+      sceneStyle: 'position: absolute; top: 0; left: 0; width: 390px; height: 844px; transform-origin: 195px 340px; transform: ' + sceneT + ';' + (st.dragging ? '' : ' transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);'),
+      driftClass: stage === 'viewfinder' && !still ? 'drift' : '',
+      boxes: boxesMode,
+      tilt: stage === 'viewfinder' ? 1.8 : -2,
+      blur: stage === 'viewfinder' ? 1.4 : 0,
+      hideBoxes: !!st.hideBoxes,
+      boxesOn: !st.hideBoxes,
+      slashStyle: st.hideBoxes ? '' : 'display: none;',
+      scanAt: stage === 'scanning' && still ? 900 : undefined,
+      pickBox: (ch) => this.setState({ detailCh: ch }),
+      pillStyle: 'box-sizing: border-box; height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid rgba(239, 232, 216, 0.25); background: rgba(21, 19, 15, 0.55); font-family: inherit; font-size: 14px; line-height: 20px; font-weight: 500; color: #efe8d8; cursor: pointer;',
+      torch: !!st.torch,
+      torchFill: st.torch ? '#efe8d8' : 'none',
+      torchStyle: 'pointer-events: auto; position: absolute; top: 52px; right: 16px; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(239, 232, 216, 0.25); display: flex; align-items: center; justify-content: center; cursor: pointer; background: ' + (st.torch ? 'rgba(232, 96, 63, 0.7)' : 'rgba(21, 19, 15, 0.55)') + ';',
+      toast: !!st.toast,
+      toastText: st.toast || '',
+      flash: !!st.flash,
+      modeFull: mode === 'full',
+      modePeek: mode === 'peek',
+      modeHalf: mode === 'half',
+      showTitleRow: mode === 'half' || mode === 'full',
+      showBody: inSheet && h > 150,
+      foundLine: all.length + ' kanji found',
+      newLine: newCount + ' new to you',
+      subLine: on ? 'Showing ' + newCount + ' new' : newCount + ' new to you · ' + learnedCount + ' learned',
+      newOnly: on,
+      trackStyle: 'position: relative; display: block; box-sizing: border-box; width: 48px; height: 28px; flex: none; border-radius: 999px; transition: background-color 0.18s ease; ' + (on ? 'background: #1f1b16; border: 1px solid #1f1b16;' : 'background: #eae2d1; border: 1px solid #8c8068;'),
+      thumbStyle: 'position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: #fbf7ee; box-shadow: 0 1px 2px rgba(31, 27, 22, 0.3); transition: transform 0.18s ease; transform: translateX(' + (on ? 20 : 0) + 'px);',
+      toggleNew: () => this.setState({ newOnly: !this.state.newOnly }),
+      toggleBoxes: () => this.setState({ hideBoxes: !this.state.hideBoxes }),
+      toggleTorch: () => this.setState({ torch: !this.state.torch }),
+      tiles: tiles,
+      empty: tiles.length === 0,
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; height: ' + h + 'px; display: flex; flex-direction: column; overflow: hidden; background: #f4eee2; color: #1f1b16; border-radius: ' + radius + 'px ' + radius + 'px 0 0; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55); ' + (st.dragging ? '' : 'transition: height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.32s ease;'),
+      bodyStyle: 'flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 12px 16px ' + (mode === 'full' ? 99 : 34) + 'px;',
+      navStyle: 'position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; height: 83px; padding: 0 8px 34px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fbf7ee; border-top: 1px solid #d9cfbc; transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); ' + (mode === 'full' && !st.dragging ? '' : 'transform: translateY(100%); pointer-events: none; visibility: hidden;'),
+      detailOpen: !!st.detailCh,
+      detailCh: st.detailCh || '語',
+      closeDetail: () => this.setState({ detailCh: null }),
+      shoot: () => {
+        if (this.state.stage !== 'viewfinder') return;
+        this.setState({ flash: true, stage: 'scanning', snap: 'half', newOnly: false, hideBoxes: false });
+        this.later(() => this.setState({ flash: false }), 230);
+        this.later(() => this.setState({ stage: 'sheet', snap: 'half' }), 1900);
+      },
+      retake: () => {
+        this.timers.forEach((t) => clearTimeout(t));
+        this.timers = [];
+        this.setState({ stage: 'viewfinder', cropping: false, detailCh: null, dragH: null, dragging: false, toast: null, flash: false });
+      },
+      close: () => { if (this.props.onClose) this.props.onClose(); },
+      save: () => {
+        this.setState({ toast: 'Saved to Photos' });
+        this.later(() => this.setState({ toast: null }), 1800);
+      },
+      startCrop: () => this.setState({ cropping: true }),
+      cancelCrop: () => this.setState({ cropping: false }),
+      doneCrop: () => {
+        this.setState({ cropping: false, stage: 'scanning', snap: 'half' });
+        this.later(() => this.setState({ stage: 'sheet', snap: 'half' }), 1900);
+      },
+      toPeek: () => this.setState({ snap: 'peek', dragH: null, dragging: false }),
+      bodyScroll: (e) => {
+        // Scrolling the half-height grid pulls the sheet up to full screen.
+        const el = e && e.currentTarget;
+        if (this.state.snap === 'half' && !this.state.dragging && el && el.scrollTop > 10) this.setState({ snap: 'full' });
+      },
+      dragStart: (e) => {
+        if (e.target && e.target.closest && e.target.closest('[data-noswipe]')) return;
+        this.drag = { y: e.clientY, h: this.curH(), moved: false, id: e.pointerId, el: e.currentTarget, snap: this.state.snap };
+        // Buttons inside the header opt out with data-noswipe, so capturing here does not steal their taps.
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      },
+      dragMove: (e) => {
+        const d = this.drag;
+        if (!d) return;
+        const dy = e.clientY - d.y;
+        if (!d.moved) {
+          if (Math.abs(dy) < 6) return;
+          d.moved = true;
+        }
+        this.setState({ dragH: Math.max(112, Math.min(844, d.h - dy)), dragging: true });
+      },
+      dragEnd: (e) => {
+        const d = this.drag;
+        if (!d) return;
+        this.drag = null;
+        if (!d.moved) {
+          if (d.snap === 'peek') this.setState({ snap: 'half' });
+          return;
+        }
+        const dy = e.clientY - d.y;
+        const end = Math.max(112, Math.min(844, d.h - dy));
+        const snaps = ['peek', 'half', 'full'];
+        let best = 0;
+        snaps.forEach((s, i) => { if (Math.abs(this.heightFor(s) - end) < Math.abs(this.heightFor(snaps[best]) - end)) best = i; });
+        const from = snaps.indexOf(d.snap);
+        if (best === from && Math.abs(dy) > 40) best = Math.max(0, Math.min(2, from + (dy < 0 ? 1 : -1)));
+        this.setState({ snap: snaps[best], dragH: null, dragging: false });
+      },
+      goToday: () => { if (this.props.onTab) this.props.onTab('today'); },
+      goDictionary: () => { if (this.props.onClose) this.props.onClose(); },
+      goReview: () => { if (this.props.onTab) this.props.onTab('review'); },
+      goYou: () => { if (this.props.onTab) this.props.onTab('you'); }
+    };
+  }
+}
+</script>
+</body>
+</html>
