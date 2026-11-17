@@ -91,7 +91,7 @@ final class PhotoLookupModel {
 
 /*---------------------------------entry----------------------------------*/
 
-/// What a tap on "Look up a photo" does.
+/// What a tap on "Scan a kanji" does.
 enum PhotoLookupEntry: Equatable {
     case paywall(ProFeature)
     case sheet
@@ -101,9 +101,17 @@ enum PhotoLookupEntry: Equatable {
     }
 }
 
-/// The open photo lookup camera. Each open gets a fresh model, so a new photo never shows the last one's grid.
-struct PhotoLookupPresentation: Identifiable {
+/// One push of the scan screen onto the Dictionary stack. Each open gets a fresh model, so a new photo never shows the last one's grid.
+struct PhotoLookupPresentation: Identifiable, Hashable {
     let model: PhotoLookupModel
 
     var id: ObjectIdentifier { ObjectIdentifier(model) }
+
+    static func == (lhs: PhotoLookupPresentation, rhs: PhotoLookupPresentation) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

@@ -894,3 +894,24 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: One haiku auditor. The report was approved in round 2 after six fixes. The implementation was approved in round 2 after fixes for the flash render, a device read across threads, and a silent failed capture. The black flash was kept to match the system camera.
+
+### Build the scan entry and viewfinder (v0.27.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. "Draw a kanji" and "Scan a kanji" sit side by side under the search bar, at least 44 pt high, and stack at accessibility text sizes. Both stay Pro, and a locked tap opens the paywall.
+  2. "Scan a kanji" pushes `PhotoLookupScreen` onto the Dictionary's `NavigationStack` with the nav bar and tab bar hidden. Its navigation title is "Scan results", so detail pushed from it reads that back label.
+  3. The viewfinder shows Close, a flash toggle, a corner-bracket reticle, the hint pill, a library button and a neutral shutter on the dark overlay colors (ink `rgba(21,19,15,.55)`, outline `rgba(239,232,216,.25)`, text `#efe8d8`). It reuses `CameraSession`.
+  4. The shutter flashes white for about 0.2 s. Reduce Motion turns the flash off.
+- **Scope Boundary**: In: the two entry buttons, the push, the viewfinder look, and tests and docs. Out: the scan sweep, boxes, results sheet, Crop and Save (tickets 077 to 081). The frozen shot and the old results panel stay until those land, so photo lookup keeps working in between.
+- **Anticipated TODOs**: None in code. The tab bar hiding, the push and the look need a device check.
+- **Planned Tests**: Copy, route identity, the reticle's bounds and the shutter metrics, in `PhotoLookupTests`.
+- **Version**: MINOR, v0.26.1 to v0.27.0.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. The tab bar stays hidden for the whole scan screen, since the half and full results states that bring it back are the results ticket's.
+- **Scope Boundary**: Kept. The shared `FocusSquare` and the results panel are untouched.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/076-build-the-scan-entry-and-viewfinder-report.md`.
+

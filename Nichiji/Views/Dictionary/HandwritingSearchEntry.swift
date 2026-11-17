@@ -2,7 +2,7 @@ import SwiftUI
 
 /*---------------------------------entry----------------------------------*/
 
-/// What a tap on "Draw a kanji to search" does.
+/// What a tap on "Draw a kanji" does.
 enum HandwritingSearchEntry {
     case paywall(ProFeature)
     case pad(HandwritingSearchModel)
@@ -29,7 +29,7 @@ struct DrawSearchPresentation: Identifiable {
 /*----------------------------------copy----------------------------------*/
 
 enum HandwritingSearchCopy {
-    static let buttonTitle = "Draw a kanji to search"
+    static let buttonTitle = "Draw a kanji"
     static let buttonHint = "Opens a pad to draw a kanji"
     static let sheetTitle = "Draw to search"
     static let placeholder = "Draw a kanji here"
@@ -50,7 +50,6 @@ enum HandwritingSearchCopy {
 /*---------------------------------layout---------------------------------*/
 
 enum HandwritingSearchLayout {
-    static let buttonMinHeight = LayoutTokens.minHitTarget
     static let controlMinSide = LayoutTokens.minHitTarget
     /// The design's match row height.
     static let tileMinSide: CGFloat = 56
@@ -59,36 +58,4 @@ enum HandwritingSearchLayout {
     /// Proportions of the 342 pt pad in the design.
     static let inkWidthRatio: CGFloat = 7 / 342
     static let crosshairInsetRatio: CGFloat = 6 / 342
-}
-
-/*---------------------------------button---------------------------------*/
-
-/// The full-width button under `DictionarySearchBar`.
-struct DrawSearchButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: LayoutTokens.space8) {
-                Image(systemName: "pencil.and.scribble")
-                    .accessibilityHidden(true)
-                Text(HandwritingSearchCopy.buttonTitle)
-            }
-            .font(.uiText(size: 14, weight: .medium))
-            .foregroundColor(.nichijiInk)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: HandwritingSearchLayout.buttonMinHeight)
-            .padding(.horizontal, LayoutTokens.space16)
-            .contentShape(Rectangle())
-            .overlay(
-                RoundedRectangle(cornerRadius: LayoutTokens.cornerRadiusSmall, style: .continuous)
-                    .stroke(Color.nichijiBorderControl, lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(HandwritingSearchCopy.buttonTitle)
-        .accessibilityHint(HandwritingSearchCopy.buttonHint)
-        .padding(.horizontal, LayoutTokens.screenMarginCompact)
-        .padding(.bottom, LayoutTokens.space8)
-    }
 }

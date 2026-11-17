@@ -78,6 +78,6 @@ struct HandwritingSearchLayoutTests {
         #expect(HandwritingSearchCopy.tileLabel(kanji: "学") == "Search for 学")
         #expect(HandwritingSearchCopy.padLabel(strokeCount: 1) == "Drawing pad, 1 stroke")
         #expect(HandwritingSearchCopy.padLabel(strokeCount: 3) == "Drawing pad, 3 strokes")
-        #expect(HandwritingSearchCopy.buttonTitle == "Draw a kanji to search")
+        #expect(HandwritingSearchCopy.buttonTitle == "Draw a kanji")
     }
 }
