@@ -63,7 +63,7 @@ struct HandwritingSearchLayoutTests {
     @Test("Every control is at least 44 pt")
     func hitTargets() {
         let sides = [
-            HandwritingSearchLayout.buttonMinHeight,
+            LayoutTokens.minHitTarget,
             HandwritingSearchLayout.controlMinSide,
             HandwritingSearchLayout.tileMinSide,
             HandwritingSearchLayout.padMaxSide

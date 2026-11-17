@@ -73,12 +73,12 @@ Each row gives the question, the options, the choice and who chose.
 
 ## Audit
 
-Council, round 1, with five rounds allowed. Verdict APPROVE. Scores: claude 8, gemini 10, gpt 9.
+Council, round 1, with five rounds allowed. Verdict APPROVE. Scores: claude 8, gemini 10, gpt 9. After CI found a test-target compile error, round 2 re-checked the one-line fix: claude 9, gemini 10, gpt 10, APPROVE.
 
 Problems raised, all by the claude seat and all minor:
 
 - `NavigationPath` might break array-only uses of `path`. Rebutted. Every use is `path.append` or the stack binding (`DictionaryView.swift` lines 26, 59, 94, 110, 207 and 267).
-- The removed symbols may still be referenced. Rebutted. A grep over the app, unit tests and UI tests found no references to `DrawSearchButton`, `PhotoLookupButton`, `CameraChromeIcon` or `buttonMinHeight`. The remaining `appearanceModeRaw` hits are other files with their own storage.
+- The removed symbols may still be referenced. Rebutted in the audit with a grep, but the grep output was cut off by `head`, so the rebuttal was wrong. CI found `HandwritingSearchLayout.buttonMinHeight` still used in `HandwritingSearchEntryTests.swift`. Fixed by testing `LayoutTokens.minHitTarget`, the height the new buttons use. A full grep now finds no references to `DrawSearchButton`, `PhotoLookupButton`, `CameraChromeIcon` or `buttonMinHeight`.
 - The `copy` and `shutterMetrics` tests mostly repeat literals. Declined. They are cheap guards on the design's words and numbers, and one seat raised it.
 
 ## Left for later tickets
