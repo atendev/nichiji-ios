@@ -21,7 +21,8 @@ public enum PhotoLookupState: Equatable, Sendable {
 final class PhotoLookupModel {
     private(set) var state: PhotoLookupState = .empty
     private(set) var photoData: Data?
-    private(set) var kanji: [String] = []
+    /// Each kanji found with its boxes, in reading order.
+    private(set) var scanned: [ScannedKanji] = []
     private(set) var startedIDs: Set<String> = []
     /// The "New to you" filter. Off by default.
     var showsNewOnly = false
@@ -36,6 +37,11 @@ final class PhotoLookupModel {
         self.contentStore = contentStore
         self.learnerStore = learnerStore
     }
+
+    var kanji: [String] { scanned.map(\.id) }
+
+    /// Highlights need boxes, which only a Vision read gives.
+    var hasBoxes: Bool { scanned.contains { !$0.boxes.isEmpty } }
 
     /// What the grid shows: every kanji found, or only the unstarted ones with the filter on.
     var visibleKanji: [String] {
@@ -52,16 +58,16 @@ final class PhotoLookupModel {
         generation += 1
         let mine = generation
         photoData = imageData
-        kanji = []
+        scanned = []
         state = .reading
 
         let reader = reader
         let contentStore = contentStore
-        let outcome: Result<[String], Error> = await Task.detached(priority: .userInitiated) { () async -> Result<[String], Error> in
+        let outcome: Result<[ScannedKanji], Error> = await Task.detached(priority: .userInitiated) { () async -> Result<[ScannedKanji], Error> in
             do {
                 let reading = try await reader.read(imageData: imageData)
                 let bundled = Set(try contentStore.indexEntries().map(\.id))
-                return .success(PhotoKanjiExtractor.kanji(in: reading.combinedLines, bundled: bundled))
+                return .success(PhotoKanjiExtractor.scanned(reading, bundled: bundled))
             } catch {
                 return .failure(error)
             }
@@ -72,7 +78,7 @@ final class PhotoLookupModel {
         case .success(let found):
             startedIDs = (try? await learnerStore?.nonNewKanjiIDs()) ?? []
             guard mine == generation else { return }
-            kanji = found
+            scanned = found
             state = found.isEmpty ? .noKanji : .found
         case .failure:
             state = .failed
@@ -83,7 +89,7 @@ final class PhotoLookupModel {
     func retake() {
         generation += 1
         photoData = nil
-        kanji = []
+        scanned = []
         startedIDs = []
         state = .empty
     }

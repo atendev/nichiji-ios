@@ -25,18 +25,25 @@ struct SystemPhotoTextReader: PhotoTextReader {
             Result { try Self.visionLines(imageData) }
         }.value
         let visionLines = (try? vision.get()) ?? []
-        guard PhotoTextReading.needsLiveText(visionLines: visionLines) else {
-            return PhotoTextReading(visionLines: visionLines, liveTextLines: [])
+        let visionBoxes = visionLines.map(\.boxes)
+        let visionText = visionLines.map(\.text)
+        guard PhotoTextReading.needsLiveText(visionLines: visionText) else {
+            return PhotoTextReading(visionLines: visionText, liveTextLines: [], visionBoxes: visionBoxes)
         }
         let liveTextLines = await Self.liveTextLines(imageData)
         // A Vision failure only matters when Live Text found nothing to cover for it.
         if case .failure(let error) = vision, liveTextLines.isEmpty {
             throw error
         }
-        return PhotoTextReading(visionLines: visionLines, liveTextLines: liveTextLines)
+        return PhotoTextReading(visionLines: visionText, liveTextLines: liveTextLines, visionBoxes: visionBoxes)
     }
 
-    private static func visionLines(_ data: Data) throws -> [String] {
+    private struct VisionLine: Sendable {
+        let text: String
+        let boxes: [CGRect?]
+    }
+
+    private static func visionLines(_ data: Data) throws -> [VisionLine] {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
             throw PhotoTextError.unreadableImage
@@ -50,7 +57,20 @@ struct SystemPhotoTextReader: PhotoTextReader {
         request.recognitionLanguages = languages
         request.usesLanguageCorrection = true
         try VNImageRequestHandler(cgImage: image, orientation: orientation).perform([request])
-        return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }
+        return (request.results ?? []).compactMap { observation in
+            guard let candidate = observation.topCandidates(1).first else { return nil }
+            return VisionLine(text: candidate.string, boxes: characterBoxes(of: candidate))
+        }
+    }
+
+    /// One box per character, flipped to a top-left origin. A character Vision cannot box stays nil.
+    private static func characterBoxes(of candidate: VNRecognizedText) -> [CGRect?] {
+        let text = candidate.string
+        return text.indices.map { start in
+            let range = start..<text.index(after: start)
+            guard let box = try? candidate.boundingBox(for: range)?.boundingBox else { return nil }
+            return PhotoBox.topLeftOrigin(fromVision: box)
+        }
     }
 
     /// Live Text is a backup, so any failure reads as no text rather than an error.
