@@ -75,17 +75,111 @@ struct PhotoLookupTextTests {
         #expect(!PhotoTextReading.needsLiveText(visionLines: ["abcd"]))
     }
 
+    private func scanned(_ reading: PhotoTextReading) -> [ScannedKanji] {
+        PhotoKanjiExtractor.scanned(reading, bundled: bundled)
+    }
+
+    private func box(_ x: Double) -> CGRect {
+        CGRect(x: x, y: 0.1, width: 0.1, height: 0.2)
+    }
+
     @Test("Only bundled kanji are kept, once each, in order of first appearance")
     func extractsBundledKanjiOnce() {
-        let found = PhotoKanjiExtractor.kanji(in: ["本日は日本語", "OPEN 学 日", "ひらがな"], bundled: bundled)
+        let found = scanned(PhotoTextReading(visionLines: ["本日は日本語", "OPEN 学 日", "ひらがな"], liveTextLines: []))
 
-        #expect(found == ["本", "日", "語", "学"])
+        #expect(found.map(\.id) == ["本", "日", "語", "学"])
     }
 
     @Test("Text with no bundled kanji finds none")
     func noKanji() {
-        #expect(PhotoKanjiExtractor.kanji(in: ["EXIT", "ひらがな"], bundled: bundled).isEmpty)
-        #expect(PhotoKanjiExtractor.kanji(in: [], bundled: bundled).isEmpty)
+        #expect(scanned(PhotoTextReading(visionLines: ["EXIT", "ひらがな"], liveTextLines: [])).isEmpty)
+        #expect(scanned(PhotoTextReading(visionLines: [], liveTextLines: [])).isEmpty)
+    }
+
+    @Test("A kanji that appears twice carries both boxes in reading order")
+    func repeatedKanjiKeepsEveryBox() {
+        let reading = PhotoTextReading(
+            visionLines: ["日本", "語日"],
+            liveTextLines: [],
+            visionBoxes: [[box(0.1), box(0.2)], [box(0.3), box(0.4)]]
+        )
+
+        let found = scanned(reading)
+
+        #expect(found.map(\.id) == ["日", "本", "語"])
+        #expect(found[0].boxes == [box(0.1), box(0.4)])
+        #expect(found[1].boxes == [box(0.2)])
+        #expect(found[2].boxes == [box(0.3)])
+    }
+
+    @Test("Characters that are not kept still use up their box slot")
+    func skippedCharactersKeepBoxesAligned() {
+        let reading = PhotoTextReading(
+            visionLines: ["A日"],
+            liveTextLines: [],
+            visionBoxes: [[box(0.1), box(0.2)]]
+        )
+
+        #expect(scanned(reading) == [ScannedKanji(id: "日", boxes: [box(0.2)])])
+    }
+
+    @Test("A character Vision could not box keeps its kanji but adds no box")
+    func missingBoxIsSkipped() {
+        let reading = PhotoTextReading(
+            visionLines: ["日本"],
+            liveTextLines: [],
+            visionBoxes: [[nil, box(0.2)]]
+        )
+
+        #expect(scanned(reading) == [
+            ScannedKanji(id: "日", boxes: []),
+            ScannedKanji(id: "本", boxes: [box(0.2)])
+        ])
+    }
+
+    @Test("Short or missing box rows never crash and leave boxes empty")
+    func shortBoxRows() {
+        let reading = PhotoTextReading(visionLines: ["日本", "語"], liveTextLines: [], visionBoxes: [[box(0.1)]])
+
+        #expect(scanned(reading) == [
+            ScannedKanji(id: "日", boxes: [box(0.1)]),
+            ScannedKanji(id: "本", boxes: []),
+            ScannedKanji(id: "語", boxes: [])
+        ])
+    }
+
+    @Test("A Live Text read finds its kanji with no boxes")
+    func liveTextHasNoBoxes() {
+        let reading = PhotoTextReading(
+            visionLines: ["日"],
+            liveTextLines: ["日本語"],
+            visionBoxes: [[box(0.1)]]
+        )
+
+        #expect(reading.usesLiveText)
+        #expect(scanned(reading) == [
+            ScannedKanji(id: "日", boxes: []),
+            ScannedKanji(id: "本", boxes: []),
+            ScannedKanji(id: "語", boxes: [])
+        ])
+    }
+
+    @Test("A sparse Vision read with nothing from Live Text keeps Vision's boxes")
+    func sparseVisionWithoutLiveTextKeepsBoxes() {
+        let reading = PhotoTextReading(visionLines: ["日"], liveTextLines: [], visionBoxes: [[box(0.1)]])
+
+        #expect(!reading.usesLiveText)
+        #expect(scanned(reading) == [ScannedKanji(id: "日", boxes: [box(0.1)])])
+    }
+
+    @Test("Vision's bottom-left box flips to a top-left origin")
+    func flipsVisionBox() {
+        let flipped = PhotoBox.topLeftOrigin(fromVision: CGRect(x: 0.2, y: 0.1, width: 0.3, height: 0.2))
+
+        #expect(abs(flipped.minX - 0.2) < 1e-9)
+        #expect(abs(flipped.minY - 0.7) < 1e-9)
+        #expect(abs(flipped.width - 0.3) < 1e-9)
+        #expect(abs(flipped.height - 0.2) < 1e-9)
     }
 }
 
@@ -114,6 +208,27 @@ struct PhotoLookupModelTests {
         #expect(model.state == .found)
         #expect(model.kanji == ["日", "一", "川"])
         #expect(model.photoData == Data([1]))
+    }
+
+    @Test("The model keeps each kanji's boxes and reports them")
+    func modelKeepsBoxes() async {
+        let box = CGRect(x: 0.1, y: 0.1, width: 0.1, height: 0.1)
+        let model = makeModel(reading: PhotoTextReading(visionLines: ["日"], liveTextLines: [], visionBoxes: [[box]]))
+
+        await model.lookUp(imageData: Data([1]))
+
+        #expect(model.scanned == [ScannedKanji(id: "日", boxes: [box])])
+        #expect(model.hasBoxes)
+    }
+
+    @Test("A Live Text read lists kanji but offers no boxes")
+    func liveTextOffersNoBoxes() async {
+        let model = makeModel(reading: PhotoTextReading(visionLines: [], liveTextLines: ["日本一"]))
+
+        await model.lookUp(imageData: Data([1]))
+
+        #expect(model.kanji == ["日", "一"])
+        #expect(!model.hasBoxes)
     }
 
     @Test("A photo with no bundled kanji ends as noKanji")
