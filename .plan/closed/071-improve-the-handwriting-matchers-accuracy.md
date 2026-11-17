@@ -32,3 +32,5 @@ Yes, partly. A stroke with no partner now costs 0.35 in the matcher's stroke ass
 - Still missed: 弓, 飽 and 糾 stay out of the top 10, and 包 sits at rank 6. They need the matcher to join or split strokes, a larger change than this ticket.
 - Not confirmed on other learners: the 0.35 value was picked on one learner's fixture (it sits on a 0.3 to 0.45 plateau), and the drawings from [Collect handwriting drawings from other learners](072-collect-handwriting-drawings-from-other-learners.md) do not exist yet. Re-score and raise the floors when they do.
 - Version v0.26.2. Decision report: `.plan/assets/071-improve-the-handwriting-matchers-accuracy-report.md`. PR 53.
+
+Timing: wall 55m, active 19m, user 0s, wait 35m, blocked 0s | setup 55m | tools 71 | limits 0, compactions 0, handoffs 0
