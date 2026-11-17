@@ -139,7 +139,10 @@ private struct HighlightsLayer: View {
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(PhotoLookupCopy.boxLabel(kanji: box.kanji, isNew: box.isNew))
                     .accessibilityAddTraits(.isButton)
-                    .accessibilityAction { onPick(box.kanji) }
+                    .accessibilityAction {
+                        guard !isSweeping else { return }
+                        onPick(box.kanji)
+                    }
             }
         }
     }
