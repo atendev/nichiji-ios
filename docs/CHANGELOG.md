@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.28.0
+- Build the frozen photo, scan sweep and highlights. The shot now freezes full screen while a vermilion scan line sweeps down it with the pill "Scanning for kanji…", looping until the read is done and then finishing its pass as each kanji's box fades in. Every kanji found gets a red (new) or green (started) box, mapped from the image to the view under aspect-fill; a tap opens that kanji's detail, with at least a 44 pt tap region and the nearest box winning on overlap. X at top left removes the photo and returns to the camera, and a labelled Highlights option shows or hides the boxes (hidden after a Live Text read). Reduce Motion drops the line and crossfades the boxes. Crop and Save stay hidden until their tickets land
+- Close ticket 078
+
 ## v0.27.0
 - Build the scan entry and viewfinder. "Scan a kanji" now sits beside "Draw a kanji" under the Dictionary search bar (stacked at accessibility text sizes), and opens the camera by pushing it onto the Dictionary's navigation stack with the nav and tab bars hidden, instead of a full-screen cover. The viewfinder gets the design's corner-bracket reticle, hint pill, neutral shutter, library button, flash toggle and dark overlay colors, and the shutter flashes white for about 0.2 s (off under Reduce Motion). Kanji detail opened from a result keeps "Scan results" as its back label
 - Close ticket 076

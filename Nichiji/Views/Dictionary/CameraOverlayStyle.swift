@@ -9,6 +9,10 @@ extension Color {
     static let cameraText = Color(red: 239 / 255, green: 232 / 255, blue: 216 / 255)
     /// The backdrop behind the feed, and the base of the edge gradients.
     static let cameraBase = Color(red: 21 / 255, green: 19 / 255, blue: 15 / 255)
+    /// Box and sweep color for a kanji that is new to the learner.
+    static let cameraNew = Color(red: 232 / 255, green: 96 / 255, blue: 63 / 255)
+    /// Box color for a kanji the learner has started.
+    static let cameraLearned = Color(red: 141 / 255, green: 180 / 255, blue: 131 / 255)
 }
 
 /*--------------------------------reticle---------------------------------*/
