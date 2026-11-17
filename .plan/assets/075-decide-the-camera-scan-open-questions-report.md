@@ -4,7 +4,7 @@ Ticket: `.plan/tickets/075-decide-the-camera-scan-open-questions.md` (grilling, 
 
 ## How it ran
 
-The main thread asked the user the first three rounds (fifteen questions) with AskUserQuestion. The user picked the recommended option every time, then asked for auto mode. From there a grilling subagent (Sonnet) decided every question in two rounds: Q1 to Q11, then Q12 to Q16. Its picks match the user's earlier answers. The main thread added three HIG rules from the `apple` skill: box tap targets, the Reduce Motion path and VoiceOver announcements. The council audited the resolution.
+The main thread asked the user the first three rounds (fifteen questions) with AskUserQuestion. The user picked the recommended option every time, then asked for auto mode. From there a grilling subagent (Sonnet) decided every question in two rounds: Q1 to Q11, then Q12 to Q16. Its picks match the user's earlier answers. The user delegated these choices ("auto mode"), and the master confirmed that the recommended option stands on every question. Every decision below is the recommended option. The main thread added three HIG rules from the `apple` skill: box tap targets, the Reduce Motion path and VoiceOver announcements. The council audited the resolution.
 
 ## Decisions
 

@@ -3,9 +3,9 @@ id: "075"
 title: Decide the camera scan open questions
 type: grilling
 mode: HITL
-status: open
+status: closed
 blocked_by: []
-claimed: true
+claimed: false
 ---
 
 ## Question
