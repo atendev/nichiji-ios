@@ -915,3 +915,25 @@ The user answered the merge question with two changes and asked for CI before as
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See `.plan/assets/076-build-the-scan-entry-and-viewfinder-report.md`.
 
+
+### Build the frozen photo, scan sweep and highlights (v0.28.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. The shot freezes full screen at the shutter. A vermilion scan line loops down it, about 1.6 s a pass, with the pill "Scanning for kanji…" until the read ends. Reduce Motion drops the line.
+  2. Once results land, the pass in progress finishes: each kanji's box fades in as the line reaches it, and the line goes at the bottom. Under Reduce Motion the boxes crossfade together.
+  3. Every kanji found gets a box: new `#e8603f`, started `#8db483`, each with about 22% fill, mapped from the image to the view under aspect-fill.
+  4. A tap on a box opens that kanji's detail. Each box has a tap region of at least 44 x 44 pt, the nearest box wins on overlap, and taps wait until the sweep settles.
+  5. X at top left removes the photo and returns to the camera. A labelled Highlights option at top right shows or hides the boxes, and only appears after a read that gave boxes.
+  6. Crop and Save stay hidden until their tickets land.
+- **Scope Boundary**: In: the box geometry, the sweep clock, the frozen photo layer, the pill, the Highlights option, tests and docs. Out: the results sheet (the old panel stays, up to 55% of the screen), Crop and Save, and any change to the readers or extractor.
+- **Anticipated TODOs**: None in code. The sweep, the box fade and taps need a device check.
+- **Planned Tests**: Aspect-fill frames and box mapping, box colors, tap regions and the hit test, and the sweep clock, in `PhotoHighlightsTests`.
+- **Version**: MINOR, v0.27.0 to v0.28.0.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. Boxes are not filtered by "New to you". The line finishes the pass in progress after results land rather than restarting. `PhotoLookupScreen` moved its helper views into an extension to stay under SwiftLint's type body length.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/078-build-the-frozen-photo-and-highlights-report.md`.
