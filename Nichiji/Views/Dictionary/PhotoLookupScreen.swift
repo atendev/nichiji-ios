@@ -88,6 +88,7 @@ struct PhotoLookupScreen: View {
     @State private var sweep: ScanSweep?
     @State private var isSweeping = false
     @State private var showsHighlights = true
+    @State private var isCropping = false
 
     private var isLive: Bool { model.state == .empty }
     private var showsPanel: Bool { !isLive && model.state != .reading }
@@ -127,6 +128,7 @@ struct PhotoLookupScreen: View {
                     }
                 }
             }
+            .photoCrop(isPresented: $isCropping, image: frozenImage, model: model)
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: isLive)
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: showsPanel)
         }
@@ -337,15 +339,20 @@ extension PhotoLookupScreen {
                 ) {
                     camera.toggleTorch()
                 }
-            } else if !isLive, model.state == .found, model.hasBoxes {
-                // Crop and Save join Highlights here when their own tickets land.
-                PhotoOptionButton(
-                    systemName: showsHighlights ? "eye" : "eye.slash",
-                    label: PhotoLookupCopy.highlights,
-                    hint: PhotoLookupCopy.highlightsHint,
-                    isOn: showsHighlights,
-                    action: toggleHighlights
-                )
+            } else if !isLive, showsPanel {
+                // Save joins these options when its own ticket lands.
+                HStack(spacing: LayoutTokens.space8) {
+                    PhotoCropOption(isHidden: isSweeping) { isCropping = true }
+                    if model.state == .found, model.hasBoxes {
+                        PhotoOptionButton(
+                            systemName: showsHighlights ? "eye" : "eye.slash",
+                            label: PhotoLookupCopy.highlights,
+                            hint: PhotoLookupCopy.highlightsHint,
+                            isOn: showsHighlights,
+                            action: toggleHighlights
+                        )
+                    }
+                }
             }
         }
         .padding(.horizontal, LayoutTokens.screenMarginCompact)

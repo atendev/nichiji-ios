@@ -3,7 +3,7 @@ id: "080"
 title: Build Crop for the scanned photo
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["078"]
 claimed: true
 ---
@@ -20,4 +20,4 @@ The photo shows at full size with the rest dimmed, a crop frame with corner hand
 
 ## Resolution
 
-<Filled in at close.>
+Yes. A labelled Crop option on the frozen photo opens its own `PhotoCropView`: photo at full size, rest dimmed, thirds lines, four draggable corner handles with 44 pt targets (VoiceOver can nudge them), and Cancel / Done. Done crops the pixels (upright, JPEG), the crop becomes the photo, and the model reads it again with the sweep. Cancel returns to the results. Crop shows once the sweep ends, in found, no-kanji and failed states, and works again on a cropped photo. A frame still covering the whole photo closes like Cancel. The entry and hook sit in `PhotoCropView.swift`, so `PhotoLookupScreen.swift` stays at 390 lines. The model keeps no "is cropped" flag; the Save ticket adds what it needs. Report: `assets/080-build-scan-crop-report.md`. v0.29.0.
