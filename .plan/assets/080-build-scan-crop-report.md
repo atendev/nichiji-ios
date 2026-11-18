@@ -57,3 +57,5 @@ Version v0.29.0 (MINOR). Branch `t3/build-scan-crop`. No Swift toolchain on this
 - Needs a device check: dragging the handles, VoiceOver nudges and the rescan sweep.
 - The commit gate asked the user nothing, per the master's brief.
 - `docs/CHANGELOG.md` v0.29.0 may collide with the sibling tickets' entries at the batch merge. Tagging is the user's call.
+
+- CI: green (lint, build and tests), run 44222407703.
