@@ -60,4 +60,15 @@ CI's test log is the substitute for a simulator measurement. The master should c
 
 ## Audit
 
-The council audit result is recorded in the ticket resolution and the final report. Minor problems declined are listed there.
+COUNCIL APPROVE, round 2 of 5. Claude 8, Gemini 10, GPT 9.
+
+- Round 1. Claude 8 (approve), GPT 9 (approve), Gemini 7 (disapprove). Gemini raised one blocking problem, that `mach_task_self()` in `DictionarySearchIndexCostTests` does not compile. Rebutted. Swift's Darwin overlay declares `mach_task_self()`, and the `mach_task_self_` global would fail under Swift 6 strict concurrency, which `project.yml` sets. No code changed.
+- Round 2. Gemini re-checked the rebuttal and approved with 10.
+
+Minor problems declined, each raised by one seat.
+
+- Claude. The Draw to search sheet shows a note ("Drawing cannot find kanji that have no stroke order. Search those by reading or meaning.") instead of the exact "No stroke order for this kanji" line. Declined. A drawn match can never be one of these kanji, so the sheet explains why. Detail and Practice use the exact line.
+- Claude. `KanjiDetailTests` covers the no-stroke-file case through `TestKanjiContentStore`, not the bundled store. Declined. `DatasetContractTests.strokeFileCoverage` checks the real bundle's 32 missing files, and the view state does not depend on the store type.
+- Claude. `SourcesTests` asserts "3465" without a separator and might not match. Not a problem. `tools/dataset/build.py:294` and `Dataset/Shared/DATA-SOURCES.md` write the totals without separators.
+
+Swift was not compiled. The seats read the diff for compile and concurrency problems and found none that held up. CI is the first compile.
