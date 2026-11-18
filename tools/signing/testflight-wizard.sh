@@ -203,6 +203,7 @@ mkdir -p "$SIGNING_DIR"
 chmod 700 "$SIGNING_DIR"
 if [[ -f "$KEY" && -f "$CERT_PEM" && -f "$P12" ]] && confirm "You already made a certificate. Reuse it and skip to the profiles?"; then
   reuse_cert=true
+  note "Skipping the certificate and its secrets; both are already set."
 elif [[ -f "$KEY" ]] && ! confirm "A key already exists there. Replace it with a new one?"; then
   note "Keeping the existing key and request."
 else
@@ -215,43 +216,39 @@ else
 fi
 pause
 
-stage "Create the Apple Distribution certificate"
 if [[ "$reuse_cert" == true ]]; then
-  note "Reusing $CERT_PEM."
+  _STAGE_INDEX=$((_STAGE_INDEX + 2))
 else
-  open_url "https://developer.apple.com/account/resources/certificates/add"
-  step "Pick Apple Distribution, then Continue."
-  step "Choose File: $CSR"
-  step "Continue, then Download. You get a file like distribution.cer."
-  ask CER_PATH "Path to the downloaded .cer file:"
-  CER_PATH="${CER_PATH/#\~/$HOME}"
-  [[ -f "$CER_PATH" ]] || { warn "No file at $CER_PATH"; exit 1; }
-  openssl x509 -inform DER -in "$CER_PATH" -out "$CERT_PEM" 2>/dev/null \
-    || openssl x509 -in "$CER_PATH" -out "$CERT_PEM"
-  if [[ "$(openssl x509 -noout -pubkey -in "$CERT_PEM")" != "$(openssl pkey -pubout -in "$KEY")" ]]; then
-    warn "That certificate does not match the key from stage 1. Upload $CSR and download again."
-    exit 1
-  fi
-  printf '  %s✓ certificate matches the key%s\n' "$GREEN" "$RESET"
+stage "Create the Apple Distribution certificate"
+open_url "https://developer.apple.com/account/resources/certificates/add"
+step "Pick Apple Distribution, then Continue."
+step "Choose File: $CSR"
+step "Continue, then Download. You get a file like distribution.cer."
+ask CER_PATH "Path to the downloaded .cer file:"
+CER_PATH="${CER_PATH/#\~/$HOME}"
+[[ -f "$CER_PATH" ]] || { warn "No file at $CER_PATH"; exit 1; }
+openssl x509 -inform DER -in "$CER_PATH" -out "$CERT_PEM" 2>/dev/null \
+  || openssl x509 -in "$CER_PATH" -out "$CERT_PEM"
+if [[ "$(openssl x509 -noout -pubkey -in "$CERT_PEM")" != "$(openssl pkey -pubout -in "$KEY")" ]]; then
+  warn "That certificate does not match the key from stage 1. Upload $CSR and download again."
+  exit 1
 fi
+printf '  %s✓ certificate matches the key%s\n' "$GREEN" "$RESET"
 pause
 
 stage "Store the certificate as GitHub secrets"
 say "CI imports this certificate on every run instead of making a new one."
-if [[ "$reuse_cert" == true ]] && ! confirm "Store it in GitHub again?"; then
-  note "Keeping the DIST_CERT_P12 and DIST_CERT_PASSWORD secrets already set."
-else
-  DIST_CERT_PASSWORD="$(openssl rand -hex 24)"
-  # macOS security import rejects the newer OpenSSL 3 PKCS#12 ciphers.
-  openssl pkcs12 -export -inkey "$KEY" -in "$CERT_PEM" -out "$P12" \
-    -name "Nichiji Distribution" -passout "pass:$DIST_CERT_PASSWORD" \
-    -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES -macalg sha1
-  chmod 600 "$P12"
-  set_secret DIST_CERT_P12 "$(base64 < "$P12" | tr -d '\n')"
-  set_secret DIST_CERT_PASSWORD "$DIST_CERT_PASSWORD"
-fi
+DIST_CERT_PASSWORD="$(openssl rand -hex 24)"
+# macOS security import rejects the newer OpenSSL 3 PKCS#12 ciphers.
+openssl pkcs12 -export -inkey "$KEY" -in "$CERT_PEM" -out "$P12" \
+  -name "Nichiji Distribution" -passout "pass:$DIST_CERT_PASSWORD" \
+  -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES -macalg sha1
+chmod 600 "$P12"
+set_secret DIST_CERT_P12 "$(base64 < "$P12" | tr -d '\n')"
+set_secret DIST_CERT_PASSWORD "$DIST_CERT_PASSWORD"
 note "Keep $SIGNING_DIR backed up somewhere private. The certificate lasts one year."
 pause
+fi
 
 stage "Create the two App Store provisioning profiles"
 say "A profile ties the certificate to one bundle ID and its App Group."
