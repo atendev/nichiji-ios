@@ -4,7 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
-## v0.X.0 (placeholder for the scan results sheet; the master renumbers at the batch merge)
+## v0.30.0
+- Add Crop to the scanned photo. A labelled Crop option opens the photo at full size with the rest dimmed, a frame with thirds lines, and four draggable corner handles with 44 pt targets that VoiceOver can nudge. Done cuts the frame out, makes it the frozen photo and reads it again with the sweep; Cancel returns to the results. Crop also shows after an empty or failed read and works again on a cropped photo
+
+## v0.29.0
 - Build the scan results sheet. The photo now sits behind a sheet that rises to half about 1.9 s after the shutter and moves between peek, half and full by drag, snapping to the nearest state (a drag over 40 pt always moves one). Half and full show a 3-column tile grid with each kanji's short meaning and a NEW tag or a green check, a "New only" switch, and "Nothing new here…" when it empties the grid. Full brings the tab bar back and shows the "Scan" header with a photo row. Reduce Motion snaps with no animation. This replaces the old results panel
 - Close ticket 079
 

@@ -939,7 +939,7 @@ The user answered the merge question with two changes and asked for CI before as
 - **Audit**: See `.plan/assets/078-build-the-frozen-photo-and-highlights-report.md`.
 
 
-### Build the scan results sheet (v0.X.0, placeholder)
+### Build the scan results sheet (v0.29.0)
 
 #### Requirements Report
 - **Success Criteria**:

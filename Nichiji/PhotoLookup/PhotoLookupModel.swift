@@ -105,6 +105,19 @@ final class PhotoLookupModel {
         }
     }
 
+    /// Crops the photo to a normalized frame and reads that part alone. The crop becomes the photo and its results replace the old ones. Returns false and changes nothing when the photo cannot be cropped.
+    @discardableResult
+    func crop(to region: CGRect) async -> Bool {
+        guard let data = photoData else { return false }
+        let mine = generation
+        let cropped = await Task.detached(priority: .userInitiated) {
+            PhotoCropper.crop(imageData: data, to: region)
+        }.value
+        guard mine == generation, let cropped else { return false }
+        await lookUp(imageData: cropped)
+        return true
+    }
+
     /// Back to the live camera. A read still running drops its result, and the "New to you" choice stays.
     func retake() {
         generation += 1
