@@ -26,6 +26,11 @@ struct KnownKanjiStoreTests {
         return rows.first?.wasHandKnown
     }
 
+    /// Stand-in kanji IDs that sort in a fixed order, so a batch's positions are known.
+    private func batchIDs(count: Int) -> [String] {
+        (1...count).map { String(format: "k%03d", $0) }
+    }
+
     @Test("Declaring a new kanji starts it learning, due now, with no log row")
     func declareStartsLearning() async throws {
         let store = try makeStore()
@@ -35,12 +40,82 @@ struct KnownKanjiStoreTests {
 
         let progress = try #require(try await store.progress(for: "山"))
         #expect(progress.stage == .learning)
-        #expect(progress.nextReviewAt == date)
+        #expect(progress.nextReviewAt == ReviewScheduler.dueDate(addingDays: 0, to: date, calendar: .current))
         #expect(progress.declaredKnownAt == date)
         #expect(progress.declaredKnown)
         #expect(try await store.studyLog().isEmpty)
         #expect(try await store.declaredKnownIDs() == ["山", "川"])
         #expect(try await store.nonNewKanjiIDs() == ["山", "川"])
+    }
+
+    @Test("Declaring a batch comes due ten kanji a day starting on the day it is marked")
+    func declareStaggersBatch() async throws {
+        let store = try makeStore()
+        let date = Date(timeIntervalSince1970: 1_793_000_000)
+        let ids = Set(batchIDs(count: 25))
+
+        try await store.declareKnown(ids, at: date)
+
+        let sorted = ids.sorted()
+        for (position, id) in sorted.enumerated() {
+            let expected = ReviewScheduler.dueDate(addingDays: position / SwiftDataLearnerStore.marksPerDay, to: date, calendar: .current)
+            #expect(try await store.progress(for: id)?.nextReviewAt == expected)
+        }
+        var dueDays: Set<Date> = []
+        for id in sorted {
+            dueDays.insert(try #require(try await store.progress(for: id)?.nextReviewAt))
+        }
+        #expect(dueDays.count == 3)
+        #expect(try await store.progress(for: sorted[9])?.nextReviewAt == ReviewScheduler.dueDate(addingDays: 0, to: date, calendar: .current))
+        #expect(try await store.progress(for: sorted[10])?.nextReviewAt == ReviewScheduler.dueDate(addingDays: 1, to: date, calendar: .current))
+    }
+
+    @Test("Kanji already in study do not take a slot in the stagger")
+    func staggerSkipsStudiedKanji() async throws {
+        let (store, container) = try makeStoreAndContainer()
+        let date = Date(timeIntervalSince1970: 1_793_000_000)
+        let context = ModelContext(container)
+        context.insert(KanjiProgress(kanjiID: "000", stage: .familiar))
+        try context.save()
+        let ids = Set(batchIDs(count: 10))
+
+        try await store.declareKnown(ids.union(["000"]), at: date)
+
+        let today = ReviewScheduler.dueDate(addingDays: 0, to: date, calendar: .current)
+        for id in ids {
+            #expect(try await store.progress(for: id)?.nextReviewAt == today)
+        }
+        #expect(try await store.progress(for: "000")?.declaredKnownAt == nil)
+    }
+
+    @Test("A single hand mark stays due today")
+    func singleMarkIsDueToday() async throws {
+        let store = try makeStore()
+        let date = Date(timeIntervalSince1970: 1_793_000_000)
+
+        try await store.declareKnown(["山"], at: date)
+
+        #expect(try await store.progress(for: "山")?.nextReviewAt == ReviewScheduler.dueDate(addingDays: 0, to: date, calendar: .current))
+    }
+
+    @Test("Syncing a level staggers the new marks ten a day, and a later pick starts its own batch today")
+    func syncStaggersBatches() async throws {
+        let store = try makeStore()
+        let date = Date(timeIntervalSince1970: 1_793_000_000)
+        let first = Set(batchIDs(count: 12))
+        let second = Set(batchIDs(count: 14)).subtracting(first)
+
+        try await store.syncAutoKnown(first, at: date)
+        try await store.syncAutoKnown(first.union(second), at: date)
+
+        let today = ReviewScheduler.dueDate(addingDays: 0, to: date, calendar: .current)
+        let tomorrow = ReviewScheduler.dueDate(addingDays: 1, to: date, calendar: .current)
+        let firstSorted = first.sorted()
+        #expect(try await store.progress(for: firstSorted[9])?.nextReviewAt == today)
+        #expect(try await store.progress(for: firstSorted[10])?.nextReviewAt == tomorrow)
+        for id in second {
+            #expect(try await store.progress(for: id)?.nextReviewAt == today)
+        }
     }
 
     @Test("Declaring leaves kanji that are already in study alone")
