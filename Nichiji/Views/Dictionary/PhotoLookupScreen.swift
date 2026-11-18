@@ -13,9 +13,7 @@ enum PhotoLookupCopy {
     static let captureFailed = "The photo didn\u{2019}t take. Try again."
     static let reading = "Reading the photo\u{2026}"
     static let scanning = "Scanning for kanji\u{2026}"
-    static let newToYou = "New to you"
     static let noKanji = "No kanji found. Try a closer, sharper photo."
-    static let allStarted = "You have started every kanji found here."
     static let failed = "That photo could not be read."
     static let photoLabel = "The photo being read"
 
@@ -61,13 +59,11 @@ enum PhotoLookupLayout {
     static let reticleTopShare: CGFloat = 160 / 844
     /// The shutter's white flash, in seconds.
     static let flashDuration: Double = 0.2
-    /// The results panel never covers more than this share of the screen, so the photo stays in view.
-    static let panelMaxShare: CGFloat = 0.55
 }
 
 /*---------------------------------screen---------------------------------*/
 
-/// "Scan a kanji": a full-screen camera pushed onto the Dictionary stack. One shutter tap reads the shot, which stays frozen behind a panel of every bundled kanji in it.
+/// "Scan a kanji": a full-screen camera pushed onto the Dictionary stack. One shutter tap reads the shot, which stays frozen behind a sheet of every bundled kanji in it.
 struct PhotoLookupScreen: View {
     @Bindable var model: PhotoLookupModel
     let onPick: (String) -> Void
@@ -88,9 +84,9 @@ struct PhotoLookupScreen: View {
     @State private var sweep: ScanSweep?
     @State private var isSweeping = false
     @State private var showsHighlights = true
+    @State private var sheet = ScanSheetModel()
 
     private var isLive: Bool { model.state == .empty }
-    private var showsPanel: Bool { !isLive && model.state != .reading }
 
     var body: some View {
         GeometryReader { proxy in
@@ -117,24 +113,22 @@ struct PhotoLookupScreen: View {
                     if isLive {
                         captureControls
                             .transition(.opacity)
-                    } else if model.state == .reading {
+                    } else if !sheet.isVisible {
                         ScanningPill()
                             .padding(.bottom, LayoutTokens.space48)
                             .transition(.opacity)
-                    } else {
-                        PhotoLookupResultsPanel(model: model, maxHeight: proxy.size.height * PhotoLookupLayout.panelMaxShare, onPick: onPick)
-                            .transition(reduceMotion ? .opacity : .move(edge: .bottom))
                     }
                 }
+
+                ScanSheetLayer(model: model, sheet: sheet, image: frozenImage, onPick: onPick)
             }
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: isLive)
-            .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: showsPanel)
         }
         .statusBarHidden()
         // The stack's own bars stay away, but the title is what detail's back button reads.
         .navigationTitle(PhotoLookupCopy.backTitle)
         .toolbar(.hidden, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
+        .scanSheetHost(sheet, state: model.state, sweep: sweep)
         .sensoryFeedback(.impact(weight: .medium), trigger: shutterCount)
         .task {
             if isLive { await camera.start() }
@@ -253,6 +247,8 @@ extension PhotoLookupScreen {
                 showsHighlights: showsHighlights,
                 onPick: onPick
             )
+            .scanSheetPhotoPose(sheet)
+            .accessibilityHidden(sheet.isFull)
         } else {
             switch camera.access {
             case .authorized:

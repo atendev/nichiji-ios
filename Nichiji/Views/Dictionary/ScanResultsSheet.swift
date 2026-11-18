@@ -13,6 +13,7 @@ struct ScanSheetLayer: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.clear
+                .allowsHitTesting(false)
             if sheet.isVisible {
                 ScanResultsSheet(model: model, sheet: sheet, image: image, onPick: onPick)
                     .transition(.move(edge: .bottom))

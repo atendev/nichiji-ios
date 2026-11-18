@@ -937,3 +937,25 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See `.plan/assets/078-build-the-frozen-photo-and-highlights-report.md`.
+
+
+### Build the scan results sheet (v0.X.0, placeholder)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. The sheet rises to half about 1.9 s after the shutter. Peek is 112 pt, half is 456 pt with the photo scaled to 0.8 and lifted 100 pt, and full fills the screen and brings the tab bar back.
+  2. A drag on the header follows the finger, snaps to the nearest state, and a drag over 40 pt always moves one state, in 0.32 s `cubic-bezier(.2,.8,.2,1)`. Top corners are 20 pt and flatten at full. The photo scales with the drag between peek and half. Scrolling the half grid pulls the sheet to full. Reduce Motion snaps.
+  3. The header reads "N kanji found" over "X new to you · Y learned" (or "Showing X new"), with a New only switch. Tiles are 3 columns with the kanji, its short meaning and a NEW tag or a green check. "Nothing new here…" shows when New only empties the grid.
+  4. The full header is 写 | Scan with a chevron back to the photo, a thumbnail, "Your photo / Scanned just now" and View photo.
+  5. A tile opens detail with the back label "Scan results", and Back restores the sheet.
+- **Scope Boundary**: In: the sheet geometry and model, the sheet and tile views, the screen wiring, per-kanji meanings and counts on `PhotoLookupModel`, tests and docs. Out: Crop and Save to Photos (tickets 080 and 081). The old `PhotoLookupResultsPanel` is deleted.
+- **Anticipated TODOs**: None in code. The drag, snap, tab bar and photo pose need a device check.
+- **Planned Tests**: Heights, snap with the 40 pt rule, photo pose, corner radius, rise delay and the model's rise, drag, step, pull and reset in `ScanSheetTests`, plus meanings and counts.
+- **Version**: MINOR after v0.28.1. The number is a placeholder; the master renumbers at the batch merge.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. The screen wiring lives in `ScanSheetHost` (a view modifier) to keep `PhotoLookupScreen.swift` under the 400-line lint cap while Crop and Save edit the same file.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/079-build-the-scan-results-sheet-report.md`.

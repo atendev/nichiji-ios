@@ -4,6 +4,10 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.X.0 (placeholder for the scan results sheet; the master renumbers at the batch merge)
+- Build the scan results sheet. The photo now sits behind a sheet that rises to half about 1.9 s after the shutter and moves between peek, half and full by drag, snapping to the nearest state (a drag over 40 pt always moves one). Half and full show a 3-column tile grid with each kanji's short meaning and a NEW tag or a green check, a "New only" switch, and "Nothing new here…" when it empties the grid. Full brings the tab bar back and shows the "Scan" header with a photo row. Reduce Motion snaps with no animation. This replaces the old results panel
+- Close ticket 079
+
 ## v0.28.1
 - Silence the camera shutter and lock the app to portrait. Scan now grabs a frame from the live video feed instead of taking a photo capture, which skips the shutter sound iOS forces on phones sold in Japan and South Korea; the frame is turned upright and saved as a JPEG. A pending capture now resolves to nil if the session stops. The app supports portrait only on iPhone and iPad (iPad runs full screen) until a landscape layout exists
 
