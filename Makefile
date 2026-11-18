@@ -22,8 +22,8 @@ lint:
 testflight: generate
 	rm -rf build
 	xcodebuild archive -project Nichiji.xcodeproj -scheme $(SCHEME) -configuration Internal \
-		-destination 'generic/platform=iOS' -archivePath build/Nichiji.xcarchive $(ASC_AUTH) \
-		CODE_SIGN_IDENTITY='Apple Distribution' CURRENT_PROJECT_VERSION=$(BUILD_NUMBER)
+		-destination 'generic/platform=iOS' -archivePath build/Nichiji.xcarchive \
+		CURRENT_PROJECT_VERSION=$(BUILD_NUMBER)
 	xcodebuild -exportArchive -archivePath build/Nichiji.xcarchive \
 		-exportOptionsPlist Config/ExportOptions-TestFlight.plist -exportPath build/export $(ASC_AUTH)
 

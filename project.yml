@@ -4,6 +4,7 @@ options:
   deploymentTarget:
     iOS: "27.0"
 # Internal is a Release build with the dev unlock, for TestFlight.
+# Internal and Release sign manually with the App Store profiles the signing wizard makes.
 configs:
   Debug: debug
   Internal: release
@@ -68,6 +69,15 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UIRequiresFullScreen: YES
+      configs:
+        Internal:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Nichiji App Store
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Nichiji App Store
   NichijiWidget:
     type: app-extension
     platform: iOS
@@ -99,6 +109,15 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji.widget
+      configs:
+        Internal:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Nichiji Widget App Store
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Nichiji Widget App Store
   NichijiTests:
     type: bundle.unit-test
     platform: iOS

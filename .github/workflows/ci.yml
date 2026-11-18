@@ -51,6 +51,21 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain"
           security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
           rm "$RUNNER_TEMP/dist.p12"
+      - name: Install provisioning profiles
+        env:
+          PROFILE_APP: ${{ secrets.PROFILE_APP }}
+          PROFILE_WIDGET: ${{ secrets.PROFILE_WIDGET }}
+        run: |
+          for dir in "$HOME/Library/MobileDevice/Provisioning Profiles" \
+            "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$dir"
+            for profile in "$PROFILE_APP" "$PROFILE_WIDGET"; do
+              printf '%s' "$profile" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+              uuid=$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" | plutil -extract UUID raw -)
+              cp "$RUNNER_TEMP/profile.mobileprovision" "$dir/$uuid.mobileprovision"
+            done
+          done
+          rm "$RUNNER_TEMP/profile.mobileprovision"
       - name: Write App Store Connect key
         env:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
