@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.37.0
+- Ship device builds through TestFlight instead of sideloading. `project.yml` signs automatically with team `68DPHWR5V5`, adds an Internal configuration (Release plus the `DEV_UNLOCK` flag), and declares no non-exempt encryption. CI's `testflight` job replaces the unsigned IPA job: it imports the Apple Distribution certificate from secrets, archives Internal with the run number as the build number, and uploads an internal-testers-only build with the App Store Connect API key. `make ipa` becomes `make testflight`, and `tools/signing/testflight-wizard.sh` makes the certificate and its secrets. Not tagged
+
 ## v0.36.1
 - Stagger the first reviews of kanji marked known. Marking a whole level, from onboarding, the known-kanji picker or a level pick, no longer puts every mark in the same day's review. A batch comes due ten kanji a day starting on the day it is marked, in sorted kanji order, and kanji already in study do not take a slot. A single hand mark from kanji detail stays due today, and a later level pick starts its own batch today. Not tagged
 

@@ -3,13 +3,22 @@ options:
   bundleIdPrefix: com.aten
   deploymentTarget:
     iOS: "27.0"
+# Internal is a Release build with the dev unlock, for TestFlight.
+configs:
+  Debug: debug
+  Internal: release
+  Release: release
 settings:
   base:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: 68DPHWR5V5
+    CODE_SIGN_STYLE: Automatic
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
+  configs:
+    Internal:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) DEV_UNLOCK
 targets:
   Nichiji:
     type: application
@@ -42,6 +51,7 @@ targets:
     info:
       path: Config/Nichiji-Info.plist
       properties:
+        ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
           - CFBundleURLName: com.aten.nichiji
             CFBundleURLSchemes:
@@ -120,8 +130,12 @@ schemes:
         NichijiUITests: [test]
     # Local runs buy Pro against the StoreKit configuration instead of the App Store.
     run:
+      config: Debug
       storeKitConfiguration: Config/Nichiji.storekit
     test:
+      config: Debug
       targets:
         - NichijiTests
         - NichijiUITests
+    archive:
+      config: Release
