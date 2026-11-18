@@ -114,12 +114,120 @@ struct PhotoCropFrameTests {
         #expect(PhotoCrop.pixelRect(forNormalized: PhotoCrop.fullFrame, pixelWidth: 0, pixelHeight: 5) == .zero)
     }
 
-    @Test("A photo fitted whole is centred with room on one axis")
-    func fittedFrame() {
-        let tall = PhotoFit.fittedFrame(imageSize: CGSize(width: 100, height: 200), in: CGSize(width: 300, height: 300))
+    @Test("A portrait photo fits by height and is centred sideways")
+    func fitsPortrait() {
+        let frame = PhotoFit.fittedFrame(imageSize: CGSize(width: 100, height: 200), in: CGSize(width: 300, height: 300))
 
-        #expect(tall == CGRect(x: 75, y: 0, width: 150, height: 300))
+        #expect(frame == CGRect(x: 75, y: 0, width: 150, height: 300))
+    }
+
+    @Test("A square photo in a tall view fits by width and is centred vertically")
+    func fitsSquare() {
+        let frame = PhotoFit.fittedFrame(imageSize: CGSize(width: 1_000, height: 1_000), in: CGSize(width: 300, height: 600))
+
+        #expect(frame == CGRect(x: 0, y: 150, width: 300, height: 300))
+    }
+
+    @Test("A landscape photo in a tall view fits by width and is centred vertically")
+    func fitsLandscape() {
+        let frame = PhotoFit.fittedFrame(imageSize: CGSize(width: 4_000, height: 3_000), in: CGSize(width: 300, height: 600))
+
+        #expect(frame == CGRect(x: 0, y: 187.5, width: 300, height: 225))
+    }
+
+    @Test("A fitted photo never overflows the view and keeps its aspect ratio", arguments: [
+        CGSize(width: 100, height: 200), CGSize(width: 500, height: 500), CGSize(width: 4_032, height: 3_024), CGSize(width: 10, height: 3_000)
+    ])
+    func fitsInside(imageSize: CGSize) {
+        let view = CGSize(width: 390, height: 560)
+        let frame = PhotoFit.fittedFrame(imageSize: imageSize, in: view)
+
+        #expect(CGRect(origin: .zero, size: view).insetBy(dx: -1e-6, dy: -1e-6).contains(frame))
+        #expect(abs(frame.width / frame.height - imageSize.width / imageSize.height) < 1e-9)
+        #expect(abs(frame.midX - view.width / 2) < 1e-9)
+        #expect(abs(frame.midY - view.height / 2) < 1e-9)
+    }
+
+    @Test("A photo with no size or a view with no size fits to nothing")
+    func fitsNothing() {
         #expect(PhotoFit.fittedFrame(imageSize: .zero, in: CGSize(width: 10, height: 10)) == .zero)
+        #expect(PhotoFit.fittedFrame(imageSize: CGSize(width: 10, height: 10), in: .zero) == .zero)
+    }
+
+    @Test("The whole-photo frame covers exactly the fitted photo")
+    func fullFrameCoversPhoto() {
+        let fittedFrame = PhotoFit.fittedFrame(imageSize: CGSize(width: 4_000, height: 3_000), in: CGSize(width: 300, height: 600))
+
+        #expect(PhotoCrop.frameRect(for: PhotoCrop.fullFrame, fitted: fittedFrame.size) == CGRect(origin: .zero, size: fittedFrame.size))
+    }
+
+    @Test("The whole-photo frame sits on the letterboxed photo for any shape", arguments: [
+        CGSize(width: 100, height: 200), CGSize(width: 500, height: 500), CGSize(width: 4_000, height: 3_000)
+    ])
+    func wholeFrameHugsPhoto(imageSize: CGSize) {
+        let canvas = CGSize(width: 300, height: 600)
+        let photo = PhotoFit.fittedFrame(imageSize: imageSize, in: canvas)
+        let frame = PhotoCrop.frameRect(for: PhotoCrop.fullFrame, fitted: photo.size)
+
+        #expect(frame.size == photo.size)
+        #expect(frame.origin == .zero)
+        #expect(abs(photo.width - canvas.width) < 1e-6 || abs(photo.height - canvas.height) < 1e-6)
+        #expect(photo.width <= canvas.width + 1e-6 && photo.height <= canvas.height + 1e-6)
+    }
+
+    @Test("A frame in the corner of a square photo is measured on the photo, not the view")
+    func frameMeasuredOnPhoto() {
+        let photo = PhotoFit.fittedFrame(imageSize: CGSize(width: 500, height: 500), in: CGSize(width: 300, height: 600))
+        let frame = PhotoCrop.frameRect(for: CGRect(x: 0.5, y: 0.5, width: 0.5, height: 0.5), fitted: photo.size)
+
+        #expect(photo == CGRect(x: 0, y: 150, width: 300, height: 300))
+        #expect(frame == CGRect(x: 150, y: 150, width: 150, height: 150))
+    }
+
+    @Test("Dragging inside the frame moves it without resizing it")
+    func translateKeepsSize() {
+        let rect = CGRect(x: 0.2, y: 0.2, width: 0.4, height: 0.5)
+
+        let moved = PhotoCrop.translate(rect, by: CGSize(width: 30, height: -40), fitted: fitted)
+
+        #expect(abs(moved.minX - 0.3) < 1e-9)
+        #expect(abs(moved.minY - 0.1) < 1e-9)
+        #expect(abs(moved.width - rect.width) < 1e-9)
+        #expect(abs(moved.height - rect.height) < 1e-9)
+    }
+
+    @Test("A frame drag stops at the photo's edges")
+    func translateClamps() {
+        let rect = CGRect(x: 0.2, y: 0.2, width: 0.4, height: 0.5)
+
+        let topLeft = PhotoCrop.translate(rect, by: CGSize(width: -900, height: -900), fitted: fitted)
+        let bottomRight = PhotoCrop.translate(rect, by: CGSize(width: 900, height: 900), fitted: fitted)
+
+        #expect(topLeft == CGRect(x: 0, y: 0, width: 0.4, height: 0.5))
+        #expect(abs(bottomRight.maxX - 1) < 1e-9)
+        #expect(abs(bottomRight.maxY - 1) < 1e-9)
+        #expect(abs(bottomRight.width - 0.4) < 1e-9)
+    }
+
+    @Test("The whole-photo frame has nowhere to move")
+    func fullFrameStaysPut() {
+        #expect(PhotoCrop.translate(PhotoCrop.fullFrame, by: CGSize(width: 50, height: -50), fitted: fitted) == PhotoCrop.fullFrame)
+        #expect(PhotoCrop.translate(PhotoCrop.fullFrame, by: CGSize(width: 50, height: 50), fitted: .zero) == PhotoCrop.fullFrame)
+    }
+
+    @Test("A VoiceOver move steps the whole frame one way and stops at the edge", arguments: PhotoCrop.Direction.allCases)
+    func nudgeFrame(direction: PhotoCrop.Direction) {
+        let rect = CGRect(x: 0.25, y: 0.25, width: 0.5, height: 0.5)
+
+        let moved = PhotoCrop.nudge(rect, toward: direction)
+
+        #expect(abs(moved.width - rect.width) < 1e-9)
+        #expect(abs(moved.minX - (rect.minX + direction.unit.dx * PhotoCrop.nudgeStep)) < 1e-9)
+        #expect(abs(moved.minY - (rect.minY + direction.unit.dy * PhotoCrop.nudgeStep)) < 1e-9)
+
+        let edge = CGRect(x: 0, y: 0, width: 0.5, height: 0.5)
+        #expect(PhotoCrop.nudge(edge, toward: .left) == edge)
+        #expect(PhotoCrop.nudge(edge, toward: .up) == edge)
     }
 
     @Test("Each corner handle has a 44 pt target and its bracket stays inside it", arguments: PhotoCrop.Corner.allCases)
@@ -232,7 +340,7 @@ struct PhotoCropTests {
     @Test("The crop screen uses the design's words")
     func copy() {
         #expect(PhotoCropCopy.title == "Crop")
-        #expect(PhotoCropCopy.hint == "Drag the corners to choose the part to scan")
+        #expect(PhotoCropCopy.hint == "Drag the corners to resize the frame, or drag inside it to move it")
         #expect(PhotoCropCopy.cancel == "Cancel")
         #expect(PhotoCropCopy.done == "Done")
     }

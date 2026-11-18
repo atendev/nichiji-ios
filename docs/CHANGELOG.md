@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.32.0
+- Fix the Crop photo fit and drag the whole frame. Crop draws the photo whole at its own shape, centred, with the frame and corners on the visible photo, for portrait, square and landscape photos alike. Dragging inside the frame now moves it without resizing, stopping at the photo's edges, and the corners still resize. VoiceOver gets four "Move frame" actions. The hint now reads "Drag the corners to resize the frame, or drag inside it to move it". Crop now covers the whole screen as a full-screen cover, so the photo fits the screen and not the scan screen's layout. Close ticket 082
+
 ## v0.31.0
 - Build Save to Photos for the scanned photo. A labelled Save option joins Highlights at the top right of the frozen photo. It writes the current photo to Photos with add-only access (asked on the first tap) and shows a "Saved to Photos" toast with a green check for about 1.8 s, "Photos access is off" with Open Settings when access is denied, or "The photo couldn’t be saved." on a write error. Save is hidden for an uncropped library photo. `NSPhotoLibraryAddUsageDescription` is added, and the camera usage string, the Privacy screen, `DESIGN.md`, the listing and the policy draft now say the photo is saved only when you tap Save.
 

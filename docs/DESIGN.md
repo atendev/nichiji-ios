@@ -122,8 +122,8 @@ its back label, and Back restores the sheet. Nothing is sent anywhere. The photo
 is saved only when you tap Save: it lives on the open camera screen otherwise.
 
 Crop, Highlights and Save sit in the top right with text labels. Crop shows the
-photo at full size with the rest dimmed and a frame with four draggable corners
-(44 pt targets); Done makes the frame the frozen photo and reads it again, and
+whole photo at its own shape, centred, with the rest dimmed and a frame with four
+draggable corners (44 pt targets) that also moves when dragged inside; Done makes the frame the frozen photo and reads it again, and
 Cancel returns to the results.
 
 Save writes the plain photo (the crop, once cropped), with no boxes, to Photos

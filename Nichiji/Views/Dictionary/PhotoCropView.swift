@@ -7,11 +7,21 @@ enum PhotoCropCopy {
     static let option = "Crop"
     static let optionHint = "Choose part of the photo and scan only that"
     static let title = "Crop"
-    static let hint = "Drag the corners to choose the part to scan"
+    static let hint = "Drag the corners to resize the frame, or drag inside it to move it"
     static let cancel = "Cancel"
     static let done = "Done"
     static let frameLabel = "Crop frame"
+    static let moveHint = "Swipe through the actions to move the frame"
     static let handleHint = "Swipe up to shrink the frame from this corner, or down to grow it"
+
+    static func moveLabel(_ direction: PhotoCrop.Direction) -> String {
+        switch direction {
+        case .left: "Move frame left"
+        case .right: "Move frame right"
+        case .up: "Move frame up"
+        case .down: "Move frame down"
+        }
+    }
 
     static func cornerLabel(_ corner: PhotoCrop.Corner) -> String {
         switch corner {
@@ -48,15 +58,20 @@ struct PhotoCropOption: View {
 }
 
 extension View {
-    /// Lays the crop screen over this view while `isPresented` is on. Done rescans the frame through the model and calls `onCropped` once the crop replaces the photo; Cancel just closes.
+    /// Covers the whole screen with the crop screen while `isPresented` is on. A cover lays out against the window, not this view, so the photo fits the screen whatever the host view's size is. Done rescans the frame through the model and calls `onCropped` once the crop replaces the photo; Cancel just closes.
     func photoCrop(
         isPresented: Binding<Bool>,
         image: UIImage?,
         model: PhotoLookupModel,
         onCropped: @escaping () -> Void = {}
     ) -> some View {
-        overlay {
-            if isPresented.wrappedValue, let image {
+        fullScreenCover(
+            isPresented: Binding(
+                get: { isPresented.wrappedValue && image != nil },
+                set: { isPresented.wrappedValue = $0 }
+            )
+        ) {
+            if let image {
                 PhotoCropView(
                     image: image,
                     onCancel: { isPresented.wrappedValue = false },
@@ -67,16 +82,14 @@ extension View {
                         Task { if await model.crop(to: region) { onCropped() } }
                     }
                 )
-                .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: isPresented.wrappedValue)
     }
 }
 
 /*---------------------------------screen---------------------------------*/
 
-/// "Crop": the photo at full size with the rest dimmed, and a frame whose four corners drag. Done hands back the frame; Cancel hands back nothing.
+/// "Crop": the whole photo, letterboxed to its own shape, with the rest dimmed and a frame that moves when dragged inside and resizes from its four corners. Done hands back the frame; Cancel hands back nothing.
 struct PhotoCropView: View {
     let image: UIImage
     let onCancel: () -> Void
@@ -85,6 +98,8 @@ struct PhotoCropView: View {
     @State private var region = PhotoCrop.fullFrame
     /// The frame as it was when the current drag began, so a drag measures from where it started.
     @State private var dragStart: CGRect?
+    /// The frame as it was when the current move began.
+    @State private var moveStart: CGRect?
 
     var body: some View {
         VStack(spacing: LayoutTokens.space16) {
@@ -112,18 +127,14 @@ struct PhotoCropView: View {
         .background(Color.cameraBase.ignoresSafeArea())
         .contentShape(Rectangle())
         .accessibilityAddTraits(.isModal)
+        .statusBarHidden()
     }
 
     /*-----------------------------canvas-------------------------------*/
 
     private func canvas(in size: CGSize) -> some View {
         let fitted = PhotoFit.fittedFrame(imageSize: image.size, in: size)
-        let frame = CGRect(
-            x: region.minX * fitted.width,
-            y: region.minY * fitted.height,
-            width: region.width * fitted.width,
-            height: region.height * fitted.height
-        )
+        let frame = PhotoCrop.frameRect(for: region, fitted: fitted.size)
         return ZStack(alignment: .topLeading) {
             Image(uiImage: image)
                 .resizable()
@@ -142,12 +153,7 @@ struct PhotoCropView: View {
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
 
-            Rectangle()
-                .strokeBorder(Color.cameraText, lineWidth: PhotoCropLayout.frameLine)
-                .frame(width: frame.width, height: frame.height)
-                .offset(x: frame.minX, y: frame.minY)
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
+            moveArea(frame: frame, fitted: fitted.size)
 
             ForEach(PhotoCrop.Corner.allCases, id: \.self) { corner in
                 handle(corner, frame: frame, fitted: fitted.size)
@@ -156,6 +162,34 @@ struct PhotoCropView: View {
         .coordinateSpace(.named(PhotoCropLayout.coordinateSpace))
         .frame(width: fitted.width, height: fitted.height)
         .position(x: size.width / 2, y: size.height / 2)
+    }
+
+    /// The frame's outline. Dragging inside it moves the whole frame; the corner targets sit above it, so they keep resizing.
+    private func moveArea(frame: CGRect, fitted: CGSize) -> some View {
+        Rectangle()
+            .strokeBorder(Color.cameraText, lineWidth: PhotoCropLayout.frameLine)
+            .frame(width: frame.width, height: frame.height)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0, coordinateSpace: .named(PhotoCropLayout.coordinateSpace))
+                    .onChanged { value in
+                        let start = moveStart ?? region
+                        moveStart = start
+                        region = PhotoCrop.translate(start, by: value.translation, fitted: fitted)
+                    }
+                    .onEnded { _ in moveStart = nil }
+            )
+            .accessibilityElement()
+            .accessibilityLabel(PhotoCropCopy.frameLabel)
+            .accessibilityHint(PhotoCropCopy.moveHint)
+            .accessibilityActions {
+                ForEach(PhotoCrop.Direction.allCases, id: \.self) { direction in
+                    Button(PhotoCropCopy.moveLabel(direction)) {
+                        region = PhotoCrop.nudge(region, toward: direction)
+                    }
+                }
+            }
+            .offset(x: frame.minX, y: frame.minY)
     }
 
     /// The bracket drawn on a corner, inside a 44 pt target centred on that corner.
