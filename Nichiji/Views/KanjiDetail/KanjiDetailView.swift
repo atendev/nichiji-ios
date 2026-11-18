@@ -92,6 +92,7 @@ struct KanjiDetailView: View {
                     kunyomi: kanji.kunyomi,
                     radical: kanji.radical.character,
                     strokeCount: kanji.strokeCount,
+                    classification: kanji.classification.listLabel,
                     jlptLevel: kanji.jlptLevel.map { $0.rawValue },
                     isJLPTLevelEstimated: kanji.isJLPTLevelEstimated,
                     joyoGrade: kanji.joyoGrade?.detailsLabel,
