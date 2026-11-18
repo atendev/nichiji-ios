@@ -26,3 +26,20 @@ The user asked for this after batch 3 (results sheet, Crop, Save). The frozen ph
 ## Resolution
 
 <Filled in at close.>
+
+## Handoff
+
+Branch `t3/pan-zoom-frozen-photo`. The work and the decision report are committed (see `git log -1`). Council approved in round 2 (Claude 8, Gemini 9, GPT 9), three minor problems declined. Audit rounds used: 2 of 5.
+
+Done: `PhotoZoom.swift` (pure geometry), `PhotoZoomGestures.swift`, `FrozenPhotoView.swift` wiring, `PhotoZoomTests.swift` (18 tests, never run, no Swift toolchain), docs v0.33.0, report at `.plan/assets/083-pan-and-zoom-the-frozen-photo-report.md`.
+
+Left, in order:
+1. Push the branch without forcing. If the repo works through PRs, open one against `wayfinder/nichiji-v1-master` and link it. Return PUSHED. The master triggers and watches CI.
+2. On "CI red", fix the named failure (changed hunks only through a council round, rounds continue from 2), commit, push, return PUSHED.
+3. On "CI green" or "no CI", run the Timing close (`python3 -I ~/.claude/skills/wayfinder-runner/wf-time.py close --slug nichiji-v1 --ticket 083 --name 'Pan and zoom the frozen photo' --ticket-file .plan/tickets/083-pan-and-zoom-the-frozen-photo.md`), fill `## Resolution` in this file, delete this Handoff section, commit, push, return DONE with the Decisions line and Timing line.
+
+Decisions line: Pinch (1x to 4x, about the pinch point), drag pan (clamped) and double-tap (1x or 2.5x) use SwiftUI gestures, not a UIScrollView wrapper. Boxes are re-mapped in screen space so strokes and 44 pt targets stay constant. A single tap waits out the double-tap window, zoom waits for the sweep and resets on a new photo, and a sheet header drag wins over the photo pan by hit testing.
+
+Surfaced: none so far. Open question for device feedback, not a ticket: aspect-fill's cropped-off edges cannot be zoomed into.
+
+Files to read first: the report above, `Nichiji/PhotoLookup/PhotoZoom.swift`, `Nichiji/Views/Dictionary/PhotoZoomGestures.swift`.

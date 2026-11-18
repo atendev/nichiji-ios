@@ -103,7 +103,7 @@ mapped from the image to the view under aspect-fill. A tap opens that kanji's
 detail (box tap regions are at least 44 x 44 pt, and the nearest box wins where
 they overlap). The top left X removes the photo and goes back to the camera, and
 a labelled Highlights option at the top right shows or hides the boxes; it is
-hidden after a Live Text read, which has no boxes. If camera access is
+hidden after a Live Text read, which has no boxes. The photo pinches to zoom from 1x to 4x about the pinch point, a drag pans it while zoomed (it never leaves the screen), and a double-tap toggles 1x and 2.5x; the boxes and their tap targets follow, a single tap waits out the double-tap window, and zoom waits until the sweep settles and resets on a new photo or crop. Reduce Motion snaps the double-tap. If camera access is
 off, the screen points to Settings, and with no camera it offers only the
 library. `Nichiji/PhotoLookup/` reads the photo on device with Vision
 (accurate, Japanese then English) and falls back to Live Text when Vision
