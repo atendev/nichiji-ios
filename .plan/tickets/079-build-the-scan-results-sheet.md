@@ -21,18 +21,8 @@ The header reads "N kanji found" over "X new to you · Y learned" (or "Showing X
 
 ## Resolution
 
-<Filled in at close.>
+Yes, as far as reading the code and CI can show. The results sheet is an `@Observable ScanSheetModel` over pure `ScanSheetGeometry`. It rises to half 1.9 s after the shutter and moves between peek (112 pt), half (456 pt, photo at 0.8 and lifted 100 pt) and full (tab bar back) by drag. It snaps to the nearest state, a drag over 40 pt always moves one state, and Reduce Motion snaps with no animation. Half and full show a 3-column tile grid with each kanji's short meaning and a NEW tag or a green check, a New only switch, and "Nothing new here…" when the filter empties the grid. A tile opens detail with the back label "Scan results", and Back restores the sheet. `ScanSheetHost` carries the wiring, so `PhotoLookupScreen.swift` stays under the 400-line lint cap for the Crop and Save branches. The old results panel is deleted.
 
-## Handoff
+Council approved in round 3 (Claude 8, Gemini 10, GPT 10) with 3 minor problems declined. CI is green on 943d0dc. The drag, snap, tab bar and photo pose still need a device check. Docs use the placeholder version `v0.X.0` for the master to renumber. Decision report: `.plan/assets/079-build-the-scan-results-sheet-report.md`. PR: https://github.com/atendev/nichiji-ios/pull/57.
 
-Branch `t3/scan-results-sheet-2`, pushed at `67fb077`, PR https://github.com/atendev/nichiji-ios/pull/57 against `wayfinder/nichiji-v1-master`. Printf tag `wfm-nichiji-v1-079-1794967719`. Council approved in round 3 (claude 8, gemini 10, gpt 10), so the audit is done. Three audit rounds used, one CI fix used (the first CI run failed to compile `ScanSheetTests.swift`, now fixed).
-
-Done: the sheet, model, tiles, host modifier, screen wiring, tests, docs under placeholder `v0.X.0`, the decision report `.plan/assets/079-build-the-scan-results-sheet-report.md`, and the PR.
-
-Left, in order:
-1. Wait for the master's CI result. On "CI red", fix the failure, run the changed hunks through the council (round 4 and 5 are left), push, return PUSHED.
-2. On "CI green" or "no CI", run `python3 -I ~/.claude/skills/wayfinder-runner/wf-time.py close --slug nichiji-v1 --ticket 079 --name 'Build the scan results sheet' --ticket-file .plan/tickets/079-build-the-scan-results-sheet.md`, fill in `## Resolution` here, delete this `## Handoff` section, commit, push, return DONE.
-
-Report notes: 3 commits, 15 files, +1077 -143 against the master branch. Decision line for the map: the sheet is an `@Observable ScanSheetModel` over pure `ScanSheetGeometry`, wired through `ScanSheetHost` so `PhotoLookupScreen.swift` stays under 400 lines, and the old results panel is deleted. Minor problems declined: 3. No surfaced tickets so far.
-
-Read first: this ticket, the decision report, `Nichiji/Views/Dictionary/ScanSheetHost.swift`.
+Timing: wall 46m, active 15m, user 1m, wait 30m, blocked 0s | implement 9m, audit 6m (3 rounds), ci 2m, handoff 27m | tools 110 (9 subagent) | limits 0, compactions 0, handoffs 2 | ctx peak 159k | cost $4.13 sonnet-5-5 + $0.04 haiku-5-5
