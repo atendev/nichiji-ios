@@ -4,6 +4,32 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.34.0
+- Fit library and cropped photos on the frozen photo screen. A camera shot still fills the screen; a library photo, and any crop (a cropped shot included), is now shown whole at its own shape, centred on the camera base, so a square or landscape photo is no longer zoomed in to the full height with its sides cut off. The boxes, their tap targets, the scan sweep and the Highlights layer use the same photo rect in both modes. Pan and zoom now treat the photo's own rect as 1x: a letterboxed photo cannot be panned into its bars, and a filled shot's cut-off sides can now be reached by zooming in. The geometry is `PhotoFit.photoFrame` and `PhotoOrigin.fitMode`, covered by `PhotoFitModeTests`.
+
+## v0.33.0
+- Pan and zoom the frozen photo. Pinch zooms from 1x to 4x about the pinch point, a drag pans while zoomed and cannot take a photo edge inside the screen, and a double-tap toggles between 1x and 2.5x. The kanji boxes, their 44 pt tap targets and the Highlights toggle follow the zoom, and a box tap still opens detail (it waits out the double-tap window). Zoom waits for the sweep to settle, rides on top of the sheet's peek, half and full pose, and resets on a new photo and after a crop rescan. Reduce Motion snaps the double-tap. The geometry is `PhotoZoom`, covered by `PhotoZoomTests`.
+
+## v0.32.0
+- Fix the Crop photo fit and drag the whole frame. Crop draws the photo whole at its own shape, centred, with the frame and corners on the visible photo, for portrait, square and landscape photos alike. Dragging inside the frame now moves it without resizing, stopping at the photo's edges, and the corners still resize. VoiceOver gets four "Move frame" actions. The hint now reads "Drag the corners to resize the frame, or drag inside it to move it". Crop now covers the whole screen as a full-screen cover, so the photo fits the screen and not the scan screen's layout. Close ticket 082
+
+## v0.31.0
+- Build Save to Photos for the scanned photo. A labelled Save option joins Highlights at the top right of the frozen photo. It writes the current photo to Photos with add-only access (asked on the first tap) and shows a "Saved to Photos" toast with a green check for about 1.8 s, "Photos access is off" with Open Settings when access is denied, or "The photo couldn’t be saved." on a write error. Save is hidden for an uncropped library photo. `NSPhotoLibraryAddUsageDescription` is added, and the camera usage string, the Privacy screen, `DESIGN.md`, the listing and the policy draft now say the photo is saved only when you tap Save.
+
+## v0.30.0
+- Add Crop to the scanned photo. A labelled Crop option opens the photo at full size with the rest dimmed, a frame with thirds lines, and four draggable corner handles with 44 pt targets that VoiceOver can nudge. Done cuts the frame out, makes it the frozen photo and reads it again with the sweep; Cancel returns to the results. Crop also shows after an empty or failed read and works again on a cropped photo
+
+## v0.29.0
+- Build the scan results sheet. The photo now sits behind a sheet that rises to half about 1.9 s after the shutter and moves between peek, half and full by drag, snapping to the nearest state (a drag over 40 pt always moves one). Half and full show a 3-column tile grid with each kanji's short meaning and a NEW tag or a green check, a "New only" switch, and "Nothing new here…" when it empties the grid. Full brings the tab bar back and shows the "Scan" header with a photo row. Reduce Motion snaps with no animation. This replaces the old results panel
+- Close ticket 079
+
+## v0.28.1
+- Silence the camera shutter and lock the app to portrait. Scan now grabs a frame from the live video feed instead of taking a photo capture, which skips the shutter sound iOS forces on phones sold in Japan and South Korea; the frame is turned upright and saved as a JPEG. A pending capture now resolves to nil if the session stops. The app supports portrait only on iPhone and iPad (iPad runs full screen) until a landscape layout exists
+
+## v0.28.0
+- Build the frozen photo, scan sweep and highlights. The shot now freezes full screen while a vermilion scan line sweeps down it with the pill "Scanning for kanji…", looping until the read is done and then finishing its pass as each kanji's box fades in. Every kanji found gets a red (new) or green (started) box, mapped from the image to the view under aspect-fill; a tap opens that kanji's detail, with at least a 44 pt tap region and the nearest box winning on overlap. X at top left removes the photo and returns to the camera, and a labelled Highlights option shows or hides the boxes (hidden after a Live Text read). Reduce Motion drops the line and crossfades the boxes. Crop and Save stay hidden until their tickets land
+- Close ticket 078
+
 ## v0.27.0
 - Build the scan entry and viewfinder. "Scan a kanji" now sits beside "Draw a kanji" under the Dictionary search bar (stacked at accessibility text sizes), and opens the camera by pushing it onto the Dictionary's navigation stack with the nav and tab bars hidden, instead of a full-screen cover. The viewfinder gets the design's corner-bracket reticle, hint pill, neutral shutter, library button, flash toggle and dark overlay colors, and the shutter flashes white for about 0.2 s (off under Reduce Motion). Kanji detail opened from a result keeps "Scan results" as its back label
 - Close ticket 076

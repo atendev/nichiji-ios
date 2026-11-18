@@ -915,3 +915,118 @@ The user answered the merge question with two changes and asked for CI before as
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See `.plan/assets/076-build-the-scan-entry-and-viewfinder-report.md`.
 
+
+### Build the frozen photo, scan sweep and highlights (v0.28.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. The shot freezes full screen at the shutter. A vermilion scan line loops down it, about 1.6 s a pass, with the pill "Scanning for kanji…" until the read ends. Reduce Motion drops the line.
+  2. Once results land, the pass in progress finishes: each kanji's box fades in as the line reaches it, and the line goes at the bottom. Under Reduce Motion the boxes crossfade together.
+  3. Every kanji found gets a box: new `#e8603f`, started `#8db483`, each with about 22% fill, mapped from the image to the view under aspect-fill.
+  4. A tap on a box opens that kanji's detail. Each box has a tap region of at least 44 x 44 pt, the nearest box wins on overlap, and taps wait until the sweep settles.
+  5. X at top left removes the photo and returns to the camera. A labelled Highlights option at top right shows or hides the boxes, and only appears after a read that gave boxes.
+  6. Crop and Save stay hidden until their tickets land.
+- **Scope Boundary**: In: the box geometry, the sweep clock, the frozen photo layer, the pill, the Highlights option, tests and docs. Out: the results sheet (the old panel stays, up to 55% of the screen), Crop and Save, and any change to the readers or extractor.
+- **Anticipated TODOs**: None in code. The sweep, the box fade and taps need a device check.
+- **Planned Tests**: Aspect-fill frames and box mapping, box colors, tap regions and the hit test, and the sweep clock, in `PhotoHighlightsTests`.
+- **Version**: MINOR, v0.27.0 to v0.28.0.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. Boxes are not filtered by "New to you". The line finishes the pass in progress after results land rather than restarting. `PhotoLookupScreen` moved its helper views into an extension to stay under SwiftLint's type body length.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/078-build-the-frozen-photo-and-highlights-report.md`.
+
+
+### Build the scan results sheet (v0.29.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. The sheet rises to half about 1.9 s after the shutter. Peek is 112 pt, half is 456 pt with the photo scaled to 0.8 and lifted 100 pt, and full fills the screen and brings the tab bar back.
+  2. A drag on the header follows the finger, snaps to the nearest state, and a drag over 40 pt always moves one state, in 0.32 s `cubic-bezier(.2,.8,.2,1)`. Top corners are 20 pt and flatten at full. The photo scales with the drag between peek and half. Scrolling the half grid pulls the sheet to full. Reduce Motion snaps.
+  3. The header reads "N kanji found" over "X new to you · Y learned" (or "Showing X new"), with a New only switch. Tiles are 3 columns with the kanji, its short meaning and a NEW tag or a green check. "Nothing new here…" shows when New only empties the grid.
+  4. The full header is 写 | Scan with a chevron back to the photo, a thumbnail, "Your photo / Scanned just now" and View photo.
+  5. A tile opens detail with the back label "Scan results", and Back restores the sheet.
+- **Scope Boundary**: In: the sheet geometry and model, the sheet and tile views, the screen wiring, per-kanji meanings and counts on `PhotoLookupModel`, tests and docs. Out: Crop and Save to Photos (tickets 080 and 081). The old `PhotoLookupResultsPanel` is deleted.
+- **Anticipated TODOs**: None in code. The drag, snap, tab bar and photo pose need a device check.
+- **Planned Tests**: Heights, snap with the 40 pt rule, photo pose, corner radius, rise delay and the model's rise, drag, step, pull and reset in `ScanSheetTests`, plus meanings and counts.
+- **Version**: MINOR after v0.28.1. The number is a placeholder; the master renumbers at the batch merge.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. The screen wiring lives in `ScanSheetHost` (a view modifier) to keep `PhotoLookupScreen.swift` under the 400-line lint cap while Crop and Save edit the same file.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/079-build-the-scan-results-sheet-report.md`.
+
+### Build Save to Photos for the scanned photo (v0.31.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. A labelled Save option sits top right beside Highlights once a photo is frozen and read. It saves `model.photoData`, whichever photo is current, with no boxes.
+  2. Add-only Photos access is asked on the first tap. A saved photo shows "Saved to Photos" with a green check for about 1.8 s.
+  3. Denied or restricted access shows "Photos access is off" with Open Settings and saves nothing. A write error shows "The photo couldn't be saved."
+  4. Save is hidden for an uncropped library photo. Crop will set `PhotoOrigin.cropped` to show it again.
+  5. `NSPhotoLibraryAddUsageDescription` is set, and the camera usage string, the Privacy screen, `DESIGN.md`, the listing and the policy draft say the photo is saved only on Save.
+- **Scope Boundary**: In: the saver, the toast model and view, the Save button, copy and tests. Out: Crop and the results sheet, built on sibling branches.
+- **Version**: MINOR, v0.28.1 to v0.29.0.
+
+#### Deviation Report
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check. The Photos write needs a device check.
+- **Audit**: See `.plan/assets/081-build-save-to-photos-report.md`.
+
+### Fix the crop photo fit and drag the whole frame (v0.32.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. Crop is a full-screen cover, laid out against the window rather than the scan screen, and shows the whole photo at its own aspect ratio, centred, with the frame and handles on the visible photo, for portrait, square and landscape sizes.
+  2. Dragging inside the frame moves it without resizing, clamped to the photo. The 44 pt corners keep resizing and win where they overlap the frame.
+  3. VoiceOver gets a move action per direction.
+  4. Unit tests cover the fit for portrait, square and landscape, and the frame move.
+- **Scope Boundary**: In: `PhotoCropView.swift`, the crop geometry in `PhotoCrop.swift`, tests and docs. Out: the frozen photo screen (aspect-fill by design for camera shots, and being reworked by the pan and zoom ticket).
+- **Version**: MINOR by the master's brief, v0.31.0 to v0.32.0.
+
+#### Deviation Report
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check. The drags and VoiceOver actions need a device check.
+- **Audit**: See `.plan/assets/082-fix-crop-fit-and-drag-the-frame-report.md`.
+
+### Pan and zoom the frozen photo (v0.33.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. Pinch zooms 1x to 4x about the pinch point; drag pans while zoomed and is clamped so the photo covers the screen; double-tap toggles 1x and 2.5x.
+  2. Boxes, their 44 pt tap targets and the Highlights toggle follow the zoom and pan. A box tap opens detail and a pan never steals it. The sweep plays at 1x and zoom waits for it to settle.
+  3. The sheet's pose still scales and lifts the photo, with zoom on top. Zoom resets on Retake, a new photo and a crop rescan.
+  4. Reduce Motion: fingers drive zoom and pan; the double-tap snaps.
+- **Scope Boundary**: In: `PhotoZoom` (pure geometry), `PhotoZoomGestures`, the zoom wiring in `FrozenPhotoLayer`, tests and docs. Out: crop fit (sibling ticket), any change to `PhotoFit`, a `UIScrollView` wrapper.
+- **Anticipated TODOs**: None. The gestures need a device check.
+- **Planned Tests**: `PhotoZoomTests`: caps, anchor, clamp, pan limit, snap, double-tap, point and box mapping.
+- **Version**: MINOR after v0.31.0 (placeholder; the master renumbers at the merge).
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. SwiftUI gestures (`MagnifyGesture`, `DragGesture`, `SpatialTapGesture`) did the job without a `UIScrollView`. A drag on the sheet header wins over the photo pan because the sheet is a layer above the photo.
+- **Scope Boundary**: Kept. `PhotoLookupScreen.swift` is unchanged.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host has no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/083-pan-and-zoom-the-frozen-photo-report.md`.
+
+### Fit library and cropped photos on the frozen photo screen (v0.34.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. A camera shot fills the screen. A library photo or a crop (a cropped shot included) is fitted whole, centred on the camera base.
+  2. Boxes, tap targets, the sweep and the Highlights layer use the same photo rect in both modes, so boxes stay on their kanji.
+  3. Zoom's 1x is the photo's rect and the pan clamp uses its bounds, so a letterboxed photo cannot be panned into the bars and a filled shot's cut-off sides can be zoomed into.
+  4. Pure geometry with unit tests for portrait, square and landscape photos in both modes.
+- **Scope Boundary**: In: `PhotoFit`, `PhotoOrigin.fitMode`, `PhotoZoom` and its gestures, the frozen photo layer, one line in `PhotoLookupScreen.swift`, tests and docs. Out: Crop's own screen, the sheet pose.
+- **Anticipated TODOs**: None. The fit and the zoom clamp need a device check.
+- **Planned Tests**: `PhotoFitModeTests`: origin to mode, frames for portrait, narrow, square and landscape photos in both modes, box mapping, and the zoom clamp with a content size.
+- **Version**: MINOR, v0.33.0 to v0.34.0 by the master's brief.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check.
+- **Scope Boundary**: Kept. `PhotoLookupScreen.swift` grew by one line (369 of 400).
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host has no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/084-fit-library-and-cropped-photos-on-the-frozen-photo-report.md`.

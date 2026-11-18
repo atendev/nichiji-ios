@@ -12,9 +12,8 @@ enum PhotoLookupCopy {
     static let aimHint = "Point at a kanji, then tap the shutter"
     static let captureFailed = "The photo didn\u{2019}t take. Try again."
     static let reading = "Reading the photo\u{2026}"
-    static let newToYou = "New to you"
+    static let scanning = "Scanning for kanji\u{2026}"
     static let noKanji = "No kanji found. Try a closer, sharper photo."
-    static let allStarted = "You have started every kanji found here."
     static let failed = "That photo could not be read."
     static let photoLabel = "The photo being read"
 
@@ -25,6 +24,9 @@ enum PhotoLookupCopy {
     static let torchOn = "Turn on flashlight"
     static let torchOff = "Turn off flashlight"
     static let retake = "Retake"
+    static let removePhoto = "Remove photo and go back to the camera"
+    static let highlights = "Highlights"
+    static let highlightsHint = "Shows or hides the boxes on the photo"
     static let retakeHint = "Goes back to the camera"
     static let focusHint = "Double-tap to focus on the middle of the view"
 
@@ -33,6 +35,10 @@ enum PhotoLookupCopy {
     static let openSettings = "Open Settings"
     static let noCameraTitle = "No camera here"
     static let noCameraBody = "Choose a photo from your library instead."
+
+    static func boxLabel(kanji: String, isNew: Bool) -> String {
+        "Kanji \(kanji), \(isNew ? "new to you" : "already started")"
+    }
 
     static func foundCount(_ count: Int) -> String {
         count == 1 ? "1 kanji found" : "\(count) kanji found"
@@ -53,19 +59,16 @@ enum PhotoLookupLayout {
     static let reticleTopShare: CGFloat = 160 / 844
     /// The shutter's white flash, in seconds.
     static let flashDuration: Double = 0.2
-    /// The results panel never covers more than this share of the screen, so the photo stays in view.
-    static let panelMaxShare: CGFloat = 0.55
 }
 
 /*---------------------------------screen---------------------------------*/
 
-/// "Scan a kanji": a full-screen camera pushed onto the Dictionary stack. One shutter tap reads the shot, which stays frozen behind a panel of every bundled kanji in it.
+/// "Scan a kanji": a full-screen camera pushed onto the Dictionary stack. One shutter tap reads the shot, which stays frozen behind a sheet of every bundled kanji in it.
 struct PhotoLookupScreen: View {
     @Bindable var model: PhotoLookupModel
     let onPick: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var camera = CameraSession()
@@ -77,8 +80,15 @@ struct PhotoLookupScreen: View {
     @State private var focusPoint: CGPoint?
     @State private var focusCount = 0
     @State private var previewSize: CGSize = .zero
+    @State private var sweep: ScanSweep?
+    @State private var isSweeping = false
+    @State private var showsHighlights = true
+    @State private var sheet = ScanSheetModel()
+    @State private var isCropping = false
+    @State private var saver = PhotoSaveModel(library: SystemPhotoLibrarySaver())
 
     private var isLive: Bool { model.state == .empty }
+    private var showsPanel: Bool { !isLive && model.state != .reading }
 
     var body: some View {
         GeometryReader { proxy in
@@ -105,19 +115,25 @@ struct PhotoLookupScreen: View {
                     if isLive {
                         captureControls
                             .transition(.opacity)
-                    } else {
-                        PhotoLookupResultsPanel(model: model, maxHeight: proxy.size.height * PhotoLookupLayout.panelMaxShare, onPick: onPick)
-                            .transition(reduceMotion ? .opacity : .move(edge: .bottom))
+                    } else if !sheet.isVisible {
+                        ScanningPill()
+                            .padding(.bottom, LayoutTokens.space48)
+                            .transition(.opacity)
                     }
                 }
+
+                ScanSheetLayer(model: model, sheet: sheet, image: frozenImage, onPick: onPick)
+
+                PhotoSaveToastView(model: saver)
             }
+            .photoCrop(isPresented: $isCropping, image: frozenImage, model: model) { saver.origin = .cropped }
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: isLive)
         }
         .statusBarHidden()
         // The stack's own bars stay away, but the title is what detail's back button reads.
         .navigationTitle(PhotoLookupCopy.backTitle)
         .toolbar(.hidden, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
+        .scanSheetHost(sheet, state: model.state, sweep: sweep)
         .sensoryFeedback(.impact(weight: .medium), trigger: shutterCount)
         .task {
             if isLive { await camera.start() }
@@ -130,6 +146,15 @@ struct PhotoLookupScreen: View {
                 camera.stop()
             }
         }
+        .onChange(of: model.state, initial: true) { _, state in
+            updateSweep(for: state)
+        }
+        // The line and boxes finish together; then the clock stops and taps open.
+        .task(id: sweep?.resultsAt) {
+            guard let sweep, sweep.resultsAt != nil else { return }
+            try? await Task.sleep(for: .seconds(sweep.settleTime(reduceMotion: reduceMotion) + 0.05))
+            if !Task.isCancelled { isSweeping = false }
+        }
         .onChange(of: model.photoData, initial: true) { _, data in
             frozenImage = data.flatMap(UIImage.init(data:))
         }
@@ -137,6 +162,7 @@ struct PhotoLookupScreen: View {
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
+                    saver.origin = .library
                     await model.lookUp(imageData: data)
                 }
                 libraryItem = nil
@@ -155,10 +181,34 @@ struct PhotoLookupScreen: View {
             let data = await camera.capture()
             isCapturing = false
             if let data {
+                saver.origin = .camera
                 await model.lookUp(imageData: data)
             } else {
                 captureFailed = true
             }
+        }
+    }
+
+    /// The sweep starts when the read does and ends once results exist, per `ScanSweep`.
+    private func updateSweep(for state: PhotoLookupState) {
+        switch state {
+        case .empty:
+            sweep = nil
+            isSweeping = false
+            showsHighlights = true
+        case .reading:
+            sweep = ScanSweep(readStart: .now)
+            isSweeping = true
+        case .found, .noKanji, .failed:
+            guard var current = sweep else { return }
+            current.finishRead(at: .now)
+            sweep = current
+        }
+    }
+
+    private func toggleHighlights() {
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+            showsHighlights.toggle()
         }
     }
 
@@ -167,7 +217,9 @@ struct PhotoLookupScreen: View {
         focusPoint = point
         focusCount += 1
     }
+}
 
+extension PhotoLookupScreen {
     /*------------------------------viewfinder----------------------------*/
 
     /// A white blink of about 0.2 s on each shot.
@@ -194,12 +246,17 @@ struct PhotoLookupScreen: View {
 
     @ViewBuilder private var backdrop: some View {
         if let frozenImage, !isLive {
-            Image(uiImage: frozenImage)
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .accessibilityLabel(PhotoLookupCopy.photoLabel)
+            FrozenPhotoLayer(
+                image: frozenImage,
+                fitMode: saver.origin.fitMode,
+                boxes: PhotoHighlights.boxes(scanned: model.scanned, startedIDs: model.startedIDs),
+                sweep: sweep,
+                isSweeping: isSweeping,
+                showsHighlights: showsHighlights,
+                onPick: onPick
+            )
+            .scanSheetPhotoPose(sheet)
+            .accessibilityHidden(sheet.isFull)
         } else {
             switch camera.access {
             case .authorized:
@@ -207,9 +264,9 @@ struct PhotoLookupScreen: View {
             case .notDetermined:
                 Color.cameraBase
             case .denied:
-                accessMessage(title: PhotoLookupCopy.deniedTitle, message: PhotoLookupCopy.deniedBody, showsSettings: true)
+                CameraAccessMessage(title: PhotoLookupCopy.deniedTitle, message: PhotoLookupCopy.deniedBody, showsSettings: true)
             case .unavailable:
-                accessMessage(title: PhotoLookupCopy.noCameraTitle, message: PhotoLookupCopy.noCameraBody, showsSettings: false)
+                CameraAccessMessage(title: PhotoLookupCopy.noCameraTitle, message: PhotoLookupCopy.noCameraBody, showsSettings: false)
             }
         }
     }
@@ -238,38 +295,17 @@ struct PhotoLookupScreen: View {
             }
     }
 
-    private func accessMessage(title: String, message: String, showsSettings: Bool) -> some View {
-        VStack(spacing: LayoutTokens.space16) {
-            Image(systemName: "camera")
-                .font(.system(size: 34, weight: .regular))
-                .foregroundStyle(Color.cameraText.opacity(0.7))
-                .accessibilityHidden(true)
-            Text(title)
-                .font(.nichijiHeading)
-                .foregroundStyle(Color.cameraText)
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
-            Text(message)
-                .font(.nichijiCallout)
-                .foregroundStyle(Color.cameraText.opacity(0.75))
-                .multilineTextAlignment(.center)
-            if showsSettings, let url = URL(string: UIApplication.openSettingsURLString) {
-                PrimaryButton(title: PhotoLookupCopy.openSettings) {
-                    openURL(url)
-                }
-                .padding(.top, LayoutTokens.space8)
-            }
-        }
-        .padding(.horizontal, LayoutTokens.space32)
-        .frame(maxWidth: 420)
-    }
-
     /*-------------------------------chrome-------------------------------*/
 
     private var topBar: some View {
         HStack {
-            CameraChromeButton(systemName: "xmark", label: PhotoLookupCopy.close) {
-                dismiss()
+            CameraChromeButton(systemName: "xmark", label: isLive ? PhotoLookupCopy.close : PhotoLookupCopy.removePhoto) {
+                if isLive {
+                    dismiss()
+                } else {
+                    saver.dismissToast()
+                    model.retake()
+                }
             }
             Spacer()
             if isLive, camera.access == .authorized, camera.hasTorch {
@@ -279,6 +315,22 @@ struct PhotoLookupScreen: View {
                     isActive: camera.isTorchOn
                 ) {
                     camera.toggleTorch()
+                }
+            } else if !isLive, showsPanel {
+                HStack(spacing: LayoutTokens.space8) {
+                    PhotoCropOption(isHidden: isSweeping) { isCropping = true }
+                    if model.state == .found, model.hasBoxes {
+                        PhotoOptionButton(
+                            systemName: showsHighlights ? "eye" : "eye.slash",
+                            label: PhotoLookupCopy.highlights,
+                            hint: PhotoLookupCopy.highlightsHint,
+                            isOn: showsHighlights,
+                            action: toggleHighlights
+                        )
+                    }
+                    if saver.origin.isSavable {
+                        SavePhotoOption(saver: saver, imageData: model.photoData)
+                    }
                 }
             }
         }

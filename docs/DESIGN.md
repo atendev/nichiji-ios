@@ -93,22 +93,52 @@ then tap the shutter", a library button and a neutral shutter, all on the
 dark overlay colors. The shutter flashes white for about 0.2 s, and Reduce
 Motion turns the flash off. The camera also has tap to focus. One shutter tap reads the shot with no
 "Use Photo" step, and there is no live scanning. The shot stays frozen behind a
-results panel, and Retake goes back to the live camera. If camera access is
+results sheet, and Retake goes back to the live camera. While the photo is read,
+a vermilion scan line sweeps down it (about 1.6 s a pass, looping until the read
+is done) with the pill "Scanning for kanji…"; once results exist the pass
+in progress finishes, each kanji's box fading in as the line reaches it. A Reduce
+Motion setting drops the line and crossfades the boxes. Each box is red
+(`#e8603f`, new to you) or green (`#8db483`, started), with about a 22% fill,
+mapped from the image to the view the way the photo is drawn: a camera shot fills the screen (aspect-fill), while a library photo or a crop is shown whole at its own shape, centred on the camera base (aspect-fit). A tap opens that kanji's
+detail (box tap regions are at least 44 x 44 pt, and the nearest box wins where
+they overlap). The top left X removes the photo and goes back to the camera, and
+a labelled Highlights option at the top right shows or hides the boxes; it is
+hidden after a Live Text read, which has no boxes. The photo pinches to zoom from 1x to 4x about the pinch point, a drag pans it while zoomed (no edge of the photo pulls inside the screen, and a letterboxed photo is not panned into its bars), and a double-tap toggles 1x and 2.5x; the boxes and their tap targets follow, a single tap waits out the double-tap window, and zoom waits until the sweep settles and resets on a new photo or crop. Reduce Motion snaps the double-tap. If camera access is
 off, the screen points to Settings, and with no camera it offers only the
 library. `Nichiji/PhotoLookup/` reads the photo on device with Vision
 (accurate, Japanese then English) and falls back to Live Text when Vision
-reads fewer than four characters. The panel lists every bundled kanji found,
-once each, in a grid under the found count. A tile opens kanji detail on the same stack,
-with "Scan results" as its back label. A "New to you" toggle, off by default, hides kanji the learner
-has started. Nothing is saved or sent: the photo lives only on the open
-camera screen.
+reads fewer than four characters. The results sheet rises to half about 1.9 s
+after the shutter. Peek is 112 pt, half is 456 pt with the photo scaled to 0.8
+and lifted 100 pt, and full fills the screen and brings the tab bar back. A
+drag on the header follows the finger and snaps to the nearest state, and a drag
+over 40 pt always moves one state (0.32 s, `cubic-bezier(.2,.8,.2,1)`);
+scrolling the half grid pulls the sheet to full, and Reduce Motion snaps with no
+animation. The header reads "N kanji found" over "X new to you · Y learned", with
+a "New only" switch, off by default, that changes the second line to "Showing X
+new" and shows "Nothing new here…" when it empties the grid. Every bundled kanji
+found sits once in a 3-column tile grid with its short meaning and a NEW tag or a
+green check. A tile opens kanji detail on the same stack, with "Scan results" as
+its back label, and Back restores the sheet. Nothing is sent anywhere. The photo
+is saved only when you tap Save: it lives on the open camera screen otherwise.
 
-This camera is being rebuilt to the design in `docs/ui-reference/camera/`. The
-entry buttons and the viewfinder are done; still to come are a scan sweep with
-red (new) and green (learned) boxes on each kanji, a peek, half and full
-results sheet, Crop, and Save to Photos. "Decide the camera scan
-open questions" in `.plan/` settles what the design leaves open, and this
-section changes as those tickets land.
+Crop, Highlights and Save sit in the top right with text labels. Crop shows the
+whole photo at its own shape, centred, with the rest dimmed and a frame with four
+draggable corners (44 pt targets) that also moves when dragged inside; Done makes the frame the frozen photo and reads it again, and
+Cancel returns to the results.
+
+Save writes the plain photo (the crop, once cropped), with no boxes, to Photos
+with add-only access (`NSPhotoLibraryAddUsageDescription`, asked on the first
+tap), and shows a "Saved to Photos" toast with a green check for about 1.8 s. It
+is hidden for a photo picked from the library, which is already in Photos, until
+it is cropped. With access off or restricted the toast reads "Photos access is
+off" with Open Settings, and a write error reads "The photo couldn't be saved." A
+saved photo can sync through the learner's iCloud Photos, which is theirs; the
+privacy label stays Data Not Collected.
+
+This camera was rebuilt to the design in `docs/ui-reference/camera/`: the entry
+buttons, the viewfinder, the frozen photo with its sweep and boxes, the results
+sheet, Crop and Save to Photos are done. "Decide the camera scan
+open questions" in `.plan/` settled what the design left open.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same

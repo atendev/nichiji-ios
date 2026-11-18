@@ -66,7 +66,7 @@ Nichiji Pro is a one-time purchase. No subscription. It adds:
 Everything else is free, with no time limit and no ads.
 
 PRIVACY
-No account and no sign-in. Nichiji collects no data, and everything stays on your iPhone.
+No account and no sign-in. Nichiji collects no data, and everything stays on your iPhone. A photo you scan is read on your iPhone and sent nowhere; it is added to your Photos library only if you tap Save.
 
 Dictionary data: KANJIDIC2 / JMdict (EDRDG), stroke order: KanjiVG. Full credits in Settings > About > Sources.
 

@@ -51,8 +51,13 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.aten.nichiji
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Nichiji
-        INFOPLIST_KEY_NSCameraUsageDescription: Nichiji uses the camera to take a photo and find the kanji in it. The photo is read on your device and never leaves it.
+        INFOPLIST_KEY_NSCameraUsageDescription: Nichiji uses the camera to take a photo and find the kanji in it. The photo is read on your device, and Nichiji sends it nowhere.
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: Nichiji adds a photo to your library only when you tap Save.
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # Portrait only until a landscape layout exists. iPad multitasking needs every orientation, so it runs full screen.
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
   NichijiWidget:
     type: app-extension
     platform: iOS
