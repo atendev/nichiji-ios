@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.28.1
+- Silence the camera shutter and lock the app to portrait. Scan now grabs a frame from the live video feed instead of taking a photo capture, which skips the shutter sound iOS forces on phones sold in Japan and South Korea; the frame is turned upright and saved as a JPEG. A pending capture now resolves to nil if the session stops. The app supports portrait only on iPhone and iPad (iPad runs full screen) until a landscape layout exists
+
 ## v0.28.0
 - Build the frozen photo, scan sweep and highlights. The shot now freezes full screen while a vermilion scan line sweeps down it with the pill "Scanning for kanji…", looping until the read is done and then finishing its pass as each kanji's box fades in. Every kanji found gets a red (new) or green (started) box, mapped from the image to the view under aspect-fill; a tap opens that kanji's detail, with at least a 44 pt tap region and the nearest box winning on overlap. X at top left removes the photo and returns to the camera, and a labelled Highlights option shows or hides the boxes (hidden after a Live Text read). Reduce Motion drops the line and crossfades the boxes. Crop and Save stay hidden until their tickets land
 - Close ticket 078

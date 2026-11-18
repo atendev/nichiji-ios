@@ -1,4 +1,5 @@
 import AVFoundation
+import CoreImage
 import Observation
 import SwiftUI
 import UIKit
@@ -105,14 +106,23 @@ final class CameraSession {
 /*---------------------------------worker---------------------------------*/
 
 /// Owns the capture session. Every session and device change runs on its own serial queue.
-private final class CameraWorker: NSObject, AVCapturePhotoCaptureDelegate, @unchecked Sendable {
+///
+/// Stills are frames pulled from the live video feed, not `AVCapturePhotoOutput` shots. The system forces a
+/// shutter sound on photo captures for phones sold in Japan and South Korea, but never on video frames.
+private final class CameraWorker: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
+    private struct PendingCapture {
+        let continuation: CheckedContinuation<Data?, Never>
+        let rotationAngle: CGFloat
+    }
+
     let session = AVCaptureSession()
 
     private var device: AVCaptureDevice?
-    private let output = AVCapturePhotoOutput()
+    private let output = AVCaptureVideoDataOutput()
     private let queue = DispatchQueue(label: "com.aten.nichiji.camera")
+    private let ciContext = CIContext()
     private var isConfigured = false
-    private var pendingCapture: CheckedContinuation<Data?, Never>?
+    private var pendingCapture: PendingCapture?
 
     static func backCamera() -> AVCaptureDevice? {
         AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
@@ -137,6 +147,8 @@ private final class CameraWorker: NSObject, AVCapturePhotoCaptureDelegate, @unch
             if session.isRunning {
                 session.stopRunning()
             }
+            pendingCapture?.continuation.resume(returning: nil)
+            pendingCapture = nil
         }
     }
 
@@ -166,22 +178,31 @@ private final class CameraWorker: NSObject, AVCapturePhotoCaptureDelegate, @unch
                     continuation.resume(returning: nil)
                     return
                 }
-                if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(rotationAngle) {
-                    connection.videoRotationAngle = rotationAngle
-                }
-                pendingCapture = continuation
-                let settings = AVCapturePhotoSettings()
-                settings.photoQualityPrioritization = .balanced
-                output.capturePhoto(with: settings, delegate: self)
+                // The next frame to arrive is the shot, so it is never older than the tap.
+                pendingCapture = PendingCapture(continuation: continuation, rotationAngle: rotationAngle)
             }
         }
     }
 
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        let data = error == nil ? photo.fileDataRepresentation() : nil
-        queue.async { [self] in
-            pendingCapture?.resume(returning: data)
-            pendingCapture = nil
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        guard let pending = pendingCapture, let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        pendingCapture = nil
+        // Frames arrive in the sensor's landscape orientation; turn them upright for how the phone was held.
+        let image = CIImage(cvPixelBuffer: buffer).oriented(Self.orientation(forRotationAngle: pending.rotationAngle))
+        let data = ciContext.jpegRepresentation(
+            of: image,
+            colorSpace: image.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
+            options: [kCGImageDestinationLossyCompressionQuality as CIImageRepresentationOption: 0.9]
+        )
+        pending.continuation.resume(returning: data)
+    }
+
+    private static func orientation(forRotationAngle angle: CGFloat) -> CGImagePropertyOrientation {
+        switch Int(angle.rounded()) % 360 {
+        case 90: return .right
+        case 180: return .down
+        case 270: return .left
+        default: return .up
         }
     }
 
@@ -193,7 +214,9 @@ private final class CameraWorker: NSObject, AVCapturePhotoCaptureDelegate, @unch
         if session.canAddInput(input), session.canAddOutput(output) {
             session.addInput(input)
             session.addOutput(output)
-            output.maxPhotoQualityPrioritization = .balanced
+            output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+            output.alwaysDiscardsLateVideoFrames = true
+            output.setSampleBufferDelegate(self, queue: queue)
             device = camera
             isConfigured = true
         }
