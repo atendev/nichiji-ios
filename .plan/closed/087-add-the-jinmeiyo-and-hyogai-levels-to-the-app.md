@@ -3,9 +3,9 @@ id: "087"
 title: Add the Jinmeiyō and Hyōgai levels to the app
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["086"]
-claimed: true
+claimed: false
 ---
 
 ## Question
