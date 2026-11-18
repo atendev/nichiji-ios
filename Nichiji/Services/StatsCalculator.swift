@@ -38,7 +38,7 @@ enum StatsCalculator {
             ),
             needsAttention: needsAttention(progress: progress, log: log),
             learnedKanjiIDs: learnedKanjiIDs(progress: progress),
-            kanjiKnown: progress.filter(\.declaredKnown).count
+            kanjiKnown: progress.filter { $0.stage == .known }.count
         )
     }
 

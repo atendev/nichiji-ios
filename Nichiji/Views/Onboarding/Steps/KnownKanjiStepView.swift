@@ -2,8 +2,9 @@ import SwiftUI
 
 /*-----------------------------known-kanji-step---------------------------*/
 
-/// Optional step after level selection. Easier levels are marked known when it appears; skipping keeps those marks.
+/// Optional step after level selection. Easier levels start learning when it becomes active; skipping keeps those marks.
 struct KnownKanjiStepView: View {
+    let isActive: Bool
     let onNext: () -> Void
 
     @Environment(\.serviceContainer) private var services
@@ -19,7 +20,7 @@ struct KnownKanjiStepView: View {
 
     static func subtitle(hasEasierLevels: Bool) -> String {
         hasEasierLevels
-            ? "Kanji from the levels below yours are already marked. Mark any others you know. Change it any time in Settings."
+            ? "Kanji from the levels below yours are already marked and start in your flashcards. Mark any others you know. Change it any time in Settings."
             : "Mark them and your daily kanji start with the ones you don't know yet. Skip this and change it any time in Settings."
     }
 
@@ -44,7 +45,9 @@ struct KnownKanjiStepView: View {
                 KnownKanjiPickerView()
             }
         }
-        .task {
+        // The pager builds this step while the level step is still showing, so mark each time it becomes the active one.
+        .task(id: isActive) {
+            guard isActive else { return }
             await markEasierLevels()
         }
     }

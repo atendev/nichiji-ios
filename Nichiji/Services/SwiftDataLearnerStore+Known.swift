@@ -63,8 +63,9 @@ extension SwiftDataLearnerStore {
     }
 
     private static func mark(_ row: KanjiProgress, at date: Date, byHand: Bool) {
-        row.stage = .known
-        row.nextReviewAt = nil
+        // Saying you know a kanji starts it learning, due today, so it shows up in flashcards.
+        row.stage = .learning
+        row.nextReviewAt = date
         row.declaredKnownAt = date
         row.wasHandKnown = byHand
     }

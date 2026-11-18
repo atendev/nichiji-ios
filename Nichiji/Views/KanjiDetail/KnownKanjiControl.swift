@@ -2,7 +2,7 @@ import SwiftUI
 
 /*--------------------------------known-kanji-----------------------------*/
 
-/// Quiet control beside Forget it: mark a new kanji as already known, or take the mark back.
+/// Foot of the kanji screen: start learning a new kanji, or take that back before the first review.
 struct KnownKanjiControl: View {
     enum Choice: Equatable {
         case declare
@@ -10,14 +10,14 @@ struct KnownKanjiControl: View {
 
         var title: String {
             switch self {
-            case .declare: "I know this"
-            case .undeclare: "Not known after all"
+            case .declare: "Start learning this kanji"
+            case .undeclare: "Stop learning this kanji"
             }
         }
 
         var hint: String {
             switch self {
-            case .declare: "Marks this kanji as known, so it leaves your daily kanji and reviews"
+            case .declare: "Adds this kanji to your flashcard reviews, due today"
             case .undeclare: "Returns this kanji to new"
             }
         }
@@ -44,15 +44,24 @@ struct KnownKanjiControl: View {
     var body: some View {
         if let choice = Self.choice(stage: stage, isDeclared: isDeclared) {
             VStack(spacing: LayoutTokens.space4) {
-                Button(choice.title) {
-                    apply(choice)
+                switch choice {
+                case .declare:
+                    PrimaryButton(title: choice.title, isEnabled: !isWorking) {
+                        apply(choice)
+                    }
+                    .padding(.horizontal, LayoutTokens.screenMarginCompact)
+                    .accessibilityHint(choice.hint)
+                case .undeclare:
+                    Button(choice.title) {
+                        apply(choice)
+                    }
+                    .font(.nichijiCallout)
+                    .foregroundColor(.nichijiInkMuted)
+                    .padding(.horizontal, LayoutTokens.space16)
+                    .minTouchTarget()
+                    .disabled(isWorking)
+                    .accessibilityHint(choice.hint)
                 }
-                .font(.nichijiCallout)
-                .foregroundColor(.nichijiInkMuted)
-                .padding(.horizontal, LayoutTokens.space16)
-                .minTouchTarget()
-                .disabled(isWorking)
-                .accessibilityHint(choice.hint)
 
                 if let errorMessage {
                     Text(errorMessage)

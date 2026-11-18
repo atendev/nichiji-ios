@@ -163,16 +163,16 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
         }
     }
 
-    func declareKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
+    func declareKnown(_ kanjiIDs: Set<String>, at date: Date) async throws {
         try checkForError()
         for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
-            progress[id] = .known
-            nextReviewAt[id] = nil
+            progress[id] = .learning
+            nextReviewAt[id] = date
             declaredKnown.insert(id)
         }
     }
 
-    func syncAutoKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
+    func syncAutoKnown(_ kanjiIDs: Set<String>, at date: Date) async throws {
         try checkForError()
         for id in autoKnown.subtracting(kanjiIDs) {
             progress[id] = .new
@@ -181,8 +181,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
             autoKnown.remove(id)
         }
         for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
-            progress[id] = .known
-            nextReviewAt[id] = nil
+            progress[id] = .learning
+            nextReviewAt[id] = date
             declaredKnown.insert(id)
             autoKnown.insert(id)
         }
