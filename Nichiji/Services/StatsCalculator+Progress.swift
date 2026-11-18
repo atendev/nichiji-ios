@@ -83,18 +83,17 @@ extension StatsCalculator {
         return (dayProvider.calendar.dateComponents([.day], from: start, to: end).day ?? 0) + 1
     }
 
-    /// Same groups as the Dictionary browse: N5 to N1, or Grades 1 to 6, Secondary and Name kanji.
+    /// Same groups as the Dictionary browse: N5 to N1 or Grades 1 to 6 and Secondary, then Name kanji and Beyond the lists.
     private static func levelGroups(index: [KanjiIndexEntry], system: LevelSystem) -> [(id: String, title: String, ids: [String])] {
         switch system {
         case .jlpt:
             return JLPTLevel.allCases.map { level in
-                (id: level.rawValue, title: level.codeLabel, ids: index.filter { $0.jlptLevel == level }.map(\.id))
+                (id: level.rawValue, title: level.badgeLabel, ids: index.filter { level.includes($0) }.map(\.id))
             }
         case .joyo:
-            let grades = JoyoGrade.allCases.map { grade in
-                (id: grade.rawValue, title: grade.displayName, ids: index.filter { $0.joyoGrade == grade }.map(\.id))
+            return JoyoGrade.allCases.map { grade in
+                (id: grade.rawValue, title: grade.displayName, ids: index.filter { grade.includes($0) }.map(\.id))
             }
-            return grades + [(id: "name-kanji", title: "Name kanji", ids: index.filter { $0.joyoGrade == nil }.map(\.id))]
         }
     }
 }

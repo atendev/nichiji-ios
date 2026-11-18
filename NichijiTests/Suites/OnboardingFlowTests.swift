@@ -171,6 +171,10 @@ struct OnboardingFlowTests {
         #expect(jlptCounts[.jlpt(.n5)] == (try fixture.contentStore.entries(for: .n5).count))
         #expect(jlptCounts[.jlpt(.n4)] == 1)
         #expect(jlptCounts[.jlpt(.n3)] == 0)
+        #expect(jlptCounts[.jlpt(.jinmeiyo)] == 0)
+        #expect(jlptCounts[.jlpt(.hyogai)] == 0)
+        #expect(flow.levelRows.suffix(2).map(\.title) == ["Name kanji", "Beyond the lists"])
+        #expect(flow.levelRows.suffix(2).map(\.code) == ["名", "外"])
 
         flow.selectLevelSystem(.joyo)
         let joyoCounts = Dictionary(uniqueKeysWithValues: flow.levelRows.map { ($0.level, $0.kanjiCount) })
@@ -178,6 +182,7 @@ struct OnboardingFlowTests {
         #expect(joyoCounts[.joyo(.grade1)] == (try fixture.contentStore.entries(for: .grade1).count))
         #expect(joyoCounts[.joyo(.grade1)] != 80)
         #expect(joyoCounts[.joyo(.grade2)] == 1)
+        #expect(flow.levelRows.suffix(2).map(\.title) == ["Name kanji", "Beyond the lists"])
     }
 
     @Test("Reminder permission is requested only while undecided, and Continue never blocks")

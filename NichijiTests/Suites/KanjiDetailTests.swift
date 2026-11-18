@@ -114,4 +114,35 @@ struct KanjiDetailTests {
         #expect(JoyoGrade.grade3.detailsLabel == "3")
         #expect(JoyoGrade.secondary.detailsLabel == "Secondary")
     }
+
+    @Test("The List row names each classification")
+    func listLabels() {
+        #expect(KanjiClassification.joyo.listLabel == "Jōyō")
+        #expect(KanjiClassification.jinmeiyo.listLabel == "Jinmeiyō")
+        #expect(KanjiClassification.hyogai.listLabel == "Hyōgai")
+    }
+
+    @Test("A kanji with no stroke file loads with empty stroke paths and no crash")
+    func missingStrokeFileLoads() async throws {
+        let entry = KanjiEntry(
+            id: "凜",
+            meanings: ["dignified"],
+            onyomi: [],
+            kunyomi: [],
+            radical: KanjiRadical(character: "冫", meaning: "ice"),
+            strokeCount: 15,
+            jlptLevel: nil,
+            joyoGrade: nil,
+            frequencyRank: nil,
+            listIndex: 0,
+            exampleWords: [],
+            classification: .jinmeiyo
+        )
+        let contentStore = TestKanjiContentStore(entries: [entry])
+
+        let content = try await KanjiDetailContent.load(kanjiID: "凜", contentStore: contentStore, learnerStore: TestLearnerStore())
+
+        #expect(content.entry.classification == .jinmeiyo)
+        #expect(content.strokePaths.isEmpty)
+    }
 }

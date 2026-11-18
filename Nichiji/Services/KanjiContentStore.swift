@@ -7,10 +7,10 @@ public protocol KanjiContentStore: Sendable {
     /// Loads the bundled kanji entry for a single-character kanji literal.
     func entry(for kanjiID: String) throws -> KanjiEntry
 
-    /// Loads all bundled kanji entries matching a JLPT level in canonical list order.
+    /// Loads all bundled kanji entries on a JLPT rung in canonical list order.
     func entries(for jlptLevel: JLPTLevel) throws -> [KanjiEntry]
 
-    /// Loads all bundled kanji entries matching a Joyo grade in canonical list order.
+    /// Loads all bundled kanji entries on a Joyo rung in canonical list order.
     func entries(for joyoGrade: JoyoGrade) throws -> [KanjiEntry]
 
     /// Counts the bundled kanji at a JLPT level without decoding their records.
@@ -51,7 +51,7 @@ public final class BundledKanjiContentStore: KanjiContentStore, @unchecked Senda
         defer { lock.unlock() }
 
         return try loadIndex()
-            .filter { $0.jlptLevel == jlptLevel }
+            .filter { jlptLevel.includes($0) }
             .sorted { $0.listIndex < $1.listIndex }
             .map { try loadEntry($0.id) }
     }
@@ -61,7 +61,7 @@ public final class BundledKanjiContentStore: KanjiContentStore, @unchecked Senda
         defer { lock.unlock() }
 
         return try loadIndex()
-            .filter { $0.joyoGrade == joyoGrade }
+            .filter { joyoGrade.includes($0) }
             .sorted { $0.listIndex < $1.listIndex }
             .map { try loadEntry($0.id) }
     }
@@ -70,14 +70,14 @@ public final class BundledKanjiContentStore: KanjiContentStore, @unchecked Senda
         lock.lock()
         defer { lock.unlock() }
 
-        return try loadIndex().filter { $0.jlptLevel == jlptLevel }.count
+        return try loadIndex().filter { jlptLevel.includes($0) }.count
     }
 
     public func count(for joyoGrade: JoyoGrade) throws -> Int {
         lock.lock()
         defer { lock.unlock() }
 
-        return try loadIndex().filter { $0.joyoGrade == joyoGrade }.count
+        return try loadIndex().filter { joyoGrade.includes($0) }.count
     }
 
     public func indexEntries() throws -> [KanjiIndexEntry] {

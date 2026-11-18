@@ -102,7 +102,7 @@ struct YouTabTests {
         #expect(row.count == "14 of 103")
     }
 
-    @Test("Jōyō bars map to grade codes, and Name kanji has no code")
+    @Test("Jōyō bars map to grade codes, and the two list steps carry 名 and 外")
     func joyoRows() {
         let grade = YouCopy.levelRow(LevelBar(id: "grade1", title: "1st grade", learned: 0, total: 80))
         #expect(grade.code == "1")
@@ -110,9 +110,12 @@ struct YouTabTests {
         let secondary = YouCopy.levelRow(LevelBar(id: JoyoGrade.secondary.rawValue, title: "Secondary school", learned: 0, total: 1))
         #expect(secondary.code == "S")
         #expect(secondary.name == "Secondary school")
-        let names = YouCopy.levelRow(LevelBar(id: "name-kanji", title: "Name kanji", learned: 1, total: 247))
-        #expect(names.code == nil)
+        let names = YouCopy.levelRow(LevelBar(id: JoyoGrade.jinmeiyo.rawValue, title: "Name kanji", learned: 1, total: 806))
+        #expect(names.code == "名")
         #expect(names.name == "Name kanji")
+        let beyond = YouCopy.levelRow(LevelBar(id: JoyoGrade.hyogai.rawValue, title: "Beyond the lists", learned: 0, total: 3_465))
+        #expect(beyond.code == "外")
+        #expect(beyond.name == "Beyond the lists")
     }
 
     @Test("Bar fill shows a sliver for any progress and caps at full")
@@ -207,6 +210,8 @@ struct YouTabTests {
         #expect(StudyLevel.joyo(.grade1).title == "Grade 1")
         #expect(StudyLevel.joyo(.secondary).title == "Secondary")
         #expect(StudyLevel.joyo(.secondary).finishLabel == "Finish Secondary")
+        #expect(StudyLevel.jlpt(.jinmeiyo).title == "Name kanji")
+        #expect(StudyLevel.joyo(.hyogai).finishLabel == "Finish Beyond the lists")
     }
 
     @Test("Level-complete title, figures and next-level button")
@@ -224,11 +229,20 @@ struct YouTabTests {
 
     @Test("Missing figures read as dashes, and the last level has no next")
     func levelCompleteLastLevel() {
-        let summary = LevelCompleteSummary(level: .jlpt(.n1), figures: LevelCompleteFigures(kanjiLearned: 0, daysTaken: nil, gotItRate: nil))
+        let figures = LevelCompleteFigures(kanjiLearned: 0, daysTaken: nil, gotItRate: nil)
+        let summary = LevelCompleteSummary(level: .jlpt(.hyogai), figures: figures)
         #expect(summary.figures.map(\.value) == ["0", "–", "–"])
         #expect(summary.nextLevel == nil)
         #expect(summary.startTitle == nil)
-        #expect(LevelCompleteSummary(level: .joyo(.secondary), figures: LevelCompleteFigures(kanjiLearned: 0, daysTaken: nil, gotItRate: nil)).startTitle == nil)
+        #expect(LevelCompleteSummary(level: .joyo(.hyogai), figures: figures).startTitle == nil)
+    }
+
+    @Test("N1 and Secondary lead on to Name kanji")
+    func levelCompleteLeadsToNameKanji() {
+        let figures = LevelCompleteFigures(kanjiLearned: 0, daysTaken: nil, gotItRate: nil)
+        #expect(LevelCompleteSummary(level: .jlpt(.n1), figures: figures).startTitle == "Start Name kanji")
+        #expect(LevelCompleteSummary(level: .joyo(.secondary), figures: figures).startTitle == "Start Name kanji")
+        #expect(LevelCompleteSummary(level: .jlpt(.jinmeiyo), figures: figures).startTitle == "Start Beyond the lists")
     }
 
     @Test("Custom pools have no level, so no figures or switcher")

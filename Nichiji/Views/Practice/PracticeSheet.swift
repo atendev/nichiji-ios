@@ -36,21 +36,31 @@ public struct PracticeSheet: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: LayoutTokens.space12) {
-                    PracticePadView(pad: $pad, kanji: target.kanji, showsGuide: showsGuide)
-                        .padding(.horizontal, LayoutTokens.screenMarginRegular)
+                    if target.hasStrokeOrder {
+                        PracticePadView(pad: $pad, kanji: target.kanji, showsGuide: showsGuide)
+                            .padding(.horizontal, LayoutTokens.screenMarginRegular)
 
-                    Text(pad.countLabel(total: target.strokeCount))
-                        .font(.nichijiCallout.monospacedDigit())
-                        .foregroundColor(.nichijiInkMuted)
-                        .padding(.horizontal, LayoutTokens.screenMarginRegular)
-                        .accessibilityHidden(true)
+                        Text(pad.countLabel(total: target.strokeCount))
+                            .font(.nichijiCallout.monospacedDigit())
+                            .foregroundColor(.nichijiInkMuted)
+                            .padding(.horizontal, LayoutTokens.screenMarginRegular)
+                            .accessibilityHidden(true)
 
-                    controls
+                        controls
+                    } else {
+                        Text(StrokeOrderCardView.noStrokeOrderMessage)
+                            .font(.nichijiBody)
+                            .foregroundColor(.nichijiInkMuted)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, LayoutTokens.screenMarginRegular)
+                    }
 
-                    // The card adds its own 16 pt inset, which brings it to the 24 pt sheet margin.
-                    StrokeOrderCardView(strokeCount: target.strokeCount, strokePaths: target.strokePaths)
-                        .padding(.horizontal, LayoutTokens.space8)
-                        .padding(.top, LayoutTokens.space24)
+                    if target.hasStrokeOrder {
+                        // The card adds its own 16 pt inset, which brings it to the 24 pt sheet margin.
+                        StrokeOrderCardView(strokeCount: target.strokeCount, strokePaths: target.strokePaths)
+                            .padding(.horizontal, LayoutTokens.space8)
+                            .padding(.top, LayoutTokens.space24)
+                    }
                 }
                 .padding(.top, LayoutTokens.space16)
                 .padding(.bottom, LayoutTokens.space32)

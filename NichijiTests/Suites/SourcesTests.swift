@@ -45,6 +45,27 @@ struct SourcesTests {
         #expect(document.section("Inputs") == nil)
     }
 
+    @Test("The totals line reads as the bundle summary, and a file without one has none")
+    func bundleSummary() {
+        let document = DataSourcesDocument(markdown: Self.fixture)
+        let bare = DataSourcesDocument(markdown: "## Attribution\n\n- Radical names are the app's own.")
+
+        #expect(document.bundleSummary == "The bundle holds 2 kanji.")
+        #expect(bare.bundleSummary == nil)
+        #expect(bare.section("Attribution")?.items.count == 1)
+    }
+
+    @Test("Each ladder footer names the KANJIDIC2 source, and only JLPT flags unofficial lists")
+    func levelFooters() {
+        let jlpt = SourcesCopy.levelFooter(for: .jlpt)
+        let joyo = SourcesCopy.levelFooter(for: .joyo)
+
+        #expect(jlpt.contains("unofficial"))
+        #expect(!joyo.contains("unofficial"))
+        #expect(jlpt.contains("KANJIDIC2"))
+        #expect(joyo.contains("KANJIDIC2"))
+    }
+
     @Test("A bullet's text drops link markup and keeps its links in order")
     func stripsLinks() {
         let item = DataSourceItem(markdown: "Stroke order: [KanjiVG](https://kanjivg.tagaini.net) by Ulrich Apel, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).")
@@ -64,6 +85,7 @@ struct SourcesTests {
         let waller = try #require(attribution.items.first { $0.text.contains("Jonathan Waller's JLPT Resources") })
         #expect(waller.links.contains { $0.title == "CC BY" && $0.url.absoluteString == "https://www.tanos.co.uk/jlpt/sharing/" })
         #expect(!markdown.contains("isJLPTLevelEstimated"))
+        #expect(document.bundleSummary?.contains("2136 Jōyō, 806 Jinmeiyō, 3465 Hyōgai") == true)
     }
 
     @Test("Missing or non-UTF-8 data reads as missing")

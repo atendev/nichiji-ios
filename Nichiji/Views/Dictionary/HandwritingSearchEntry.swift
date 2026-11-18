@@ -37,6 +37,7 @@ enum HandwritingSearchCopy {
     static let preparing = "Preparing"
     static let unavailable = "Handwriting search is unavailable."
     static let noMatches = "No matches yet. Keep drawing."
+    static let noStrokeOrderNote = "Drawing cannot find kanji that have no stroke order. Search those by reading or meaning."
 
     static func tileLabel(kanji: String) -> String {
         "Search for \(kanji)"

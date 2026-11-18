@@ -12,12 +12,16 @@ public struct HandwritingTemplateMatcher: Sendable {
     /// Cost of a stroke with no partner. Low, so a drawing with a stroke too many or too few still ranks its kanji.
     static let missingStrokeCost = 0.35
     static let reversedStrokeExtra = 0.08
+    /// Added per classification step (Joyo 0, jinmeiyo 1, hyogai 2) so a common kanji beats a rare look-alike on a near tie.
+    static let rarityStep = 0.02
 
     struct Template: Sendable {
         let kanji: String
         let strokeCount: Int
         /// x, y pairs, `pointsPerStroke` per stroke, normalized.
         let points: [Double]
+        /// Added to the drawing's cost, higher for rarer kanji.
+        let prior: Double
     }
 
     let templates: [Template]
@@ -26,16 +30,22 @@ public struct HandwritingTemplateMatcher: Sendable {
     public let shippedKanji: Set<String>
 
     /// `templates` are raw stroke points in template order, which breaks ties. Kanji with no strokes are dropped.
-    public init(templates: [(kanji: String, strokes: [[CGPoint]])], shippedKanji: Set<String>? = nil) {
+    /// `priors` maps a kanji to the cost added for its rarity, and a kanji without one gets none.
+    public init(templates: [(kanji: String, strokes: [[CGPoint]])], shippedKanji: Set<String>? = nil, priors: [String: Double] = [:]) {
         self.templates = templates.compactMap { template in
             let prepared = Self.prepare(template.strokes)
             guard !prepared.isEmpty else { return nil }
-            return Template(kanji: template.kanji, strokeCount: prepared.count, points: Self.flatten(prepared))
+            return Template(
+                kanji: template.kanji,
+                strokeCount: prepared.count,
+                points: Self.flatten(prepared),
+                prior: priors[template.kanji] ?? 0
+            )
         }
         self.shippedKanji = shippedKanji ?? Set(templates.map(\.kanji))
     }
 
-    /// Best first, templates within `strokeWindow` strokes of the drawing. Ties keep template order.
+    /// Best first, templates within `strokeWindow` strokes of the drawing. Costs include each kanji's rarity prior, and ties keep template order.
     public func candidates(for strokes: [[CGPoint]], limit: Int) -> [String] {
         ranked(for: strokes).prefix(limit).map(\.kanji)
     }
@@ -47,7 +57,7 @@ public struct HandwritingTemplateMatcher: Sendable {
         var scored: [(index: Int, cost: Double)] = []
         for (index, template) in templates.enumerated() where abs(template.strokeCount - input.count) <= Self.strokeWindow {
             let cost = Self.characterCost(inputPoints, count: input.count, template.points, count: template.strokeCount)
-            scored.append((index: index, cost: cost))
+            scored.append((index: index, cost: cost + template.prior))
         }
         scored.sort { $0.cost != $1.cost ? $0.cost < $1.cost : $0.index < $1.index }
         return scored.map { (kanji: templates[$0.index].kanji, cost: $0.cost) }

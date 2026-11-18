@@ -7,7 +7,7 @@ Nichiji is a local-first iOS kanji learning application built around learning on
 ### Content
 
 **Kanji entry**:
-An immutable bundled record describing a single kanji character, its readings, meanings, radical, level classifications, and example words. Stroke paths load separately and lazily. Level classifications are the unofficial JLPT level plus the Jōyō grade.
+An immutable bundled record describing a single kanji character, its readings, meanings, radical, level classifications, and example words. Stroke paths load separately and lazily. Level classifications are the unofficial JLPT level, the Jōyō grade and the kanji classification.
 _Avoid_: Kanji model, card, character record
 
 **Reading**:
@@ -41,6 +41,26 @@ The folded in-memory `DictionarySearchIndex`, built once from `kanji-search.json
 The 2,136 kanji with a KANJIDIC2 grade of 1 to 6 or 8. Grades 9 and 10 (jinmeiyō) are not Jōyō and have no `joyoGrade`.
 _Avoid_: Common-use kanji
 
+**Kanji classification**:
+Which list a bundled kanji belongs to, stored as `classification` on every record and index entry: `joyo` (2,136), `jinmeiyo` (806) or `hyogai` (3,465). Both the JLPT and Jōyō level ladders derive from it, and `joyoGrade` stays Jōyō-only.
+_Avoid_: Kanji type, kanji tier
+
+**Level ladder**:
+The ordered rungs a learner studies through, one per level system. The JLPT ladder is N5 to N1, then Jinmeiyō ("Name kanji"), then Hyōgai ("Beyond the lists"); the Jōyō ladder is grade 1 to Secondary, then the same two. Every bundled kanji sits on exactly one rung per ladder. On the JLPT ladder the Jinmeiyō rung holds only the 559 jinmeiyō kanji with no N-level (the other 247 are N1); on the Jōyō ladder it holds all 806. Hyōgai holds all 3,465 on both.
+_Avoid_: Level list, tier
+
+**Jinmeiyō kanji** ("Name kanji"):
+Every KANJIDIC2 kanji with grade 9 or 10, except the 57 compatibility ideographs that fold into a unified twin, 806 in all. 247 of them are Waller N1 kanji, and 559 have no N-level.
+_Avoid_: Name kanji (as a stored value)
+
+**Compatibility ideograph**:
+A code point in U+F900–U+FAFF whose canonical (NFC) form is a unified ideograph. Swift compares `String`s by canonical equivalence, so one would equal its twin as a dictionary key, `Set` member or `Identifiable` id. The generator folds each into its twin and fails if the twin is not bundled. KANJIDIC2 lists 57 of them as jinmeiyō.
+_Avoid_: Variant kanji
+
+**Hyōgai kanji** ("Beyond the lists"):
+Every JIS X 0208 kanji that is neither Jōyō nor jinmeiyō, 3,465 in all. Most have no KANJIDIC2 frequency rank, so list order falls to their JMdict common-word count. All have KanjiVG stroke order. The 32 jinmeiyō kanji with no KanjiVG file ship without it.
+_Avoid_: Rare kanji, other kanji
+
 **JLPT level (unofficial)**:
 The N5 to N1 value from Jonathan Waller's community lists. The JLPT publishes no official kanji lists.
 _Avoid_: Official level
@@ -56,7 +76,7 @@ _Avoid_: Top word, main example
 ### Study pool and daily assignment
 
 **Study pool**:
-The active set of kanji entries eligible for daily assignment, determined either by a selected JLPT level, a selected Joyo grade, or a custom selection.
+The active set of kanji entries eligible for daily assignment, determined either by a selected JLPT level, a selected Joyo grade, or a custom selection. The JLPT and Jōyō ladders include the Jinmeiyō and Hyōgai rungs, so any bundled kanji can be a study pool member.
 _Avoid_: Deck, curriculum, syllabus
 
 **Daily assignment**:

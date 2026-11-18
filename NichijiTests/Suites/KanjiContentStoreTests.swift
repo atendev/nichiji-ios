@@ -64,6 +64,28 @@ struct KanjiContentStoreTests {
         #expect(try store.entries(for: .n5).count == 84)
     }
 
+    @Test("Jinmeiyō and Hyōgai counts cover every kanji once on each ladder")
+    func listStepCounts() throws {
+        let store = BundledKanjiContentStore()
+
+        #expect(try store.count(for: JLPTLevel.jinmeiyo) == 559)
+        #expect(try store.count(for: JLPTLevel.hyogai) == 3_465)
+        #expect(try store.count(for: JoyoGrade.jinmeiyo) == 806)
+        #expect(try store.count(for: JoyoGrade.hyogai) == 3_465)
+        #expect(try JLPTLevel.allCases.reduce(0) { $0 + (try store.count(for: $1)) } == 6_407)
+        #expect(try JoyoGrade.allCases.reduce(0) { $0 + (try store.count(for: $1)) } == 6_407)
+    }
+
+    @Test("A Hyōgai record decodes with its classification and no JLPT level")
+    func hyogaiRecord() throws {
+        let store = BundledKanjiContentStore()
+        let first = try #require(try store.entries(for: JLPTLevel.hyogai).first)
+
+        #expect(first.classification == .hyogai)
+        #expect(first.jlptLevel == nil)
+        #expect(first.joyoGrade == nil)
+    }
+
     @Test("Estimated levels are flagged on the record")
     func estimatedLevelFlag() throws {
         let store = BundledKanjiContentStore()

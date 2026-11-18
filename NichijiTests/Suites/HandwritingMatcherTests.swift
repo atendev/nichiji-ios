@@ -110,6 +110,19 @@ struct HandwritingMatcherTests {
         #expect(matcher.candidates(for: [horizontal], limit: 5) == ["甲", "乙", "丙"])
     }
 
+    @Test("A rarity prior lets a common kanji beat an identical rare one listed first")
+    func priorBreaksTies() {
+        let matcher = HandwritingTemplateMatcher(
+            templates: [
+                (kanji: "乙", strokes: [horizontal]),
+                (kanji: "甲", strokes: [horizontal])
+            ],
+            priors: ["乙": HandwritingTemplateMatcher.rarityStep]
+        )
+
+        #expect(matcher.candidates(for: [horizontal], limit: 5) == ["甲", "乙"])
+    }
+
     @Test("The shipped set defaults to the template kanji")
     func shippedDefaults() {
         let matcher = HandwritingTemplateMatcher(templates: [(kanji: "一", strokes: [horizontal])])

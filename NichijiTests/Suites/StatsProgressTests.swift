@@ -37,6 +37,22 @@ struct StatsProgressTests {
         #expect(bars.map(\.total) == [2, 1, 1, 1])
     }
 
+    @Test("Both ladders end with Name kanji and Beyond the lists, and an empty rung gets no bar")
+    func listStepBars() {
+        let withHyogai = index + [StatsFixtures.entry("丼", jlpt: nil, joyo: nil, classification: .hyogai, listIndex: 5)]
+        let progress = [StatsFixtures.progress("丼", .learning), StatsFixtures.progress("凜", .known)]
+
+        let jlpt = StatsCalculator.levelBars(progress: progress, index: withHyogai, system: .jlpt)
+        let joyo = StatsCalculator.levelBars(progress: progress, index: withHyogai, system: .joyo)
+
+        #expect(jlpt.map(\.id) == ["n5", "n4", "n1", "hyogai"])
+        #expect(jlpt.last?.title == "Beyond the lists")
+        #expect(jlpt.last?.learned == 1)
+        #expect(joyo.map(\.id) == ["grade1", "grade2", "secondary", "jinmeiyo", "hyogai"])
+        #expect(joyo.map(\.learned) == [0, 0, 0, 1, 1])
+        #expect(joyo.suffix(2).map(\.title) == ["Name kanji", "Beyond the lists"])
+    }
+
     /*-----------------------------milestones-------------------------------*/
 
     @Test("Every milestone stays earned after Forget it and a broken streak")
@@ -167,12 +183,16 @@ struct StatsProgressTests {
 
     /*----------------------------level-sequence----------------------------*/
 
-    @Test("The next level stops after N1 and Secondary, and a custom pool has none")
+    @Test("The next level runs through Jinmeiyō to Hyōgai on both ladders, and a custom pool has none")
     func levelSequence() {
         #expect(LevelSequence.next(after: .jlpt(.n5)) == .jlpt(.n4))
-        #expect(LevelSequence.next(after: .jlpt(.n1)) == nil)
+        #expect(LevelSequence.next(after: .jlpt(.n1)) == .jlpt(.jinmeiyo))
+        #expect(LevelSequence.next(after: .jlpt(.jinmeiyo)) == .jlpt(.hyogai))
+        #expect(LevelSequence.next(after: .jlpt(.hyogai)) == nil)
         #expect(LevelSequence.next(after: .joyo(.grade6)) == .joyo(.secondary))
-        #expect(LevelSequence.next(after: .joyo(.secondary)) == nil)
+        #expect(LevelSequence.next(after: .joyo(.secondary)) == .joyo(.jinmeiyo))
+        #expect(LevelSequence.next(after: .joyo(.jinmeiyo)) == .joyo(.hyogai))
+        #expect(LevelSequence.next(after: .joyo(.hyogai)) == nil)
         #expect(LevelSequence.next(after: nil) == nil)
         #expect(LevelSequence.current(preferences: .standard) == .jlpt(.n5))
         #expect(LevelSequence.current(preferences: LearnerPreferencesSnapshot(levelSystem: .joyo)) == .joyo(.grade1))

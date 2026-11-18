@@ -57,8 +57,14 @@ design. The dataset is version-pinned per release and regenerated from
 upstream at each release; there is no automated update process.
 
 Dictionary opens on a browse grid of every bundled kanji, grouped by the
-active level system: N5 to N1 for JLPT, or grade 1 to Secondary then a "Name
-kanji" group for the jinmeiyō kanji with no Jōyō grade. The grid reads only
+active level system: N5 to N1 for JLPT, or grade 1 to Secondary for Jōyō.
+Both ladders then end with "Name kanji" (Jinmeiyō) and "Beyond the lists"
+(Hyōgai). On the JLPT ladder Name kanji holds only the jinmeiyō kanji with no
+N-level; on the Jōyō ladder it holds all of them. Every kanji sits on exactly
+one rung per ladder. Level pickers, level footers and Stats progress use the
+same rungs, and the Details card adds a Classification row. A kanji with no
+stroke file shows "No stroke order for this kanji" in detail, Practice and
+handwriting matching. The grid reads only
 `kanji-index.json`. A tile pushes the shared kanji detail screen (hero,
 Details, Example words, Stroke order with "Practice this kanji"). Detail and
 Today end with a quiet Forget it control for kanji past `new`; it confirms,

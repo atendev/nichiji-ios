@@ -19,15 +19,57 @@ struct DatasetContractTests {
         return try urls.filter { $0.pathExtension == "json" }.map { try JSONDecoder().decode(KanjiEntry.self, from: Data(contentsOf: $0)) }
     }
 
+    private static let appOnly: URL = shared.deletingLastPathComponent().appendingPathComponent("AppOnly")
+
     @Test("Index decodes and matches the record count")
     func indexDecodes() throws {
         let data = try Data(contentsOf: Self.shared.appendingPathComponent("kanji-index.json"))
         let index = try JSONDecoder().decode(KanjiIndex.self, from: data)
 
         #expect(index.formatVersion == 1)
-        #expect(index.entries.count == 2_383)
-        #expect(index.entries.map(\.listIndex) == Array(0..<2_383))
+        #expect(index.entries.count == 6_407)
+        #expect(index.entries.map(\.listIndex) == Array(0..<6_407))
         #expect(index.entries.first?.id == "日")
+    }
+
+    @Test("Classification counts match KANJIDIC2 and JIS X 0208, in the index and the records")
+    func classificationCounts() throws {
+        let entries = try Self.loadEntries()
+        let data = try Data(contentsOf: Self.shared.appendingPathComponent("kanji-index.json"))
+        let index = try JSONDecoder().decode(KanjiIndex.self, from: data)
+
+        for counts in [
+            Dictionary(grouping: entries, by: \.classification).mapValues(\.count),
+            Dictionary(grouping: index.entries, by: \.classification).mapValues(\.count)
+        ] {
+            #expect(counts[.joyo] == 2_136)
+            #expect(counts[.jinmeiyo] == 806)
+            #expect(counts[.hyogai] == 3_465)
+        }
+        #expect(entries.filter { ($0.classification == .joyo) != ($0.joyoGrade != nil) }.isEmpty)
+    }
+
+    @Test("Every kanji sits on exactly one rung of each level ladder")
+    func oneRungPerLadder() throws {
+        let data = try Data(contentsOf: Self.shared.appendingPathComponent("kanji-index.json"))
+        let entries = try JSONDecoder().decode(KanjiIndex.self, from: data).entries
+        let jlptMisses = entries.filter { e in JLPTLevel.allCases.filter { $0.includes(e) }.count != 1 }
+        let joyoMisses = entries.filter { e in JoyoGrade.allCases.filter { $0.includes(e) }.count != 1 }
+        #expect(jlptMisses.isEmpty)
+        #expect(joyoMisses.isEmpty)
+        #expect(entries.filter { JLPTLevel.jinmeiyo.includes($0) }.count == 559)
+        #expect(entries.filter { JoyoGrade.jinmeiyo.includes($0) }.count == 806)
+    }
+
+    @Test("Stroke SVGs exist for every kanji except 32 jinmeiyo kanji KanjiVG lacks")
+    func strokeFileCoverage() throws {
+        let entries = try Self.loadEntries()
+        let folder = Self.appOnly.appendingPathComponent("stroke-order")
+        let hex = { (id: String) in String(format: "%05x", id.unicodeScalars.first!.value) }
+        let missing = entries.filter { !FileManager.default.fileExists(atPath: folder.appendingPathComponent("\(hex($0.id)).svg").path) }
+
+        #expect(missing.count == 32)
+        #expect(missing.allSatisfy { $0.classification == .jinmeiyo })
     }
 
     @Test("Joyo grade counts match KANJIDIC2")
@@ -42,7 +84,7 @@ struct DatasetContractTests {
         #expect(counts[.grade5] == 193)
         #expect(counts[.grade6] == 191)
         #expect(counts[.secondary] == 1_110)
-        #expect(entries.filter { $0.joyoGrade == nil }.count == 247)
+        #expect(entries.filter { $0.joyoGrade == nil }.count == 4_271)
     }
 
     @Test("JLPT level counts match the pinned lists")
@@ -56,6 +98,7 @@ struct DatasetContractTests {
         #expect(counts[.n2] == 398)
         #expect(counts[.n1] == 1_345)
         #expect(entries.filter(\.isJLPTLevelEstimated).count == 172)
+        #expect(entries.filter { $0.jlptLevel == nil }.count == 4_024)
     }
 
     @Test("Records carry at most three example words")
@@ -63,6 +106,7 @@ struct DatasetContractTests {
         let entries = try Self.loadEntries()
 
         #expect(entries.allSatisfy { $0.exampleWords.count <= 3 })
-        #expect(entries.filter { $0.exampleWords.isEmpty }.count == 11)
+        #expect(entries.filter { $0.exampleWords.isEmpty }.count == 1_282)
+        #expect(entries.filter { $0.meanings.isEmpty }.count == 0)
     }
 }

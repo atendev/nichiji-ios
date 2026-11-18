@@ -4,6 +4,7 @@ import json
 import re
 import shutil
 import sys
+import unicodedata
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -20,11 +21,13 @@ import sources
 HERE = Path(__file__).parent
 ROOT = HERE.parent.parent
 ALLOWLIST = HERE / "strokecount-allowlist.json"
-SHARED_BUDGET = 3 * 1024 * 1024
-APP_BUDGET = 8 * 1024 * 1024
+SHARED_BUDGET = 8 * 1024 * 1024
+APP_BUDGET = 24 * 1024 * 1024
 MAX_EXAMPLES = 3
 LEVEL_RANK = {level: index for index, level in enumerate(sources.LEVELS)}
 JOYO_GRADES = set(kanjidic.GRADE_NAMES)
+JOYO, JINMEIYO, HYOGAI = "joyo", "jinmeiyo", "hyogai"
+CLASSIFICATIONS = (JOYO, JINMEIYO, HYOGAI)
 EDRDG_URL = "https://www.edrdg.org"
 EDRDG_LICENCE_URL = "https://www.edrdg.org/edrdg/licence.html"
 CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
@@ -58,31 +61,50 @@ def is_kanji(char: str) -> bool:
     )
 
 
+def classify(entry: kanjidic.KanjidicEntry) -> str:
+    """Joyo is grade 1-6 or 8, jinmeiyo is grade 9 or 10, and every other bundled kanji is hyogai."""
+    if entry.grade in JOYO_GRADES:
+        return JOYO
+    if entry.grade in kanjidic.JINMEIYO_GRADES:
+        return JINMEIYO
+    return HYOGAI
+
+
 def select_literals(inputs: Inputs) -> list[str]:
+    """Every Joyo and jinmeiyo kanji, every other JIS X 0208 kanji, and any Waller-listed kanji. Compatibility ideographs fold into their unified twin."""
+    bundled = {c for c, e in inputs.kanji.items() if e.grade in JOYO_GRADES or e.grade in kanjidic.JINMEIYO_GRADES or e.jis208}
+    listed = set(inputs.waller_levels)
     joyo = {c for c, e in inputs.kanji.items() if e.grade in JOYO_GRADES}
-    extra = {c for c, level in inputs.waller_levels.items() if c not in joyo}
-    stray = {c for c in extra if inputs.waller_levels[c] != "n1"}
+    stray = {c for c in listed - joyo if inputs.waller_levels[c] != "n1"}
     if stray:
         raise BuildError(f"non-Joyo kanji outside N1: {''.join(sorted(stray))}")
-    missing = (joyo | extra) - set(inputs.kanji)
+    missing = listed - set(inputs.kanji)
     if missing:
         raise BuildError(f"not in KANJIDIC2: {''.join(sorted(missing))}")
-    return sorted(joyo | extra, key=ord)
+    chosen = bundled | listed
+    # A compatibility ideograph is canonically equal to a unified one, and Swift compares Strings that way.
+    folded = {c for c in chosen if unicodedata.normalize("NFC", c) != c}
+    orphans = {c for c in folded if unicodedata.normalize("NFC", c) not in chosen}
+    if orphans:
+        raise BuildError(f"compatibility ideographs with no unified twin in the bundle: {''.join(sorted(orphans))}")
+    return sorted(chosen - folded, key=ord)
 
 
 def assign_level(literal: str, inputs: Inputs) -> tuple[str | None, bool]:
+    """Waller's level, else OpenJLPT's estimate for a Joyo kanji. Jinmeiyo and hyogai kanji outside Waller have none."""
     if literal in inputs.waller_levels:
         return inputs.waller_levels[literal], False
-    if literal in inputs.supplement_levels:
+    if literal in inputs.supplement_levels and classify(inputs.kanji[literal]) == JOYO:
         return inputs.supplement_levels[literal], True
     return None, False
 
 
-def list_order(literals: list[str], kanji: dict[str, kanjidic.KanjidicEntry]) -> dict[str, int]:
+def list_order(literals: list[str], kanji: dict[str, kanjidic.KanjidicEntry], common_counts: dict[str, int]) -> dict[str, int]:
+    """Frequency rank first (unranked last), then more common JMdict words, then fewer strokes, then code point."""
+
     def key(literal: str):
         entry = kanji[literal]
-        grade = 7 if entry.grade == 8 else (entry.grade or 99)
-        return (grade, entry.frequency or 10**6, entry.stroke_count, ord(literal))
+        return (entry.frequency or 10**6, -common_counts.get(literal, 0), entry.stroke_count, ord(literal))
 
     return {literal: index for index, literal in enumerate(sorted(literals, key=key))}
 
@@ -132,11 +154,13 @@ def readings(kind: str, values: list[str]) -> list[dict]:
 
 
 def check_stroke_counts(inputs: Inputs, literals: list[str], allowlist: set[str]) -> None:
-    missing = [c for c in literals if c not in inputs.svgs]
+    """Joyo kanji must have a KanjiVG file. Others without one ship with no stroke order."""
+    missing = [c for c in literals if c not in inputs.svgs and classify(inputs.kanji[c]) == JOYO]
     if missing:
         raise BuildError(f"no KanjiVG file for: {''.join(missing)}")
-    problems = [p for c in literals for p in kanjivg.validate(c, inputs.svgs[c])]
-    mismatched = {c for c in literals if kanjivg.stroke_count(inputs.svgs[c]) != inputs.kanji[c].stroke_count}
+    drawn = [c for c in literals if c in inputs.svgs]
+    problems = [p for c in drawn for p in kanjivg.validate(c, inputs.svgs[c])]
+    mismatched = {c for c in drawn if kanjivg.stroke_count(inputs.svgs[c]) != inputs.kanji[c].stroke_count}
     new = sorted(mismatched - allowlist)
     if new:
         details = ", ".join(
@@ -162,7 +186,13 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
         for char in set(word.headword):
             if char in bundle:
                 words_by_kanji.setdefault(char, []).append(word)
-    order = list_order(literals, inputs.kanji)
+    common = sorted({(w.sequence, w.headword): w for w in usable if w.is_common}.values(), key=lambda w: (w.sequence, w.headword))
+    common_counts: dict[str, int] = {}
+    for word in common:
+        for char in set(word.headword):
+            if char in bundle:
+                common_counts[char] = common_counts.get(char, 0) + 1
+    order = list_order(literals, inputs.kanji, common_counts)
     files: dict[str, str] = {}
     index = []
     search_kanji = []
@@ -176,6 +206,7 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
             "onyomi": readings("onyomi", entry.onyomi),
             "kunyomi": readings("kunyomi", entry.kunyomi),
             "radical": {"character": radical_character, "meaning": radical_name},
+            "classification": classify(entry),
             "strokeCount": entry.stroke_count,
             "isJLPTLevelEstimated": estimated,
             "listIndex": order[literal],
@@ -188,7 +219,8 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
         }
         record.update({k: v for k, v in optional.items() if v is not None})
         files[f"Shared/kanji/{kanjivg.hex_name(literal)}.json"] = dump(record)
-        files[f"AppOnly/stroke-order/{kanjivg.hex_name(literal)}.svg"] = kanjivg.minify(inputs.svgs[literal])
+        if literal in inputs.svgs:
+            files[f"AppOnly/stroke-order/{kanjivg.hex_name(literal)}.svg"] = kanjivg.minify(inputs.svgs[literal])
         search_kanji.append(
             {
                 "id": literal,
@@ -202,6 +234,7 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
             "id": literal,
             "primaryMeaning": entry.meanings[0] if entry.meanings else "",
             "primaryReading": first_reading,
+            "classification": record["classification"],
             "strokeCount": entry.stroke_count,
             "listIndex": order[literal],
         }
@@ -209,11 +242,11 @@ def generate(inputs: Inputs, allowlist: set[str], lock: dict) -> dict[str, str]:
         index.append(summary)
     index.sort(key=lambda item: item["listIndex"])
     files["Shared/kanji-index.json"] = dump({"formatVersion": 1, "entries": index})
-    common = sorted({(w.sequence, w.headword): w for w in usable if w.is_common}.values(), key=lambda w: (w.sequence, w.headword))
     files["AppOnly/words.json"] = dump([search_word_record(w) for w in common])
     files["AppOnly/kanji-search.json"] = dump(search_kanji)
     estimated_count = sum(1 for literal in literals if assign_level(literal, inputs)[1])
-    files["Shared/DATA-SOURCES.md"] = data_sources(lock, len(literals), len(common), estimated_count)
+    level_counts = {name: sum(1 for item in index if item["classification"] == name) for name in CLASSIFICATIONS}
+    files["Shared/DATA-SOURCES.md"] = data_sources(lock, level_counts, len(common), estimated_count)
     return files
 
 
@@ -252,13 +285,14 @@ def snapshots(lock: dict) -> list[str]:
     ]
 
 
-def data_sources(lock: dict, kanji_count: int, word_count: int, estimated_count: int) -> str:
+def data_sources(lock: dict, level_counts: dict[str, int], word_count: int, estimated_count: int) -> str:
     lines = [
         "# Data sources",
         "",
         "Generated by `tools/dataset`. Do not edit by hand.",
         "",
-        f"The bundle holds {kanji_count} kanji and {word_count} common words for Dictionary search.",
+        f"The bundle holds {sum(level_counts.values())} kanji ({level_counts[JOYO]} Jōyō, {level_counts[JINMEIYO]} Jinmeiyō, "
+        f"{level_counts[HYOGAI]} Hyōgai) and {word_count} common words for Dictionary search.",
         "",
         "## Inputs",
         "",

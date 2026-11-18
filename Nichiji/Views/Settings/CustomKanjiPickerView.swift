@@ -18,7 +18,7 @@ public struct CustomKanjiPickerView: View {
     )
     private var isCustomPoolActive: Bool = false
 
-    @State private var sections: [KanjiGroupSection] = []
+    @State private var sections: [KanjiBrowseSection] = []
     @State private var selectedIDs: Set<String> = []
     @State private var isLoaded: Bool = false
 
@@ -70,7 +70,7 @@ public struct CustomKanjiPickerView: View {
         }
     }
 
-    private func sectionView(for section: KanjiGroupSection) -> some View {
+    private func sectionView(for section: KanjiBrowseSection) -> some View {
         let sectionIDs = Set(section.entries.map(\.id))
         let onCount = selectedIDs.intersection(sectionIDs).count
         let isAllSelected = !section.entries.isEmpty && onCount == section.entries.count
@@ -119,7 +119,7 @@ public struct CustomKanjiPickerView: View {
         }
     }
 
-    private func kanjiCell(for entry: KanjiEntry) -> some View {
+    private func kanjiCell(for entry: KanjiIndexEntry) -> some View {
         let isSelected = selectedIDs.contains(entry.id)
 
         return Button {
@@ -189,7 +189,7 @@ public struct CustomKanjiPickerView: View {
         let contentStore = services?.contentStore ?? BundledKanjiContentStore()
         let system = activeLevelSystem
         let loadedSections = await Task.detached {
-            buildSections(for: system, contentStore: contentStore)
+            (try? KanjiBrowseGrouping.load(system: system, contentStore: contentStore)) ?? []
         }.value
         guard !Task.isCancelled else { return }
 
@@ -216,7 +216,7 @@ public struct CustomKanjiPickerView: View {
         }
     }
 
-    private func toggleAll(in section: KanjiGroupSection, selectAll: Bool) {
+    private func toggleAll(in section: KanjiBrowseSection, selectAll: Bool) {
         for entry in section.entries {
             if selectAll {
                 selectedIDs.insert(entry.id)
@@ -250,48 +250,4 @@ public struct CustomKanjiPickerView: View {
         await persistSelection()
         dismiss()
     }
-}
-
-private struct KanjiGroupSection: Identifiable {
-    let id: String
-    let title: String
-    let entries: [KanjiEntry]
-}
-
-/// Decoding every record behind a level is heavy, so it runs off the main actor.
-private func buildSections(
-    for system: LevelSystem,
-    contentStore: KanjiContentStore
-) -> [KanjiGroupSection] {
-    var loadedSections: [KanjiGroupSection] = []
-
-    switch system {
-    case .jlpt:
-        for level in JLPTLevel.allCases {
-            let entries = (try? contentStore.entries(for: level)) ?? []
-            if !entries.isEmpty || level == .n5 {
-                loadedSections.append(
-                    KanjiGroupSection(
-                        id: level.rawValue,
-                        title: level.codeLabel,
-                        entries: entries
-                    )
-                )
-            }
-        }
-    case .joyo:
-        for grade in JoyoGrade.allCases {
-            let entries = (try? contentStore.entries(for: grade)) ?? []
-            if !entries.isEmpty || grade == .grade1 {
-                loadedSections.append(
-                    KanjiGroupSection(
-                        id: grade.rawValue,
-                        title: grade.displayName,
-                        entries: entries
-                    )
-                )
-            }
-        }
-    }
-    return loadedSections
 }

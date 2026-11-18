@@ -10,10 +10,10 @@ enum AutoKnownLevels {
         switch preferences.levelSystem {
         case .jlpt:
             let easier = Set(JLPTLevel.allCases.prefix { $0 != preferences.selectedJLPTLevel })
-            return Set(index.filter { $0.jlptLevel.map(easier.contains) ?? false }.map(\.id))
+            return Set(index.filter { kanji in easier.contains { $0.includes(kanji) } }.map(\.id))
         case .joyo:
             let easier = Set(JoyoGrade.allCases.prefix { $0 != preferences.selectedJoyoGrade })
-            return Set(index.filter { $0.joyoGrade.map(easier.contains) ?? false }.map(\.id))
+            return Set(index.filter { kanji in easier.contains { $0.includes(kanji) } }.map(\.id))
         }
     }
 

@@ -19,7 +19,7 @@ private struct HandwritingTestSet: Decodable {
 
 @Suite("Handwriting Accuracy Tests")
 struct HandwritingAccuracyTests {
-    /// Built once for the suite; the 2,383 templates are slow to build in a Debug test run.
+    /// Built once for the suite; the 6,375 templates are slow to build in a Debug test run.
     private static let matcher = Result { try HandwritingTemplateBuilder.matcher(contentStore: BundledKanjiContentStore()) }
 
     private func loadTestSet() throws -> HandwritingTestSet {
@@ -50,6 +50,7 @@ struct HandwritingAccuracyTests {
         let top1 = Double(ranks.filter { $0 == 0 }.count) / Double(samples.count)
         let top5 = Double(ranks.filter { $0 != nil }.count) / Double(samples.count)
 
+        print("handwriting accuracy: top-1 \(top1), top-5 \(top5) over \(samples.count) drawings")
         #expect(top1 >= 0.82, "top-1 was \(top1)")
         #expect(top5 >= 0.91, "top-5 was \(top5)")
     }
@@ -65,6 +66,7 @@ struct HandwritingAccuracyTests {
         let top1 = Double(ranks.filter { $0 == 0 }.count) / Double(samples.count)
         let top5 = Double(ranks.filter { $0 != nil }.count) / Double(samples.count)
 
+        print("handwriting mismatch accuracy: top-1 \(top1), top-5 \(top5) over \(samples.count) drawings")
         #expect(top1 >= 0.70, "top-1 was \(top1)")
         #expect(top5 >= 0.80, "top-5 was \(top5)")
     }
@@ -77,7 +79,7 @@ struct HandwritingAccuracyTests {
         let strokes = sample.strokes.map { stroke in stroke.map { CGPoint(x: $0[0], y: $0[1]) } }
 
         #expect(matcher.shippedKanji == shipped)
-        #expect(matcher.templates.count == shipped.count)
+        #expect(matcher.templates.count == 6_375)
         #expect(matcher.candidates(for: strokes, limit: 50).allSatisfy(shipped.contains))
     }
 
