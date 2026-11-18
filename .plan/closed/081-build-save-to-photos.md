@@ -3,9 +3,9 @@ id: "081"
 title: Build Save to Photos for the scanned photo
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["078"]
-claimed: true
+claimed: false
 ---
 
 ## Question

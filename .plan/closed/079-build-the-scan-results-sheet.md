@@ -3,9 +3,9 @@ id: "079"
 title: Build the scan results sheet
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["078"]
-claimed: true
+claimed: false
 ---
 
 ## Question

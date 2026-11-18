@@ -25,6 +25,9 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Build the scan results sheet](closed/079-build-the-scan-results-sheet.md): The old results panel is gone. A sheet rises to half about 1.9 s after the shutter and moves between peek, half and full by drag, with the 3-column tile grid, New only, and the full header that brings the tab bar back. It runs on an `@Observable ScanSheetModel` over a pure `ScanSheetGeometry`, wired in through `ScanSheetHost`. The drag, snap, tab bar and photo pose need a device check. v0.29.0.
+- [Build Crop for the scanned photo](closed/080-build-scan-crop.md): Crop opens its own `PhotoCropView` with four draggable 44 pt corners. Done makes the crop the frozen photo and rescans it, Cancel returns to the results, and Done on an untouched frame closes like Cancel. The handle drags, VoiceOver nudges and the rescan need a device check. v0.30.0.
+- [Build Save to Photos for the scanned photo](closed/081-build-save-to-photos.md): A labelled Save option writes the current photo to Photos with add-only access and shows a "Saved to Photos" toast (1.8 s), a "Photos access is off" note with Open Settings, or a "couldn't be saved" note. Save is hidden for an uncropped library photo, and a successful crop makes it savable. The usage strings, Privacy screen, `DESIGN.md`, listing and policy draft say the photo is saved only on Save, and the label stays Data Not Collected. The Photos write needs a device check. v0.31.0.
 - [Build the frozen photo, scan sweep and highlights](closed/078-build-the-frozen-photo-and-highlights.md): The frozen shot shows the scan sweep and red (new) or green (learned) kanji boxes, with a Highlights toggle. The sweep finishes its pass as the boxes fade in, and box taps wait until it settles. Crop and Save stay hidden until their tickets land, and the old results panel stays until the results sheet ticket.
 - [Build the scan entry and viewfinder](closed/076-build-the-scan-entry-and-viewfinder.md): "Scan a kanji" sits beside "Draw a kanji" and pushes the designed viewfinder onto the Dictionary stack with the nav and tab bars hidden. Both buttons stay Pro, and the flash is off under Reduce Motion. The tab bar stays hidden for the whole screen until the results sheet ticket.
 - [Find each kanji's box in the photo](closed/077-find-each-kanjis-box-in-the-photo.md): The photo read returns each bundled kanji with every Vision box in reading order, in normalized top-left coordinates. A Live Text read lists its kanji with no boxes, and `hasBoxes` tells the highlights ticket to hide Highlights. The per-character boxes need a device check.
@@ -93,8 +96,5 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
-- [Build the scan results sheet](tickets/079-build-the-scan-results-sheet.md) (task, AFK)
-- [Build Crop for the scanned photo](tickets/080-build-scan-crop.md) (task, AFK)
-- [Build Save to Photos for the scanned photo](tickets/081-build-save-to-photos.md) (task, AFK)
 
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), now also behind Crop, Save and the results sheet.
+Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.
