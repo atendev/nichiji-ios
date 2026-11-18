@@ -29,18 +29,19 @@ Read [Add kanji beyond Jōyō](../closed/085-add-kanji-beyond-joyo.md) first.
 
 ## Handoff
 
-Branch `t3/add-jinmeiyo-hyogai-levels`, SHA = the commit that adds this section. No Swift edited yet. Audit round 0. Read-only research used 155k context. The bundle is 6,407 kanji (2,136 Jōyō, 806 Jinmeiyō, 3,465 Hyōgai), 32 Jinmeiyō have no SVG, the 086 report is stale on counts.
+Handoff 2. Branch `t3/add-jinmeiyo-hyogai-levels-1` (new branch from the first handoff commit), SHA = the commit that adds this section. Audit rounds used: 0 of 5. Swift not compiled (no toolchain), all code re-read by eye.
 
-**Design (decided):**
-- Add `case jinmeiyo, hyogai` to `JLPTLevel` and `JoyoGrade` (`Nichiji/Models/KanjiContent.swift`). `isListStep`, `includes(_ kanji: some LevelMember)`: n-levels and grades match `jlptLevel`/`joyoGrade`, `.jinmeiyo` matches classification (JLPT ladder also needs `jlptLevel == nil`), `.hyogai` matches classification. `LevelMember` protocol on `KanjiEntry` and `KanjiIndexEntry`.
-- `LearnerPreferences.swift`: `codeLabel` 名/外, `displayName` "Name kanji"/"Beyond the lists", `groupTitle`, `shortLabel`, settingsSummary, scheme notes. Update the exhaustive switches.
-- Use `includes` in `AutoKnownLevels`, `StudyLog` (`StudyLevel.contains/title`, `LevelSequence.next`), `KanjiContentStore` (entries/count, plus the `TestKanjiContentStore` double, which must pass `classification` to the index), `KanjiBrowseGrouping` (drop "Other kanji" and "name-kanji"), `StatsCalculator+Progress.levelGroups`, `YouCopy.levelRow`, `KnownKanjiPickerModel` (`levelLabel`, scope).
-- `CustomKanjiPickerView`: build sections from the index via `KanjiBrowseGrouping`, not `entries(for:)`, so Hyōgai does not decode 3,465 records.
-- `DefaultDailyKanjiService`: pick from index entries (small `PoolCandidate` protocol); decode only the first record in `refreshAssignment…` (`reassignToday` reads `pool.first` only). This keeps the widget load-on-demand shape.
-- `DetailsCardView`: add a "List" row (Jōyō/Jinmeiyō/Hyōgai) and keep JLPT/Grade rows hidden when nil. `StrokeOrderCardView`: "No stroke order for this kanji" and hide Practice when paths are empty. `PracticeSheet`: message instead of the pad. `DrawSearchSheet`: caption that drawing cannot find kanji with no stroke order.
-- Sources: `SourcesCopy.levelFooter(for:)` on both ladders (show `SourcesFooterLink` for both); show the "The bundle holds …" line from `DATA-SOURCES.md` on the screen.
-- New test: build the search index from the real bundle, print build time and resident memory growth, loose ceiling. Write a widget memory device check into the resolution.
+**Done (committed, no tests touched yet):**
+- `KanjiContent.swift`: `.jinmeiyo`/`.hyogai` on `JLPTLevel` and `JoyoGrade`, `LevelMember`, `isListStep`, `includes(_:)`, `KanjiClassification.listLabel`. `LearnerPreferences.swift`: codeLabel 名/外, displayName, `badgeLabel`, settingsSummary, scheme notes.
+- `DailyKanjiService`: `activePool` now returns `[KanjiIndexEntry]` (`PoolCandidate` protocol, generic `selectKanjiID`); `refreshAssignment…` decodes only the head record. `KanjiContentStore`, `TestKanjiContentStore` (passes `classification`), `AutoKnownLevels`, `StudyLog`, `KanjiBrowseGrouping` (no more "Other kanji"/"name-kanji"; `unleveledTitle`/`nameKanjiTitle` removed), `StatsCalculator+Progress.levelGroups`, `KnownKanjiPickerModel.levelLabel`, `CustomKanjiPickerView` (index sections, `KanjiGroupSection` removed).
+- Sources: `SourcesCopy.levelFooter(for:)`, `SourcesFooterLink(system:)` on both ladders, `DataSourcesDocument.bundleSummary` shown on `SourcesView`, intro line.
+- Detail: `DetailsCardView(classification:)` List row, `StrokeOrderCardView.noStrokeOrderMessage` and Practice hidden when no paths, `PracticeTarget.hasStrokeOrder`, `PracticeSheet` message, `HandwritingSearchCopy.noStrokeOrderNote` in `DrawSearchSheet`.
 
-**To fix in tests:** AutoKnownLevelsTests, DictionaryBrowseTests, KnownKanjiPickerTests, YouTabTests, StatsProgressTests, KanjiContentStoreTests, OnboardingFlowTests, SettingsPreferencesTests, SourcesTests, KanjiDetailTests, DatasetContractTests (add the exactly-one-rung check for both ladders).
+**Left, in order:**
+1. Fix tests: AutoKnownLevelsTests, DictionaryBrowseTests (uses removed `unleveledTitle`/`nameKanjiTitle`), KnownKanjiPickerTests (`jlptGroups`/`joyoGroups` use "unleveled"/"name-kanji"), YouTabTests line ~113 ("name-kanji" bar), StatsProgressTests, KanjiContentStoreTests, OnboardingFlowTests, SettingsPreferencesTests (`activePool` is now index entries), SourcesTests (add `bundleSummary`, `levelFooter(for:)`), KanjiDetailTests, DatasetContractTests (exactly-one-rung per ladder), DailyKanjiServiceTests/KnownKanjiServiceTests (check `activePool` use), StatsFixtures. Add a Swift Testing test that builds `DictionarySearchIndex` from the real bundle and prints build time and resident memory growth, loose ceiling.
+2. Check `ServiceContainer` and other callers for `activePool` return type; grep `[KanjiEntry]` users.
+3. `docs/CHANGELOG.md` entry and version decision per `docs/workflow.md`; `CONTEXT.md`, `docs/PROGRESS.md`, `docs/DESIGN.md` line 61.
+4. Widget memory device check written into the resolution (widget loads index only; `assignment(for:)` now uses index entries, so Hyōgai no longer decodes records).
+5. Decision report `.plan/assets/087-...-report.md` (unslop), council audit, commit, push, resolution, remove this section, timing close with `--slug nichiji-v1`.
 
-**Left, in order:** code, tests, CHANGELOG and version note, docs (`CONTEXT.md`, `docs/PROGRESS.md`), report, council audit, commit, push, resolution.
+Read first: this section, `Nichiji/Models/KanjiContent.swift`, `Nichiji/Services/DailyKanjiService.swift`, then the test files above.
