@@ -3,9 +3,9 @@ id: "086"
 title: Generate the Jinmeiyō and Hyōgai kanji
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["085"]
-claimed: true
+claimed: false
 ---
 
 ## Question

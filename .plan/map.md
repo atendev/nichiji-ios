@@ -26,6 +26,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Generate the Jinmeiyō and Hyōgai kanji](closed/086-generate-the-jinmeiyo-and-hyogai-kanji.md): `make dataset` builds 6,464 kanji (2,136 Jōyō, 863 Jinmeiyō, 3,465 Hyōgai) with a per-record `classification` in the records, the index and the Swift types. Order is frequency, common-word count, strokes, code point. 89 Jinmeiyō ship without stroke SVGs and the stroke-count allow-list grows from 9 to 102. Shared is 5.11 MiB of 8 and the app set 16.84 MiB of 24; 1,339 kanji have no example word and 25 have no English meaning. Swift was not compiled by the child, and the handwriting floors over 6,375 candidates need a CI check.
 - [Add kanji beyond Jōyō](closed/085-add-kanji-beyond-joyo.md): The bundle adds Jinmeiyō (all 863 KANJIDIC2 grade 9 and 10 kanji, 616 new) and Hyōgai (the other 3,465 JIS X 0208 kanji), about 6,464 in all, with no new sources. Both levels follow the last level on the JLPT and Jōyō ladders. On the JLPT ladder, Jinmeiyō holds only kanji with no N-level. A per-record classification drives both ladders. The 89 Jinmeiyō kanji with no KanjiVG file ship without stroke order. Budgets rise to 8 MB Shared and 24 MB app, and the widget's runtime memory gets measured.
 - [Fit library and cropped photos on the frozen photo screen](closed/084-fit-library-and-cropped-photos-on-the-frozen-photo.md): Camera shots still aspect-fill. Library photos and crops (`PhotoOrigin.fitMode`) aspect-fit on the camera base, which fixes the zoom the user saw after a crop. `PhotoFit.photoFrame` and `sweepFrame` drive the image, boxes, tap targets and sweep. `PhotoZoom` takes the photo's content size, so a letterboxed photo can't be panned into its bars and a filled shot's cut-off sides can be zoomed into. The fit, pan limit and sweep need a device check. v0.34.0.
 - [Pan and zoom the frozen photo](closed/083-pan-and-zoom-the-frozen-photo.md): Pinch zooms 1x to 4x around the pinch point, drag pans (clamped) and double-tap toggles 1x and 2.5x, all in SwiftUI gestures, not a `UIScrollView`. The boxes follow in screen space. A single box tap waits out the double-tap window, and a sheet header drag wins over the photo pan. Zoom resets on Retake, a new photo and a crop. The gestures and tap delay need a device check. v0.33.0.
@@ -99,8 +100,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
-- [Generate the Jinmeiyō and Hyōgai kanji](tickets/086-generate-the-jinmeiyo-and-hyogai-kanji.md) (task, AFK)
+- [Add the Jinmeiyō and Hyōgai levels to the app](tickets/087-add-the-jinmeiyo-and-hyogai-levels-to-the-app.md) (task, AFK)
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
 
-Blocked: [Add the Jinmeiyō and Hyōgai levels to the app](tickets/087-add-the-jinmeiyo-and-hyogai-levels-to-the-app.md), behind the generator (086). [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.
+Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.
