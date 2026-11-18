@@ -26,3 +26,21 @@ Read [Add kanji beyond Jōyō](../closed/085-add-kanji-beyond-joyo.md) first.
 - Update the Sources screen totals.
 
 ## Resolution
+
+## Handoff
+
+Branch `t3/add-jinmeiyo-hyogai-levels`, SHA = the commit that adds this section. No Swift edited yet. Audit round 0. Read-only research used 155k context. The bundle is 6,407 kanji (2,136 Jōyō, 806 Jinmeiyō, 3,465 Hyōgai), 32 Jinmeiyō have no SVG, the 086 report is stale on counts.
+
+**Design (decided):**
+- Add `case jinmeiyo, hyogai` to `JLPTLevel` and `JoyoGrade` (`Nichiji/Models/KanjiContent.swift`). `isListStep`, `includes(_ kanji: some LevelMember)`: n-levels and grades match `jlptLevel`/`joyoGrade`, `.jinmeiyo` matches classification (JLPT ladder also needs `jlptLevel == nil`), `.hyogai` matches classification. `LevelMember` protocol on `KanjiEntry` and `KanjiIndexEntry`.
+- `LearnerPreferences.swift`: `codeLabel` 名/外, `displayName` "Name kanji"/"Beyond the lists", `groupTitle`, `shortLabel`, settingsSummary, scheme notes. Update the exhaustive switches.
+- Use `includes` in `AutoKnownLevels`, `StudyLog` (`StudyLevel.contains/title`, `LevelSequence.next`), `KanjiContentStore` (entries/count, plus the `TestKanjiContentStore` double, which must pass `classification` to the index), `KanjiBrowseGrouping` (drop "Other kanji" and "name-kanji"), `StatsCalculator+Progress.levelGroups`, `YouCopy.levelRow`, `KnownKanjiPickerModel` (`levelLabel`, scope).
+- `CustomKanjiPickerView`: build sections from the index via `KanjiBrowseGrouping`, not `entries(for:)`, so Hyōgai does not decode 3,465 records.
+- `DefaultDailyKanjiService`: pick from index entries (small `PoolCandidate` protocol); decode only the first record in `refreshAssignment…` (`reassignToday` reads `pool.first` only). This keeps the widget load-on-demand shape.
+- `DetailsCardView`: add a "List" row (Jōyō/Jinmeiyō/Hyōgai) and keep JLPT/Grade rows hidden when nil. `StrokeOrderCardView`: "No stroke order for this kanji" and hide Practice when paths are empty. `PracticeSheet`: message instead of the pad. `DrawSearchSheet`: caption that drawing cannot find kanji with no stroke order.
+- Sources: `SourcesCopy.levelFooter(for:)` on both ladders (show `SourcesFooterLink` for both); show the "The bundle holds …" line from `DATA-SOURCES.md` on the screen.
+- New test: build the search index from the real bundle, print build time and resident memory growth, loose ceiling. Write a widget memory device check into the resolution.
+
+**To fix in tests:** AutoKnownLevelsTests, DictionaryBrowseTests, KnownKanjiPickerTests, YouTabTests, StatsProgressTests, KanjiContentStoreTests, OnboardingFlowTests, SettingsPreferencesTests, SourcesTests, KanjiDetailTests, DatasetContractTests (add the exactly-one-rung check for both ladders).
+
+**Left, in order:** code, tests, CHANGELOG and version note, docs (`CONTEXT.md`, `docs/PROGRESS.md`), report, council audit, commit, push, resolution.
