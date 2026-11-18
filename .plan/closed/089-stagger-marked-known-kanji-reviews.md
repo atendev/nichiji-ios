@@ -3,9 +3,9 @@ id: "089"
 title: Stagger marked-known kanji reviews ten a day
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: []
-claimed: true
+claimed: false
 ---
 
 ## Question
@@ -25,3 +25,7 @@ Open details for the resolver to settle and note in the report: whether the orde
 Check that the Review tab's due count, Coming up and the stats treat staggered dates correctly, and update the tests in `KnownKanjiStoreTests` plus `docs/CHANGELOG.md` and `docs/PROGRESS.md`. Follow `docs/workflow.md` Phase 5.
 
 ## Resolution
+
+Yes. A batch of marked-known kanji now comes due ten a day, starting on the day it is marked. `declareKnown` and `syncAutoKnown` walk the IDs in sorted order and give each kanji that actually gets marked the next position (rows already past new take no slot). `mark` sets `nextReviewAt` to the start of the day `position / marksPerDay` days later, with `SwiftDataLearnerStore.marksPerDay` at 10. Settled details: the order is the sorted ID, since the store has no dataset access and frequency order would change the `LearnerStore` protocol; a later level pick starts its own batch at position 0, so picks on the same few days can stack (k picks put up to 10k kanji on one day); a single hand mark is position 0 and stays due today. The Review tab due count and queue go through `ReviewScheduler.isDue`, which compares days, and Coming up buckets learning and familiar kanji one to seven days out, so staggered dates land correctly; stats never read the due date. Version v0.36.1, untagged. Council approved in round 2 (Claude 8, Gemini 10, GPT 9). CI green: run 44295640739 on `t3/stagger-known-kanji-reviews`, TEST SUCCEEDED (workflow_dispatch, started by hand); Swift was not compiled on the Linux host. Report: [089 report](../assets/089-stagger-marked-known-kanji-reviews-report.md).
+
+Timing: wall 53m, active 4m, user 0s, wait 49m, blocked 0s | setup 32s, implement 52s, audit 3m (2 rounds), ci 49m | tools 45 (10 subagent) | limits 0, compactions 0, handoffs 0 | ctx peak 122k | cost $1.24 sonnet-5-5 + $0.02 haiku-5-5
