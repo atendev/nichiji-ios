@@ -76,10 +76,8 @@ public struct LevelSettingsView: View {
                     .foregroundColor(.nichijiInkSubtle)
                     .padding(.horizontal, LayoutTokens.space8)
 
-                if activeLevelSystem == .jlpt {
-                    SourcesFooterLink()
-                        .padding(.horizontal, LayoutTokens.space8)
-                }
+                SourcesFooterLink(system: activeLevelSystem)
+                    .padding(.horizontal, LayoutTokens.space8)
             }
             .padding(.horizontal, LayoutTokens.screenMarginRegular)
             .padding(.bottom, LayoutTokens.space48)

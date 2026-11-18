@@ -65,6 +65,9 @@ public struct PracticeTarget: Identifiable, Equatable, Sendable {
 
     public var id: String { kanji }
 
+    /// False for a kanji with no stroke file, where Practice has nothing to trace.
+    public var hasStrokeOrder: Bool { !strokePaths.isEmpty }
+
     public init(kanji: String, meanings: [String], strokeCount: Int, strokePaths: [String]) {
         self.kanji = kanji
         self.meaning = meanings.first ?? ""

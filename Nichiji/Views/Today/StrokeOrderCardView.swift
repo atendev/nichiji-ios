@@ -3,6 +3,9 @@ import SwiftUI
 /*---------------------------------stroke---------------------------------*/
 
 public struct StrokeOrderCardView: View {
+    /// Shown in place of the diagram, Practice and handwriting matching for a kanji with no stroke file.
+    public static let noStrokeOrderMessage = "No stroke order for this kanji"
+
     public let strokeCount: Int
     public let strokePaths: [String]
     public let onPractice: (() -> Void)?
@@ -30,7 +33,7 @@ public struct StrokeOrderCardView: View {
                     .foregroundColor(.nichijiInkMuted)
 
                 if strokePaths.isEmpty {
-                    Text("The stroke diagram is unavailable for this kanji.")
+                    Text(Self.noStrokeOrderMessage)
                         .font(.nichijiCallout)
                         .foregroundColor(.nichijiInkMuted)
                 }
@@ -44,7 +47,7 @@ public struct StrokeOrderCardView: View {
                     }
                 }
 
-                if let onPractice {
+                if let onPractice, !strokePaths.isEmpty {
                     Button(action: onPractice) {
                         HStack(spacing: LayoutTokens.space8) {
                             Image(systemName: "pencil")

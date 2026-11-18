@@ -41,7 +41,15 @@ struct StatsClock {
 }
 
 enum StatsFixtures {
-    static func entry(_ id: String, jlpt: JLPTLevel?, joyo: JoyoGrade?, listIndex: Int = 0, meaning: String = "") -> KanjiIndexEntry {
+    /// A grade-less kanji reads as Jinmeiyō unless the test names a classification.
+    static func entry(
+        _ id: String,
+        jlpt: JLPTLevel?,
+        joyo: JoyoGrade?,
+        classification: KanjiClassification? = nil,
+        listIndex: Int = 0,
+        meaning: String = ""
+    ) -> KanjiIndexEntry {
         KanjiIndexEntry(
             id: id,
             primaryMeaning: meaning,
@@ -49,7 +57,8 @@ enum StatsFixtures {
             strokeCount: 1,
             jlptLevel: jlpt,
             joyoGrade: joyo,
-            listIndex: listIndex
+            listIndex: listIndex,
+            classification: classification
         )
     }
 

@@ -48,7 +48,7 @@ public enum StudyDay {
 
 /*--------------------------------levels--------------------------------------*/
 
-/// A selectable study level. Name kanji is a browse group only, so it has no case here.
+/// A selectable study level on either ladder, including the Jinmeiyō and Hyōgai rungs.
 public enum StudyLevel: Hashable, Sendable {
     case jlpt(JLPTLevel)
     case joyo(JoyoGrade)
@@ -56,8 +56,10 @@ public enum StudyLevel: Hashable, Sendable {
     /// Short level name ("N5", "Grade 1", "Secondary").
     public var title: String {
         switch self {
+        case .jlpt(let level) where level.isListStep: level.displayName
         case .jlpt(let level): level.codeLabel
         case .joyo(.secondary): "Secondary"
+        case .joyo(let grade) where grade.isListStep: grade.displayName
         case .joyo(let grade): "Grade \(grade.codeLabel)"
         }
     }
@@ -69,8 +71,8 @@ public enum StudyLevel: Hashable, Sendable {
 
     func contains(_ entry: KanjiIndexEntry) -> Bool {
         switch self {
-        case .jlpt(let level): entry.jlptLevel == level
-        case .joyo(let grade): entry.joyoGrade == grade
+        case .jlpt(let level): level.includes(entry)
+        case .joyo(let grade): grade.includes(entry)
         }
     }
 }
@@ -86,7 +88,7 @@ public enum LevelSequence {
         }
     }
 
-    /// The level after the given one, or nil after N1, after Secondary, or for a custom pool.
+    /// The level after the given one, or nil after Hyōgai, or for a custom pool.
     public static func next(after level: StudyLevel?) -> StudyLevel? {
         switch level {
         case .jlpt(let current):

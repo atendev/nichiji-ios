@@ -7,6 +7,7 @@ public struct DetailsCardView: View {
     public let kunyomi: [KanjiReading]
     public let radical: String
     public let strokeCount: Int
+    public let classification: String?
     public let jlptLevel: String?
     public let isJLPTLevelEstimated: Bool
     public let joyoGrade: String?
@@ -18,6 +19,7 @@ public struct DetailsCardView: View {
         kunyomi: [KanjiReading] = [],
         radical: String = "",
         strokeCount: Int = 0,
+        classification: String? = nil,
         jlptLevel: String? = nil,
         isJLPTLevelEstimated: Bool = false,
         joyoGrade: String? = nil,
@@ -27,6 +29,7 @@ public struct DetailsCardView: View {
         self.kunyomi = kunyomi
         self.radical = radical
         self.strokeCount = strokeCount
+        self.classification = classification
         self.jlptLevel = jlptLevel
         self.isJLPTLevelEstimated = isJLPTLevelEstimated
         self.joyoGrade = joyoGrade
@@ -46,6 +49,10 @@ public struct DetailsCardView: View {
                 Divider().background(Color.nichijiHairline)
 
                 detailRow(label: "Strokes", value: "\(strokeCount)")
+                if let classification {
+                    Divider().background(Color.nichijiHairline)
+                    detailRow(label: "List", value: classification)
+                }
                 if let jlptLevel {
                     Divider().background(Color.nichijiHairline)
                     detailRow(label: "JLPT", value: Self.jlptLabel(jlptLevel, isEstimated: isJLPTLevelEstimated))

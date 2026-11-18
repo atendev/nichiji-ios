@@ -27,23 +27,23 @@ final class TestKanjiContentStore: KanjiContentStore, @unchecked Sendable {
     func entries(for jlptLevel: JLPTLevel) throws -> [KanjiEntry] {
         recordLoadCount += 1
         return entriesDict.values
-            .filter { $0.jlptLevel == jlptLevel }
+            .filter { jlptLevel.includes($0) }
             .sorted(by: { $0.listIndex < $1.listIndex })
     }
 
     func entries(for joyoGrade: JoyoGrade) throws -> [KanjiEntry] {
         recordLoadCount += 1
         return entriesDict.values
-            .filter { $0.joyoGrade == joyoGrade }
+            .filter { joyoGrade.includes($0) }
             .sorted(by: { $0.listIndex < $1.listIndex })
     }
 
     func count(for jlptLevel: JLPTLevel) throws -> Int {
-        entriesDict.values.filter { $0.jlptLevel == jlptLevel }.count
+        entriesDict.values.filter { jlptLevel.includes($0) }.count
     }
 
     func count(for joyoGrade: JoyoGrade) throws -> Int {
-        entriesDict.values.filter { $0.joyoGrade == joyoGrade }.count
+        entriesDict.values.filter { joyoGrade.includes($0) }.count
     }
 
     func indexEntries() throws -> [KanjiIndexEntry] {
@@ -58,7 +58,8 @@ final class TestKanjiContentStore: KanjiContentStore, @unchecked Sendable {
                     jlptLevel: entry.jlptLevel,
                     joyoGrade: entry.joyoGrade,
                     listIndex: entry.listIndex,
-                    frequencyRank: entry.frequencyRank
+                    frequencyRank: entry.frequencyRank,
+                    classification: entry.classification
                 )
             }
     }

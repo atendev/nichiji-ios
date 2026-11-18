@@ -93,8 +93,8 @@ struct KnownKanjiPickerModel: Equatable {
     /// Where a search result sits in the learner's level system, so out-of-level kanji are clear.
     static func levelLabel(for entry: KanjiIndexEntry, system: LevelSystem) -> String {
         switch system {
-        case .jlpt: entry.jlptLevel?.codeLabel ?? "No level"
-        case .joyo: entry.joyoGrade?.codeLabel ?? KanjiBrowseGrouping.nameKanjiTitle
+        case .jlpt: JLPTLevel.allCases.first { $0.includes(entry) }?.badgeLabel ?? "No level"
+        case .joyo: JoyoGrade.allCases.first { $0.includes(entry) }?.badgeLabel ?? "No level"
         }
     }
 }
@@ -103,7 +103,7 @@ struct KnownKanjiPickerModel: Equatable {
 
 /// Which groups the picker lists before the learner types anything: the learner's level and every easier one.
 enum KnownKanjiScope {
-    /// A custom pool has no level of its own, so it lists every group. "Other kanji" and name kanji are never easier.
+    /// A custom pool has no level of its own, so it lists every group. Harder levels are never listed.
     static func sections(
         from all: [KanjiBrowseSection],
         preferences: LearnerPreferencesSnapshot

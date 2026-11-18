@@ -8,6 +8,8 @@ public enum JLPTLevel: String, Codable, CaseIterable, Sendable {
     case n3
     case n2
     case n1
+    case jinmeiyo
+    case hyogai
 }
 
 /// Joyo school grade classification for a kanji entry or study pool.
@@ -19,6 +21,8 @@ public enum JoyoGrade: String, Codable, CaseIterable, Sendable {
     case grade5
     case grade6
     case secondary
+    case jinmeiyo
+    case hyogai
 }
 
 /// Which official list a kanji belongs to: the Joyo school set, the jinmeiyo name kanji, or hyogai (neither).
@@ -30,6 +34,56 @@ public enum KanjiClassification: String, Codable, CaseIterable, Sendable {
     /// The classification of a hand-built record: a Joyo grade means Joyo, none means jinmeiyo (the old "name kanji").
     static func inferred(joyoGrade: JoyoGrade?) -> KanjiClassification {
         joyoGrade == nil ? .jinmeiyo : .joyo
+    }
+}
+
+/// The fields a level rung reads to decide whether a kanji belongs to it; shared by full and index records.
+public protocol LevelMember {
+    var classification: KanjiClassification { get }
+    var jlptLevel: JLPTLevel? { get }
+    var joyoGrade: JoyoGrade? { get }
+}
+
+public extension JLPTLevel {
+    /// True for the two rungs past N1, which hold name kanji and kanji beyond the lists.
+    var isListStep: Bool {
+        self == .jinmeiyo || self == .hyogai
+    }
+
+    /// Whether the kanji sits on this rung. Jinmeiyo and Hyogai hold only kanji with no N-level, so every kanji has one rung.
+    func includes(_ kanji: some LevelMember) -> Bool {
+        switch self {
+        case .jinmeiyo: kanji.classification == .jinmeiyo && kanji.jlptLevel == nil
+        case .hyogai: kanji.classification == .hyogai && kanji.jlptLevel == nil
+        case .n5, .n4, .n3, .n2, .n1: kanji.jlptLevel == self
+        }
+    }
+}
+
+public extension JoyoGrade {
+    /// True for the two rungs past secondary school.
+    var isListStep: Bool {
+        self == .jinmeiyo || self == .hyogai
+    }
+
+    /// Whether the kanji sits on this rung. Jinmeiyo holds all 806 name kanji, Hyogai all kanji beyond the lists.
+    func includes(_ kanji: some LevelMember) -> Bool {
+        switch self {
+        case .jinmeiyo: kanji.classification == .jinmeiyo
+        case .hyogai: kanji.classification == .hyogai
+        case .grade1, .grade2, .grade3, .grade4, .grade5, .grade6, .secondary: kanji.joyoGrade == self
+        }
+    }
+}
+
+public extension KanjiClassification {
+    /// Label for the Details card List row.
+    var listLabel: String {
+        switch self {
+        case .joyo: "Jōyō"
+        case .jinmeiyo: "Jinmeiyō"
+        case .hyogai: "Hyōgai"
+        }
     }
 }
 
@@ -138,6 +192,8 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
     }
 }
 
+extension KanjiEntry: LevelMember {}
+
 /// Lightweight summary record contained in the bundled kanji index.
 public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
     public let id: String
@@ -172,6 +228,8 @@ public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
         self.listIndex = listIndex
     }
 }
+
+extension KanjiIndexEntry: LevelMember {}
 
 /// Top-level shape of the generated `kanji-index.json`.
 public struct KanjiIndex: Codable, Sendable {

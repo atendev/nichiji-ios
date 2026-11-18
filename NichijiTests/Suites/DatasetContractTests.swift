@@ -49,6 +49,18 @@ struct DatasetContractTests {
         #expect(entries.filter { ($0.classification == .joyo) != ($0.joyoGrade != nil) }.isEmpty)
     }
 
+    @Test("Every kanji sits on exactly one rung of each level ladder")
+    func oneRungPerLadder() throws {
+        let data = try Data(contentsOf: Self.shared.appendingPathComponent("kanji-index.json"))
+        let entries = try JSONDecoder().decode(KanjiIndex.self, from: data).entries
+        let jlptMisses = entries.filter { e in JLPTLevel.allCases.filter { $0.includes(e) }.count != 1 }
+        let joyoMisses = entries.filter { e in JoyoGrade.allCases.filter { $0.includes(e) }.count != 1 }
+        #expect(jlptMisses.isEmpty)
+        #expect(joyoMisses.isEmpty)
+        #expect(entries.filter { JLPTLevel.jinmeiyo.includes($0) }.count == 559)
+        #expect(entries.filter { JoyoGrade.jinmeiyo.includes($0) }.count == 806)
+    }
+
     @Test("Stroke SVGs exist for every kanji except 32 jinmeiyo kanji KanjiVG lacks")
     func strokeFileCoverage() throws {
         let entries = try Self.loadEntries()
