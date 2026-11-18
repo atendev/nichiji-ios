@@ -99,4 +99,4 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 - [Fix the crop photo fit and drag the whole frame](tickets/082-fix-crop-fit-and-drag-the-frame.md) (task, AFK)
 - [Pan and zoom the frozen photo](tickets/083-pan-and-zoom-the-frozen-photo.md) (task, AFK)
 
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067), the crop fix (082) and pan and zoom (083). The camera scan stage is built; its device checks go with the release build.
+Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067), the crop fix (082) and pan and zoom (083), and fitting library and cropped photos ([084](tickets/084-fit-library-and-cropped-photos-on-the-frozen-photo.md), after 083). The camera scan stage is built; its device checks go with the release build.
