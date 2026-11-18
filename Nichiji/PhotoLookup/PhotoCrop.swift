@@ -66,6 +66,46 @@ enum PhotoCrop {
         return move(corner, of: rect, by: delta, minSize: CGSize(width: minSide / fitted.width, height: minSide / fitted.height))
     }
 
+    /// The four ways VoiceOver can move the whole frame.
+    enum Direction: CaseIterable, Hashable, Sendable {
+        case left, right, up, down
+
+        var unit: CGVector {
+            switch self {
+            case .left: CGVector(dx: -1, dy: 0)
+            case .right: CGVector(dx: 1, dy: 0)
+            case .up: CGVector(dx: 0, dy: -1)
+            case .down: CGVector(dx: 0, dy: 1)
+            }
+        }
+    }
+
+    /// Moves the whole frame by a normalized distance without resizing it, stopping at the photo's edges.
+    static func translate(_ rect: CGRect, by delta: CGVector) -> CGRect {
+        CGRect(
+            x: clamp(rect.minX + delta.dx, lower: 0, upper: 1 - rect.width),
+            y: clamp(rect.minY + delta.dy, lower: 0, upper: 1 - rect.height),
+            width: rect.width,
+            height: rect.height
+        )
+    }
+
+    /// The same move from a distance in points on a photo drawn at `fitted` size.
+    static func translate(_ rect: CGRect, by translation: CGSize, fitted: CGSize) -> CGRect {
+        guard fitted.width > 0, fitted.height > 0 else { return rect }
+        return translate(rect, by: CGVector(dx: translation.width / fitted.width, dy: translation.height / fitted.height))
+    }
+
+    /// One VoiceOver step of the whole frame.
+    static func nudge(_ rect: CGRect, toward direction: Direction) -> CGRect {
+        translate(rect, by: CGVector(dx: direction.unit.dx * nudgeStep, dy: direction.unit.dy * nudgeStep))
+    }
+
+    /// A normalized frame as a rectangle in points on the fitted photo, whose top left is the origin.
+    static func frameRect(for region: CGRect, fitted: CGSize) -> CGRect {
+        CGRect(x: region.minX * fitted.width, y: region.minY * fitted.height, width: region.width * fitted.width, height: region.height * fitted.height)
+    }
+
     /// The frame in whole pixels, clamped to the photo and never empty.
     static func pixelRect(forNormalized rect: CGRect, pixelWidth: Int, pixelHeight: Int) -> CGRect {
         guard pixelWidth > 0, pixelHeight > 0 else { return .zero }

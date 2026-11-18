@@ -975,3 +975,18 @@ The user answered the merge question with two changes and asked for CI before as
 #### Deviation Report
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check. The Photos write needs a device check.
 - **Audit**: See `.plan/assets/081-build-save-to-photos-report.md`.
+
+### Fix the crop photo fit and drag the whole frame (v0.32.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. Crop is a full-screen cover, laid out against the window rather than the scan screen, and shows the whole photo at its own aspect ratio, centred, with the frame and handles on the visible photo, for portrait, square and landscape sizes.
+  2. Dragging inside the frame moves it without resizing, clamped to the photo. The 44 pt corners keep resizing and win where they overlap the frame.
+  3. VoiceOver gets a move action per direction.
+  4. Unit tests cover the fit for portrait, square and landscape, and the frame move.
+- **Scope Boundary**: In: `PhotoCropView.swift`, the crop geometry in `PhotoCrop.swift`, tests and docs. Out: the frozen photo screen (aspect-fill by design for camera shots, and being reworked by the pan and zoom ticket).
+- **Version**: MINOR by the master's brief, v0.31.0 to v0.32.0.
+
+#### Deviation Report
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check. The drags and VoiceOver actions need a device check.
+- **Audit**: See `.plan/assets/082-fix-crop-fit-and-drag-the-frame-report.md`.
