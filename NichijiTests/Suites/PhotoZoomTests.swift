@@ -54,7 +54,7 @@ struct PhotoZoomTests {
         let zoom = PhotoZoom.identity.pinched(by: 2, about: .zero, in: view)
 
         #expect(zoom.offset == CGSize(width: 100, height: 200))
-        #expect(zoom.apply(to: .zero, in: view) == .zero)
+        #expect(zoom.apply(to: CGPoint.zero, in: view) == CGPoint.zero)
     }
 
     @Test("A drag pans a zoomed photo")

@@ -67,3 +67,6 @@ The pinch and pan feel, the single-tap delay on a box, zoom under the sheet's ha
 
 ## Files
 `PhotoZoom.swift` (new), `PhotoZoomGestures.swift` (new), `FrozenPhotoView.swift`, `PhotoZoomTests.swift` (new), and the docs (`CHANGELOG`, `PROGRESS`, `DESIGN`, `IMPLOG`). `PhotoFit`, `PhotoHighlights.swift` and `PhotoLookupScreen.swift` are unchanged.
+
+## CI fix 1
+CI failed to compile `PhotoZoomTests.swift:57`: `zoom.apply(to: .zero, in: view) == .zero` is ambiguous because `apply(to:)` has `CGPoint` and `CGRect` overloads. The implementer qualified both sides as `CGPoint.zero`. The rest of the file has no other ambiguous `.zero`, since every other call passes a typed value or sits where one type fits. Council round 3 approved it (Claude 9, Gemini 10, GPT 10), with no problems declined. No version bump, since only a test changed.
