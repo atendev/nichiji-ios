@@ -937,3 +937,20 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See `.plan/assets/078-build-the-frozen-photo-and-highlights-report.md`.
+
+
+### Build Save to Photos for the scanned photo (v0.29.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. A labelled Save option sits top right beside Highlights once a photo is frozen and read. It saves `model.photoData`, whichever photo is current, with no boxes.
+  2. Add-only Photos access is asked on the first tap. A saved photo shows "Saved to Photos" with a green check for about 1.8 s.
+  3. Denied or restricted access shows "Photos access is off" with Open Settings and saves nothing. A write error shows "The photo couldn't be saved."
+  4. Save is hidden for an uncropped library photo. Crop will set `PhotoOrigin.cropped` to show it again.
+  5. `NSPhotoLibraryAddUsageDescription` is set, and the camera usage string, the Privacy screen, `DESIGN.md`, the listing and the policy draft say the photo is saved only on Save.
+- **Scope Boundary**: In: the saver, the toast model and view, the Save button, copy and tests. Out: Crop and the results sheet, built on sibling branches.
+- **Version**: MINOR, v0.28.1 to v0.29.0.
+
+#### Deviation Report
+- **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check. The Photos write needs a device check.
+- **Audit**: See `.plan/assets/081-build-save-to-photos-report.md`.

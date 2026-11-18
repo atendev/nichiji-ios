@@ -25,5 +25,5 @@ To restore Nichiji Pro on a new device, open Settings > Nichiji Pro and tap Rest
 ```markdown
 # Nichiji privacy policy
 
-Nichiji does not collect, store or share any personal data. It has no account, no analytics, no ads and no tracking. Your study progress and settings stay on your device, in the app and its widgets. Apple processes in-app purchases, and Nichiji never sees your payment details. If you delete the app, your data is deleted with it. Questions: <support email>.
+Nichiji does not collect, store or share any personal data. It has no account, no analytics, no ads and no tracking. Your study progress and settings stay on your device, in the app and its widgets. Photo lookup reads a photo on your device and sends it nowhere. If you tap Save, Nichiji adds that photo to your Photos library, and your iCloud Photos settings decide whether it syncs. Apple processes in-app purchases, and Nichiji never sees your payment details. If you delete the app, your data is deleted with it. Questions: <support email>.
 ```

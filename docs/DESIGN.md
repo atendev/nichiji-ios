@@ -110,13 +110,23 @@ library. `Nichiji/PhotoLookup/` reads the photo on device with Vision
 reads fewer than four characters. The panel lists every bundled kanji found,
 once each, in a grid under the found count. A tile opens kanji detail on the same stack,
 with "Scan results" as its back label. A "New to you" toggle, off by default, hides kanji the learner
-has started. Nothing is saved or sent: the photo lives only on the open
-camera screen.
+has started. Nothing is sent anywhere. The photo is saved only when you tap
+Save: it lives on the open camera screen otherwise.
+
+Save sits in the top right beside Highlights, with a text label. It writes the
+plain photo (the crop, once Crop lands), with no boxes, to Photos with add-only
+access (`NSPhotoLibraryAddUsageDescription`, asked on the first tap), and shows
+a "Saved to Photos" toast with a green check for about 1.8 s. It is hidden for a
+photo picked from the library, which is already in Photos, until it is cropped.
+With access off or restricted the toast reads "Photos access is off" with Open
+Settings, and a write error reads "The photo couldn't be saved." A saved photo
+can sync through the learner's iCloud Photos, which is theirs; the privacy label
+stays Data Not Collected.
 
 This camera is being rebuilt to the design in `docs/ui-reference/camera/`. The
 entry buttons, the viewfinder, the frozen photo with its sweep and boxes are
-done; still to come are a peek, half and full results sheet, Crop, and Save to
-Photos (Crop and Save join Highlights in the top right as they land). "Decide the camera scan
+done, and so is Save to Photos; still to come are a peek, half and full results
+sheet and Crop (Crop joins Highlights and Save in the top right as it lands). "Decide the camera scan
 open questions" in `.plan/` settles what the design leaves open, and this
 section changes as those tickets land.
 

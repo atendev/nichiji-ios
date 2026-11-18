@@ -88,6 +88,9 @@ struct PhotoLookupScreen: View {
     @State private var sweep: ScanSweep?
     @State private var isSweeping = false
     @State private var showsHighlights = true
+    @State private var saver = PhotoSaveModel(library: SystemPhotoLibrarySaver())
+    /// Crop sets `.cropped` when it replaces the photo. Save saves `model.photoData`, whichever photo is current.
+    @State private var photoOrigin: PhotoOrigin = .camera
 
     private var isLive: Bool { model.state == .empty }
     private var showsPanel: Bool { !isLive && model.state != .reading }
@@ -126,6 +129,8 @@ struct PhotoLookupScreen: View {
                             .transition(reduceMotion ? .opacity : .move(edge: .bottom))
                     }
                 }
+
+                PhotoSaveToastView(model: saver)
             }
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: isLive)
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: showsPanel)
@@ -163,6 +168,7 @@ struct PhotoLookupScreen: View {
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
+                    photoOrigin = .library
                     await model.lookUp(imageData: data)
                 }
                 libraryItem = nil
@@ -181,6 +187,7 @@ struct PhotoLookupScreen: View {
             let data = await camera.capture()
             isCapturing = false
             if let data {
+                photoOrigin = .camera
                 await model.lookUp(imageData: data)
             } else {
                 captureFailed = true
@@ -203,6 +210,10 @@ struct PhotoLookupScreen: View {
             current.finishRead(at: .now)
             sweep = current
         }
+    }
+
+    private func savePhoto() {
+        Task { await saver.save(imageData: model.photoData) }
     }
 
     private func toggleHighlights() {
@@ -325,6 +336,7 @@ extension PhotoLookupScreen {
                 if isLive {
                     dismiss()
                 } else {
+                    saver.dismissToast()
                     model.retake()
                 }
             }
@@ -338,7 +350,7 @@ extension PhotoLookupScreen {
                     camera.toggleTorch()
                 }
             } else if !isLive, model.state == .found, model.hasBoxes {
-                // Crop and Save join Highlights here when their own tickets land.
+                // Crop joins Highlights here when its own ticket lands.
                 PhotoOptionButton(
                     systemName: showsHighlights ? "eye" : "eye.slash",
                     label: PhotoLookupCopy.highlights,
@@ -346,6 +358,15 @@ extension PhotoLookupScreen {
                     isOn: showsHighlights,
                     action: toggleHighlights
                 )
+            }
+            if showsPanel, photoOrigin.isSavable {
+                PhotoOptionButton(
+                    systemName: "square.and.arrow.down",
+                    label: PhotoSaveCopy.save,
+                    hint: PhotoSaveCopy.hint,
+                    action: savePhoto
+                )
+                .disabled(saver.isSaving)
             }
         }
         .padding(.horizontal, LayoutTokens.screenMarginCompact)

@@ -304,6 +304,10 @@ public struct PrivacySettingsView: View {
                         Text("The app does not collect any data about you. You do not need an account to use it.")
                             .font(.nichijiBody)
                             .foregroundColor(.nichijiInkMuted)
+
+                        Text("A photo you scan is read on your device and sent nowhere. It goes into your Photos library only when you tap Save.")
+                            .font(.nichijiBody)
+                            .foregroundColor(.nichijiInkMuted)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

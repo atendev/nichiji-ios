@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.29.0
+- Build Save to Photos for the scanned photo. A labelled Save option joins Highlights at the top right of the frozen photo. It writes the current photo to Photos with add-only access (asked on the first tap) and shows a "Saved to Photos" toast with a green check for about 1.8 s, "Photos access is off" with Open Settings when access is denied, or "The photo couldn’t be saved." on a write error. Save is hidden for an uncropped library photo. `NSPhotoLibraryAddUsageDescription` is added, and the camera usage string, the Privacy screen, `DESIGN.md`, the listing and the policy draft now say the photo is saved only when you tap Save.
+
 ## v0.28.1
 - Silence the camera shutter and lock the app to portrait. Scan now grabs a frame from the live video feed instead of taking a photo capture, which skips the shutter sound iOS forces on phones sold in Japan and South Korea; the frame is turned upright and saved as a JPEG. A pending capture now resolves to nil if the session stops. The app supports portrait only on iPhone and iPad (iPad runs full screen) until a landscape layout exists
 
