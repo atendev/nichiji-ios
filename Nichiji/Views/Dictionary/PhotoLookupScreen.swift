@@ -69,7 +69,6 @@ struct PhotoLookupScreen: View {
     let onPick: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var camera = CameraSession()
@@ -86,8 +85,10 @@ struct PhotoLookupScreen: View {
     @State private var showsHighlights = true
     @State private var sheet = ScanSheetModel()
     @State private var isCropping = false
+    @State private var saver = PhotoSaveModel(library: SystemPhotoLibrarySaver())
 
     private var isLive: Bool { model.state == .empty }
+    private var showsPanel: Bool { !isLive && model.state != .reading }
 
     var body: some View {
         GeometryReader { proxy in
@@ -122,8 +123,10 @@ struct PhotoLookupScreen: View {
                 }
 
                 ScanSheetLayer(model: model, sheet: sheet, image: frozenImage, onPick: onPick)
+
+                PhotoSaveToastView(model: saver)
             }
-            .photoCrop(isPresented: $isCropping, image: frozenImage, model: model)
+            .photoCrop(isPresented: $isCropping, image: frozenImage, model: model) { saver.origin = .cropped }
             .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.35, dampingFraction: 0.9), value: isLive)
         }
         .statusBarHidden()
@@ -159,6 +162,7 @@ struct PhotoLookupScreen: View {
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
+                    saver.origin = .library
                     await model.lookUp(imageData: data)
                 }
                 libraryItem = nil
@@ -177,6 +181,7 @@ struct PhotoLookupScreen: View {
             let data = await camera.capture()
             isCapturing = false
             if let data {
+                saver.origin = .camera
                 await model.lookUp(imageData: data)
             } else {
                 captureFailed = true
@@ -258,9 +263,9 @@ extension PhotoLookupScreen {
             case .notDetermined:
                 Color.cameraBase
             case .denied:
-                accessMessage(title: PhotoLookupCopy.deniedTitle, message: PhotoLookupCopy.deniedBody, showsSettings: true)
+                CameraAccessMessage(title: PhotoLookupCopy.deniedTitle, message: PhotoLookupCopy.deniedBody, showsSettings: true)
             case .unavailable:
-                accessMessage(title: PhotoLookupCopy.noCameraTitle, message: PhotoLookupCopy.noCameraBody, showsSettings: false)
+                CameraAccessMessage(title: PhotoLookupCopy.noCameraTitle, message: PhotoLookupCopy.noCameraBody, showsSettings: false)
             }
         }
     }
@@ -289,32 +294,6 @@ extension PhotoLookupScreen {
             }
     }
 
-    private func accessMessage(title: String, message: String, showsSettings: Bool) -> some View {
-        VStack(spacing: LayoutTokens.space16) {
-            Image(systemName: "camera")
-                .font(.system(size: 34, weight: .regular))
-                .foregroundStyle(Color.cameraText.opacity(0.7))
-                .accessibilityHidden(true)
-            Text(title)
-                .font(.nichijiHeading)
-                .foregroundStyle(Color.cameraText)
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
-            Text(message)
-                .font(.nichijiCallout)
-                .foregroundStyle(Color.cameraText.opacity(0.75))
-                .multilineTextAlignment(.center)
-            if showsSettings, let url = URL(string: UIApplication.openSettingsURLString) {
-                PrimaryButton(title: PhotoLookupCopy.openSettings) {
-                    openURL(url)
-                }
-                .padding(.top, LayoutTokens.space8)
-            }
-        }
-        .padding(.horizontal, LayoutTokens.space32)
-        .frame(maxWidth: 420)
-    }
-
     /*-------------------------------chrome-------------------------------*/
 
     private var topBar: some View {
@@ -323,6 +302,7 @@ extension PhotoLookupScreen {
                 if isLive {
                     dismiss()
                 } else {
+                    saver.dismissToast()
                     model.retake()
                 }
             }
@@ -336,7 +316,6 @@ extension PhotoLookupScreen {
                     camera.toggleTorch()
                 }
             } else if !isLive, showsPanel {
-                // Save joins these options when its own ticket lands.
                 HStack(spacing: LayoutTokens.space8) {
                     PhotoCropOption(isHidden: isSweeping) { isCropping = true }
                     if model.state == .found, model.hasBoxes {
@@ -347,6 +326,9 @@ extension PhotoLookupScreen {
                             isOn: showsHighlights,
                             action: toggleHighlights
                         )
+                    }
+                    if saver.origin.isSavable {
+                        SavePhotoOption(saver: saver, imageData: model.photoData)
                     }
                 }
             }

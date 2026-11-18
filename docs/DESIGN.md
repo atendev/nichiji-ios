@@ -118,15 +118,27 @@ a "New only" switch, off by default, that changes the second line to "Showing X
 new" and shows "Nothing new here…" when it empties the grid. Every bundled kanji
 found sits once in a 3-column tile grid with its short meaning and a NEW tag or a
 green check. A tile opens kanji detail on the same stack, with "Scan results" as
-its back label, and Back restores the sheet. Nothing is saved or sent: the photo lives only on the open
-camera screen.
+its back label, and Back restores the sheet. Nothing is sent anywhere. The photo
+is saved only when you tap Save: it lives on the open camera screen otherwise.
 
-This camera is being rebuilt to the design in `docs/ui-reference/camera/`. The
-entry buttons, the viewfinder, the frozen photo with its sweep and boxes, and
-the results sheet are done; still to come are Crop and Save to
-Photos (Crop and Save join Highlights in the top right as they land). "Decide the camera scan
-open questions" in `.plan/` settles what the design leaves open, and this
-section changes as those tickets land.
+Crop, Highlights and Save sit in the top right with text labels. Crop shows the
+photo at full size with the rest dimmed and a frame with four draggable corners
+(44 pt targets); Done makes the frame the frozen photo and reads it again, and
+Cancel returns to the results.
+
+Save writes the plain photo (the crop, once cropped), with no boxes, to Photos
+with add-only access (`NSPhotoLibraryAddUsageDescription`, asked on the first
+tap), and shows a "Saved to Photos" toast with a green check for about 1.8 s. It
+is hidden for a photo picked from the library, which is already in Photos, until
+it is cropped. With access off or restricted the toast reads "Photos access is
+off" with Open Settings, and a write error reads "The photo couldn't be saved." A
+saved photo can sync through the learner's iCloud Photos, which is theirs; the
+privacy label stays Data Not Collected.
+
+This camera was rebuilt to the design in `docs/ui-reference/camera/`: the entry
+buttons, the viewfinder, the frozen photo with its sweep and boxes, the results
+sheet, Crop and Save to Photos are done. "Decide the camera scan
+open questions" in `.plan/` settled what the design left open.
 
 A shared App Group (`group.com.aten.nichiji`) backs both SwiftData and
 `UserDefaults` so the main app and WidgetKit extension operate on the same

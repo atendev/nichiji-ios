@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.31.0
+- Build Save to Photos for the scanned photo. A labelled Save option joins Highlights at the top right of the frozen photo. It writes the current photo to Photos with add-only access (asked on the first tap) and shows a "Saved to Photos" toast with a green check for about 1.8 s, "Photos access is off" with Open Settings when access is denied, or "The photo couldn’t be saved." on a write error. Save is hidden for an uncropped library photo. `NSPhotoLibraryAddUsageDescription` is added, and the camera usage string, the Privacy screen, `DESIGN.md`, the listing and the policy draft now say the photo is saved only when you tap Save.
+
 ## v0.30.0
 - Add Crop to the scanned photo. A labelled Crop option opens the photo at full size with the rest dimmed, a frame with thirds lines, and four draggable corner handles with 44 pt targets that VoiceOver can nudge. Done cuts the frame out, makes it the frozen photo and reads it again with the sweep; Cancel returns to the results. Crop also shows after an empty or failed read and works again on a cropped photo
 

@@ -48,8 +48,13 @@ struct PhotoCropOption: View {
 }
 
 extension View {
-    /// Lays the crop screen over this view while `isPresented` is on. Done rescans the frame through the model; Cancel just closes.
-    func photoCrop(isPresented: Binding<Bool>, image: UIImage?, model: PhotoLookupModel) -> some View {
+    /// Lays the crop screen over this view while `isPresented` is on. Done rescans the frame through the model and calls `onCropped` once the crop replaces the photo; Cancel just closes.
+    func photoCrop(
+        isPresented: Binding<Bool>,
+        image: UIImage?,
+        model: PhotoLookupModel,
+        onCropped: @escaping () -> Void = {}
+    ) -> some View {
         overlay {
             if isPresented.wrappedValue, let image {
                 PhotoCropView(
@@ -59,7 +64,7 @@ extension View {
                         isPresented.wrappedValue = false
                         // A frame that still covers the whole photo has nothing new to read, so it closes like Cancel.
                         guard region != PhotoCrop.fullFrame else { return }
-                        Task { await model.crop(to: region) }
+                        Task { if await model.crop(to: region) { onCropped() } }
                     }
                 )
                 .transition(.opacity)
