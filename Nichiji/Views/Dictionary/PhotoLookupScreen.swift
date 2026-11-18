@@ -248,6 +248,7 @@ extension PhotoLookupScreen {
         if let frozenImage, !isLive {
             FrozenPhotoLayer(
                 image: frozenImage,
+                fitMode: saver.origin.fitMode,
                 boxes: PhotoHighlights.boxes(scanned: model.scanned, startedIDs: model.startedIDs),
                 sweep: sweep,
                 isSweeping: isSweeping,

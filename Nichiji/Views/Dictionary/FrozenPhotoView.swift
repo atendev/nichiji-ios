@@ -3,9 +3,10 @@ import UIKit
 
 /*-------------------------------frozen-photo-------------------------------*/
 
-/// The frozen shot, filling the screen, with the scan line and the kanji boxes over it. Boxes are mapped from the image to the view under aspect-fill, then through the learner's pinch and pan.
+/// The frozen photo with the scan line and the kanji boxes over it. A camera shot fills the screen; a library photo or a crop is fitted whole on the camera base. Boxes are mapped from the image to the view the same way, then through the learner's pinch and pan.
 struct FrozenPhotoLayer: View {
     let image: UIImage
+    var fitMode: PhotoFitMode = .fill
     let boxes: [HighlightBox]
     let sweep: ScanSweep?
     /// True from the shutter until the last box is in. It runs the timeline and holds taps and zoom back.
@@ -18,7 +19,7 @@ struct FrozenPhotoLayer: View {
 
     /// The design draws each box a little larger than the glyph: 1 pt either side, 3 pt above and below.
     private func drawn(_ box: HighlightBox, in viewSize: CGSize) -> CGRect {
-        PhotoFit.viewRect(forNormalized: box.rect, imageSize: image.size, in: viewSize).insetBy(dx: -1, dy: -3)
+        PhotoFit.viewRect(forNormalized: box.rect, imageSize: image.size, in: viewSize, mode: fitMode).insetBy(dx: -1, dy: -3)
     }
 
     var body: some View {
@@ -26,14 +27,14 @@ struct FrozenPhotoLayer: View {
             let size = proxy.size
             let rects = boxes.map { drawn($0, in: size) }
             let shown = rects.map { zoom.apply(to: $0, in: size) }
-            // Only the part of the photo on screen carries boxes, so one cropped off by aspect-fill stays hidden when zoomed in.
-            let visible = zoom.apply(to: CGRect(origin: .zero, size: size), in: size)
+            let photo = PhotoFit.photoFrame(imageSize: image.size, in: size, mode: fitMode)
+            // Only the photo carries boxes, so none shows on a fitted photo's bars, and one cropped off by aspect-fill appears once zoomed in far enough.
+            let visible = zoom.apply(to: photo, in: size)
+            let sweepRect = PhotoFit.sweepFrame(imageSize: image.size, in: size, mode: fitMode)
             ZStack {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFill()
-                    .frame(width: size.width, height: size.height)
-                    .clipped()
+                    .frame(width: photo.width, height: photo.height)
                     .scaleEffect(zoom.scale)
                     .offset(zoom.offset)
                     .frame(width: size.width, height: size.height)
@@ -45,7 +46,7 @@ struct FrozenPhotoLayer: View {
                         boxes: boxes,
                         rects: rects,
                         shown: shown,
-                        viewHeight: size.height,
+                        sweepRect: sweepRect,
                         sweep: sweep,
                         isSweeping: isSweeping,
                         onPick: onPick
@@ -60,24 +61,25 @@ struct FrozenPhotoLayer: View {
                 }
 
                 if isSweeping, !reduceMotion, let sweep {
-                    ScanLine(sweep: sweep, height: size.height)
+                    ScanLine(sweep: sweep, rect: sweepRect)
                 }
             }
-            .photoZoomGestures($zoom, viewSize: size, isEnabled: !isSweeping) { point in
+            .photoZoomGestures($zoom, viewSize: size, contentSize: photo.size, isEnabled: !isSweeping) { point in
                 guard showsHighlights, !isSweeping, let index = PhotoHighlights.index(at: point, in: shown) else { return }
                 onPick(boxes[index].kanji)
             }
         }
         .onChange(of: image) { _, _ in zoom = .identity }
+        .onChange(of: fitMode) { _, _ in zoom = .identity }
     }
 }
 
 /*--------------------------------scan-line---------------------------------*/
 
-/// The line that sweeps down the photo while it is read.
+/// The line that sweeps down the photo while it is read, over `rect`: the photo as it sits on screen at 1x.
 private struct ScanLine: View {
     let sweep: ScanSweep
-    let height: CGFloat
+    let rect: CGRect
 
     private static let thickness: CGFloat = 3
 
@@ -98,11 +100,12 @@ private struct ScanLine: View {
                     .frame(height: Self.thickness)
                     .shadow(color: Color.cameraNew.opacity(0.5), radius: 9)
                     .padding(.horizontal, LayoutTokens.space24)
-                    .offset(y: position * height)
+                    .offset(y: position * rect.height)
                     .opacity(ScanSweep.lineOpacity(at: position))
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .frame(width: rect.width, height: rect.height, alignment: .top)
+            .position(x: rect.midX, y: rect.midY)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -111,12 +114,13 @@ private struct ScanLine: View {
 
 /*--------------------------------highlights--------------------------------*/
 
-/// A red or green box on every kanji found. `rects` are the boxes with the photo at 1x, which time the sweep; `shown` are the same boxes under the current zoom, which are drawn and labelled. Taps are read by the zoom gestures, since a single tap must wait out a double-tap.
+/// A red or green box on every kanji found. `rects` are the boxes with the photo at 1x, which time the sweep down `sweepRect`; `shown` are the same boxes under the current zoom, which are drawn and labelled. Taps are read by the zoom gestures, since a single tap must wait out a double-tap.
 private struct HighlightsLayer: View {
     let boxes: [HighlightBox]
     let rects: [CGRect]
     let shown: [CGRect]
-    let viewHeight: CGFloat
+    /// The photo as it sits on screen at 1x; the sweep runs down it.
+    let sweepRect: CGRect
     let sweep: ScanSweep?
     let isSweeping: Bool
     let onPick: (String) -> Void
@@ -131,7 +135,7 @@ private struct HighlightsLayer: View {
                         let rect = shown[box.id]
                         let progress = sweep?.boxProgress(
                             at: context.date,
-                            normalizedY: viewHeight > 0 ? rects[box.id].midY / viewHeight : 0,
+                            normalizedY: sweepRect.height > 0 ? (rects[box.id].midY - sweepRect.minY) / sweepRect.height : 0,
                             reduceMotion: reduceMotion
                         ) ?? 1
                         HighlightBoxView(isNew: box.isNew)

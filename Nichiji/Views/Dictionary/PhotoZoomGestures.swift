@@ -6,6 +6,7 @@ import SwiftUI
 private struct PhotoZoomGestures: ViewModifier {
     @Binding var zoom: PhotoZoom
     let viewSize: CGSize
+    let contentSize: CGSize
     let isEnabled: Bool
     let onTap: (CGPoint) -> Void
 
@@ -48,7 +49,7 @@ private struct PhotoZoomGestures: ViewModifier {
                 pinchBase = base
                 panBase = nil
                 panNeedsRebase = isDragging
-                zoom = base.pinched(by: value.magnification, about: value.startLocation, in: viewSize)
+                zoom = base.pinched(by: value.magnification, about: value.startLocation, in: viewSize, content: contentSize)
             }
             .onEnded { _ in
                 pinchBase = nil
@@ -75,7 +76,8 @@ private struct PhotoZoomGestures: ViewModifier {
                 let base = panBase ?? zoom
                 zoom = base.panned(
                     by: CGSize(width: value.translation.width - panOrigin.width, height: value.translation.height - panOrigin.height),
-                    in: viewSize
+                    in: viewSize,
+                    content: contentSize
                 )
             }
             .onEnded { _ in
@@ -86,7 +88,7 @@ private struct PhotoZoomGestures: ViewModifier {
     }
 
     private func toggle(at point: CGPoint) {
-        let next = zoom.toggled(at: point, in: viewSize)
+        let next = zoom.toggled(at: point, in: viewSize, content: contentSize)
         animate { zoom = next }
     }
 
@@ -97,13 +99,14 @@ private struct PhotoZoomGestures: ViewModifier {
 }
 
 extension View {
-    /// Lets the learner pinch, drag and double-tap to change `zoom`. While `isEnabled` is off the gestures do nothing, and a single tap goes to `onTap` in this view's coordinates.
+    /// Lets the learner pinch, drag and double-tap to change `zoom`. `contentSize` is the photo's size at 1x, which bounds the pan. While `isEnabled` is off the gestures do nothing, and a single tap goes to `onTap` in this view's coordinates.
     func photoZoomGestures(
         _ zoom: Binding<PhotoZoom>,
         viewSize: CGSize,
+        contentSize: CGSize,
         isEnabled: Bool,
         onTap: @escaping (CGPoint) -> Void
     ) -> some View {
-        modifier(PhotoZoomGestures(zoom: zoom, viewSize: viewSize, isEnabled: isEnabled, onTap: onTap))
+        modifier(PhotoZoomGestures(zoom: zoom, viewSize: viewSize, contentSize: contentSize, isEnabled: isEnabled, onTap: onTap))
     }
 }

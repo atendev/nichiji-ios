@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.34.0
+- Fit library and cropped photos on the frozen photo screen. A camera shot still fills the screen; a library photo, and any crop (a cropped shot included), is now shown whole at its own shape, centred on the camera base, so a square or landscape photo is no longer zoomed in to the full height with its sides cut off. The boxes, their tap targets, the scan sweep and the Highlights layer use the same photo rect in both modes. Pan and zoom now treat the photo's own rect as 1x: a letterboxed photo cannot be panned into its bars, and a filled shot's cut-off sides can now be reached by zooming in. The geometry is `PhotoFit.photoFrame` and `PhotoOrigin.fitMode`, covered by `PhotoFitModeTests`.
+
 ## v0.33.0
 - Pan and zoom the frozen photo. Pinch zooms from 1x to 4x about the pinch point, a drag pans while zoomed and cannot take a photo edge inside the screen, and a double-tap toggles between 1x and 2.5x. The kanji boxes, their 44 pt tap targets and the Highlights toggle follow the zoom, and a box tap still opens detail (it waits out the double-tap window). Zoom waits for the sweep to settle, rides on top of the sheet's peek, half and full pose, and resets on a new photo and after a crop rescan. Reduce Motion snaps the double-tap. The geometry is `PhotoZoom`, covered by `PhotoZoomTests`.
 

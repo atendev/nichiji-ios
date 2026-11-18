@@ -2,7 +2,7 @@ import CoreGraphics
 
 /*---------------------------------zoom-----------------------------------*/
 
-/// How far the frozen photo is zoomed and panned. The photo fills the view at 1x; `offset` moves the view's centre once it is scaled about that centre, so a point `p` lands at `centre + offset + scale * (p - centre)`.
+/// How far the frozen photo is zoomed and panned. At 1x the photo sits in `content`, a centred size that is the whole view when it is left out, larger than the view for a filled shot and smaller on one axis for a fitted photo. `offset` moves the view's centre once it is scaled about that centre, so a point `p` lands at `centre + offset + scale * (p - centre)`.
 struct PhotoZoom: Equatable, Sendable {
     static let minScale: CGFloat = 1
     static let maxScale: CGFloat = 4
@@ -20,10 +20,11 @@ struct PhotoZoom: Equatable, Sendable {
 
     /*-----------------------------clamping-----------------------------*/
 
-    /// The scale within range, and an offset small enough that the photo still covers the view. At 1x there is no pan.
-    func clamped(in viewSize: CGSize) -> PhotoZoom {
+    /// The scale within range, and an offset small enough that no edge of the photo pulls inside the view. At 1x there is no pan.
+    func clamped(in viewSize: CGSize, content: CGSize? = nil) -> PhotoZoom {
         let next = min(max(scale, Self.minScale), Self.maxScale)
-        let limit = Self.maxOffset(scale: next, in: viewSize)
+        guard next > Self.minScale else { return PhotoZoom(scale: next) }
+        let limit = Self.maxOffset(scale: next, in: viewSize, content: content)
         return PhotoZoom(
             scale: next,
             offset: CGSize(
@@ -33,15 +34,19 @@ struct PhotoZoom: Equatable, Sendable {
         )
     }
 
-    /// How far the scaled photo can shift each way before an edge pulls inside the view.
-    static func maxOffset(scale: CGFloat, in viewSize: CGSize) -> CGSize {
-        CGSize(width: max(viewSize.width * (scale - 1) / 2, 0), height: max(viewSize.height * (scale - 1) / 2, 0))
+    /// How far the scaled photo can shift each way before an edge pulls inside the view. An axis the scaled photo does not fill stays centred, so a fitted photo cannot be panned into its bars.
+    static func maxOffset(scale: CGFloat, in viewSize: CGSize, content: CGSize? = nil) -> CGSize {
+        let photo = content ?? viewSize
+        return CGSize(
+            width: max((photo.width * scale - viewSize.width) / 2, 0),
+            height: max((photo.height * scale - viewSize.height) / 2, 0)
+        )
     }
 
     /*-----------------------------gestures-----------------------------*/
 
     /// The zoom at `newScale`, with the photo point under `anchor` (view coordinates) held still.
-    func zoomed(to newScale: CGFloat, about anchor: CGPoint, in viewSize: CGSize) -> PhotoZoom {
+    func zoomed(to newScale: CGFloat, about anchor: CGPoint, in viewSize: CGSize, content: CGSize? = nil) -> PhotoZoom {
         let target = min(max(newScale, Self.minScale), Self.maxScale)
         guard scale > 0 else { return .identity }
         let ratio = target / scale
@@ -53,21 +58,21 @@ struct PhotoZoom: Equatable, Sendable {
                 height: fromCentre.y - ratio * (fromCentre.y - offset.height)
             )
         )
-        return next.clamped(in: viewSize)
+        return next.clamped(in: viewSize, content: content)
     }
 
     /// The zoom after a pinch that began at this state: `magnification` is the gesture's factor.
-    func pinched(by magnification: CGFloat, about anchor: CGPoint, in viewSize: CGSize) -> PhotoZoom {
-        zoomed(to: scale * magnification, about: anchor, in: viewSize)
+    func pinched(by magnification: CGFloat, about anchor: CGPoint, in viewSize: CGSize, content: CGSize? = nil) -> PhotoZoom {
+        zoomed(to: scale * magnification, about: anchor, in: viewSize, content: content)
     }
 
     /// The zoom after a drag of `translation` from this state. A photo at 1x does not move.
-    func panned(by translation: CGSize, in viewSize: CGSize) -> PhotoZoom {
+    func panned(by translation: CGSize, in viewSize: CGSize, content: CGSize? = nil) -> PhotoZoom {
         guard isZoomed else { return .identity }
         return PhotoZoom(
             scale: scale,
             offset: CGSize(width: offset.width + translation.width, height: offset.height + translation.height)
-        ).clamped(in: viewSize)
+        ).clamped(in: viewSize, content: content)
     }
 
     /// Where a finished pinch rests: a hair above 1x closes back to it.
@@ -76,8 +81,8 @@ struct PhotoZoom: Equatable, Sendable {
     }
 
     /// A double-tap: back to 1x from any zoom, otherwise in to `doubleTapScale` about the tap.
-    func toggled(at point: CGPoint, in viewSize: CGSize) -> PhotoZoom {
-        isZoomed ? .identity : zoomed(to: Self.doubleTapScale, about: point, in: viewSize)
+    func toggled(at point: CGPoint, in viewSize: CGSize, content: CGSize? = nil) -> PhotoZoom {
+        isZoomed ? .identity : zoomed(to: Self.doubleTapScale, about: point, in: viewSize, content: content)
     }
 
     /*-----------------------------mapping------------------------------*/

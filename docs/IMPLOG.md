@@ -1010,3 +1010,23 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host has no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See `.plan/assets/083-pan-and-zoom-the-frozen-photo-report.md`.
+
+### Fit library and cropped photos on the frozen photo screen (v0.34.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. A camera shot fills the screen. A library photo or a crop (a cropped shot included) is fitted whole, centred on the camera base.
+  2. Boxes, tap targets, the sweep and the Highlights layer use the same photo rect in both modes, so boxes stay on their kanji.
+  3. Zoom's 1x is the photo's rect and the pan clamp uses its bounds, so a letterboxed photo cannot be panned into the bars and a filled shot's cut-off sides can be zoomed into.
+  4. Pure geometry with unit tests for portrait, square and landscape photos in both modes.
+- **Scope Boundary**: In: `PhotoFit`, `PhotoOrigin.fitMode`, `PhotoZoom` and its gestures, the frozen photo layer, one line in `PhotoLookupScreen.swift`, tests and docs. Out: Crop's own screen, the sheet pose.
+- **Anticipated TODOs**: None. The fit and the zoom clamp need a device check.
+- **Planned Tests**: `PhotoFitModeTests`: origin to mode, frames for portrait, narrow, square and landscape photos in both modes, box mapping, and the zoom clamp with a content size.
+- **Version**: MINOR, v0.33.0 to v0.34.0 by the master's brief.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check.
+- **Scope Boundary**: Kept. `PhotoLookupScreen.swift` grew by one line (369 of 400).
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host has no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/084-fit-library-and-cropped-photos-on-the-frozen-photo-report.md`.

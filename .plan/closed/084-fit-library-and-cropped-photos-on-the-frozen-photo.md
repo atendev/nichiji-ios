@@ -3,9 +3,9 @@ id: "084"
 title: Fit library and cropped photos on the frozen photo screen
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["083"]
-claimed: true
+claimed: false
 ---
 
 ## Question
@@ -25,4 +25,6 @@ The user found this on device. After Crop's Done, or with a square or landscape 
 
 ## Resolution
 
-<Filled in at close.>
+A camera shot still aspect-fills; a library photo and any crop (`PhotoOrigin.library` or `.cropped`, a cropped shot included) is aspect-fitted whole, centred on the camera base. `PhotoOrigin.fitMode` picks the `PhotoFitMode`, and `PhotoFit.photoFrame` is the one rect the image, the boxes, their tap targets, the sweep and the Highlights mask all use. Zoom's 1x is that rect: `PhotoZoom` takes an optional content size and clamps the pan to it, an axis the scaled photo does not fill stays centred (so a letterboxed photo cannot be panned into its bars), and a filled shot's cut-off sides can now be zoomed into, which settles the open note on [Pan and zoom the frozen photo](083-pan-and-zoom-the-frozen-photo.md). Version v0.34.0. Tests: `PhotoFitModeTests` (portrait, narrow, square and landscape in both modes, box mapping, zoom clamp with a content size).
+
+CI: pending; see the final report. Decision report: `.plan/assets/084-fit-library-and-cropped-photos-on-the-frozen-photo-report.md`.

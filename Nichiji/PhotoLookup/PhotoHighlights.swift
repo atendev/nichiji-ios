@@ -12,9 +12,24 @@ enum PhotoFit {
         return CGRect(x: (viewSize.width - size.width) / 2, y: (viewSize.height - size.height) / 2, width: size.width, height: size.height)
     }
 
-    /// A normalized box (top-left origin) in view coordinates, for a photo drawn aspect-fill.
-    static func viewRect(forNormalized box: CGRect, imageSize: CGSize, in viewSize: CGSize) -> CGRect {
-        let frame = filledFrame(imageSize: imageSize, in: viewSize)
+    /// Where the frozen photo is drawn in a view under `mode`.
+    static func photoFrame(imageSize: CGSize, in viewSize: CGSize, mode: PhotoFitMode) -> CGRect {
+        switch mode {
+        case .fill: filledFrame(imageSize: imageSize, in: viewSize)
+        case .fit: fittedFrame(imageSize: imageSize, in: viewSize)
+        }
+    }
+
+    /// The part of the photo on screen, which the scan line sweeps. A filled shot sweeps the whole view; a fitted photo sweeps only itself, not its bars.
+    static func sweepFrame(imageSize: CGSize, in viewSize: CGSize, mode: PhotoFitMode) -> CGRect {
+        let photo = photoFrame(imageSize: imageSize, in: viewSize, mode: mode)
+        guard photo != .zero else { return .zero }
+        return photo.intersection(CGRect(origin: .zero, size: viewSize))
+    }
+
+    /// A normalized box (top-left origin) in view coordinates, for a photo drawn under `mode`.
+    static func viewRect(forNormalized box: CGRect, imageSize: CGSize, in viewSize: CGSize, mode: PhotoFitMode = .fill) -> CGRect {
+        let frame = photoFrame(imageSize: imageSize, in: viewSize, mode: mode)
         return CGRect(
             x: frame.minX + box.minX * frame.width,
             y: frame.minY + box.minY * frame.height,
@@ -22,6 +37,17 @@ enum PhotoFit {
             height: box.height * frame.height
         )
     }
+}
+
+/// How the frozen photo sits in the screen. A shot fills it; a library photo or a crop is shown whole.
+enum PhotoFitMode: Equatable, Sendable {
+    case fill
+    case fit
+}
+
+extension PhotoOrigin {
+    /// A camera shot fills the screen. A library photo, or any crop of one (a cropped shot included), is fitted whole.
+    var fitMode: PhotoFitMode { self == .camera ? .fill : .fit }
 }
 
 /*--------------------------------highlights------------------------------*/
