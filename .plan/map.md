@@ -22,9 +22,11 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 7. Pro: the free/Pro boundary, the StoreKit 2 purchase service, the paywall.
 8. Release: App Store metadata, then the signed TestFlight build.
 9. Camera scan: rebuild photo lookup to the design in `docs/ui-reference/camera/`. Decide the open questions, then build the entry and viewfinder, kanji boxes, frozen photo and highlights, results sheet, Crop and Save. This stage comes before the release build (numbered later only because it came up later).
+10. Kanji beyond Jōyō: add the Jinmeiyō and Hyōgai levels to the dataset, then to the app.
 
 ## Decisions so far
 
+- [Add kanji beyond Jōyō](closed/085-add-kanji-beyond-joyo.md): The bundle adds Jinmeiyō (all 863 KANJIDIC2 grade 9 and 10 kanji, 616 new) and Hyōgai (the other 3,465 JIS X 0208 kanji), about 6,464 in all, with no new sources. Both levels follow the last level on the JLPT and Jōyō ladders. On the JLPT ladder, Jinmeiyō holds only kanji with no N-level. A per-record classification drives both ladders. The 89 Jinmeiyō kanji with no KanjiVG file ship without stroke order. Budgets rise to 8 MB Shared and 24 MB app, and the widget's runtime memory gets measured.
 - [Fit library and cropped photos on the frozen photo screen](closed/084-fit-library-and-cropped-photos-on-the-frozen-photo.md): Camera shots still aspect-fill. Library photos and crops (`PhotoOrigin.fitMode`) aspect-fit on the camera base, which fixes the zoom the user saw after a crop. `PhotoFit.photoFrame` and `sweepFrame` drive the image, boxes, tap targets and sweep. `PhotoZoom` takes the photo's content size, so a letterboxed photo can't be panned into its bars and a filled shot's cut-off sides can be zoomed into. The fit, pan limit and sweep need a device check. v0.34.0.
 - [Pan and zoom the frozen photo](closed/083-pan-and-zoom-the-frozen-photo.md): Pinch zooms 1x to 4x around the pinch point, drag pans (clamped) and double-tap toggles 1x and 2.5x, all in SwiftUI gestures, not a `UIScrollView`. The boxes follow in screen space. A single box tap waits out the double-tap window, and a sheet header drag wins over the photo pan. Zoom resets on Retake, a new photo and a crop. The gestures and tap delay need a device check. v0.33.0.
 - [Fix the crop photo fit and drag the whole frame](closed/082-fix-crop-fit-and-drag-the-frame.md): Dragging inside the Crop frame moves it, clamped to the photo, and the corners still resize, with four VoiceOver move actions. Crop is now a `fullScreenCover`, and its fit gained tests but was already correct. The user's zoom bug is on the frozen photo screen, so [Fit library and cropped photos on the frozen photo screen](closed/084-fit-library-and-cropped-photos-on-the-frozen-photo.md) took it. The drag and the cover transition need a device check. v0.32.0.
@@ -97,7 +99,8 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Frontier
 
+- [Generate the Jinmeiyō and Hyōgai kanji](tickets/086-generate-the-jinmeiyo-and-hyogai-kanji.md) (task, AFK)
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
 
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.
+Blocked: [Add the Jinmeiyō and Hyōgai levels to the app](tickets/087-add-the-jinmeiyo-and-hyogai-levels-to-the-app.md), behind the generator (086). [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.
