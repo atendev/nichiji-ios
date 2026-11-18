@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.36.1
+- Stagger the first reviews of kanji marked known. Marking a whole level, from onboarding, the known-kanji picker or a level pick, no longer puts every mark in the same day's review. A batch comes due ten kanji a day starting on the day it is marked, in sorted kanji order, and kanji already in study do not take a slot. A single hand mark from kanji detail stays due today, and a later level pick starts its own batch today. Not tagged
+
 ## v0.36.0
 - Add the Jinmeiyō and Hyōgai levels to the app. Both level ladders now end with Jinmeiyō ("Name kanji") and Hyōgai ("Beyond the lists"), in onboarding, Settings, the known-kanji picker, Dictionary browse, the level footers and Stats. On the JLPT ladder Jinmeiyō holds the 559 kanji with no N-level; on the Jōyō ladder it holds all 806. Hyōgai holds the 3,465 others. Every kanji sits on exactly one rung per ladder. The study pool now reads index entries, so the widget decodes one record for a Hyōgai kanji. The Details card gets a Classification row. The 32 Jinmeiyō kanji with no stroke SVG show "No stroke order for this kanji" in detail, Practice and handwriting matching instead of an empty pad. The Sources totals follow the bundle. `DictionarySearchIndexCostTests` logs the search-index build time and memory. Not tagged
 
