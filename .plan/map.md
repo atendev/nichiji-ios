@@ -96,5 +96,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
+- [Fix the crop photo fit and drag the whole frame](tickets/082-fix-crop-fit-and-drag-the-frame.md) (task, AFK)
+- [Pan and zoom the frozen photo](tickets/083-pan-and-zoom-the-frozen-photo.md) (task, AFK)
 
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.
+Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067), the crop fix (082) and pan and zoom (083). The camera scan stage is built; its device checks go with the release build.
