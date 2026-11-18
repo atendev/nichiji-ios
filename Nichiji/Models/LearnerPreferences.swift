@@ -50,8 +50,8 @@ public enum LevelSystem: String, Codable, CaseIterable, Sendable {
     /// Explanatory note displayed below the level system switch.
     public var schemeNote: String {
         switch self {
-        case .jlpt: "JLPT levels follow the Japanese-Language Proficiency Test, from N5 to N1."
-        case .joyo: "Jōyō grades follow the Japanese school curriculum, from 1st grade to secondary school."
+        case .jlpt: "JLPT levels follow the Japanese-Language Proficiency Test, from N5 to N1. Name kanji and kanji beyond the lists come after."
+        case .joyo: "Jōyō grades follow the Japanese school curriculum, from 1st grade to secondary school. Name kanji and kanji beyond the lists come after."
         }
     }
 }
@@ -82,12 +82,16 @@ public enum DailyOrder: String, Codable, CaseIterable, Sendable {
 }
 
 public extension JLPTLevel {
-    /// Short badge code (`N5` through `N1`).
+    /// Short badge code (`N5` through `N1`, `名` for name kanji, `外` for beyond the lists).
     var codeLabel: String {
-        rawValue.uppercased()
+        switch self {
+        case .n5, .n4, .n3, .n2, .n1: rawValue.uppercased()
+        case .jinmeiyo: "名"
+        case .hyogai: "外"
+        }
     }
 
-    /// Descriptive level name (`Beginner` through `Advanced`).
+    /// Descriptive level name (`Beginner` through `Advanced`, then `Name kanji` and `Beyond the lists`).
     var displayName: String {
         switch self {
         case .n5: "Beginner"
@@ -95,12 +99,23 @@ public extension JLPTLevel {
         case .n3: "Intermediate"
         case .n2: "Upper intermediate"
         case .n1: "Advanced"
+        case .jinmeiyo: "Name kanji"
+        case .hyogai: "Beyond the lists"
         }
     }
 
-    /// Summary string displayed in the main Settings row (`N5 · Beginner`).
+    /// Summary string displayed in the main Settings row (`N5 · Beginner`, `Name kanji · Jinmeiyō`).
     var settingsSummary: String {
-        "\(codeLabel) · \(displayName)"
+        isListStep ? "\(displayName) · \(classificationName)" : "\(codeLabel) · \(displayName)"
+    }
+
+    /// Official list name for the two rungs past N1; empty for N-levels.
+    private var classificationName: String {
+        switch self {
+        case .jinmeiyo: KanjiClassification.jinmeiyo.listLabel
+        case .hyogai: KanjiClassification.hyogai.listLabel
+        case .n5, .n4, .n3, .n2, .n1: ""
+        }
     }
 }
 
@@ -115,6 +130,8 @@ public extension JoyoGrade {
         case .grade5: "5"
         case .grade6: "6"
         case .secondary: "S"
+        case .jinmeiyo: "名"
+        case .hyogai: "外"
         }
     }
 
@@ -128,6 +145,8 @@ public extension JoyoGrade {
         case .grade5: "5th grade"
         case .grade6: "6th grade"
         case .secondary: "Secondary school"
+        case .jinmeiyo: "Name kanji"
+        case .hyogai: "Beyond the lists"
         }
     }
 
@@ -136,9 +155,13 @@ public extension JoyoGrade {
         self == .secondary ? "Secondary" : codeLabel
     }
 
-    /// Summary string displayed in the main Settings row (`1st grade · Jōyō`).
+    /// Summary string displayed in the main Settings row (`1st grade · Jōyō`, `Name kanji · Jinmeiyō`).
     var settingsSummary: String {
-        "\(displayName) · Jōyō"
+        switch self {
+        case .jinmeiyo: "\(displayName) · \(KanjiClassification.jinmeiyo.listLabel)"
+        case .hyogai: "\(displayName) · \(KanjiClassification.hyogai.listLabel)"
+        case .grade1, .grade2, .grade3, .grade4, .grade5, .grade6, .secondary: "\(displayName) · Jōyō"
+        }
     }
 }
 

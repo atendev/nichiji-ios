@@ -2,17 +2,27 @@ import Foundation
 
 /*-------------------------------protocols------------------------------------*/
 
+/// The fields the daily picker orders by; the pool holds index summaries so a large level never decodes its records.
+public protocol PoolCandidate {
+    var id: String { get }
+    var listIndex: Int { get }
+    var frequencyRank: Int? { get }
+}
+
+extension KanjiIndexEntry: PoolCandidate {}
+extension KanjiEntry: PoolCandidate {}
+
 /// Resolves the active study pool, runs lazy day rollover, and selects each day's kanji.
 public protocol DailyKanjiService: Sendable {
     /// Returns or creates the assignment for a local calendar day after rolling over past days.
     func assignment(for day: String) async throws -> DailyAssignmentSnapshot?
 
     /// Resolves the unlearned study pool for the learner's current level or custom selection.
-    func activePool(preferences: LearnerPreferencesSnapshot) async throws -> [KanjiEntry]
+    func activePool(preferences: LearnerPreferencesSnapshot) async throws -> [KanjiIndexEntry]
 
     /// Deterministically picks one kanji identifier from the candidate pool.
     func selectKanjiID(
-        from pool: [KanjiEntry],
+        from pool: [some PoolCandidate],
         order: DailyOrder,
         excluding excludedIDs: Set<String>,
         day: String
@@ -78,25 +88,20 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
         )
     }
 
-    public func activePool(preferences: LearnerPreferencesSnapshot) async throws -> [KanjiEntry] {
+    public func activePool(preferences: LearnerPreferencesSnapshot) async throws -> [KanjiIndexEntry] {
         let nonNewIDs = try await learnerStore.nonNewKanjiIDs()
-        let candidateEntries: [KanjiEntry]
+        let index = try contentStore.indexEntries()
+        let candidateEntries: [KanjiIndexEntry]
 
         if preferences.isCustomPoolActive {
             let customIDs = try await learnerStore.customSelectionIDs(for: preferences.levelSystem)
-            var entries: [KanjiEntry] = []
-            for id in customIDs {
-                if let entry = try? contentStore.entry(for: id) {
-                    entries.append(entry)
-                }
-            }
-            candidateEntries = entries.sorted { $0.listIndex < $1.listIndex }
+            candidateEntries = index.filter { customIDs.contains($0.id) }
         } else {
             switch preferences.levelSystem {
             case .jlpt:
-                candidateEntries = try contentStore.entries(for: preferences.selectedJLPTLevel)
+                candidateEntries = index.filter { preferences.selectedJLPTLevel.includes($0) }
             case .joyo:
-                candidateEntries = try contentStore.entries(for: preferences.selectedJoyoGrade)
+                candidateEntries = index.filter { preferences.selectedJoyoGrade.includes($0) }
             }
         }
 
@@ -104,7 +109,7 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
     }
 
     public func selectKanjiID(
-        from pool: [KanjiEntry],
+        from pool: [some PoolCandidate],
         order: DailyOrder,
         excluding excludedIDs: Set<String>,
         day: String
@@ -120,7 +125,9 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
     ) async throws -> DailyAssignmentSnapshot? {
         let pool = try await activePool(preferences: preferences)
         let ordered = orderedCandidates(from: pool, order: preferences.dailyOrder, day: day)
-        return try await learnerStore.reassignToday(day: day, from: ordered)
+        // The store reads only the head of the pool, so decode just that one record.
+        let head = try ordered.first.map { [try contentStore.entry(for: $0.id)] } ?? []
+        return try await learnerStore.reassignToday(day: day, from: head)
     }
 
     public func widgetSnapshot(for day: String) async throws -> DailyKanjiWidgetSnapshot? {
@@ -142,11 +149,11 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
 
     // MARK: - Private Helpers
 
-    private func orderedCandidates(
-        from pool: [KanjiEntry],
+    private func orderedCandidates<Candidate: PoolCandidate>(
+        from pool: [Candidate],
         order: DailyOrder,
         day: String
-    ) -> [KanjiEntry] {
+    ) -> [Candidate] {
         switch order {
         case .mostCommon:
             return pool.sorted {
