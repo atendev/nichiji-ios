@@ -5,7 +5,7 @@ type: task
 mode: AFK
 status: open
 blocked_by: ["086"]
-claimed: false
+claimed: true
 ---
 
 ## Question
@@ -17,7 +17,7 @@ Can a learner pick Jinmeiyō or Hyōgai on either level ladder and study, browse
 Skills: `apple`, `tdd`, `unslop`.
 Read [Add kanji beyond Jōyō](../closed/085-add-kanji-beyond-joyo.md) first.
 
-- Both ladders end with Jinmeiyō ("Name kanji") then Hyōgai ("Beyond the lists"). On the JLPT ladder, Jinmeiyō holds only kanji with no N-level. On the Jōyō ladder, it holds all 863.
+- Both ladders end with Jinmeiyō ("Name kanji") then Hyōgai ("Beyond the lists"). On the JLPT ladder, Jinmeiyō holds only kanji with no N-level. On the Jōyō ladder, it holds all 806.
 - Update the level pickers in onboarding and Settings (`LevelSettingsView`), the study pool, `AutoKnownLevels`, the known-kanji picker, Dictionary browse grouping, the kanji Details card, the level footers, and Stats progress.
 - The Details card shows the classification, with "—" or no row where a JLPT level or Jōyō grade is missing. The JLPT "(est.)" label is unchanged.
 - Kanji with no stroke file: detail, Practice and handwriting matching show a clear "No stroke order for this kanji" state, with no empty pad and no crash.
