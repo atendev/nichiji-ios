@@ -45,6 +45,10 @@ _Avoid_: Common-use kanji
 Which list a bundled kanji belongs to, stored as `classification` on every record and index entry: `joyo` (2,136), `jinmeiyo` (806) or `hyogai` (3,465). Both the JLPT and Jōyō level ladders derive from it, and `joyoGrade` stays Jōyō-only.
 _Avoid_: Kanji type, kanji tier
 
+**Level ladder**:
+The ordered rungs a learner studies through, one per level system. The JLPT ladder is N5 to N1, then Jinmeiyō ("Name kanji"), then Hyōgai ("Beyond the lists"); the Jōyō ladder is grade 1 to Secondary, then the same two. Every bundled kanji sits on exactly one rung per ladder. On the JLPT ladder the Jinmeiyō rung holds only the 559 jinmeiyō kanji with no N-level (the other 247 are N1); on the Jōyō ladder it holds all 806. Hyōgai holds all 3,465 on both.
+_Avoid_: Level list, tier
+
 **Jinmeiyō kanji** ("Name kanji"):
 Every KANJIDIC2 kanji with grade 9 or 10, except the 57 compatibility ideographs that fold into a unified twin, 806 in all. 247 of them are Waller N1 kanji, and 559 have no N-level.
 _Avoid_: Name kanji (as a stored value)
@@ -72,7 +76,7 @@ _Avoid_: Top word, main example
 ### Study pool and daily assignment
 
 **Study pool**:
-The active set of kanji entries eligible for daily assignment, determined either by a selected JLPT level, a selected Joyo grade, or a custom selection.
+The active set of kanji entries eligible for daily assignment, determined either by a selected JLPT level, a selected Joyo grade, or a custom selection. The JLPT and Jōyō ladders include the Jinmeiyō and Hyōgai rungs, so any bundled kanji can be a study pool member.
 _Avoid_: Deck, curriculum, syllabus
 
 **Daily assignment**:
