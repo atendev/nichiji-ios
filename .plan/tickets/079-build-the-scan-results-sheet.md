@@ -25,18 +25,14 @@ The header reads "N kanji found" over "X new to you · Y learned" (or "Showing X
 
 ## Handoff
 
-Branch `t3/build-scan-results-sheet`. Audit round 0 (council not run yet). Printf tag `wfm-nichiji-v1-079-1794967719`. No Swift toolchain on the host, so CI is the build, lint (`swiftlint --strict`: file 400, type body 250, function 50 lines, no trailing commas) and test check.
+Branch `t3/scan-results-sheet-2`, pushed at `67fb077`, PR https://github.com/atendev/nichiji-ios/pull/57 against `wayfinder/nichiji-v1-master`. Printf tag `wfm-nichiji-v1-079-1794967719`. Council approved in round 3 (claude 8, gemini 10, gpt 10), so the audit is done. Three audit rounds used, one CI fix used (the first CI run failed to compile `ScanSheetTests.swift`, now fixed).
 
-Done (uncommitted work is in the wip commit):
-- `Nichiji/PhotoLookup/ScanSheet.swift`: `ScanSheetState`, `ScanSheetGeometry` (heights, snap with the 40 pt rule, presentation, corner radius, photo pose, riseDelay), `ScanScreenMetrics`.
-- `Nichiji/PhotoLookup/ScanSheetModel.swift`: `@Observable ScanSheetModel` (state nil until rise, drag, endDrag, move, step, pullToFull, reset, photoPose) and `View.scanSheetPhotoPose(_:)`.
-- `PhotoLookupModel`: `meanings`, `newCount`, `learnedCount`, `PhotoReadOutcome`.
-- `Nichiji/Views/Dictionary/ScanResultTile.swift` (copy extension on `PhotoLookupCopy`, tile) and `ScanResultsSheet.swift` (`ScanSheetLayer`, `ScanResultsSheet`).
+Done: the sheet, model, tiles, host modifier, screen wiring, tests, docs under placeholder `v0.X.0`, the decision report `.plan/assets/079-build-the-scan-results-sheet-report.md`, and the PR.
 
 Left, in order:
-1. Wire `PhotoLookupScreen.swift` (keep edits small: siblings Crop and Save edit its `topBar` and copy). Add `@State private var sheet = ScanSheetModel()`. Drop `showsPanel`, the panel call and its `.animation(value: showsPanel)`. Add `ScanSheetLayer(model:sheet:image: frozenImage, onPick:)` as the last ZStack child. Show `ScanningPill` while `!isLive && !sheet.isVisible`. Add `.scanSheetPhotoPose(sheet)` to `FrozenPhotoLayer` plus `.accessibilityHidden(sheet.isFull)`. Use `.toolbar(sheet.isFull ? .visible : .hidden, for: .tabBar)`. Feed `.onGeometryChange(for: ScanScreenMetrics.self)` (size, safeAreaInsets top/bottom) into `sheet.update`. Add a `.task(id: sweep?.resultsAt)` that sleeps `ScanSheetGeometry.riseDelay(readStart: sweep.readStart, now: .now)` then calls `sheet.rise(reduceMotion:)`. Call `sheet.reset()` in `updateSweep` for `.empty` and `.reading`. Keep `PhotoLookupScreen.swift` under 400 lines (383 now).
-2. Delete `PhotoLookupResultsPanel.swift` and `PhotoLookupCopy.allStarted`.
-3. Tests: `NichijiTests/Suites/ScanSheetTests.swift` (heights, snap, 40 pt rule, pose, corner radius, riseDelay, model rise/reset/pullToFull) and model tests for meanings, newCount, learnedCount. Reread all new Swift for compile and lint risk.
-4. Docs per `docs/workflow.md` (PROGRESS, CHANGELOG, IMPLOG; MINOR bump after v0.28.0), decision report at `.plan/assets/079-build-the-scan-results-sheet-report.md` (unslop), council audit, `## Resolution` in this ticket, then commit, push, return PUSHED.
+1. Wait for the master's CI result. On "CI red", fix the failure, run the changed hunks through the council (round 4 and 5 are left), push, return PUSHED.
+2. On "CI green" or "no CI", run `python3 -I ~/.claude/skills/wayfinder-runner/wf-time.py close --slug nichiji-v1 --ticket 079 --name 'Build the scan results sheet' --ticket-file .plan/tickets/079-build-the-scan-results-sheet.md`, fill in `## Resolution` here, delete this `## Handoff` section, commit, push, return DONE.
 
-Read first: the new files above, `PhotoLookupScreen.swift`, `.plan/assets/078-build-the-frozen-photo-and-highlights-report.md`.
+Report notes: 3 commits, 15 files, +1077 -143 against the master branch. Decision line for the map: the sheet is an `@Observable ScanSheetModel` over pure `ScanSheetGeometry`, wired through `ScanSheetHost` so `PhotoLookupScreen.swift` stays under 400 lines, and the old results panel is deleted. Minor problems declined: 3. No surfaced tickets so far.
+
+Read first: this ticket, the decision report, `Nichiji/Views/Dictionary/ScanSheetHost.swift`.
