@@ -91,6 +91,11 @@ public extension JLPTLevel {
         }
     }
 
+    /// Compact tag for lists and search rows: the N-code, or the full name for the two rungs past N1.
+    var badgeLabel: String {
+        isListStep ? displayName : codeLabel
+    }
+
     /// Descriptive level name (`Beginner` through `Advanced`, then `Name kanji` and `Beyond the lists`).
     var displayName: String {
         switch self {
@@ -135,7 +140,12 @@ public extension JoyoGrade {
         }
     }
 
-    /// Descriptive grade name (`1st grade` through `Secondary school`).
+    /// Compact tag for lists and search rows: the grade code, or the full name for the two rungs past secondary school.
+    var badgeLabel: String {
+        isListStep ? displayName : codeLabel
+    }
+
+    /// Descriptive grade name (`1st grade` through `Secondary school`, then `Name kanji` and `Beyond the lists`).
     var displayName: String {
         switch self {
         case .grade1: "1st grade"
