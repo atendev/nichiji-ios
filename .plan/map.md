@@ -104,5 +104,6 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 - [Measure widget memory and the search index on a device](tickets/088-measure-widget-memory-and-search-index-on-a-device.md) (task, HITL)
 - [Check kanji glyphs outside the bundled fonts](tickets/067-check-kanji-glyphs-outside-the-bundled-fonts.md) (task, HITL)
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
+- [Stagger marked-known kanji reviews ten a day](tickets/089-stagger-marked-known-kanji-reviews.md) (task, AFK, claimed)
 
 Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the glyph check (067). The camera scan stage is built; its device checks go with the release build.

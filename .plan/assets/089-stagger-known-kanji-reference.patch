@@ -1,0 +1,382 @@
+diff --git a/Nichiji/Services/LearnerStore.swift b/Nichiji/Services/LearnerStore.swift
+index 20ffe338..878bfa99 100644
+--- a/Nichiji/Services/LearnerStore.swift
++++ b/Nichiji/Services/LearnerStore.swift
+@@ -52,7 +52,7 @@ public protocol LearnerStore: Sendable {
+     /// Marks the given day's assignment as learned from Today or the interactive widget, scheduling its first review.
+     func markLearned(day: String, nextReviewAt: Date) async throws -> DailyAssignmentSnapshot
+ 
+-    /// Marks new kanji as already known: stage known, no review date, no log row. Kanji past new are left alone.
++    /// Marks new kanji as already known: stage learning, no log row, first review today and staggered ten a day for a batch. Kanji past new are left alone.
+     func declareKnown(_ kanjiIDs: Set<String>, at date: Date) async throws
+ 
+     /// Returns declared kanji to new and logs nothing. Kanji the learner did not declare are left alone.
+diff --git a/Nichiji/Services/ReviewScheduler.swift b/Nichiji/Services/ReviewScheduler.swift
+index fa1bc7b8..adb97d36 100644
+--- a/Nichiji/Services/ReviewScheduler.swift
++++ b/Nichiji/Services/ReviewScheduler.swift
+@@ -29,8 +29,9 @@ public struct KanjiProgressSnapshot: Equatable, Sendable {
+     public let forgotItCount: Int
+     public let declaredKnownAt: Date?
+ 
+-    /// Marked known by the learner rather than learned here; counted apart from Learned.
+-    public var declaredKnown: Bool { stage == .known && declaredKnownAt != nil }
++    /// Marked known by the learner rather than learned here; counted apart from Learned. It sits in the review
++    /// queue as learning, and its first review clears the mark.
++    public var declaredKnown: Bool { declaredKnownAt != nil }
+ 
+     /// Past new and learned through Today or Review, so it counts toward Learned.
+     public var isLearned: Bool { stage != .new && !declaredKnown }
+diff --git a/Nichiji/Services/SwiftDataLearnerStore+Known.swift b/Nichiji/Services/SwiftDataLearnerStore+Known.swift
+index 0a01f1f7..7da72619 100644
+--- a/Nichiji/Services/SwiftDataLearnerStore+Known.swift
++++ b/Nichiji/Services/SwiftDataLearnerStore+Known.swift
+@@ -9,11 +9,13 @@ extension SwiftDataLearnerStore {
+         let context = modelExecutor.modelContext
+         var rows = try progressRows(in: context)
+ 
+-        for id in kanjiIDs {
++        var marked = 0
++        for id in kanjiIDs.sorted() {
+             let row = Self.row(for: id, in: &rows, context: context)
+             // Learning, familiar and known kanji already have progress that marking must not overwrite.
+             guard row.stage == .new else { continue }
+-            Self.mark(row, at: date, byHand: true)
++            Self.mark(row, at: date, byHand: true, position: marked)
++            marked += 1
+         }
+         try context.save()
+     }
+@@ -39,10 +41,12 @@ extension SwiftDataLearnerStore {
+         for row in rows.values where row.declaredKnownAt != nil && !row.wasHandKnown && !kanjiIDs.contains(row.kanjiID) {
+             Self.unmark(row)
+         }
+-        for id in kanjiIDs {
++        var marked = 0
++        for id in kanjiIDs.sorted() {
+             let row = Self.row(for: id, in: &rows, context: context)
+             guard row.stage == .new else { continue }
+-            Self.mark(row, at: date, byHand: false)
++            Self.mark(row, at: date, byHand: false, position: marked)
++            marked += 1
+         }
+         try context.save()
+     }
+@@ -62,9 +66,18 @@ extension SwiftDataLearnerStore {
+         return row
+     }
+ 
+-    private static func mark(_ row: KanjiProgress, at date: Date, byHand: Bool) {
+-        row.stage = .known
+-        row.nextReviewAt = nil
++    /// A mark keeps the kanji out of Today but puts it in the review queue. Kanji marked together come due
++    /// `marksPerDay` at a time starting today, so a learner finishing onboarding has reviews on day one
++    /// and marking a whole level does not bury one day.
++    static let marksPerDay = 10
++
++    private static func mark(_ row: KanjiProgress, at date: Date, byHand: Bool, position: Int) {
++        row.stage = .learning
++        row.nextReviewAt = ReviewScheduler.dueDate(
++            addingDays: position / marksPerDay,
++            to: date,
++            calendar: .current
++        )
+         row.declaredKnownAt = date
+         row.wasHandKnown = byHand
+     }
+diff --git a/Nichiji/Views/KanjiDetail/KanjiDetailView.swift b/Nichiji/Views/KanjiDetail/KanjiDetailView.swift
+index 4317d36e..0931db70 100644
+--- a/Nichiji/Views/KanjiDetail/KanjiDetailView.swift
++++ b/Nichiji/Views/KanjiDetail/KanjiDetailView.swift
+@@ -87,6 +87,10 @@ struct KanjiDetailView: View {
+                     onPlayAudio: { speak(kanji.id, reading: kanji.onyomi.first?.kana ?? kanji.kunyomi.first?.kana) }
+                 )
+ 
++                KnownKanjiControl(kanjiID: kanji.id, stage: stage, isDeclared: isDeclaredKnown) {
++                    await refreshStage()
++                }
++
+                 DetailsCardView(
+                     onyomi: kanji.onyomi,
+                     kunyomi: kanji.kunyomi,
+@@ -110,11 +114,7 @@ struct KanjiDetailView: View {
+                     onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: content.strokePaths) }
+                 )
+ 
+-                KnownKanjiControl(kanjiID: kanji.id, stage: stage, isDeclared: isDeclaredKnown) {
+-                    await refreshStage()
+-                }
+-
+-                // A marked kanji is unmarked above, so Forget it would only leave a reset in History.
++                // A marked kanji is unmarked at the top, so Forget it would only leave a reset in History.
+                 if !isDeclaredKnown {
+                     ForgetItControl(kanjiID: kanji.id, stage: stage) {
+                         stage = .new
+diff --git a/Nichiji/Views/KanjiDetail/KnownKanjiControl.swift b/Nichiji/Views/KanjiDetail/KnownKanjiControl.swift
+index 436f5004..e5e62b73 100644
+--- a/Nichiji/Views/KanjiDetail/KnownKanjiControl.swift
++++ b/Nichiji/Views/KanjiDetail/KnownKanjiControl.swift
+@@ -2,7 +2,7 @@ import SwiftUI
+ 
+ /*--------------------------------known-kanji-----------------------------*/
+ 
+-/// Quiet control beside Forget it: mark a new kanji as already known, or take the mark back.
++/// Top of the kanji detail: mark a new kanji as already known, or show that it is and let the mark be taken back.
+ struct KnownKanjiControl: View {
+     enum Choice: Equatable {
+         case declare
+@@ -10,15 +10,15 @@ struct KnownKanjiControl: View {
+ 
+         var title: String {
+             switch self {
+-            case .declare: "I know this"
+-            case .undeclare: "Not known after all"
++            case .declare: "I know this kanji"
++            case .undeclare: "Undo"
+             }
+         }
+ 
+         var hint: String {
+             switch self {
+-            case .declare: "Marks this kanji as known, so it leaves your daily kanji and reviews"
+-            case .undeclare: "Returns this kanji to new"
++            case .declare: "Marks this kanji as known. It skips your daily kanji and goes into your reviews"
++            case .undeclare: "Returns this kanji to new and takes it out of your reviews"
+             }
+         }
+     }
+@@ -43,26 +43,48 @@ struct KnownKanjiControl: View {
+ 
+     var body: some View {
+         if let choice = Self.choice(stage: stage, isDeclared: isDeclared) {
+-            VStack(spacing: LayoutTokens.space4) {
+-                Button(choice.title) {
+-                    apply(choice)
++            VStack(spacing: LayoutTokens.space8) {
++                switch choice {
++                case .declare:
++                    Button {
++                        apply(choice)
++                    } label: {
++                        Label(choice.title, systemImage: "checkmark.circle")
++                            .padding(.vertical, LayoutTokens.space8)
++                    }
++                    .buttonStyle(SecondaryButtonStyle())
++                    .disabled(isWorking)
++                    .accessibilityHint(choice.hint)
++                case .undeclare:
++                    HStack(spacing: LayoutTokens.space8) {
++                        Label("Known", systemImage: "checkmark.circle.fill")
++                            .font(.nichijiCallout.weight(.medium))
++                            .foregroundColor(.nichijiMatcha)
++
++                        Spacer(minLength: LayoutTokens.space8)
++
++                        Button(choice.title) {
++                            apply(choice)
++                        }
++                        .font(.nichijiCallout)
++                        .foregroundColor(.nichijiInkMuted)
++                        .minTouchTarget()
++                        .disabled(isWorking)
++                        .accessibilityHint(choice.hint)
++                    }
++                    .padding(.horizontal, LayoutTokens.space16)
++                    .frame(minHeight: LayoutTokens.minHitTarget + LayoutTokens.space8)
++                    .accessibilityElement(children: .contain)
+                 }
+-                .font(.nichijiCallout)
+-                .foregroundColor(.nichijiInkMuted)
+-                .padding(.horizontal, LayoutTokens.space16)
+-                .minTouchTarget()
+-                .disabled(isWorking)
+-                .accessibilityHint(choice.hint)
+ 
+                 if let errorMessage {
+                     Text(errorMessage)
+                         .font(.nichijiCaption)
+                         .foregroundColor(.nichijiInkMuted)
+                         .multilineTextAlignment(.center)
+-                        .padding(.horizontal, LayoutTokens.space32)
+                 }
+             }
+-            .frame(maxWidth: .infinity)
++            .padding(.horizontal, LayoutTokens.screenMarginCompact)
+         }
+     }
+ 
+diff --git a/Nichiji/Views/Settings/KnownKanjiPickerParts.swift b/Nichiji/Views/Settings/KnownKanjiPickerParts.swift
+index 3fbb1fb1..39ae27f0 100644
+--- a/Nichiji/Views/Settings/KnownKanjiPickerParts.swift
++++ b/Nichiji/Views/Settings/KnownKanjiPickerParts.swift
+@@ -103,7 +103,7 @@ struct KnownKanjiBottomBar: View {
+                     .font(.nichijiBody)
+                     .foregroundColor(.nichijiInk)
+ 
+-                Text("Kanji you study or review stay as they are.")
++                Text("Kanji you already study stay as they are.")
+                     .font(.nichijiCaption)
+                     .foregroundColor(.nichijiInkMuted)
+             }
+diff --git a/Nichiji/Views/Settings/KnownKanjiPickerView.swift b/Nichiji/Views/Settings/KnownKanjiPickerView.swift
+index a682f7e9..7f7faae8 100644
+--- a/Nichiji/Views/Settings/KnownKanjiPickerView.swift
++++ b/Nichiji/Views/Settings/KnownKanjiPickerView.swift
+@@ -2,7 +2,7 @@ import SwiftUI
+ 
+ /*------------------------------known-kanji-------------------------------*/
+ 
+-/// Turn on the kanji the learner already knows. They leave the daily pool and the review queue.
++/// Turn on the kanji the learner already knows. They leave the daily pool and join the review queue.
+ struct KnownKanjiPickerView: View {
+     @Environment(\.dismiss) private var dismiss
+     @Environment(\.serviceContainer) private var services
+@@ -31,7 +31,7 @@ struct KnownKanjiPickerView: View {
+ 
+             ScrollView(showsIndicators: false) {
+                 VStack(alignment: .leading, spacing: LayoutTokens.space24) {
+-                    Text("Turn on the kanji you already know. They stay out of your daily kanji and your reviews.")
++                    Text("Turn on the kanji you already know. They skip your daily kanji and go into your reviews.")
+                         .font(.nichijiBody)
+                         .foregroundColor(.nichijiInkMuted)
+                         .padding(.top, LayoutTokens.space8)
+diff --git a/NichijiTests/Suites/KnownKanjiControlTests.swift b/NichijiTests/Suites/KnownKanjiControlTests.swift
+index 009ad414..ca62d3ab 100644
+--- a/NichijiTests/Suites/KnownKanjiControlTests.swift
++++ b/NichijiTests/Suites/KnownKanjiControlTests.swift
+@@ -6,7 +6,7 @@ import Testing
+ 
+ @Suite("Known Kanji Control Tests")
+ struct KnownKanjiControlTests {
+-    @Test("I know this shows for new kanji only, and Not known after all for marked ones")
++    @Test("I know this kanji shows for new kanji only, and the Known state with Undo for marked ones")
+     func choiceByStage() {
+         #expect(KnownKanjiControl.choice(stage: nil, isDeclared: false) == .declare)
+         #expect(KnownKanjiControl.choice(stage: .new, isDeclared: false) == .declare)
+diff --git a/NichijiTests/Suites/KnownKanjiStatsTests.swift b/NichijiTests/Suites/KnownKanjiStatsTests.swift
+index e555c220..0bd84719 100644
+--- a/NichijiTests/Suites/KnownKanjiStatsTests.swift
++++ b/NichijiTests/Suites/KnownKanjiStatsTests.swift
+@@ -57,11 +57,11 @@ struct KnownKanjiStatsTests {
+         #expect(figures.kanjiLearned == 1)
+     }
+ 
+-    @Test("Known needs a stage of known and a declared date")
++    @Test("Known needs a declared date, and a review clears it")
+     func declaredFlag() {
+         #expect(StatsFixtures.declared("日", at: Date()).declaredKnown)
+         #expect(!StatsFixtures.progress("日", .known).declaredKnown)
+-        #expect(!KanjiProgressSnapshot(kanjiID: "日", stage: .new, declaredKnownAt: Date()).declaredKnown)
++        #expect(!KanjiProgressSnapshot(kanjiID: "日", stage: .learning).declaredKnown)
+         #expect(StatsFixtures.progress("日", .known).isLearned)
+         #expect(!StatsFixtures.progress("日", .new).isLearned)
+     }
+diff --git a/NichijiTests/Suites/KnownKanjiStoreTests.swift b/NichijiTests/Suites/KnownKanjiStoreTests.swift
+index cdcc8eb5..b67df578 100644
+--- a/NichijiTests/Suites/KnownKanjiStoreTests.swift
++++ b/NichijiTests/Suites/KnownKanjiStoreTests.swift
+@@ -26,7 +26,7 @@ struct KnownKanjiStoreTests {
+         return rows.first?.wasHandKnown
+     }
+ 
+-    @Test("Declaring a new kanji makes it known with no review date and no log row")
++    @Test("Declaring a new kanji puts it in learning, due today, with no log row")
+     func declareMarksKnown() async throws {
+         let store = try makeStore()
+         let date = Date(timeIntervalSince1970: 1_793_000_000)
+@@ -34,8 +34,8 @@ struct KnownKanjiStoreTests {
+         try await store.declareKnown(["山", "川"], at: date)
+ 
+         let progress = try #require(try await store.progress(for: "山"))
+-        #expect(progress.stage == .known)
+-        #expect(progress.nextReviewAt == nil)
++        #expect(progress.stage == .learning)
++        #expect(progress.nextReviewAt == ReviewScheduler.dueDate(addingDays: 0, to: date, calendar: .current))
+         #expect(progress.declaredKnownAt == date)
+         #expect(progress.declaredKnown)
+         #expect(try await store.studyLog().isEmpty)
+@@ -43,6 +43,20 @@ struct KnownKanjiStoreTests {
+         #expect(try await store.nonNewKanjiIDs() == ["山", "川"])
+     }
+ 
++    @Test("Kanji marked together come due ten a day starting today")
++    func declareStaggersDueDates() async throws {
++        let store = try makeStore()
++        let date = Date(timeIntervalSince1970: 1_793_000_000)
++        let ids = Set((0..<25).map { "k\(String(format: "%02d", $0))" })
++
++        try await store.declareKnown(ids, at: date)
++
++        for (index, id) in ids.sorted().enumerated() {
++            let expected = ReviewScheduler.dueDate(addingDays: index / 10, to: date, calendar: .current)
++            #expect(try await store.progress(for: id)?.nextReviewAt == expected)
++        }
++    }
++
+     @Test("Declaring leaves kanji that are already in study alone")
+     func declareSkipsStudiedKanji() async throws {
+         let store = try makeStore()
+diff --git a/NichijiTests/TestDoubles/StatsFixtures.swift b/NichijiTests/TestDoubles/StatsFixtures.swift
+index a03a924a..57b7db5e 100644
+--- a/NichijiTests/TestDoubles/StatsFixtures.swift
++++ b/NichijiTests/TestDoubles/StatsFixtures.swift
+@@ -71,6 +71,6 @@ enum StatsFixtures {
+ 
+     /// A kanji the learner marked as already known.
+     static func declared(_ id: String, at date: Date, forgotItCount: Int = 0) -> KanjiProgressSnapshot {
+-        KanjiProgressSnapshot(kanjiID: id, stage: .known, forgotItCount: forgotItCount, declaredKnownAt: date)
++        KanjiProgressSnapshot(kanjiID: id, stage: .learning, forgotItCount: forgotItCount, declaredKnownAt: date)
+     }
+ }
+diff --git a/NichijiTests/TestDoubles/TestLearnerStore.swift b/NichijiTests/TestDoubles/TestLearnerStore.swift
+index b0e386d7..92d82a40 100644
+--- a/NichijiTests/TestDoubles/TestLearnerStore.swift
++++ b/NichijiTests/TestDoubles/TestLearnerStore.swift
+@@ -166,8 +166,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
+     func declareKnown(_ kanjiIDs: Set<String>, at _: Date) async throws {
+         try checkForError()
+         for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
+-            progress[id] = .known
+-            nextReviewAt[id] = nil
++            progress[id] = .learning
++            nextReviewAt[id] = Self.declaredDate
+             declaredKnown.insert(id)
+         }
+     }
+@@ -181,8 +181,8 @@ final class TestLearnerStore: LearnerStore, @unchecked Sendable {
+             autoKnown.remove(id)
+         }
+         for id in kanjiIDs where progress[id] == nil || progress[id] == .new {
+-            progress[id] = .known
+-            nextReviewAt[id] = nil
++            progress[id] = .learning
++            nextReviewAt[id] = Self.declaredDate
+             declaredKnown.insert(id)
+             autoKnown.insert(id)
+         }
+diff --git a/docs/CHANGELOG.md b/docs/CHANGELOG.md
+index 7282b497..018bf246 100644
+--- a/docs/CHANGELOG.md
++++ b/docs/CHANGELOG.md
+@@ -4,6 +4,11 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
+ 
+ ---
+ 
++## v0.25.0
++- Marked-known kanji now go into your reviews. A mark stores the kanji as learning, so it skips Today but joins flashcards. Kanji marked together come due ten a day starting today, so there is something to review on the first launch after onboarding, so marking a whole level does not bury one day; its first review clears the mark and it is then ordinary learning
++- Kanji detail: "I know this kanji" is now a large full-width button above the details, and a marked kanji shows "Known" with an Undo button there
++- Known-kanji copy in Settings and onboarding says marked kanji join your reviews
++
+ ## v0.24.6
+ - Remove ML Kit from handwriting search. The KanjiVG matcher is now the only recognizer, so opening "Draw to search" only loads its templates and nothing downloads. `MLKitHandwritingModel`, the `OnDeviceHandwritingModel` seam and its factory, the recognizer source and the Debug "Recognizer" footnote are gone, along with their tests and test double. New tests check that the templates load once and that the app's model loads the bundled templates
+ - Remove CocoaPods. The `Podfile` is gone, `make generate` runs only XcodeGen, `make build`, `test` and `ipa` use `Nichiji.xcodeproj` again, and CI no longer installs CocoaPods or prints `Podfile.lock`
+diff --git a/docs/PROGRESS.md b/docs/PROGRESS.md
+index 10d2d147..20c22039 100644
+--- a/docs/PROGRESS.md
++++ b/docs/PROGRESS.md
+@@ -34,4 +34,4 @@ Populated from the Phase 3 TODOs.
+ | Sources screen | done | Settings > About > Sources and the Level screen's JLPT footer open `SourcesView`, which parses the bundled `DATA-SOURCES.md` through `DataSourcesDocument` and `SourcesState`: the official-lists note, one card per attribution with 44 pt link rows, and dated snapshots, or an error line when the file is missing. The generator writes the links and snapshot dates. Parsing and loading are unit tested; the screen itself was not built or run on the Linux host. |
+ | Pro purchase service and gating | done | `StoreKitPurchaseService` (StoreKit 2, no server) buys, restores and refreshes the Nichiji Pro non-consumable, unlocking only on verified, unrevoked entitlements. The result is cached in App Group `UserDefaults` for offline use and the widget. `ProAccessModel` restores on launch, follows transaction updates and reloads widgets. Without Pro, lock-screen families show a locked placeholder and the CSV export opens the paywall. `Config/Nichiji.storekit` drives local runs and `SKTestSession` tests (CI skips them; not yet passed anywhere). Nothing was built or run on the Linux host. |
+ | Paywall and locked states | done | `PaywallView` opens only from a tapped Pro feature: History's export, the widget guide's unlock button, and locked lock-screen widgets through `nichiji://pro`. It lists the four Pro features with the tapped one first, buys at the StoreKit price, restores, and closes once Pro unlocks; pending, unavailable, unverified and failed purchases each get a note. Settings has a Nichiji Pro section (status, Restore purchases, Debug-only developer unlock). `PaywallModel`, `PaywallCopy`, the export action and the widget tap URL are unit tested; nothing was built or run on the Linux host, and a real purchase still needs a device or simulator check. |
+-| Known kanji | done | `KanjiProgress.declaredKnownAt` plus `LearnerStore.declareKnown`, `undeclareKnown` and `declaredKnownIDs` (an extension in `SwiftDataLearnerStore+Known.swift`) mark new kanji as stage known with no review date and no log row; learning, Forget it and review clear the mark. `ServiceContainer.setKnown` writes, then re-picks today's kanji, reloads widgets and rebuilds reminders, and creates no assignment on a first run. `KnownKanjiPickerView` (value type `KnownKanjiPickerModel`) opens from a skippable onboarding step and a Settings row, both listing the learner's level and every easier one (every group with the custom pool), and a typed search reaches every level. A level pick marks the easier levels known automatically (`wasHandKnown` false), and the next pick removes those marks outside its easier levels while hand marks stay; kanji detail gets "I know this" and "Not known after all". Stats count marked kanji apart (`isLearned`, `kanjiKnown`). Nothing was built or run on the Linux host; CI is the check. |
++| Known kanji | done | `KanjiProgress.declaredKnownAt` plus `LearnerStore.declareKnown`, `undeclareKnown` and `declaredKnownIDs` (an extension in `SwiftDataLearnerStore+Known.swift`) mark new kanji as stage learning with no log row, first due today and staggered ten a day when many are marked at once, so they skip Today but join reviews; learning, Forget it and review clear the mark. `ServiceContainer.setKnown` writes, then re-picks today's kanji, reloads widgets and rebuilds reminders, and creates no assignment on a first run. `KnownKanjiPickerView` (value type `KnownKanjiPickerModel`) opens from a skippable onboarding step and a Settings row, both listing the learner's level and every easier one (every group with the custom pool), and a typed search reaches every level. A level pick marks the easier levels known automatically (`wasHandKnown` false), and the next pick removes those marks outside its easier levels while hand marks stay; kanji detail gets a large "I know this kanji" button above the details, or a Known state with Undo. Stats count marked kanji apart (`isLearned`, `kanjiKnown`). Nothing was built or run on the Linux host; CI is the check. |
