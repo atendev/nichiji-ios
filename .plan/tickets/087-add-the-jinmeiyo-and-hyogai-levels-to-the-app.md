@@ -29,19 +29,14 @@ Read [Add kanji beyond Jōyō](../closed/085-add-kanji-beyond-joyo.md) first.
 
 ## Handoff
 
-Handoff 2. Branch `t3/add-jinmeiyo-hyogai-levels-1` (new branch from the first handoff commit), SHA = the commit that adds this section. Audit rounds used: 0 of 5. Swift not compiled (no toolchain), all code re-read by eye.
+Handoff 3. Branch `t3/add-jinmeiyo-hyogai-levels-3` (new branch from handoff 2), SHA = the commit that adds this section. Audit rounds used: 0 of 5. Swift not compiled (no toolchain); all code and tests re-read by eye.
 
-**Done (committed, no tests touched yet):**
-- `KanjiContent.swift`: `.jinmeiyo`/`.hyogai` on `JLPTLevel` and `JoyoGrade`, `LevelMember`, `isListStep`, `includes(_:)`, `KanjiClassification.listLabel`. `LearnerPreferences.swift`: codeLabel 名/外, displayName, `badgeLabel`, settingsSummary, scheme notes.
-- `DailyKanjiService`: `activePool` now returns `[KanjiIndexEntry]` (`PoolCandidate` protocol, generic `selectKanjiID`); `refreshAssignment…` decodes only the head record. `KanjiContentStore`, `TestKanjiContentStore` (passes `classification`), `AutoKnownLevels`, `StudyLog`, `KanjiBrowseGrouping` (no more "Other kanji"/"name-kanji"; `unleveledTitle`/`nameKanjiTitle` removed), `StatsCalculator+Progress.levelGroups`, `KnownKanjiPickerModel.levelLabel`, `CustomKanjiPickerView` (index sections, `KanjiGroupSection` removed).
-- Sources: `SourcesCopy.levelFooter(for:)`, `SourcesFooterLink(system:)` on both ladders, `DataSourcesDocument.bundleSummary` shown on `SourcesView`, intro line.
-- Detail: `DetailsCardView(classification:)` List row, `StrokeOrderCardView.noStrokeOrderMessage` and Practice hidden when no paths, `PracticeTarget.hasStrokeOrder`, `PracticeSheet` message, `HandwritingSearchCopy.noStrokeOrderNote` in `DrawSearchSheet`.
+**Done:** All app code (see handoff-2 list: ladders, pool on index entries, browse, stats, picker, Sources, Details List row, no-stroke-order states). Tests (commit `test: cover the Jinmeiyō...`): StatsFixtures.entry takes `classification:`; AutoKnownLevels, DictionaryBrowse, KnownKanjiPicker, YouTab, StatsProgress, KanjiContentStore, Onboarding, SettingsPreferences, Sources, KanjiDetail, PracticeSheet and DailyKanjiService tests updated or added; new `NichijiTests/Suites/DictionarySearchIndexCostTests.swift` prints `SEARCH-INDEX build: N ms, resident growth: X MB` (ceilings 10 s, 150 MB). `activePool` callers checked: none left outside DailyKanjiService and tests. Real data: JLPT ladder Jinmeiyō = 559 (no N-level), Hyōgai 3,465; Jōyō ladder Jinmeiyō = 806. Every kanji on exactly one rung per ladder.
 
 **Left, in order:**
-1. Fix tests: AutoKnownLevelsTests, DictionaryBrowseTests (uses removed `unleveledTitle`/`nameKanjiTitle`), KnownKanjiPickerTests (`jlptGroups`/`joyoGroups` use "unleveled"/"name-kanji"), YouTabTests line ~113 ("name-kanji" bar), StatsProgressTests, KanjiContentStoreTests, OnboardingFlowTests, SettingsPreferencesTests (`activePool` is now index entries), SourcesTests (add `bundleSummary`, `levelFooter(for:)`), KanjiDetailTests, DatasetContractTests (exactly-one-rung per ladder), DailyKanjiServiceTests/KnownKanjiServiceTests (check `activePool` use), StatsFixtures. Add a Swift Testing test that builds `DictionarySearchIndex` from the real bundle and prints build time and resident memory growth, loose ceiling.
-2. Check `ServiceContainer` and other callers for `activePool` return type; grep `[KanjiEntry]` users.
-3. `docs/CHANGELOG.md` entry and version decision per `docs/workflow.md`; `CONTEXT.md`, `docs/PROGRESS.md`, `docs/DESIGN.md` line 61.
-4. Widget memory device check written into the resolution (widget loads index only; `assignment(for:)` now uses index entries, so Hyōgai no longer decodes records).
-5. Decision report `.plan/assets/087-...-report.md` (unslop), council audit, commit, push, resolution, remove this section, timing close with `--slug nichiji-v1`.
+1. `CHANGELOG.md` (root and/or `docs/CHANGELOG.md`; check which `docs/workflow.md` names) entry and version decision (new user-visible feature: minor bump, do not tag). Update `CONTEXT.md`, `docs/PROGRESS.md`, `docs/DESIGN.md` line ~61 (Jinmeiyō and Hyōgai on both ladders, no "Other kanji"/"Name kanji" group).
+2. Optional DatasetContractTests addition: exactly-one-rung per ladder over the real index (use `JLPTLevel.allCases.filter { $0.includes(e) }.count == 1`).
+3. Decision report `.plan/assets/087-add-the-jinmeiyo-and-hyogai-levels-to-the-app-report.md` (unslop). Include a widget device check: widget loads the index only (about 6.4k summary rows); `assignment(for:)` uses index entries, so Hyōgai decodes one record. Measure peak memory on a simulator/device, expect well under 30 MB. Also the search-index CI-log line.
+4. Council audit (`council-audit` skill), up to 5 rounds, then commit, push (no force, no PR, no CI), resolution in the ticket (remove this section, Decisions line, Surfaced list), timing close with `--slug nichiji-v1`, commit, push, return DONE.
 
-Read first: this section, `Nichiji/Models/KanjiContent.swift`, `Nichiji/Services/DailyKanjiService.swift`, then the test files above.
+Read first: this section, `git diff wayfinder/nichiji-v1-master...HEAD --stat`, `docs/workflow.md` changelog rules.
