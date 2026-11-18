@@ -31,7 +31,7 @@ struct DataSourceItem: Equatable, Sendable {
     }
 }
 
-/// The bulleted sections of `DATA-SOURCES.md`. The Inputs table and plain paragraphs are left out.
+/// The bulleted sections of `DATA-SOURCES.md` and its totals line. The Inputs table and other paragraphs are left out.
 struct DataSourcesDocument: Equatable, Sendable {
     struct Section: Equatable, Sendable {
         let title: String
@@ -39,14 +39,19 @@ struct DataSourcesDocument: Equatable, Sendable {
     }
 
     let sections: [Section]
+    /// The generated "The bundle holds ..." line with the kanji totals, if the file has one.
+    let bundleSummary: String?
 
     init(markdown: String) {
         var sections: [Section] = []
+        var bundleSummary: String?
         var title: String?
         var items: [DataSourceItem] = []
         for rawLine in markdown.split(separator: "\n", omittingEmptySubsequences: false) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
-            if line.hasPrefix("## ") {
+            if line.hasPrefix(Self.summaryPrefix), bundleSummary == nil {
+                bundleSummary = line
+            } else if line.hasPrefix("## ") {
                 if let title, !items.isEmpty {
                     sections.append(Section(title: title, items: items))
                 }
@@ -60,7 +65,10 @@ struct DataSourcesDocument: Equatable, Sendable {
             sections.append(Section(title: title, items: items))
         }
         self.sections = sections
+        self.bundleSummary = bundleSummary
     }
+
+    private static let summaryPrefix = "The bundle holds"
 
     func section(_ title: String) -> Section? {
         sections.first { $0.title == title }
@@ -91,9 +99,16 @@ enum SourcesState: Equatable, Sendable {
 
 enum SourcesCopy {
     static let title = "Sources"
-    static let intro = "The JLPT has not published official kanji lists since 2010. Levels follow Jonathan Waller's community lists."
+    static let intro = "The JLPT has not published official kanji lists since 2010. Levels follow Jonathan Waller's community lists. Name kanji and kanji beyond the lists follow KANJIDIC2."
     static let missing = "Sources could not be loaded."
     static let attributionSection = "Attribution"
     static let snapshotsSection = "Snapshots"
-    static let levelFooter = "JLPT levels are unofficial community lists."
+
+    /// Caption under each level ladder; the JLPT one flags the unofficial lists.
+    static func levelFooter(for system: LevelSystem) -> String {
+        switch system {
+        case .jlpt: "JLPT levels are unofficial community lists. Name kanji and kanji beyond the lists come from KANJIDIC2."
+        case .joyo: "Name kanji and kanji beyond the lists come from KANJIDIC2."
+        }
+    }
 }

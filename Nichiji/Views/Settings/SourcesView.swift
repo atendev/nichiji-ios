@@ -25,6 +25,13 @@ public struct SourcesView: View {
 
                 switch state {
                 case .loaded(let document):
+                    if let summary = document.bundleSummary {
+                        Text(summary)
+                            .font(.nichijiCallout)
+                            .foregroundColor(.nichijiInkMuted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
                     if let attribution = document.section(SourcesCopy.attributionSection) {
                         ForEach(Array(attribution.items.enumerated()), id: \.offset) { _, item in
                             attributionCard(item)
@@ -128,12 +135,14 @@ public struct SourcesView: View {
 
 /// Footer row in the Level settings that opens `SourcesView`.
 struct SourcesFooterLink: View {
+    let system: LevelSystem
+
     var body: some View {
         NavigationLink {
             SourcesView()
         } label: {
             HStack(spacing: LayoutTokens.space8) {
-                Text(SourcesCopy.levelFooter)
+                Text(SourcesCopy.levelFooter(for: system))
                     .font(.nichijiCaption)
                     .foregroundColor(.nichijiInkSubtle)
                     .frame(maxWidth: .infinity, alignment: .leading)
