@@ -260,4 +260,30 @@ extension SettingsPreferencesTests {
 
         #expect(queue.map(\.kanjiID) == ["k7", "k6", "k5", "k4", "k3"])
     }
+
+    @Test("Both ladders end with Name kanji and Beyond the lists, with their own codes and summaries")
+    func listStepLabels() {
+        #expect(Array(JLPTLevel.allCases.suffix(2)) == [.jinmeiyo, .hyogai])
+        #expect(Array(JoyoGrade.allCases.suffix(2)) == [.jinmeiyo, .hyogai])
+        #expect(JLPTLevel.jinmeiyo.codeLabel == "名")
+        #expect(JLPTLevel.hyogai.codeLabel == "外")
+        #expect(JLPTLevel.n5.badgeLabel == "N5")
+        #expect(JLPTLevel.jinmeiyo.badgeLabel == "Name kanji")
+        #expect(JLPTLevel.n1.settingsSummary == "N1 · Advanced")
+        #expect(JLPTLevel.jinmeiyo.settingsSummary == "Name kanji · Jinmeiyō")
+        #expect(JLPTLevel.hyogai.settingsSummary == "Beyond the lists · Hyōgai")
+        #expect(JoyoGrade.grade1.badgeLabel == "1")
+        #expect(JoyoGrade.hyogai.badgeLabel == "Beyond the lists")
+        #expect(JoyoGrade.secondary.settingsSummary == "Secondary school · Jōyō")
+        #expect(JoyoGrade.jinmeiyo.settingsSummary == "Name kanji · Jinmeiyō")
+        #expect(JoyoGrade.hyogai.settingsSummary == "Beyond the lists · Hyōgai")
+    }
+
+    @Test("A fresh install still starts on N5 and Grade 1, and the new rungs round-trip through storage")
+    func listStepsPersist() {
+        #expect(LearnerPreferencesSnapshot.standard.selectedJLPTLevel == .n5)
+        #expect(LearnerPreferencesSnapshot.standard.selectedJoyoGrade == .grade1)
+        #expect(JLPTLevel(rawValue: JLPTLevel.hyogai.rawValue) == .hyogai)
+        #expect(JoyoGrade(rawValue: JoyoGrade.jinmeiyo.rawValue) == .jinmeiyo)
+    }
 }

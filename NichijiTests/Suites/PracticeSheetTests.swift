@@ -133,8 +133,17 @@ struct PracticeSheetTests {
         let target = PracticeTarget(entry: entry, strokePaths: paths)
 
         #expect(target.strokePaths.isEmpty)
+        #expect(!target.hasStrokeOrder)
         #expect(target.strokeCount == entry.strokeCount)
         #expect(target.strokeCount > 0)
+    }
+
+    @Test("A target with stroke paths has stroke order to practise")
+    func targetWithPathsHasStrokeOrder() {
+        let target = PracticeTarget(kanji: "日", meanings: ["day"], strokeCount: 1, strokePaths: ["M1 1L2 2"])
+
+        #expect(target.hasStrokeOrder)
+        #expect(StrokeOrderCardView.noStrokeOrderMessage == "No stroke order for this kanji")
     }
 
     @Test("A kanji with no meanings maps to an empty meaning")

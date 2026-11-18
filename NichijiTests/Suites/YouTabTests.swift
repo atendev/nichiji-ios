@@ -102,7 +102,7 @@ struct YouTabTests {
         #expect(row.count == "14 of 103")
     }
 
-    @Test("Jōyō bars map to grade codes, and Name kanji has no code")
+    @Test("Jōyō bars map to grade codes, and the two list steps carry 名 and 外")
     func joyoRows() {
         let grade = YouCopy.levelRow(LevelBar(id: "grade1", title: "1st grade", learned: 0, total: 80))
         #expect(grade.code == "1")
@@ -110,9 +110,12 @@ struct YouTabTests {
         let secondary = YouCopy.levelRow(LevelBar(id: JoyoGrade.secondary.rawValue, title: "Secondary school", learned: 0, total: 1))
         #expect(secondary.code == "S")
         #expect(secondary.name == "Secondary school")
-        let names = YouCopy.levelRow(LevelBar(id: "name-kanji", title: "Name kanji", learned: 1, total: 247))
-        #expect(names.code == nil)
+        let names = YouCopy.levelRow(LevelBar(id: JoyoGrade.jinmeiyo.rawValue, title: "Name kanji", learned: 1, total: 806))
+        #expect(names.code == "名")
         #expect(names.name == "Name kanji")
+        let beyond = YouCopy.levelRow(LevelBar(id: JoyoGrade.hyogai.rawValue, title: "Beyond the lists", learned: 0, total: 3_465))
+        #expect(beyond.code == "外")
+        #expect(beyond.name == "Beyond the lists")
     }
 
     @Test("Bar fill shows a sliver for any progress and caps at full")

@@ -10,18 +10,11 @@ struct DictionaryBrowseTests {
         _ id: String,
         jlpt: JLPTLevel?,
         joyo: JoyoGrade?,
+        classification: KanjiClassification? = nil,
         listIndex: Int,
         meaning: String = "meaning"
     ) -> KanjiIndexEntry {
-        KanjiIndexEntry(
-            id: id,
-            primaryMeaning: meaning,
-            primaryReading: "",
-            strokeCount: 1,
-            jlptLevel: jlpt,
-            joyoGrade: joyo,
-            listIndex: listIndex
-        )
+        StatsFixtures.entry(id, jlpt: jlpt, joyo: joyo, classification: classification, listIndex: listIndex, meaning: meaning)
     }
 
     private var mixedEntries: [KanjiIndexEntry] {
@@ -43,24 +36,39 @@ struct DictionaryBrowseTests {
         #expect(sections[2].entries.map(\.id) == ["憂", "彦"])
     }
 
-    @Test("A kanji without a JLPT level lands in Other kanji, which is dropped when empty")
-    func unleveledGroup() {
-        let withGap = mixedEntries + [indexEntry("〆", jlpt: nil, joyo: nil, listIndex: 20)]
+    @Test("JLPT browse ends with Name kanji and Beyond the lists, holding only kanji with no N-level")
+    func jlptListSteps() {
+        let entries = mixedEntries + [
+            indexEntry("凜", jlpt: nil, joyo: nil, classification: .jinmeiyo, listIndex: 20),
+            indexEntry("丼", jlpt: nil, joyo: nil, classification: .hyogai, listIndex: 21)
+        ]
 
-        let sections = KanjiBrowseGrouping.sections(from: withGap, system: .jlpt)
-        let withoutGap = KanjiBrowseGrouping.sections(from: mixedEntries, system: .jlpt)
+        let sections = KanjiBrowseGrouping.sections(from: entries, system: .jlpt)
 
-        #expect(sections.last?.title == KanjiBrowseGrouping.unleveledTitle)
-        #expect(sections.last?.entries.map(\.id) == ["〆"])
-        #expect(!withoutGap.contains { $0.title == KanjiBrowseGrouping.unleveledTitle })
+        #expect(sections.map(\.title) == ["N5", "N4", "N1", "Name kanji", "Beyond the lists"])
+        #expect(sections[3].entries.map(\.id) == ["凜"])
+        #expect(sections[4].entries.map(\.id) == ["丼"])
+        #expect(sections[2].entries.map(\.id) == ["憂", "彦"])
     }
 
-    @Test("Jōyō browse runs grade 1 to Secondary, then Name kanji for ungraded kanji")
-    func joyoSectionsEndWithNameKanji() {
-        let sections = KanjiBrowseGrouping.sections(from: mixedEntries, system: .joyo)
+    @Test("Jōyō browse runs grade 1 to Secondary, then every name kanji, then Beyond the lists")
+    func joyoSectionsEndWithListSteps() {
+        let entries = mixedEntries + [indexEntry("丼", jlpt: nil, joyo: nil, classification: .hyogai, listIndex: 21)]
 
-        #expect(sections.map(\.title) == ["1st grade", "2nd grade", "Secondary school", "Name kanji"])
-        #expect(sections.last?.entries.map(\.id) == ["彦"])
+        let sections = KanjiBrowseGrouping.sections(from: entries, system: .joyo)
+
+        #expect(sections.map(\.title) == ["1st grade", "2nd grade", "Secondary school", "Name kanji", "Beyond the lists"])
+        #expect(sections[3].entries.map(\.id) == ["彦"])
+        #expect(sections[4].entries.map(\.id) == ["丼"])
+    }
+
+    @Test("Empty list steps are dropped")
+    func emptyListStepsDropped() {
+        for system in LevelSystem.allCases {
+            let titles = KanjiBrowseGrouping.sections(from: [mixedEntries[1]], system: system).map(\.title)
+            #expect(!titles.contains("Name kanji"))
+            #expect(!titles.contains("Beyond the lists"))
+        }
     }
 
     @Test("Every kanji appears exactly once in either system")
@@ -105,7 +113,7 @@ struct DictionaryBrowseTests {
         #expect(store.recordLoadCount == 0)
     }
 
-    @Test("The bundled index groups all 6,407 kanji, with every ungraded kanji in the last Jōyō group")
+    @Test("The bundled index puts all 6,407 kanji on exactly one rung of each ladder")
     func bundledIndexCoversEveryKanji() throws {
         let store = BundledKanjiContentStore()
         let entries = try store.indexEntries()
@@ -117,7 +125,9 @@ struct DictionaryBrowseTests {
         #expect(entries.map(\.listIndex) == entries.map(\.listIndex).sorted())
         #expect(jlpt.reduce(0) { $0 + $1.entries.count } == 6_407)
         #expect(joyo.reduce(0) { $0 + $1.entries.count } == 6_407)
-        #expect(joyo.last?.title == KanjiBrowseGrouping.nameKanjiTitle)
-        #expect(joyo.last?.entries.count == 4_271)
+        #expect(jlpt.suffix(2).map(\.entries.count) == [559, 3_465])
+        #expect(joyo.suffix(2).map(\.entries.count) == [806, 3_465])
+        #expect(jlpt.last?.title == "Beyond the lists")
+        #expect(joyo.last?.title == "Beyond the lists")
     }
 }

@@ -152,4 +152,94 @@ struct DailyKanjiServiceTests {
         let learnedSnapshot = try await service.widgetSnapshot(for: today)
         #expect(learnedSnapshot?.isLearned == true)
     }
+
+    /*-----------------------------list-steps------------------------------*/
+
+    private func listStepEntry(
+        _ id: String,
+        jlpt: JLPTLevel? = nil,
+        joyo: JoyoGrade? = nil,
+        classification: KanjiClassification,
+        listIndex: Int
+    ) -> KanjiEntry {
+        KanjiEntry(
+            id: id,
+            meanings: ["meaning"],
+            onyomi: [],
+            kunyomi: [],
+            radical: KanjiRadical(character: id, meaning: "radical"),
+            strokeCount: 5,
+            jlptLevel: jlpt,
+            joyoGrade: joyo,
+            frequencyRank: nil,
+            listIndex: listIndex,
+            exampleWords: [],
+            classification: classification
+        )
+    }
+
+    private func listStepService(_ contentStore: TestKanjiContentStore) throws -> DefaultDailyKanjiService {
+        let schema = Schema([KanjiProgress.self, DailyAssignment.self, CustomKanjiSelection.self, StudyLogEntry.self])
+        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        return DefaultDailyKanjiService(
+            contentStore: contentStore,
+            learnerStore: SwiftDataLearnerStore(modelContainer: container),
+            dayProvider: TestDayProvider(),
+            preferencesProvider: { .standard }
+        )
+    }
+
+    private var listStepEntries: [KanjiEntry] {
+        [
+            listStepEntry("日", jlpt: .n5, joyo: .grade1, classification: .joyo, listIndex: 0),
+            listStepEntry("彦", jlpt: .n1, classification: .jinmeiyo, listIndex: 1),
+            listStepEntry("凜", classification: .jinmeiyo, listIndex: 2),
+            listStepEntry("丼", classification: .hyogai, listIndex: 3),
+            listStepEntry("嗚", classification: .hyogai, listIndex: 4)
+        ]
+    }
+
+    @Test("The Jinmeiyō pool is the name kanji with no N-level on JLPT and every name kanji on Jōyō")
+    func jinmeiyoPools() async throws {
+        let service = try listStepService(TestKanjiContentStore(entries: listStepEntries))
+
+        var jlpt = LearnerPreferencesSnapshot.standard
+        jlpt.levelSystem = .jlpt
+        jlpt.selectedJLPTLevel = .jinmeiyo
+        var joyo = LearnerPreferencesSnapshot.standard
+        joyo.levelSystem = .joyo
+        joyo.selectedJoyoGrade = .jinmeiyo
+
+        #expect(try await service.activePool(preferences: jlpt).map(\.id) == ["凜"])
+        #expect(try await service.activePool(preferences: joyo).map(\.id) == ["彦", "凜"])
+    }
+
+    @Test("The Hyōgai pool holds every kanji beyond the lists on both ladders")
+    func hyogaiPools() async throws {
+        let service = try listStepService(TestKanjiContentStore(entries: listStepEntries))
+
+        var jlpt = LearnerPreferencesSnapshot.standard
+        jlpt.levelSystem = .jlpt
+        jlpt.selectedJLPTLevel = .hyogai
+        var joyo = LearnerPreferencesSnapshot.standard
+        joyo.levelSystem = .joyo
+        joyo.selectedJoyoGrade = .hyogai
+
+        #expect(try await service.activePool(preferences: jlpt).map(\.id) == ["丼", "嗚"])
+        #expect(try await service.activePool(preferences: joyo).map(\.id) == ["丼", "嗚"])
+    }
+
+    @Test("A Hyōgai study day decodes one record, not the pool")
+    func hyogaiAssignmentDecodesOneRecord() async throws {
+        let contentStore = TestKanjiContentStore(entries: listStepEntries)
+        let service = try listStepService(contentStore)
+        var preferences = LearnerPreferencesSnapshot.standard
+        preferences.selectedJLPTLevel = .hyogai
+        preferences.dailyOrder = .listOrder
+
+        let assignment = try await service.refreshAssignmentAfterPreferenceChange(for: "2026-11-04", preferences: preferences)
+
+        #expect(assignment?.kanjiID == "丼")
+        #expect(contentStore.recordLoadCount == 1)
+    }
 }
