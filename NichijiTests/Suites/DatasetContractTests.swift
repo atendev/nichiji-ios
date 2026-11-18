@@ -86,7 +86,7 @@ struct DatasetContractTests {
         #expect(counts[.n2] == 398)
         #expect(counts[.n1] == 1_345)
         #expect(entries.filter(\.isJLPTLevelEstimated).count == 172)
-        #expect(entries.filter { $0.jlptLevel == nil }.count == 4_081)
+        #expect(entries.filter { $0.jlptLevel == nil }.count == 4_024)
     }
 
     @Test("Records carry at most three example words")
@@ -94,7 +94,7 @@ struct DatasetContractTests {
         let entries = try Self.loadEntries()
 
         #expect(entries.allSatisfy { $0.exampleWords.count <= 3 })
-        #expect(entries.filter { $0.exampleWords.isEmpty }.count == 1_339)
-        #expect(entries.filter { $0.meanings.isEmpty }.count == 25)
+        #expect(entries.filter { $0.exampleWords.isEmpty }.count == 1_282)
+        #expect(entries.filter { $0.meanings.isEmpty }.count == 0)
     }
 }
