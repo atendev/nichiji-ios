@@ -183,12 +183,16 @@ struct StatsProgressTests {
 
     /*----------------------------level-sequence----------------------------*/
 
-    @Test("The next level stops after N1 and Secondary, and a custom pool has none")
+    @Test("The next level runs through Jinmeiyō to Hyōgai on both ladders, and a custom pool has none")
     func levelSequence() {
         #expect(LevelSequence.next(after: .jlpt(.n5)) == .jlpt(.n4))
-        #expect(LevelSequence.next(after: .jlpt(.n1)) == nil)
+        #expect(LevelSequence.next(after: .jlpt(.n1)) == .jlpt(.jinmeiyo))
+        #expect(LevelSequence.next(after: .jlpt(.jinmeiyo)) == .jlpt(.hyogai))
+        #expect(LevelSequence.next(after: .jlpt(.hyogai)) == nil)
         #expect(LevelSequence.next(after: .joyo(.grade6)) == .joyo(.secondary))
-        #expect(LevelSequence.next(after: .joyo(.secondary)) == nil)
+        #expect(LevelSequence.next(after: .joyo(.secondary)) == .joyo(.jinmeiyo))
+        #expect(LevelSequence.next(after: .joyo(.jinmeiyo)) == .joyo(.hyogai))
+        #expect(LevelSequence.next(after: .joyo(.hyogai)) == nil)
         #expect(LevelSequence.next(after: nil) == nil)
         #expect(LevelSequence.current(preferences: .standard) == .jlpt(.n5))
         #expect(LevelSequence.current(preferences: LearnerPreferencesSnapshot(levelSystem: .joyo)) == .joyo(.grade1))

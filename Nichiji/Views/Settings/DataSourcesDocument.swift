@@ -99,7 +99,8 @@ enum SourcesState: Equatable, Sendable {
 
 enum SourcesCopy {
     static let title = "Sources"
-    static let intro = "The JLPT has not published official kanji lists since 2010. Levels follow Jonathan Waller's community lists. Name kanji and kanji beyond the lists follow KANJIDIC2."
+    static let intro = "The JLPT has not published official kanji lists since 2010. Levels follow Jonathan Waller's community lists. "
+        + "Name kanji and kanji beyond the lists follow KANJIDIC2."
     static let missing = "Sources could not be loaded."
     static let attributionSection = "Attribution"
     static let snapshotsSection = "Snapshots"
