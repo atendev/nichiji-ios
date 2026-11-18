@@ -27,8 +27,8 @@ struct DatasetContractTests {
         let index = try JSONDecoder().decode(KanjiIndex.self, from: data)
 
         #expect(index.formatVersion == 1)
-        #expect(index.entries.count == 6_464)
-        #expect(index.entries.map(\.listIndex) == Array(0..<6_464))
+        #expect(index.entries.count == 6_407)
+        #expect(index.entries.map(\.listIndex) == Array(0..<6_407))
         #expect(index.entries.first?.id == "日")
     }
 
@@ -43,20 +43,20 @@ struct DatasetContractTests {
             Dictionary(grouping: index.entries, by: \.classification).mapValues(\.count)
         ] {
             #expect(counts[.joyo] == 2_136)
-            #expect(counts[.jinmeiyo] == 863)
+            #expect(counts[.jinmeiyo] == 806)
             #expect(counts[.hyogai] == 3_465)
         }
         #expect(entries.filter { ($0.classification == .joyo) != ($0.joyoGrade != nil) }.isEmpty)
     }
 
-    @Test("Stroke SVGs exist for every kanji except 89 jinmeiyo kanji KanjiVG lacks")
+    @Test("Stroke SVGs exist for every kanji except 32 jinmeiyo kanji KanjiVG lacks")
     func strokeFileCoverage() throws {
         let entries = try Self.loadEntries()
         let folder = Self.appOnly.appendingPathComponent("stroke-order")
         let hex = { (id: String) in String(format: "%05x", id.unicodeScalars.first!.value) }
         let missing = entries.filter { !FileManager.default.fileExists(atPath: folder.appendingPathComponent("\(hex($0.id)).svg").path) }
 
-        #expect(missing.count == 89)
+        #expect(missing.count == 32)
         #expect(missing.allSatisfy { $0.classification == .jinmeiyo })
     }
 
@@ -72,7 +72,7 @@ struct DatasetContractTests {
         #expect(counts[.grade5] == 193)
         #expect(counts[.grade6] == 191)
         #expect(counts[.secondary] == 1_110)
-        #expect(entries.filter { $0.joyoGrade == nil }.count == 4_328)
+        #expect(entries.filter { $0.joyoGrade == nil }.count == 4_271)
     }
 
     @Test("JLPT level counts match the pinned lists")

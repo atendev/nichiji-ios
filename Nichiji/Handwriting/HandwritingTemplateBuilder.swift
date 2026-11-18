@@ -7,7 +7,7 @@ public enum HandwritingTemplateBuilder {
     /// Points sampled per cubic, as in the prototype's `build_templates.py`.
     static let samplesPerCurve = 8
 
-    /// Reads every shipped kanji's strokes in `listIndex` order. A kanji with no stroke SVG is skipped, not fatal.
+    /// Reads every shipped kanji's strokes in `listIndex` order. A kanji with no stroke SVG is skipped, not fatal. Jinmeiyo and hyogai kanji carry a rarity prior.
     public static func matcher(contentStore: any KanjiContentStore) throws -> HandwritingTemplateMatcher {
         let entries = try contentStore.indexEntries().sorted {
             $0.listIndex != $1.listIndex ? $0.listIndex < $1.listIndex : $0.id < $1.id
@@ -16,7 +16,19 @@ public enum HandwritingTemplateBuilder {
             guard let paths = try? contentStore.strokePaths(for: entry.id) else { return nil }
             return (kanji: entry.id, strokes: strokes(fromSVGPaths: paths))
         }
-        return HandwritingTemplateMatcher(templates: templates, shippedKanji: Set(entries.map(\.id)))
+        let priors = Dictionary(
+            entries.map { ($0.id, Double(rarity(of: $0.classification)) * HandwritingTemplateMatcher.rarityStep) },
+            uniquingKeysWith: min
+        )
+        return HandwritingTemplateMatcher(templates: templates, shippedKanji: Set(entries.map(\.id)), priors: priors)
+    }
+
+    private static func rarity(of classification: KanjiClassification) -> Int {
+        switch classification {
+        case .joyo: 0
+        case .jinmeiyo: 1
+        case .hyogai: 2
+        }
     }
 
     /// One point list per SVG path, in KanjiVG's 109-unit space.

@@ -4,6 +4,7 @@ import json
 import re
 import shutil
 import sys
+import unicodedata
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -70,7 +71,7 @@ def classify(entry: kanjidic.KanjidicEntry) -> str:
 
 
 def select_literals(inputs: Inputs) -> list[str]:
-    """Every Joyo and jinmeiyo kanji, every other JIS X 0208 kanji, and any Waller-listed kanji."""
+    """Every Joyo and jinmeiyo kanji, every other JIS X 0208 kanji, and any Waller-listed kanji. Compatibility ideographs fold into their unified twin."""
     bundled = {c for c, e in inputs.kanji.items() if e.grade in JOYO_GRADES or e.grade in kanjidic.JINMEIYO_GRADES or e.jis208}
     listed = set(inputs.waller_levels)
     joyo = {c for c, e in inputs.kanji.items() if e.grade in JOYO_GRADES}
@@ -80,7 +81,13 @@ def select_literals(inputs: Inputs) -> list[str]:
     missing = listed - set(inputs.kanji)
     if missing:
         raise BuildError(f"not in KANJIDIC2: {''.join(sorted(missing))}")
-    return sorted(bundled | listed, key=ord)
+    chosen = bundled | listed
+    # A compatibility ideograph is canonically equal to a unified one, and Swift compares Strings that way.
+    folded = {c for c in chosen if unicodedata.normalize("NFC", c) != c}
+    orphans = {c for c in folded if unicodedata.normalize("NFC", c) not in chosen}
+    if orphans:
+        raise BuildError(f"compatibility ideographs with no unified twin in the bundle: {''.join(sorted(orphans))}")
+    return sorted(chosen - folded, key=ord)
 
 
 def assign_level(literal: str, inputs: Inputs) -> tuple[str | None, bool]:

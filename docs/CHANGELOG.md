@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.35.1
+- Fix the kanji dataset and handwriting ranking after the Jinmeiyō and Hyōgai merge. The generator now folds the 57 KANJIDIC2 compatibility ideographs (U+F9xx and U+FAxx) into their unified twin, since Swift compares them as equal and the id set collapsed to 6,407. The bundle is 6,407 kanji: 2,136 Jōyō, 806 Jinmeiyō and 3,465 Hyōgai, and 32 Jinmeiyō lack a stroke SVG. The handwriting matcher adds a rarity prior of 0.02 per classification step, so a common kanji beats a rare look-alike over the 6,375 templates.
+
 ## v0.35.0
 - Generate the Jinmeiyō and Hyōgai kanji. `make dataset` now builds 6,464 kanji: the 2,136 Jōyō, 863 Jinmeiyō (every KANJIDIC2 grade 9 or 10 kanji) and 3,465 Hyōgai (the other JIS X 0208 kanji). Every record and index entry gains `classification` (`joyo`, `jinmeiyo`, `hyogai`), decoded by the new `KanjiClassification`. The list is now ordered by frequency, then common-word count, then strokes, then code point. 89 Jinmeiyō kanji ship with no stroke SVG, and 93 new KanjiVG stroke-count mismatches join the allow-list. The size budgets rise to 8 MB Shared and 24 MB app (5.1 and 16.8 MiB now), words.json grows to 19,025, and 1,339 kanji have no example word. The app does not offer the new levels yet, so Dictionary browse lists them in its last Jōyō group until the app ticket lands
 

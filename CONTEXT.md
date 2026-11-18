@@ -42,15 +42,19 @@ The 2,136 kanji with a KANJIDIC2 grade of 1 to 6 or 8. Grades 9 and 10 (jinmeiy�
 _Avoid_: Common-use kanji
 
 **Kanji classification**:
-Which list a bundled kanji belongs to, stored as `classification` on every record and index entry: `joyo` (2,136), `jinmeiyo` (863) or `hyogai` (3,465). Both the JLPT and Jōyō level ladders derive from it, and `joyoGrade` stays Jōyō-only.
+Which list a bundled kanji belongs to, stored as `classification` on every record and index entry: `joyo` (2,136), `jinmeiyo` (806) or `hyogai` (3,465). Both the JLPT and Jōyō level ladders derive from it, and `joyoGrade` stays Jōyō-only.
 _Avoid_: Kanji type, kanji tier
 
 **Jinmeiyō kanji** ("Name kanji"):
-Every KANJIDIC2 kanji with grade 9 or 10, 863 in all. 247 of them are Waller N1 kanji, and 616 have no N-level.
+Every KANJIDIC2 kanji with grade 9 or 10, except the 57 compatibility ideographs that fold into a unified twin, 806 in all. 247 of them are Waller N1 kanji, and 559 have no N-level.
 _Avoid_: Name kanji (as a stored value)
 
+**Compatibility ideograph**:
+A code point in U+F900–U+FAFF whose canonical (NFC) form is a unified ideograph. Swift compares `String`s by canonical equivalence, so one would equal its twin as a dictionary key, `Set` member or `Identifiable` id. The generator folds each into its twin and fails if the twin is not bundled. KANJIDIC2 lists 57 of them as jinmeiyō.
+_Avoid_: Variant kanji
+
 **Hyōgai kanji** ("Beyond the lists"):
-Every JIS X 0208 kanji that is neither Jōyō nor jinmeiyō, 3,465 in all. Most have no KANJIDIC2 frequency rank, so list order falls to their JMdict common-word count. All have KanjiVG stroke order. The 89 jinmeiyō kanji with no KanjiVG file ship without it.
+Every JIS X 0208 kanji that is neither Jōyō nor jinmeiyō, 3,465 in all. Most have no KANJIDIC2 frequency rank, so list order falls to their JMdict common-word count. All have KanjiVG stroke order. The 32 jinmeiyō kanji with no KanjiVG file ship without it.
 _Avoid_: Rare kanji, other kanji
 
 **JLPT level (unofficial)**:

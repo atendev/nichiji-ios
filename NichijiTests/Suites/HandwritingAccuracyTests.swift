@@ -50,6 +50,7 @@ struct HandwritingAccuracyTests {
         let top1 = Double(ranks.filter { $0 == 0 }.count) / Double(samples.count)
         let top5 = Double(ranks.filter { $0 != nil }.count) / Double(samples.count)
 
+        print("handwriting accuracy: top-1 \(top1), top-5 \(top5) over \(samples.count) drawings")
         #expect(top1 >= 0.82, "top-1 was \(top1)")
         #expect(top5 >= 0.91, "top-5 was \(top5)")
     }
@@ -65,6 +66,7 @@ struct HandwritingAccuracyTests {
         let top1 = Double(ranks.filter { $0 == 0 }.count) / Double(samples.count)
         let top5 = Double(ranks.filter { $0 != nil }.count) / Double(samples.count)
 
+        print("handwriting mismatch accuracy: top-1 \(top1), top-5 \(top5) over \(samples.count) drawings")
         #expect(top1 >= 0.70, "top-1 was \(top1)")
         #expect(top5 >= 0.80, "top-5 was \(top5)")
     }

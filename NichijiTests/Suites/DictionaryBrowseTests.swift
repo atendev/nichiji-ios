@@ -105,7 +105,7 @@ struct DictionaryBrowseTests {
         #expect(store.recordLoadCount == 0)
     }
 
-    @Test("The bundled index groups all 6,464 kanji, with every ungraded kanji in the last Jōyō group")
+    @Test("The bundled index groups all 6,407 kanji, with every ungraded kanji in the last Jōyō group")
     func bundledIndexCoversEveryKanji() throws {
         let store = BundledKanjiContentStore()
         let entries = try store.indexEntries()
@@ -113,11 +113,11 @@ struct DictionaryBrowseTests {
         let jlpt = KanjiBrowseGrouping.sections(from: entries, system: .jlpt)
         let joyo = KanjiBrowseGrouping.sections(from: entries, system: .joyo)
 
-        #expect(entries.count == 6_464)
+        #expect(entries.count == 6_407)
         #expect(entries.map(\.listIndex) == entries.map(\.listIndex).sorted())
-        #expect(jlpt.reduce(0) { $0 + $1.entries.count } == 6_464)
-        #expect(joyo.reduce(0) { $0 + $1.entries.count } == 6_464)
+        #expect(jlpt.reduce(0) { $0 + $1.entries.count } == 6_407)
+        #expect(joyo.reduce(0) { $0 + $1.entries.count } == 6_407)
         #expect(joyo.last?.title == KanjiBrowseGrouping.nameKanjiTitle)
-        #expect(joyo.last?.entries.count == 4_328)
+        #expect(joyo.last?.entries.count == 4_271)
     }
 }

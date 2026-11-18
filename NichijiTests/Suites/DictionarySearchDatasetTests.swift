@@ -17,12 +17,12 @@ struct DictionarySearchDatasetTests {
         try JSONDecoder().decode(type, from: Data(contentsOf: appOnly.appendingPathComponent(file)))
     }
 
-    @Test("kanji-search.json decodes and covers all 6,464 kanji")
+    @Test("kanji-search.json decodes and covers all 6,407 kanji")
     func kanjiSearchDecodes() throws {
         let records = try Self.decode([KanjiSearchRecord].self, file: "kanji-search.json")
 
-        #expect(records.count == 6_464)
-        #expect(Set(records.map(\.id)).count == 6_464)
+        #expect(records.count == 6_407)
+        #expect(Set(records.map(\.id)).count == 6_407)
         #expect(records.allSatisfy { !$0.meanings.isEmpty || !$0.onyomi.isEmpty || !$0.kunyomi.isEmpty })
     }
 

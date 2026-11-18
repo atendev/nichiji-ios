@@ -65,6 +65,20 @@ class SelectionTests(unittest.TestCase):
         inputs = make_inputs(waller_levels={"日": "n5", "鬱": "n1", "𠮟": "n1"})
         self.assertIn("𠮟", build.select_literals(inputs))
 
+    def test_compatibility_ideographs_fold_into_their_unified_twin(self):
+        inputs = make_inputs()
+        inputs.kanji["\ufa30"] = kanji("\ufa30", 9)
+        inputs.kanji["\u4fae"] = kanji("\u4fae", None, jis208=True)
+        chosen = build.select_literals(inputs)
+        self.assertIn("\u4fae", chosen)
+        self.assertNotIn("\ufa30", chosen)
+
+    def test_compatibility_ideograph_without_a_twin_fails(self):
+        inputs = make_inputs()
+        inputs.kanji["\ufa30"] = kanji("\ufa30", 9)
+        with self.assertRaises(build.BuildError):
+            build.select_literals(inputs)
+
     def test_waller_kanji_missing_from_kanjidic_fails(self):
         inputs = make_inputs(waller_levels={"日": "n5", "猫": "n1"})
         with self.assertRaises(build.BuildError):

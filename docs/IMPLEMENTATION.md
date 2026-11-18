@@ -75,7 +75,7 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify the today link selects `AppTab.today`.
 10. **`DictionaryBrowseTests`**:
    - Verify `KanjiBrowseGrouping` orders JLPT and Jōyō sections, puts ungraded kanji in "Name kanji" and unleveled kanji in "Other kanji", places every kanji once, and drops empty groups.
-   - Verify the count label, the tile accessibility label and 44 pt minimum, that loading reads only the index, and that the bundled index groups all 6,464 kanji with 4,328 ungraded kanji in the last Jōyō group.
+   - Verify the count label, the tile accessibility label and 44 pt minimum, that loading reads only the index, and that the bundled index groups all 6,407 kanji with 4,271 ungraded kanji in the last Jōyō group.
 11. **`KanjiDetailTests`**:
    - Verify `KanjiDetailContent.load` returns the entry, strokes and stage, tolerates missing strokes and progress, and throws for an unknown kanji.
    - Verify Forget it shows only past `new`, and `ServiceContainer.forgetIt` resets then rebuilds reminders, survives a reminder failure and skips the rebuild when the reset fails.
@@ -84,7 +84,7 @@ Repeatable verification that grows alongside features: each new feature gets tes
    - Verify folding on both sides: `ō`/`ou`/`oo`, `ū`/`uu`, `shi`/`si`, `tsu`/`tu`, `chi`/`ti`, `mb`/`nb`, dropped markers, katakana to hiragana, English hyphens as spaces.
    - Verify the query reader: script picks the mode, Latin letters drop from kana queries, one kana or kanji searches, one Latin letter does not.
    - Verify ranking: tier, then field, then frequency with unranked last, then list order; words by tier, `rank`, shorter kana. English matches word starts only, per gloss. Caps are 20 kanji and 50 words. Word taps open detail, the sheet or nothing.
-   - **`DictionarySearchDatasetTests`** decodes `kanji-search.json` and `words.json` (6,464 and 19,025 records, `rank` 1 to 53), checks obvious hits on the bundled data, and bounds ten keystroke scans at five seconds.
+   - **`DictionarySearchDatasetTests`** decodes `kanji-search.json` and `words.json` (6,407 and 19,025 records, `rank` 1 to 53), checks obvious hits on the bundled data, and bounds ten keystroke scans at five seconds.
 
 ## Onboarding Flow (Slice 9)
 
