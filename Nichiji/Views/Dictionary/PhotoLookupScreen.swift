@@ -73,7 +73,6 @@ struct PhotoLookupScreen: View {
     let onPick: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var camera = CameraSession()
@@ -89,8 +88,6 @@ struct PhotoLookupScreen: View {
     @State private var isSweeping = false
     @State private var showsHighlights = true
     @State private var saver = PhotoSaveModel(library: SystemPhotoLibrarySaver())
-    /// Crop sets `.cropped` when it replaces the photo. Save saves `model.photoData`, whichever photo is current.
-    @State private var photoOrigin: PhotoOrigin = .camera
 
     private var isLive: Bool { model.state == .empty }
     private var showsPanel: Bool { !isLive && model.state != .reading }
@@ -168,7 +165,7 @@ struct PhotoLookupScreen: View {
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
-                    photoOrigin = .library
+                    saver.origin = .library
                     await model.lookUp(imageData: data)
                 }
                 libraryItem = nil
@@ -187,7 +184,7 @@ struct PhotoLookupScreen: View {
             let data = await camera.capture()
             isCapturing = false
             if let data {
-                photoOrigin = .camera
+                saver.origin = .camera
                 await model.lookUp(imageData: data)
             } else {
                 captureFailed = true
@@ -210,10 +207,6 @@ struct PhotoLookupScreen: View {
             current.finishRead(at: .now)
             sweep = current
         }
-    }
-
-    private func savePhoto() {
-        Task { await saver.save(imageData: model.photoData) }
     }
 
     private func toggleHighlights() {
@@ -271,9 +264,9 @@ extension PhotoLookupScreen {
             case .notDetermined:
                 Color.cameraBase
             case .denied:
-                accessMessage(title: PhotoLookupCopy.deniedTitle, message: PhotoLookupCopy.deniedBody, showsSettings: true)
+                CameraAccessMessage(title: PhotoLookupCopy.deniedTitle, message: PhotoLookupCopy.deniedBody, showsSettings: true)
             case .unavailable:
-                accessMessage(title: PhotoLookupCopy.noCameraTitle, message: PhotoLookupCopy.noCameraBody, showsSettings: false)
+                CameraAccessMessage(title: PhotoLookupCopy.noCameraTitle, message: PhotoLookupCopy.noCameraBody, showsSettings: false)
             }
         }
     }
@@ -300,32 +293,6 @@ extension PhotoLookupScreen {
             .accessibilityAction {
                 focus(at: CGPoint(x: previewSize.width / 2, y: previewSize.height / 2))
             }
-    }
-
-    private func accessMessage(title: String, message: String, showsSettings: Bool) -> some View {
-        VStack(spacing: LayoutTokens.space16) {
-            Image(systemName: "camera")
-                .font(.system(size: 34, weight: .regular))
-                .foregroundStyle(Color.cameraText.opacity(0.7))
-                .accessibilityHidden(true)
-            Text(title)
-                .font(.nichijiHeading)
-                .foregroundStyle(Color.cameraText)
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
-            Text(message)
-                .font(.nichijiCallout)
-                .foregroundStyle(Color.cameraText.opacity(0.75))
-                .multilineTextAlignment(.center)
-            if showsSettings, let url = URL(string: UIApplication.openSettingsURLString) {
-                PrimaryButton(title: PhotoLookupCopy.openSettings) {
-                    openURL(url)
-                }
-                .padding(.top, LayoutTokens.space8)
-            }
-        }
-        .padding(.horizontal, LayoutTokens.space32)
-        .frame(maxWidth: 420)
     }
 
     /*-------------------------------chrome-------------------------------*/
@@ -359,14 +326,8 @@ extension PhotoLookupScreen {
                     action: toggleHighlights
                 )
             }
-            if showsPanel, photoOrigin.isSavable {
-                PhotoOptionButton(
-                    systemName: "square.and.arrow.down",
-                    label: PhotoSaveCopy.save,
-                    hint: PhotoSaveCopy.hint,
-                    action: savePhoto
-                )
-                .disabled(saver.isSaving)
+            if showsPanel, saver.origin.isSavable {
+                SavePhotoOption(saver: saver, imageData: model.photoData)
             }
         }
         .padding(.horizontal, LayoutTokens.screenMarginCompact)

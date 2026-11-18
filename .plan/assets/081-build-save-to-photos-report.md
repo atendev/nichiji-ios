@@ -7,7 +7,7 @@ Version v0.29.0 (MINOR). Branch `t3/96b97910`. Crop (080) and the results sheet 
 ### 1. Where the "is this photo savable" rule lives
 - Question: How does Save know a library photo is already in Photos and an uncropped one should not show Save, without waiting for Crop?
 - Options: A flag on `PhotoLookupModel`. A screen-level `@State`. A new `PhotoOrigin` enum (`camera`, `library`, `cropped`) with `isSavable`.
-- Choice: `PhotoOrigin`, held as screen state. The screen sets `.camera` after a shutter shot and `.library` after a library pick. Crop sets `.cropped` when it replaces the photo, and Save shows again.
+- Choice: `PhotoOrigin`, held as `PhotoSaveModel.origin`. The screen sets `.camera` after a shutter shot and `.library` after a library pick. Crop sets `.cropped` when it replaces the photo, and Save shows again.
 - Made by: Implementer. Keeping it out of `PhotoLookupModel` avoids a merge conflict with Crop, which also changes that model.
 - Audit: No seat raised it.
 
@@ -65,3 +65,12 @@ While checking the names, the implementer also changed the Open Settings link fr
 ## Not verified here
 
 The host is Linux with no Swift toolchain or SwiftLint, so nothing was built, linted or run. CI is the build and test check. The Photos write, the permission prompt and the toast need a device check.
+
+## CI fix 1
+
+SwiftLint's `file_length` failed on `PhotoLookupScreen.swift` at 404 lines against a limit of 400, and Crop and the results sheet add lines to that file in the same batch. The fix moves code out of the screen.
+- The Save option is now `SavePhotoOption` in `PhotoSaveToastView.swift`, and the origin lives on `PhotoSaveModel`, so the screen keeps one line for the option and one for the toast.
+- The camera-access message moved to `CameraAccessMessage` in `PhotoLookupControls.swift`, with no change in behavior, because the Save pieces alone only reached about 395 lines.
+- The screen is now 365 lines.
+
+Audit of the fix, round 2: claude APPROVE 8, gemini APPROVE 9, gpt APPROVE 9. The claude seat's one minor problem was declined. Save now reads the photo when the screen renders rather than at tap time, but a change in `photoData` re-renders the option, so the two behave the same.

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /*-------------------------------controls---------------------------------*/
 
@@ -97,5 +98,40 @@ struct FocusSquare: View {
                 withAnimation(.easeOut(duration: 0.3)) { opacity = 0 }
             }
             .accessibilityHidden(true)
+    }
+}
+
+/// The message that replaces the feed when the camera is off limits or missing. With `showsSettings` it offers Open Settings.
+struct CameraAccessMessage: View {
+    let title: String
+    let message: String
+    let showsSettings: Bool
+
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        VStack(spacing: LayoutTokens.space16) {
+            Image(systemName: "camera")
+                .font(.system(size: 34, weight: .regular))
+                .foregroundStyle(Color.cameraText.opacity(0.7))
+                .accessibilityHidden(true)
+            Text(title)
+                .font(.nichijiHeading)
+                .foregroundStyle(Color.cameraText)
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+            Text(message)
+                .font(.nichijiCallout)
+                .foregroundStyle(Color.cameraText.opacity(0.75))
+                .multilineTextAlignment(.center)
+            if showsSettings, let url = URL(string: UIApplication.openSettingsURLString) {
+                PrimaryButton(title: PhotoLookupCopy.openSettings) {
+                    openURL(url)
+                }
+                .padding(.top, LayoutTokens.space8)
+            }
+        }
+        .padding(.horizontal, LayoutTokens.space32)
+        .frame(maxWidth: 420)
     }
 }

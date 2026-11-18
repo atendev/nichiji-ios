@@ -55,3 +55,22 @@ struct PhotoSaveToastView: View {
         .accessibilityElement(children: .contain)
     }
 }
+
+/*---------------------------------option---------------------------------*/
+
+/// The labelled Save option at the top right. It saves the image it is given and waits for a write in progress.
+struct SavePhotoOption: View {
+    let saver: PhotoSaveModel
+    let imageData: Data?
+
+    var body: some View {
+        PhotoOptionButton(
+            systemName: "square.and.arrow.down",
+            label: PhotoSaveCopy.save,
+            hint: PhotoSaveCopy.hint
+        ) {
+            Task { await saver.save(imageData: imageData) }
+        }
+        .disabled(saver.isSaving)
+    }
+}

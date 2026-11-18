@@ -80,6 +80,8 @@ final class PhotoSaveModel {
     private(set) var isSaving = false
     /// Changes with every toast, so a view can time each one on its own.
     private(set) var toastID = 0
+    /// The screen sets this per photo, and Crop sets `.cropped` when it replaces the photo. Save writes the photo the caller passes, so it follows whichever is current.
+    var origin: PhotoOrigin = .camera
 
     private let library: any PhotoLibrarySaving
 
