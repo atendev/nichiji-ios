@@ -11,7 +11,7 @@ import kanjivg
 KANJIDIC = """<?xml version="1.0"?>
 <kanjidic2>
 <header><database_version>2026-001</database_version></header>
-<character><literal>日</literal><radical><rad_value rad_type="classical">72</rad_value></radical>
+<character><literal>日</literal><codepoint><cp_value cp_type="ucs">65e5</cp_value><cp_value cp_type="jis208">1-38-92</cp_value></codepoint><radical><rad_value rad_type="classical">72</rad_value></radical>
 <misc><grade>1</grade><stroke_count>4</stroke_count><freq>1</freq><jlpt>4</jlpt></misc>
 <reading_meaning><rmgroup><reading r_type="ja_on">ニチ</reading><reading r_type="ja_kun">ひ</reading>
 <meaning>day</meaning><meaning m_lang="fr">jour</meaning></rmgroup><nanori>あ</nanori></reading_meaning></character>
@@ -63,6 +63,8 @@ class KanjidicTests(unittest.TestCase):
         self.assertEqual(day.kunyomi, ["ひ"])
         self.assertEqual(day.meanings, ["day"])
         self.assertIsNone(entries["鬱"].frequency)
+        self.assertTrue(day.jis208)
+        self.assertFalse(entries["鬱"].jis208)
         self.assertEqual(kanjidic.GRADE_NAMES[entries["学"].grade], "secondary")
         self.assertNotIn(entries["鬱"].grade, kanjidic.GRADE_NAMES)
 

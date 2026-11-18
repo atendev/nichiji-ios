@@ -13,8 +13,8 @@ SVG = (
 )
 
 
-def kanji(literal, grade, strokes=2, freq=None, radical=72):
-    return kanjidic.KanjidicEntry(literal, grade, strokes, freq, radical, ["オン"], ["く.る"], [f"meaning of {literal}"])
+def kanji(literal, grade, strokes=2, freq=None, radical=72, jis208=False):
+    return kanjidic.KanjidicEntry(literal, grade, strokes, freq, radical, ["オン"], ["く.る"], [f"meaning of {literal}"], jis208)
 
 
 def word(sequence, headword, tags=(), kana="かな"):
@@ -26,9 +26,12 @@ def make_inputs(**overrides):
         "日": kanji("日", 1, freq=1),
         "月": kanji("月", 1, freq=2),
         "学": kanji("学", 8, freq=300),
-        "鬱": kanji("鬱", None),
+        "鬱": kanji("鬱", 9),
+        "鮪": kanji("鮪", None, jis208=True),
+        "鰯": kanji("鰯", None, strokes=2, freq=900, jis208=True),
+        "𠮟": kanji("𠮟", None),
     }
-    svgs = {c: SVG.format(h=f"{ord(c):05x}") for c in entries}
+    svgs = {c: SVG.format(h=f"{ord(c):05x}") for c in entries if c != "鰯"}
     inputs = build.Inputs(
         kanji=entries,
         waller_levels={"日": "n5", "鬱": "n1"},
@@ -55,8 +58,22 @@ LOCK = {
 
 
 class SelectionTests(unittest.TestCase):
-    def test_joyo_plus_n1_extras_are_selected(self):
-        self.assertEqual(sorted(build.select_literals(make_inputs())), sorted(["日", "月", "学", "鬱"]))
+    def test_joyo_jinmeiyo_and_jis_kanji_are_selected_and_others_left_out(self):
+        self.assertEqual(sorted(build.select_literals(make_inputs())), sorted(["日", "月", "学", "鬱", "鮪", "鰯"]))
+
+    def test_waller_listed_kanji_outside_the_sets_are_kept(self):
+        inputs = make_inputs(waller_levels={"日": "n5", "鬱": "n1", "𠮟": "n1"})
+        self.assertIn("𠮟", build.select_literals(inputs))
+
+    def test_waller_kanji_missing_from_kanjidic_fails(self):
+        inputs = make_inputs(waller_levels={"日": "n5", "猫": "n1"})
+        with self.assertRaises(build.BuildError):
+            build.select_literals(inputs)
+
+    def test_classification_follows_grade(self):
+        inputs = make_inputs()
+        got = {c: build.classify(inputs.kanji[c]) for c in ("日", "学", "鬱", "鮪")}
+        self.assertEqual(got, {"日": "joyo", "学": "joyo", "鬱": "jinmeiyo", "鮪": "hyogai"})
 
     def test_extra_outside_n1_fails(self):
         inputs = make_inputs(waller_levels={"日": "n5", "鬱": "n2"})
@@ -69,10 +86,23 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(build.assign_level("月", inputs), ("n4", True))
         self.assertEqual(build.assign_level("鬱", inputs), ("n1", False))
 
-    def test_list_order_is_grade_frequency_strokes_codepoint(self):
+    def test_supplement_levels_apply_to_joyo_kanji_only(self):
+        inputs = make_inputs(supplement_levels={"月": "n4", "鮪": "n2", "鬱": "n2"}, waller_levels={"日": "n5"})
+        self.assertEqual(build.assign_level("鮪", inputs), (None, False))
+        self.assertEqual(build.assign_level("鬱", inputs), (None, False))
+        self.assertEqual(build.assign_level("月", inputs), ("n4", True))
+
+    def test_list_order_is_frequency_then_common_words_then_strokes_then_codepoint(self):
         inputs = make_inputs()
-        order = build.list_order(build.select_literals(inputs), inputs.kanji)
-        self.assertEqual(sorted(order, key=order.get), ["日", "月", "学", "鬱"])
+        counts = {"鬱": 5, "鮪": 5}
+        order = build.list_order(build.select_literals(inputs), inputs.kanji, counts)
+        # Ranked kanji come first by frequency. The unranked 鬱 and 鮪 tie on common words and strokes, so code point decides.
+        self.assertEqual(sorted(order, key=order.get), ["日", "月", "学", "鰯", "鬱", "鮪"])
+
+    def test_more_common_words_beat_fewer_strokes_and_code_point_breaks_ties(self):
+        entries = {c: kanji(c, None, strokes=s, jis208=True) for c, s in (("亜", 7), ("唖", 10), ("娃", 9), ("阿", 8))}
+        order = build.list_order(list(entries), entries, {"唖": 3, "娃": 3, "阿": 1})
+        self.assertEqual(sorted(order, key=order.get), ["娃", "唖", "阿", "亜"])
 
 
 class KanjiRangeTests(unittest.TestCase):
@@ -118,11 +148,25 @@ class GenerateTests(unittest.TestCase):
         self.assertEqual(
             set(record),
             {"id", "meanings", "onyomi", "kunyomi", "radical", "strokeCount", "isJLPTLevelEstimated", "listIndex",
-             "exampleWords", "jlptLevel", "joyoGrade", "frequencyRank"},
+             "exampleWords", "jlptLevel", "joyoGrade", "frequencyRank", "classification"},
         )
         self.assertNotIn("strokePaths", record)
         self.assertEqual(record["radical"], {"character": "日", "meaning": "sun"})
         self.assertEqual(record["onyomi"][0]["romaji"], "on")
+        self.assertEqual(record["classification"], "joyo")
+
+    def test_every_record_and_index_entry_carries_its_classification(self):
+        index = {e["id"]: e for e in json.loads(self.files["Shared/kanji-index.json"])["entries"]}
+        self.assertEqual({c: e["classification"] for c, e in index.items()}, {"日": "joyo", "月": "joyo", "学": "joyo", "鬱": "jinmeiyo", "鮪": "hyogai", "鰯": "hyogai"})
+        record = json.loads(self.files[f"Shared/kanji/{ord('鮪'):05x}.json"])
+        self.assertEqual(record["classification"], "hyogai")
+        self.assertNotIn("joyoGrade", record)
+        self.assertNotIn("jlptLevel", record)
+
+    def test_kanji_without_a_kanjivg_file_ship_no_stroke_order(self):
+        self.assertNotIn(f"AppOnly/stroke-order/{ord('鰯'):05x}.svg", self.files)
+        self.assertIn(f"Shared/kanji/{ord('鰯'):05x}.json", self.files)
+        self.assertIn(f"AppOnly/stroke-order/{ord('鮪'):05x}.svg", self.files)
 
     def test_nil_fields_are_omitted(self):
         record = json.loads(self.files[f"Shared/kanji/{ord('鬱'):05x}.json"])
@@ -133,7 +177,7 @@ class GenerateTests(unittest.TestCase):
     def test_index_is_ordered_and_carries_frequency(self):
         index = json.loads(self.files["Shared/kanji-index.json"])
         self.assertEqual(index["formatVersion"], 1)
-        self.assertEqual([e["id"] for e in index["entries"]], ["日", "月", "学", "鬱"])
+        self.assertEqual([e["id"] for e in index["entries"]], ["日", "月", "学", "鰯", "鬱", "鮪"])
         self.assertEqual(index["entries"][0]["frequencyRank"], 1)
         self.assertEqual(index["entries"][0]["primaryReading"], "オン")
 
@@ -148,7 +192,7 @@ class GenerateTests(unittest.TestCase):
 
     def test_kanji_search_has_full_readings_and_meanings_in_code_point_order(self):
         search = json.loads(self.files["AppOnly/kanji-search.json"])
-        self.assertEqual([e["id"] for e in search], ["学", "日", "月", "鬱"])
+        self.assertEqual([e["id"] for e in search], ["学", "日", "月", "鬱", "鮪", "鰯"])
         search = sorted(search, key=lambda e: e["id"] != "日")
         self.assertEqual(set(search[0]), {"id", "meanings", "onyomi", "kunyomi"})
         self.assertEqual(search[0]["meanings"], ["meaning of 日"])
@@ -189,6 +233,10 @@ class GenerateTests(unittest.TestCase):
         self.assertEqual(estimated, 2)
         self.assertIn(f"Levels for {estimated} Jōyō kanji not in those lists", self.files["Shared/DATA-SOURCES.md"])
 
+    def test_sources_file_counts_each_level(self):
+        text = self.files["Shared/DATA-SOURCES.md"]
+        self.assertIn("The bundle holds 6 kanji (3 Jōyō, 1 Jinmeiyō, 2 Hyōgai) and 1 common words", text)
+
     def test_sources_file_dates_each_snapshot(self):
         text = self.files["Shared/DATA-SOURCES.md"]
         self.assertIn("## Snapshots", text)
@@ -223,11 +271,22 @@ class GuardTests(unittest.TestCase):
             build.generate(inputs, set(), LOCK)
         build.generate(inputs, {"日"}, LOCK)
 
-    def test_missing_svg_fails(self):
+    def test_missing_svg_fails_for_joyo_only(self):
         inputs = make_inputs()
         del inputs.svgs["月"]
         with self.assertRaises(build.BuildError):
             build.generate(inputs, set(), LOCK)
+        inputs = make_inputs()
+        del inputs.svgs["鬱"]
+        build.generate(inputs, set(), LOCK)
+
+    def test_stroke_check_skips_kanji_without_a_file(self):
+        inputs = make_inputs()
+        inputs.kanji["鰯"].stroke_count = 30
+        build.generate(inputs, set(), LOCK)
+
+    def test_budget_limits_are_8_and_24_mb(self):
+        self.assertEqual((build.SHARED_BUDGET, build.APP_BUDGET), (8 * 1024 * 1024, 24 * 1024 * 1024))
 
     def test_budgets(self):
         build.check_budgets({"Shared/a": "x", "AppOnly/b": "y"})

@@ -7,7 +7,7 @@ Nichiji is a local-first iOS kanji learning application built around learning on
 ### Content
 
 **Kanji entry**:
-An immutable bundled record describing a single kanji character, its readings, meanings, radical, level classifications, and example words. Stroke paths load separately and lazily. Level classifications are the unofficial JLPT level plus the Jōyō grade.
+An immutable bundled record describing a single kanji character, its readings, meanings, radical, level classifications, and example words. Stroke paths load separately and lazily. Level classifications are the unofficial JLPT level, the Jōyō grade and the kanji classification.
 _Avoid_: Kanji model, card, character record
 
 **Reading**:
@@ -40,6 +40,18 @@ The folded in-memory `DictionarySearchIndex`, built once from `kanji-search.json
 **Jōyō kanji**:
 The 2,136 kanji with a KANJIDIC2 grade of 1 to 6 or 8. Grades 9 and 10 (jinmeiyō) are not Jōyō and have no `joyoGrade`.
 _Avoid_: Common-use kanji
+
+**Kanji classification**:
+Which list a bundled kanji belongs to, stored as `classification` on every record and index entry: `joyo` (2,136), `jinmeiyo` (863) or `hyogai` (3,465). Both the JLPT and Jōyō level ladders derive from it, and `joyoGrade` stays Jōyō-only.
+_Avoid_: Kanji type, kanji tier
+
+**Jinmeiyō kanji** ("Name kanji"):
+Every KANJIDIC2 kanji with grade 9 or 10, 863 in all. 247 of them are Waller N1 kanji, and 616 have no N-level.
+_Avoid_: Name kanji (as a stored value)
+
+**Hyōgai kanji** ("Beyond the lists"):
+Every JIS X 0208 kanji that is neither Jōyō nor jinmeiyō, 3,465 in all. Most have no KANJIDIC2 frequency rank, so list order falls to their JMdict common-word count. All have KanjiVG stroke order. The 89 jinmeiyō kanji with no KanjiVG file ship without it.
+_Avoid_: Rare kanji, other kanji
 
 **JLPT level (unofficial)**:
 The N5 to N1 value from Jonathan Waller's community lists. The JLPT publishes no official kanji lists.

@@ -21,6 +21,18 @@ public enum JoyoGrade: String, Codable, CaseIterable, Sendable {
     case secondary
 }
 
+/// Which official list a kanji belongs to: the Joyo school set, the jinmeiyo name kanji, or hyogai (neither).
+public enum KanjiClassification: String, Codable, CaseIterable, Sendable {
+    case joyo
+    case jinmeiyo
+    case hyogai
+
+    /// The classification of a hand-built record: a Joyo grade means Joyo, none means jinmeiyo (the old "name kanji").
+    static func inferred(joyoGrade: JoyoGrade?) -> KanjiClassification {
+        joyoGrade == nil ? .jinmeiyo : .joyo
+    }
+}
+
 /// Categorizes a kanji reading as Chinese-derived or native Japanese.
 public enum ReadingKind: String, Codable, Sendable {
     case onyomi
@@ -85,6 +97,7 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
     public let kunyomi: [KanjiReading]
     public let radical: KanjiRadical
     public let strokeCount: Int
+    public let classification: KanjiClassification
     /// Unofficial community level; see `isJLPTLevelEstimated`.
     public let jlptLevel: JLPTLevel?
     /// True when the level comes from the OpenJLPT supplement instead of Waller's lists.
@@ -106,7 +119,8 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
         frequencyRank: Int?,
         listIndex: Int,
         exampleWords: [ExampleWord],
-        isJLPTLevelEstimated: Bool = false
+        isJLPTLevelEstimated: Bool = false,
+        classification: KanjiClassification? = nil
     ) {
         self.id = id
         self.meanings = meanings
@@ -114,6 +128,7 @@ public struct KanjiEntry: Codable, Hashable, Sendable, Identifiable {
         self.kunyomi = kunyomi
         self.radical = radical
         self.strokeCount = strokeCount
+        self.classification = classification ?? .inferred(joyoGrade: joyoGrade)
         self.jlptLevel = jlptLevel
         self.isJLPTLevelEstimated = isJLPTLevelEstimated
         self.joyoGrade = joyoGrade
@@ -129,6 +144,7 @@ public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
     public let primaryMeaning: String
     public let primaryReading: String
     public let strokeCount: Int
+    public let classification: KanjiClassification
     public let jlptLevel: JLPTLevel?
     public let joyoGrade: JoyoGrade?
     public let frequencyRank: Int?
@@ -142,12 +158,14 @@ public struct KanjiIndexEntry: Codable, Hashable, Sendable, Identifiable {
         jlptLevel: JLPTLevel?,
         joyoGrade: JoyoGrade?,
         listIndex: Int,
-        frequencyRank: Int? = nil
+        frequencyRank: Int? = nil,
+        classification: KanjiClassification? = nil
     ) {
         self.id = id
         self.primaryMeaning = primaryMeaning
         self.primaryReading = primaryReading
         self.strokeCount = strokeCount
+        self.classification = classification ?? .inferred(joyoGrade: joyoGrade)
         self.jlptLevel = jlptLevel
         self.joyoGrade = joyoGrade
         self.frequencyRank = frequencyRank
