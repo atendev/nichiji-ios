@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 
 # KANJIDIC2 grades 1-6 are the school grades, 8 is the rest of the Joyo set.
 GRADE_NAMES = {1: "grade1", 2: "grade2", 3: "grade3", 4: "grade4", 5: "grade5", 6: "grade6", 8: "secondary"}
+# Grades 9 and 10 are the jinmeiyo (name) kanji.
+JINMEIYO_GRADES = {9, 10}
 
 
 @dataclass
@@ -18,6 +20,7 @@ class KanjidicEntry:
     onyomi: list[str] = field(default_factory=list)
     kunyomi: list[str] = field(default_factory=list)
     meanings: list[str] = field(default_factory=list)
+    jis208: bool = False
 
 
 def read_text(path) -> bytes:
@@ -40,6 +43,7 @@ def parse(data: bytes) -> tuple[str, dict[str, KanjidicEntry]]:
             stroke_count=int(node.findtext("misc/stroke_count")),
             frequency=int(freq) if freq else None,
             radical=int(radical.text),
+            jis208=node.find("codepoint/cp_value[@cp_type='jis208']") is not None,
         )
         for reading in node.iterfind("reading_meaning/rmgroup/reading"):
             kind = reading.get("r_type")

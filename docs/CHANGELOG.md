@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.35.0
+- Generate the Jinmeiyō and Hyōgai kanji. `make dataset` now builds 6,464 kanji: the 2,136 Jōyō, 863 Jinmeiyō (every KANJIDIC2 grade 9 or 10 kanji) and 3,465 Hyōgai (the other JIS X 0208 kanji). Every record and index entry gains `classification` (`joyo`, `jinmeiyo`, `hyogai`), decoded by the new `KanjiClassification`. The list is now ordered by frequency, then common-word count, then strokes, then code point. 89 Jinmeiyō kanji ship with no stroke SVG, and 93 new KanjiVG stroke-count mismatches join the allow-list. The size budgets rise to 8 MB Shared and 24 MB app (5.1 and 16.8 MiB now), words.json grows to 19,025, and 1,339 kanji have no example word. The app does not offer the new levels yet, so Dictionary browse lists them in its last Jōyō group until the app ticket lands
+
 ## v0.34.1
 - Fix known kanji in onboarding. The Known kanji step now marks the easier levels each time it becomes the active step, since the pager built it before the learner picked a level and it never re-ran. Saying you know a kanji, by level, in the picker or on the detail page, now starts it learning and due today so it shows in flashcards, instead of putting it at known. The detail page's quiet "I know this" is now a primary "Start learning this kanji" button at the bottom, with "Stop learning this kanji" to undo it before the first review. The You screen's Known count now counts only kanji that reached the known stage. Kanji marked known before this change stay as they are.
 
