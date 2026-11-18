@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.33.0
+- Pan and zoom the frozen photo. Pinch zooms from 1x to 4x about the pinch point, a drag pans while zoomed and cannot take a photo edge inside the screen, and a double-tap toggles between 1x and 2.5x. The kanji boxes, their 44 pt tap targets and the Highlights toggle follow the zoom, and a box tap still opens detail (it waits out the double-tap window). Zoom waits for the sweep to settle, rides on top of the sheet's peek, half and full pose, and resets on a new photo and after a crop rescan. Reduce Motion snaps the double-tap. The geometry is `PhotoZoom`, covered by `PhotoZoomTests`.
+
 ## v0.32.0
 - Fix the Crop photo fit and drag the whole frame. Crop draws the photo whole at its own shape, centred, with the frame and corners on the visible photo, for portrait, square and landscape photos alike. Dragging inside the frame now moves it without resizing, stopping at the photo's edges, and the corners still resize. VoiceOver gets four "Move frame" actions. The hint now reads "Drag the corners to resize the frame, or drag inside it to move it". Crop now covers the whole screen as a full-screen cover, so the photo fits the screen and not the scan screen's layout. Close ticket 082
 

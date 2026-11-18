@@ -3,9 +3,9 @@ id: "083"
 title: Pan and zoom the frozen photo
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: []
-claimed: true
+claimed: false
 ---
 
 ## Question
@@ -23,6 +23,13 @@ The user asked for this after batch 3 (results sheet, Crop, Save). The frozen ph
 - Reduce Motion: zoom and pan follow the fingers, and the double-tap snaps without animation.
 - `PhotoLookupScreen.swift` is near SwiftLint's 400-line `file_length` limit, so put the zoom state and gestures in their own file. Put the geometry (clamping, box transform) in a pure type with unit tests.
 
+
 ## Resolution
 
-<Filled in at close.>
+Pinch (1x to 4x, about the pinch point), drag pan (clamped) and double-tap (1x or 2.5x) use SwiftUI gestures, not a UIScrollView wrapper. Boxes are re-mapped in screen space so strokes and 44 pt targets stay constant. A single tap waits out the double-tap window, zoom waits for the sweep and resets on a new photo, and a sheet header drag wins over the photo pan by hit testing.
+
+Council approved in round 3 (Claude 9, Gemini 10, GPT 10) after a CI compile fix. CI green on 987dd93 (lint, build, tests): https://github.com/atendev/nichiji-ios/actions/runs/44231020346. PR: https://github.com/atendev/nichiji-ios/pull/58. Decision report: `.plan/assets/083-pan-and-zoom-the-frozen-photo-report.md`.
+
+Open question for device feedback, not a ticket: aspect-fill's cropped-off edges cannot be zoomed into.
+
+Timing: wall 29m, active 11m, user 0s, wait 15m, blocked 0s | implement 3m, audit 6m (3 rounds), ci 15m | tools 75 (8 subagent) | limits 0, compactions 0, handoffs 1 | ctx peak 158k | cost $2.48 sonnet-5-5 + $0.04 haiku-5-5

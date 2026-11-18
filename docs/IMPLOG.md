@@ -990,3 +990,23 @@ The user answered the merge question with two changes and asked for CI before as
 #### Deviation Report
 - **Test Results**: Not run. The host is Linux with no Swift toolchain or SwiftLint, so CI is the build, lint and test check. The drags and VoiceOver actions need a device check.
 - **Audit**: See `.plan/assets/082-fix-crop-fit-and-drag-the-frame-report.md`.
+
+### Pan and zoom the frozen photo (v0.33.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. Pinch zooms 1x to 4x about the pinch point; drag pans while zoomed and is clamped so the photo covers the screen; double-tap toggles 1x and 2.5x.
+  2. Boxes, their 44 pt tap targets and the Highlights toggle follow the zoom and pan. A box tap opens detail and a pan never steals it. The sweep plays at 1x and zoom waits for it to settle.
+  3. The sheet's pose still scales and lifts the photo, with zoom on top. Zoom resets on Retake, a new photo and a crop rescan.
+  4. Reduce Motion: fingers drive zoom and pan; the double-tap snaps.
+- **Scope Boundary**: In: `PhotoZoom` (pure geometry), `PhotoZoomGestures`, the zoom wiring in `FrozenPhotoLayer`, tests and docs. Out: crop fit (sibling ticket), any change to `PhotoFit`, a `UIScrollView` wrapper.
+- **Anticipated TODOs**: None. The gestures need a device check.
+- **Planned Tests**: `PhotoZoomTests`: caps, anchor, clamp, pan limit, snap, double-tap, point and box mapping.
+- **Version**: MINOR after v0.31.0 (placeholder; the master renumbers at the merge).
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check. SwiftUI gestures (`MagnifyGesture`, `DragGesture`, `SpatialTapGesture`) did the job without a `UIScrollView`. A drag on the sheet header wins over the photo pan because the sheet is a layer above the photo.
+- **Scope Boundary**: Kept. `PhotoLookupScreen.swift` is unchanged.
+- **Unanticipated TODOs**: None.
+- **Test Results**: Not run. The host has no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/083-pan-and-zoom-the-frozen-photo-report.md`.
