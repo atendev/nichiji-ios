@@ -40,7 +40,13 @@ Round 2 covered the two small fixes and the rebuttals, sent to all three seats.
 - Gemini seat: APPROVE, 9, no problems.
 - GPT seat: APPROVE, 9, no problems.
 
-Minor problems declined, 2. The placeholder version in the docs (round 1) and the X visibility note (round 2).
+Round 3 followed the first CI run, which failed to compile the test target. `ScanSheetTests.swift` read `primaryMeaning` from `KanjiEntry`, which has only `meanings`, and `primaryMeaning` belongs to `KanjiIndexEntry`. The implementer changed the expected value to `entries.first { ... }?.meanings.first`, which matches how the test store builds `primaryMeaning`, and grepped the file for other uses (none). The seats saw only that hunk.
+
+- Claude seat: APPROVE, 8, two minor problems. One suggested pinning literal meanings, which the main thread declined because the test should follow the store's rule. The other asked for a grep for further `primaryMeaning` uses, which found none.
+- Gemini seat: APPROVE, 10, no problems.
+- GPT seat: APPROVE, 10, no problems.
+
+Minor problems declined, 3. The placeholder version in the docs (round 1), the X visibility note (round 2) and the literal-pinning suggestion (round 3).
 
 ## Gates the skill overrode
 

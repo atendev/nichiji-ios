@@ -234,7 +234,7 @@ struct ScanResultsCountsTests {
         let model = await found()
 
         for id in model.kanji {
-            let expected = SeedKanjiDataset.entries.first { $0.id == id }?.primaryMeaning
+            let expected = SeedKanjiDataset.entries.first { $0.id == id }?.meanings.first
             #expect(model.meanings[id] == expected)
         }
         #expect(model.meanings.count == model.kanji.count)
