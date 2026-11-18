@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.34.1
+- Fix known kanji in onboarding. The Known kanji step now marks the easier levels each time it becomes the active step, since the pager built it before the learner picked a level and it never re-ran. Saying you know a kanji, by level, in the picker or on the detail page, now starts it learning and due today so it shows in flashcards, instead of putting it at known. The detail page's quiet "I know this" is now a primary "Start learning this kanji" button at the bottom, with "Stop learning this kanji" to undo it before the first review. The You screen's Known count now counts only kanji that reached the known stage. Kanji marked known before this change stay as they are.
+
 ## v0.34.0
 - Fit library and cropped photos on the frozen photo screen. A camera shot still fills the screen; a library photo, and any crop (a cropped shot included), is now shown whole at its own shape, centred on the camera base, so a square or landscape photo is no longer zoomed in to the full height with its sides cut off. The boxes, their tap targets, the scan sweep and the Highlights layer use the same photo rect in both modes. Pan and zoom now treat the photo's own rect as 1x: a letterboxed photo cannot be panned into its bars, and a filled shot's cut-off sides can now be reached by zooming in. The geometry is `PhotoFit.photoFrame` and `PhotoOrigin.fitMode`, covered by `PhotoFitModeTests`.
 

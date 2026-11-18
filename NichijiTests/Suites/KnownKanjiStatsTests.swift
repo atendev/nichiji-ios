@@ -27,7 +27,7 @@ struct KnownKanjiStatsTests {
         ]
     }
 
-    @Test("Declared kanji count as known and leave every Learned figure")
+    @Test("Declared kanji leave every Learned figure; only the known stage counts as known")
     func declaredLeaveLearned() {
         let stats = StatsCalculator.stats(
             log: [],
@@ -38,7 +38,7 @@ struct KnownKanjiStatsTests {
         )
 
         #expect(stats.kanjiLearned == 3)
-        #expect(stats.kanjiKnown == 2)
+        #expect(stats.kanjiKnown == 1)
         #expect(Set(stats.learnedKanjiIDs) == ["日", "会", "憂"])
         #expect(stats.levelBars.map(\.learned) == [1, 1, 1])
         #expect(stats.needsAttention.map(\.kanjiID) == ["憂"])
@@ -57,11 +57,11 @@ struct KnownKanjiStatsTests {
         #expect(figures.kanjiLearned == 1)
     }
 
-    @Test("Known needs a stage of known and a declared date")
+    @Test("Declared needs a declared date, and a declared kanji is not learned yet")
     func declaredFlag() {
         #expect(StatsFixtures.declared("日", at: Date()).declaredKnown)
+        #expect(!StatsFixtures.declared("日", at: Date()).isLearned)
         #expect(!StatsFixtures.progress("日", .known).declaredKnown)
-        #expect(!KanjiProgressSnapshot(kanjiID: "日", stage: .new, declaredKnownAt: Date()).declaredKnown)
         #expect(StatsFixtures.progress("日", .known).isLearned)
         #expect(!StatsFixtures.progress("日", .new).isLearned)
     }

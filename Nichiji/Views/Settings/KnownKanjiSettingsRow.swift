@@ -13,7 +13,7 @@ struct KnownKanjiSettingsRow: View {
         } label: {
             settingsNavigationRow(
                 title: "Known kanji",
-                subtitle: "Skip kanji you already know.",
+                subtitle: "Start kanji you already know in flashcards.",
                 value: knownCount == 0 ? nil : "\(knownCount) kanji"
             )
         }

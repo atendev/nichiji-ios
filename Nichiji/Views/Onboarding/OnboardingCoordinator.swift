@@ -121,7 +121,7 @@ private struct OnboardingStepHost: View {
         case .levelSelection:
             LevelSelectView(flow: flow)
         case .knownKanji:
-            KnownKanjiStepView(onNext: { flow.advance() })
+            KnownKanjiStepView(isActive: step == flow.step, onNext: { flow.advance() })
         case .reminder:
             ReminderSetupView(flow: flow, isActive: step == flow.step)
         case .widgetIntro:

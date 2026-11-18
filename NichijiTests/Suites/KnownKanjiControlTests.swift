@@ -6,7 +6,7 @@ import Testing
 
 @Suite("Known Kanji Control Tests")
 struct KnownKanjiControlTests {
-    @Test("I know this shows for new kanji only, and Not known after all for marked ones")
+    @Test("Start learning this kanji shows for new kanji only, and Stop learning this kanji for marked ones")
     func choiceByStage() {
         #expect(KnownKanjiControl.choice(stage: nil, isDeclared: false) == .declare)
         #expect(KnownKanjiControl.choice(stage: .new, isDeclared: false) == .declare)

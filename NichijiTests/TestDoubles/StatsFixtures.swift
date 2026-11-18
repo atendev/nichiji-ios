@@ -69,8 +69,8 @@ enum StatsFixtures {
         )
     }
 
-    /// A kanji the learner marked as already known.
+    /// A kanji the learner said they know, waiting in learning for its first review.
     static func declared(_ id: String, at date: Date, forgotItCount: Int = 0) -> KanjiProgressSnapshot {
-        KanjiProgressSnapshot(kanjiID: id, stage: .known, forgotItCount: forgotItCount, declaredKnownAt: date)
+        KanjiProgressSnapshot(kanjiID: id, stage: .learning, forgotItCount: forgotItCount, declaredKnownAt: date)
     }
 }

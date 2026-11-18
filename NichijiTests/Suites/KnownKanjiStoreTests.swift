@@ -26,16 +26,16 @@ struct KnownKanjiStoreTests {
         return rows.first?.wasHandKnown
     }
 
-    @Test("Declaring a new kanji makes it known with no review date and no log row")
-    func declareMarksKnown() async throws {
+    @Test("Declaring a new kanji starts it learning, due now, with no log row")
+    func declareStartsLearning() async throws {
         let store = try makeStore()
         let date = Date(timeIntervalSince1970: 1_793_000_000)
 
         try await store.declareKnown(["山", "川"], at: date)
 
         let progress = try #require(try await store.progress(for: "山"))
-        #expect(progress.stage == .known)
-        #expect(progress.nextReviewAt == nil)
+        #expect(progress.stage == .learning)
+        #expect(progress.nextReviewAt == date)
         #expect(progress.declaredKnownAt == date)
         #expect(progress.declaredKnown)
         #expect(try await store.studyLog().isEmpty)
