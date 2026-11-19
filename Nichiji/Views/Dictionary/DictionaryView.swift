@@ -142,99 +142,6 @@ public struct DictionaryView: View {
         }
     }
 
-    /// One flat lazy list of fixed-height rows, so the scroll offset never has to guess at nested grid heights.
-    private var browseGrid: some View {
-        let rows = KanjiBrowseGrouping.rows(
-            from: sections,
-            collapsed: collapsedSectionIDs,
-            columnCount: KanjiGridTile.columnCount
-        )
-        return ScrollView(showsIndicators: false) {
-            LazyVStack(alignment: .leading, spacing: KanjiGridTile.spacing) {
-                ForEach(rows) { row in
-                    rowView(row)
-                }
-            }
-            .padding(.horizontal, LayoutTokens.screenMarginCompact)
-            .padding(.top, LayoutTokens.space8)
-            .padding(.bottom, LayoutTokens.space32)
-        }
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
-            let side = Self.tileSide(forWidth: width)
-            if abs(side - tileSide) > 0.5 { tileSide = side }
-        }
-    }
-
-    @ViewBuilder private func rowView(_ row: KanjiBrowseRow) -> some View {
-        switch row {
-        case .header(let section, let isCollapsed, let isFirst):
-            sectionHeader(section, isCollapsed: isCollapsed)
-                .padding(.top, isFirst ? 0 : LayoutTokens.space32 - KanjiGridTile.spacing)
-        case .tiles(_, let entries):
-            if tileSide > 0 {
-                tileRow(entries)
-            }
-        }
-    }
-
-    private func sectionHeader(_ section: KanjiBrowseSection, isCollapsed: Bool) -> some View {
-        Button {
-            withAnimation(reduceMotion ? nil : .spring(response: 0.25, dampingFraction: 0.85)) {
-                if isCollapsed {
-                    collapsedSectionIDs.remove(section.id)
-                } else {
-                    collapsedSectionIDs.insert(section.id)
-                }
-            }
-        } label: {
-            HStack(alignment: .center, spacing: LayoutTokens.space12) {
-                Text(section.title)
-                    .font(.nichijiHeading)
-                    .foregroundColor(.nichijiInk)
-
-                Spacer()
-
-                Text(section.countLabel)
-                    .font(.nichijiCaption)
-                    .foregroundColor(.nichijiInkMuted)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.nichijiInkMuted)
-                    .rotationEffect(.degrees(isCollapsed ? 0 : 90))
-            }
-            .frame(minHeight: LayoutTokens.minHitTarget)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isHeader)
-        .accessibilityValue(isCollapsed ? "Collapsed" : "Expanded")
-        .accessibilityHint(isCollapsed ? "Shows the kanji in this level" : "Hides the kanji in this level")
-    }
-
-    private func tileRow(_ entries: [KanjiIndexEntry]) -> some View {
-        HStack(spacing: KanjiGridTile.spacing) {
-            ForEach(entries) { entry in
-                NavigationLink(value: KanjiDetailRoute(kanjiID: entry.id)) {
-                    KanjiGridTile(kanji: entry.id)
-                        .frame(width: tileSide, height: tileSide)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(KanjiGridTile.accessibilityLabel(kanji: entry.id, meaning: entry.primaryMeaning))
-                .accessibilityHint("Opens kanji details")
-            }
-        }
-        .frame(height: tileSide, alignment: .leading)
-    }
-
-    /// Side of one square tile once the screen margins and column gaps are taken out.
-    static func tileSide(forWidth width: CGFloat) -> CGFloat {
-        let columns = CGFloat(KanjiGridTile.columnCount)
-        let usable = width - 2 * LayoutTokens.screenMarginCompact - (columns - 1) * KanjiGridTile.spacing
-        return max(KanjiGridTile.minimumSide, (usable / columns).rounded(.down))
-    }
-
     private func loadSections() async {
         let contentStore = services?.contentStore ?? BundledKanjiContentStore()
         let system = activeLevelSystem
@@ -302,6 +209,99 @@ public struct DictionaryView: View {
 /*-----------------------------dictionary-parts-----------------------------*/
 
 private extension DictionaryView {
+    /// One flat lazy list of fixed-height rows, so the scroll offset never has to guess at nested grid heights.
+    var browseGrid: some View {
+        let rows = KanjiBrowseGrouping.rows(
+            from: sections,
+            collapsed: collapsedSectionIDs,
+            columnCount: KanjiGridTile.columnCount
+        )
+        return ScrollView(showsIndicators: false) {
+            LazyVStack(alignment: .leading, spacing: KanjiGridTile.spacing) {
+                ForEach(rows) { row in
+                    rowView(row)
+                }
+            }
+            .padding(.horizontal, LayoutTokens.screenMarginCompact)
+            .padding(.top, LayoutTokens.space8)
+            .padding(.bottom, LayoutTokens.space32)
+        }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+            let side = Self.tileSide(forWidth: width)
+            if abs(side - tileSide) > 0.5 { tileSide = side }
+        }
+    }
+
+    @ViewBuilder func rowView(_ row: KanjiBrowseRow) -> some View {
+        switch row {
+        case .header(let section, let isCollapsed, let isFirst):
+            sectionHeader(section, isCollapsed: isCollapsed)
+                .padding(.top, isFirst ? 0 : LayoutTokens.space32 - KanjiGridTile.spacing)
+        case .tiles(_, let entries):
+            if tileSide > 0 {
+                tileRow(entries)
+            }
+        }
+    }
+
+    func sectionHeader(_ section: KanjiBrowseSection, isCollapsed: Bool) -> some View {
+        Button {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.25, dampingFraction: 0.85)) {
+                if isCollapsed {
+                    collapsedSectionIDs.remove(section.id)
+                } else {
+                    collapsedSectionIDs.insert(section.id)
+                }
+            }
+        } label: {
+            HStack(alignment: .center, spacing: LayoutTokens.space12) {
+                Text(section.title)
+                    .font(.nichijiHeading)
+                    .foregroundColor(.nichijiInk)
+
+                Spacer()
+
+                Text(section.countLabel)
+                    .font(.nichijiCaption)
+                    .foregroundColor(.nichijiInkMuted)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.nichijiInkMuted)
+                    .rotationEffect(.degrees(isCollapsed ? 0 : 90))
+            }
+            .frame(minHeight: LayoutTokens.minHitTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+        .accessibilityValue(isCollapsed ? "Collapsed" : "Expanded")
+        .accessibilityHint(isCollapsed ? "Shows the kanji in this level" : "Hides the kanji in this level")
+    }
+
+    func tileRow(_ entries: [KanjiIndexEntry]) -> some View {
+        HStack(spacing: KanjiGridTile.spacing) {
+            ForEach(entries) { entry in
+                NavigationLink(value: KanjiDetailRoute(kanjiID: entry.id)) {
+                    KanjiGridTile(kanji: entry.id)
+                        .frame(width: tileSide, height: tileSide)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(KanjiGridTile.accessibilityLabel(kanji: entry.id, meaning: entry.primaryMeaning))
+                .accessibilityHint("Opens kanji details")
+            }
+        }
+        .frame(height: tileSide, alignment: .leading)
+    }
+
+    /// Side of one square tile once the screen margins and column gaps are taken out.
+    static func tileSide(forWidth width: CGFloat) -> CGFloat {
+        let columns = CGFloat(KanjiGridTile.columnCount)
+        let usable = width - 2 * LayoutTokens.screenMarginCompact - (columns - 1) * KanjiGridTile.spacing
+        return max(KanjiGridTile.minimumSide, (usable / columns).rounded(.down))
+    }
+
     func openDrawSearch() {
         let entry = HandwritingSearchEntry.open(access: proAccess?.access ?? .locked, existing: handwriting) {
             HandwritingSearchModel.live(contentStore: services?.contentStore ?? BundledKanjiContentStore())
