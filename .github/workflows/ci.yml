@@ -2,6 +2,11 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      testflight:
+        description: Upload a signed Internal build to TestFlight
+        type: boolean
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}-${{ github.event_name }}
@@ -29,6 +34,7 @@ jobs:
 
   testflight:
     needs: build-test
+    if: inputs.testflight
     runs-on: xcode-27
     timeout-minutes: 45
     steps:

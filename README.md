@@ -16,7 +16,7 @@ make testflight # signed Internal build, uploaded to TestFlight (needs the App S
 
 ## Testing on a device
 
-Every passing CI run, started manually from the Actions tab or with `gh workflow run ci.yml --ref <branch>`, signs an Internal build and uploads it to TestFlight. Internal is a Release build with the dev unlock, and it is for internal testers only. Install it from the TestFlight app once Apple finishes processing, usually 10 to 30 minutes.
+CI runs only when started by hand, from the Actions tab or with `gh workflow run ci.yml --ref <branch>`, and by default it only tests. Add `-f testflight=true` (or tick the box in the Actions tab) and a passing run also signs an Internal build and uploads it to TestFlight. The wayfinder master session does this once, when it ends. Internal is a Release build with the dev unlock, and it is for internal testers only. Install it from the TestFlight app once Apple finishes processing, usually 10 to 30 minutes.
 
 CI signs manually with the Apple Distribution certificate in the `DIST_CERT_P12` and `DIST_CERT_PASSWORD` secrets and the `Nichiji App Store` and `Nichiji Widget App Store` profiles in `PROFILE_APP` and `PROFILE_WIDGET`. It talks to App Store Connect with the `ASC_KEY_P8`, `ASC_KEY_ID` and `ASC_ISSUER_ID` API key secrets. The certificate and profiles expire after a year: run `tools/signing/testflight-wizard.sh` to make new ones.
 

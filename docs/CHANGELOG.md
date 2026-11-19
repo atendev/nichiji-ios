@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.37.1
+- Upload to TestFlight only when asked. CI's new `testflight` input is off by default, so a plain run only tests. Under a wayfinder master session, children skip CI, the master tests each merged batch, and only its final run at session end uploads. Not tagged
+
 ## v0.37.0
 - Ship device builds through TestFlight instead of sideloading. `project.yml` sets team `68DPHWR5V5`, adds an Internal configuration (Release plus the `DEV_UNLOCK` flag), signs Internal and Release manually with the `Nichiji App Store` and `Nichiji Widget App Store` profiles because automatic signing refuses a distribution identity on archive, and declares no non-exempt encryption. The app gets its icon: an `AppIcon` asset catalog with the light and dark brand icons rendered from `docs/design-system/assets/Brand`, since App Store validation rejects a bundle without one. The widget's version and build number now follow the app's. CI's `testflight` job replaces the unsigned IPA job: it imports the Apple Distribution certificate and both profiles from secrets, archives Internal with the run number as the build number, and uploads an internal-testers-only build with the App Store Connect API key. `make ipa` becomes `make testflight`, and `tools/signing/testflight-wizard.sh` makes the certificate, the profiles and their secrets. Not tagged
 
