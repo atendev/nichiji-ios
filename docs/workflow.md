@@ -306,6 +306,12 @@ find the run with `gh run list --workflow ci.yml --branch <branch> --limit 1`
 and watch it with `gh run watch <id> --exit-status` until it finishes.
 Never trigger runs for `main`.
 
+A plain run only tests. The `testflight` input (`-f testflight=true`) also
+signs an Internal build and uploads it to TestFlight. Ticket runs never set
+it. Under a wayfinder master session, children skip CI entirely: the master
+runs CI once on each merged batch, and sets `testflight=true` only on the
+final run when the session ends.
+
 On CI failure, spawn a subagent on `sonnet` with the failing job logs and
 the branch diff. It finds the cause and fixes it. The fix goes through the audit,
 then commit, push, and watch again. CI-fix commits share the run's version
