@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.38.0
+- Collapse Dictionary levels and stop the browse list jumping back up. Each level header is now a button that hides or shows its kanji, with a chevron and Expanded or Collapsed for VoiceOver. The browse list is one flat lazy list of fixed-height rows instead of a lazy grid nested in a lazy stack, whose guessed heights made the scroll offset snap to the top. Not tagged
+
 ## v0.37.1
 - Upload to TestFlight only when asked. CI's new `testflight` input is off by default, so a plain run only tests. Under a wayfinder master session, children skip CI, the master tests each merged batch, and only its final run at session end uploads. Not tagged
 

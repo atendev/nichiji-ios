@@ -113,6 +113,42 @@ struct DictionaryBrowseTests {
         #expect(store.recordLoadCount == 0)
     }
 
+    @Test("Browse rows put a header before each level and chunk its kanji into rows of the column count")
+    func rowsChunkKanjiUnderHeaders() {
+        let sections = KanjiBrowseGrouping.sections(from: mixedEntries, system: .jlpt)
+
+        let rows = KanjiBrowseGrouping.rows(from: sections, collapsed: [], columnCount: 2)
+
+        #expect(rows.map(\.id) == ["header-n5", "n5-0", "header-n4", "n4-0", "header-n1", "n1-0"])
+        #expect(rows.first == .header(sections[0], isCollapsed: false, isFirst: true))
+        #expect(rows[2] == .header(sections[1], isCollapsed: false, isFirst: false))
+    }
+
+    @Test("A collapsed level keeps its header and drops its tiles")
+    func collapsedLevelDropsTiles() {
+        let sections = KanjiBrowseGrouping.sections(from: mixedEntries, system: .jlpt)
+
+        let rows = KanjiBrowseGrouping.rows(from: sections, collapsed: [sections[1].id], columnCount: 5)
+
+        #expect(rows.map(\.id) == ["header-n5", "n5-0", "header-n4", "header-n1", "n1-0"])
+        #expect(rows[2] == .header(sections[1], isCollapsed: true, isFirst: false))
+    }
+
+    @Test("A level with more kanji than columns ends on a short row")
+    func lastRowCanBeShort() {
+        let entries = (0..<7).map { indexEntry("k\($0)", jlpt: .n5, joyo: .grade1, listIndex: $0) }
+        let sections = KanjiBrowseGrouping.sections(from: entries, system: .jlpt)
+
+        let rows = KanjiBrowseGrouping.rows(from: sections, collapsed: [], columnCount: 5)
+
+        guard case .tiles(_, let first) = rows[1], case .tiles(_, let second) = rows[2] else {
+            Issue.record("expected two tile rows")
+            return
+        }
+        #expect(first.count == 5)
+        #expect(second.count == 2)
+    }
+
     @Test("The bundled index puts all 6,407 kanji on exactly one rung of each ladder")
     func bundledIndexCoversEveryKanji() throws {
         let store = BundledKanjiContentStore()
