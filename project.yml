@@ -41,6 +41,9 @@ targets:
       - path: Dataset/AppOnly/stroke-order
         type: folder
         buildPhase: resources
+      - path: Fonts
+        includes: ["*.ttf"]
+        buildPhase: resources
     dependencies:
       - target: NichijiWidget
     entitlements:
@@ -53,6 +56,10 @@ targets:
       path: Config/Nichiji-Info.plist
       properties:
         ITSAppUsesNonExemptEncryption: false
+        UIAppFonts
+          - ShipporiMincho-Regular.ttf
+          - ZenKakuGothicNew-Regular.ttf
+          - ZenKakuGothicNew-Medium.ttf
         CFBundleURLTypes:
           - CFBundleURLName: com.aten.nichiji
             CFBundleURLSchemes:
@@ -88,6 +95,9 @@ targets:
       - Nichiji/Services
       - Nichiji/Widget
       - Nichiji/DesignSystem/Tokens
+      - path: Fonts
+        includes: ["*.ttf"]
+        buildPhase: resources
       - path: Dataset/Shared/kanji-index.json
         buildPhase: resources
       - path: Dataset/Shared/DATA-SOURCES.md
@@ -107,6 +117,10 @@ targets:
         # XcodeGen otherwise writes literal defaults, and App Store Connect wants the app's versions.
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UIAppFonts:
+          - ShipporiMincho-Regular.ttf
+          - ZenKakuGothicNew-Regular.ttf
+          - ZenKakuGothicNew-Medium.ttf
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
