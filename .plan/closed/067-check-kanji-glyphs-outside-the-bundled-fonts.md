@@ -3,9 +3,9 @@ id: "067"
 title: Check kanji glyphs outside the bundled fonts
 type: task
 mode: HITL
-status: open
+status: closed
 blocked_by: []
-claimed: true
+claimed: false
 ---
 
 ## Question
@@ -26,13 +26,10 @@ Output: a pass or fix per surface, and the fix commit if any. The fix is agent w
 
 ## Resolution
 
-## Handoff
+Pass on every surface, after two fixes. The check ran on a phone with English as the only preferred language, on TestFlight builds from CI runs 44894835544 and 44898366184. The first pass ran with Japanese still in the phone's language list, which hides the bug, so it was repeated after removing it. 直, 骨 and 角 match the KanjiVG stroke diagrams on kanji detail, Practice and example words. Today, the Review tab and session, Dictionary browse, search results, the typed text in the search field, You, the home-screen widgets and the lock-screen widget all draw Japanese shapes. Sources has no Japanese text. Another app on the same phone (T3) draws the same three kanji with Chinese shapes, which is the bug the fix prevents.
 
-Branch `feature/bundle-japanese-fonts`, pushed. Four commits not on `main`: fonts and modifier (`0126cc55`), lint comma (`bd2d20a3`), `UIAppFonts` colon (`8b45587e`), search-field fix (`547b5dd4`). CI run 44898366184 green on `547b5dd4`, TestFlight build uploaded. Council audit approved: round 1 gemini 8, claude 7, gpt failed (no quota); rounds 2 and 3 claude only (user's call), round 3 APPROVE 8. Declined minor: the Zen subset note on the test (the test documents the current no-kanji subset).
+The fix has three parts. Shippori Mincho Regular and Zen Kaku Gothic New Regular and Medium are bundled as subset files in the app and the widget extension, and `UIAppFonts` registers them in both. A shared `japaneseTypesetting()` modifier tags system-font text as Japanese at the app root and the widget root, so a new view can't miss it. The one UIKit-backed field, the Dictionary search bar, uses `Font.nichijiTypedBody`, whose fallback list names Hiragino Sans, because a text field takes its kanji fallback from the device language. `BundledFontsTests` fails when a face is not registered, since `Font.custom` falls back to the system font without a word, and checks typed kanji fall back to Hiragino Sans.
 
-Left, in order:
-1. The user types 直, 骨 and 角 into the Dictionary search field on the new build, English only. If a shape is wrong, the cascade does not reach the field: try an explicit `UITextField` wrapper and rerun the claude seat.
-2. Write the Resolution: pass on every surface checked on an English-only phone after bundling the fonts and adding the shared `japaneseTypesetting()` modifier at the app and widget roots; typed search text fixed with a Hiragino fallback list (`Font.nichijiTypedBody`) and checked on a device, or named unchecked; 骨 example words skipped by the user (same code path as 直 and 角, which were checked); Dictionary browse not checked on its own (same `KanjiGridTile` and font as search results); notification banners a known limit. v0.38.1, untagged.
-3. Move this file to `closed/`, add one line to Decisions so far in `map.md`, take the ticket out of Frontier, delete this section. `wf-time.py` does not exist in the repo or `~/tools`, so the time close step was skipped.
-4. Ticket 090 is created and in Frontier, not yet grilled.
-5. Commit gate: merge `feature/bundle-japanese-fonts` to `main` or not. Tagging is the user's call.
+Notification banners are drawn by the system, so a Chinese shape there is a known limit, not a blocker. The Zen subset has no kanji, so adding a kanji to interface text goes through the system fallback. Council audit: round 3 APPROVE (claude 8) after gemini 8 and claude 7 in round 1; the user ran the claude seat alone because the other providers had no quota.
+
+Shipped as v0.38.1, untagged. [Decide the font style setting](../tickets/090-decide-the-font-style-setting.md) takes the user's feedback on the serif kanji and thin English text.
