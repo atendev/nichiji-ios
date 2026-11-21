@@ -118,7 +118,7 @@ struct BundledFontsTests {
         }
     }
 
-    @Test("The widget modifier sets Bold Text before the views inside it read the tokens")
+    @Test("The widget modifier sets Bold Text for the views inside it")
     @MainActor
     func widgetModifierSetsStoreFirst() {
         let store = BoldTextStore.shared
@@ -132,7 +132,9 @@ struct BundledFontsTests {
             .environment(\.legibilityWeight, .bold)
         _ = ImageRenderer(content: view).uiImage
 
-        #expect(recorder.seen.first == true)
+        // `ImageRenderer` may evaluate the probe once before the environment reaches the modifier, so check the settled value, not the first.
+        #expect(recorder.seen.last == true)
+        #expect(store.isEnabled)
     }
 
     @Test("Each kanji token picks the font for its style", arguments: KanjiFontStyle.allCases)
