@@ -118,6 +118,23 @@ struct BundledFontsTests {
         }
     }
 
+    @Test("The widget modifier sets Bold Text before the views inside it read the tokens")
+    @MainActor
+    func widgetModifierSetsStoreFirst() {
+        let store = BoldTextStore.shared
+        let original = store.isEnabled
+        defer { store.update(isEnabled: original) }
+        store.update(isEnabled: false)
+        let recorder = BoldTextRecorder()
+
+        let view = BoldTextProbe(recorder: recorder)
+            .honoursBoldTextInWidget()
+            .environment(\.legibilityWeight, .bold)
+        _ = ImageRenderer(content: view).uiImage
+
+        #expect(recorder.seen.first == true)
+    }
+
     @Test("Each kanji token picks the font for its style", arguments: KanjiFontStyle.allCases)
     func kanjiTokensFollowStyle(style: KanjiFontStyle) {
         for token in KanjiFontToken.allCases {
@@ -135,6 +152,21 @@ private func withBoldText(_ isEnabled: Bool, _ body: () -> Void) {
     defer { store.update(isEnabled: original) }
     store.update(isEnabled: isEnabled)
     body()
+}
+
+@MainActor
+private final class BoldTextRecorder {
+    var seen: [Bool] = []
+}
+
+/// Records the Bold Text value each time its body runs, the way a widget view reads the tokens.
+private struct BoldTextProbe: View {
+    let recorder: BoldTextRecorder
+
+    var body: some View {
+        recorder.seen.append(BoldTextStore.shared.isEnabled)
+        return Text("A").font(.nichijiBody)
+    }
 }
 
 /*-------------------------------kanji-style-store----------------------------*/

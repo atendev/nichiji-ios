@@ -57,7 +57,7 @@ private struct WidgetBoldTextModifier: ViewModifier {
     @Environment(\.legibilityWeight) private var legibilityWeight
 
     func body(content: Content) -> some View {
-        // WidgetKit draws an entry once into an archive and runs no `onChange` or `onAppear`, so this body is the only place the widget sees the setting before its views read the tokens. `update` does nothing when the value is unchanged.
+        // WidgetKit renders each entry as a snapshot, so `onChange` and `onAppear` cannot be relied on to run before the views read the tokens. This body runs before its content's bodies, so it sets the store first. `update` does nothing when the value is unchanged.
         let _ = BoldTextStore.shared.update(isEnabled: legibilityWeight == .bold)
         content
     }
