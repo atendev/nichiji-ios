@@ -58,6 +58,7 @@ private struct WidgetBoldTextModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         // WidgetKit renders each entry as a snapshot, so `onChange` and `onAppear` cannot be relied on to run before the views read the tokens. This body runs before its content's bodies, so it sets the store first. `update` does nothing when the value is unchanged.
+        // swiftlint:disable:next redundant_discardable_let
         let _ = BoldTextStore.shared.update(isEnabled: legibilityWeight == .bold)
         content
     }
