@@ -56,7 +56,7 @@ targets:
       path: Config/Nichiji-Info.plist
       properties:
         ITSAppUsesNonExemptEncryption: false
-        UIAppFonts
+        UIAppFonts:
           - ShipporiMincho-Regular.ttf
           - ZenKakuGothicNew-Regular.ttf
           - ZenKakuGothicNew-Medium.ttf
