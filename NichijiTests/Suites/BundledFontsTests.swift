@@ -79,6 +79,16 @@ struct BundledFontsTests {
 
 /*-------------------------------kanji-style-store----------------------------*/
 
+/// The `onChange` closure of `withObservationTracking` is `@Sendable`, so it cannot mutate a captured local.
+private final class ChangeFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    var isSet: Bool { lock.withLock { value } }
+
+    func set() { lock.withLock { value = true } }
+}
+
 @Suite("Kanji font style store Tests", .serialized)
 struct KanjiFontStyleStoreTests {
     @Test("The style defaults to serif and persists to the suite")
@@ -115,13 +125,13 @@ struct KanjiFontStyleStoreTests {
         defer { store.select(original) }
         store.select(.serif)
 
-        var changed = false
+        let flag = ChangeFlag()
         withObservationTracking {
             _ = Font.kanjiHero
         } onChange: {
-            changed = true
+            flag.set()
         }
         store.select(.gothic)
-        #expect(changed)
+        #expect(flag.isSet)
     }
 }
