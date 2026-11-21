@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 /*-----------------------------------app----------------------------------*/
 
@@ -21,6 +22,9 @@ struct NichijiApp: App {
     @State private var proAccess: ProAccessModel
 
     init() {
+        // Seed Bold Text before the first frame. The root modifier keeps it live afterwards.
+        BoldTextStore.shared.update(isEnabled: UIAccessibility.isBoldTextEnabled)
+        Self.reloadWidgetsIfBoldTextChanged()
         let schema = Schema.nichijiLearner
         do {
             let container = try Self.makeModelContainer(for: schema)
@@ -94,10 +98,21 @@ struct NichijiApp: App {
         )
     }
 
+    /// Reloads the widget timelines when Bold Text differs from the value the app last saw, which also catches a toggle made while the app was closed.
+    private static func reloadWidgetsIfBoldTextChanged() {
+        let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) ?? .standard
+        if BoldTextStore.shared.recordSeen(in: defaults) {
+            SystemWidgetRefresher().reloadTimelines()
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .japaneseTypesetting()
+                .honoursBoldText {
+                    Self.reloadWidgetsIfBoldTextChanged()
+                }
                 .preferredColorScheme(preferredColorScheme)
                 .modelContainer(modelContainer)
                 .environment(\.serviceContainer, services)
