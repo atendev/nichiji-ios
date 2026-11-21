@@ -10,6 +10,7 @@ struct DailyKanjiWidget: Widget {
         StaticConfiguration(kind: Self.kind, provider: DailyKanjiProvider()) { entry in
             DailyKanjiWidgetEntryView(entry: entry)
                 .japaneseTypesetting()
+                .honoursBoldTextInWidget()
                 .containerBackground(for: .widget) {
                     Color.nichijiSurfaceRaised
                 }
