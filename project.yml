@@ -60,6 +60,7 @@ targets:
           - ShipporiMincho-Regular.ttf
           - ZenKakuGothicNew-Regular.ttf
           - ZenKakuGothicNew-Medium.ttf
+          - ZenKakuGothicNew-Bold.ttf
         CFBundleURLTypes:
           - CFBundleURLName: com.aten.nichiji
             CFBundleURLSchemes:
@@ -121,6 +122,7 @@ targets:
           - ShipporiMincho-Regular.ttf
           - ZenKakuGothicNew-Regular.ttf
           - ZenKakuGothicNew-Medium.ttf
+          - ZenKakuGothicNew-Bold.ttf
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:

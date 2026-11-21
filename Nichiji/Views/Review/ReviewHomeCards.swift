@@ -13,7 +13,7 @@ struct ReviewDueCard: View {
             VStack(alignment: .leading, spacing: LayoutTokens.space4) {
                 HStack(alignment: .lastTextBaseline, spacing: LayoutTokens.space12) {
                     Text("\(summary.dueCount)")
-                        .font(.uiText(size: 64, weight: .medium))
+                        .font(.uiText(size: 64, weight: .bold))
                         .monospacedDigit()
                         .foregroundColor(.nichijiInk)
                     Text("kanji due today")

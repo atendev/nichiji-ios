@@ -81,6 +81,31 @@ public enum DailyOrder: String, Codable, CaseIterable, Sendable {
     }
 }
 
+/// Typeface for the big kanji displays: Shippori Mincho (serif) or Zen Kaku Gothic New (gothic).
+public enum KanjiFontStyle: String, Codable, CaseIterable, Sendable {
+    case serif
+    case gothic
+
+    /// Style for learners who never chose one, including those who finished onboarding before the setting existed.
+    public static let standard: KanjiFontStyle = .serif
+
+    /// Display label used in the Settings row and the style cards.
+    public var displayName: String {
+        switch self {
+        case .serif: "Serif"
+        case .gothic: "Gothic"
+        }
+    }
+
+    /// Descriptive note shown on the style card.
+    public var subtitleNote: String {
+        switch self {
+        case .serif: "Brush-like strokes, like printed books."
+        case .gothic: "Even strokes, like signs and screens."
+        }
+    }
+}
+
 public extension JLPTLevel {
     /// Short badge code (`N5` through `N1`, `名` for name kanji, `外` for beyond the lists).
     var codeLabel: String {
@@ -189,6 +214,7 @@ public enum LearnerPreferenceKey: String, Sendable {
     case selectedJoyoGrade
     case dailyOrder
     case isCustomPoolActive
+    case kanjiFontStyle
 }
 
 /*--------------------------------structs-------------------------------------*/
@@ -207,6 +233,7 @@ public struct LearnerPreferencesSnapshot: Codable, Equatable, Sendable {
     public var selectedJoyoGrade: JoyoGrade
     public var dailyOrder: DailyOrder
     public var isCustomPoolActive: Bool
+    public var kanjiFontStyle: KanjiFontStyle
 
     public init(
         hasCompletedOnboarding: Bool = false,
@@ -220,7 +247,8 @@ public struct LearnerPreferencesSnapshot: Codable, Equatable, Sendable {
         selectedJLPTLevel: JLPTLevel = .n5,
         selectedJoyoGrade: JoyoGrade = .grade1,
         dailyOrder: DailyOrder = .mostCommon,
-        isCustomPoolActive: Bool = false
+        isCustomPoolActive: Bool = false,
+        kanjiFontStyle: KanjiFontStyle = .standard
     ) {
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.appearanceMode = appearanceMode
@@ -234,6 +262,7 @@ public struct LearnerPreferencesSnapshot: Codable, Equatable, Sendable {
         self.selectedJoyoGrade = selectedJoyoGrade
         self.dailyOrder = dailyOrder
         self.isCustomPoolActive = isCustomPoolActive
+        self.kanjiFontStyle = kanjiFontStyle
     }
 
     public static let standard = LearnerPreferencesSnapshot()
@@ -272,6 +301,9 @@ public struct LearnerPreferencesSnapshot: Codable, Equatable, Sendable {
         ) ?? standard.dailyOrder
         let isCustomPoolActive = defaults.object(forKey: LearnerPreferenceKey.isCustomPoolActive.rawValue) as? Bool
             ?? standard.isCustomPoolActive
+        let kanjiFontStyle = KanjiFontStyle(
+            rawValue: defaults.string(forKey: LearnerPreferenceKey.kanjiFontStyle.rawValue) ?? ""
+        ) ?? standard.kanjiFontStyle
 
         return LearnerPreferencesSnapshot(
             hasCompletedOnboarding: hasCompletedOnboarding,
@@ -285,7 +317,8 @@ public struct LearnerPreferencesSnapshot: Codable, Equatable, Sendable {
             selectedJLPTLevel: selectedJLPTLevel,
             selectedJoyoGrade: selectedJoyoGrade,
             dailyOrder: dailyOrder,
-            isCustomPoolActive: isCustomPoolActive
+            isCustomPoolActive: isCustomPoolActive,
+            kanjiFontStyle: kanjiFontStyle
         )
     }
 
@@ -305,6 +338,7 @@ public struct LearnerPreferencesSnapshot: Codable, Equatable, Sendable {
         defaults.set(selectedJoyoGrade.rawValue, forKey: LearnerPreferenceKey.selectedJoyoGrade.rawValue)
         defaults.set(dailyOrder.rawValue, forKey: LearnerPreferenceKey.dailyOrder.rawValue)
         defaults.set(isCustomPoolActive, forKey: LearnerPreferenceKey.isCustomPoolActive.rawValue)
+        defaults.set(kanjiFontStyle.rawValue, forKey: LearnerPreferenceKey.kanjiFontStyle.rawValue)
     }
 
     /// Human-readable summary of the active level or custom kanji pool for Settings rows.

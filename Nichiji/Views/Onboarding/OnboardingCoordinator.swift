@@ -114,6 +114,8 @@ private struct OnboardingStepHost: View {
         switch step {
         case .welcome:
             WelcomeView(onNext: { flow.advance() })
+        case .kanjiStyle:
+            KanjiStyleStepView(onNext: { flow.advance() })
         case .dailyKanji:
             DailyKanjiIntroView(onNext: { flow.advance() })
         case .flashcards:
