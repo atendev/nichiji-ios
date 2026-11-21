@@ -92,7 +92,7 @@ struct ScanResultsSheet: View {
         VStack(spacing: 0) {
             handle
             HStack(spacing: LayoutTokens.space12) {
-                titleBlock(headingFont: .uiText(size: 16, weight: .medium), subtitle: PhotoLookupCopy.newLine(model.newCount))
+                titleBlock(headingFont: .uiText(size: 16, weight: .bold), subtitle: PhotoLookupCopy.newLine(model.newCount))
                 Spacer(minLength: LayoutTokens.space8)
                 Text(PhotoLookupCopy.swipeUp)
                     .font(.nichijiCaption)

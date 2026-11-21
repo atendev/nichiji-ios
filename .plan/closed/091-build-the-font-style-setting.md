@@ -3,9 +3,9 @@ id: "091"
 title: Build the font style setting and heavier English text
 type: task
 mode: AFK
-status: open
+status: closed
 blocked_by: ["090"]
-claimed: true
+claimed: false
 ---
 
 ## Question
@@ -35,4 +35,8 @@ Output: the code, the tests, a green CI run, the version bump and the new size t
 
 ## Resolution
 
-<Filled in at close: the decision and the reason for it.>
+The app now offers a serif or gothic kanji style, chosen in a new onboarding step after Welcome and in a Settings row and sub screen, with heavier English text. Serif is the default and existing learners keep it. The style changes the big kanji displays, the Practice guide and the home screen and lock screen widgets, and is stored in the App Group `UserDefaults` through `KanjiFontStyleStore`, an `@Observable` store the font tokens read, so views re-render without a root `id`. English text picks its font file by weight (`InterfaceFace`): Bold for titles, headings and big numbers, Medium for body and callout, with a new `ZenKakuGothicNew-Bold`. Version v0.39.0, not tagged.
+
+Gothic draws in the system Japanese font (Hiragino Sans W3), not a bundled Zen Kaku Gothic New with kanji. With fonts counted, the large Zen file puts the widget bundle at 11.11 MiB (5.09 data plus 6.02 fonts) against the 8 MiB Shared budget, so the ticket's fallback applies. After it the widget is 9.18 MiB with fonts counted and the app set is 20.90 MiB (16.80 data plus 4.09 fonts). The widget was already 9.12 MiB with fonts counted before this ticket, and `tools/dataset/build.py` counts dataset files only (5.09 of 8 MiB and 16.80 of 24 MiB, both fine). Whether the 8 MiB Shared budget covers fonts is for the master to settle. CI is pending; the master runs it. Audit: Claude seats only, round 2 APPROVE 8, 8, 8. Report: [decision report](../assets/091-build-the-font-style-setting-report.md).
+
+Timing: wall 11m, active 11m, user 0s, wait 0s, blocked 0s | implement 6m, audit 4m (2 rounds) | tools 95 (14 subagent) | limits 0, compactions 0, handoffs 1 | ctx peak 156k | cost $3.19 sonnet-5-5 + $0.08 haiku-5-5

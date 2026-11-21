@@ -262,7 +262,7 @@ use sample content, but their layout, copy, navigation and interaction notes
 define the intended first-pass experience.
 
 The interface uses sentence case, no emoji and no celebratory effects. Kanji
-use Shippori Mincho. Interface text uses Zen Kaku Gothic New. SF Symbols
+use Shippori Mincho by default, or the system Japanese gothic (Hiragino Sans) when the learner picks the gothic kanji style in onboarding or Settings. Interface text uses Zen Kaku Gothic New: Bold for titles, headings and big numbers, Medium for body and callout, Regular for captions. SF Symbols
 provide navigation and action icons.
 
 Onboarding leads into Today. Today places the daily kanji first, followed by

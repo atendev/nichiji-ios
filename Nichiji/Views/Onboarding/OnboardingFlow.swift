@@ -27,11 +27,11 @@ struct OnboardingLevelRow: Identifiable, Equatable {
 
 /*----------------------------------flow----------------------------------*/
 
-/// Step navigation, level and reminder choices, and completion for the eight-step onboarding.
+/// Step navigation, level and reminder choices, and completion for the nine-step onboarding.
 @MainActor
 @Observable
 final class OnboardingFlow {
-    static let progressSegmentCount = 7
+    static let progressSegmentCount = 8
 
     private(set) var step: OnboardingStep = .welcome
     private(set) var direction: OnboardingDirection = .forward

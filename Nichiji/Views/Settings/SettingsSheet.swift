@@ -196,6 +196,10 @@ public struct SettingsSheet: View {
 
                 dividerLine
 
+                KanjiStyleSettingsRow()
+
+                dividerLine
+
                 settingsToggleRow(
                     title: "Show romaji",
                     subtitle: "Readings stay in kana unless this is on.",

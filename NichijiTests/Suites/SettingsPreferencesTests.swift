@@ -14,6 +14,7 @@ struct SettingsPreferencesTests {
 
         let initial = LearnerPreferencesSnapshot.load(from: defaults)
         #expect(initial == .standard)
+        #expect(initial.kanjiFontStyle == .serif)
         #expect(initial.reminderHour == 8)
         #expect(initial.reminderSummary == "On · 8:00 am")
         #expect(initial.levelSummary(customCount: 0) == "N5 · Beginner")
@@ -30,12 +31,14 @@ struct SettingsPreferencesTests {
             selectedJLPTLevel: .n3,
             selectedJoyoGrade: .grade2,
             dailyOrder: .random,
-            isCustomPoolActive: true
+            isCustomPoolActive: true,
+            kanjiFontStyle: .gothic
         )
         updated.save(to: defaults)
 
         let reloaded = LearnerPreferencesSnapshot.load(from: defaults)
         #expect(reloaded == updated)
+        #expect(reloaded.kanjiFontStyle == .gothic)
         #expect(reloaded.appearanceMode.displayName == "Dark")
         #expect(reloaded.reminderSummary == "On · 8:30 pm")
         #expect(reloaded.levelSummary(customCount: 12) == "Custom · 12 kanji")
