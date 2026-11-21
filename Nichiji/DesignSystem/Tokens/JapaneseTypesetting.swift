@@ -28,28 +28,37 @@ public extension View {
 }
 
 public extension View {
-    /// Makes interface fonts one weight heavier when the iPhone's Bold Text setting is on. Apply once at each root, next to `japaneseTypesetting()`. A widget root passes `rendersOnce` because WidgetKit draws each entry once and does not run `onChange`, so the store must be set while the body runs. `didChange` runs when the setting changes while the view is on screen, so the app can reload the widget timelines.
-    func honoursBoldText(rendersOnce: Bool = false, didChange: (() -> Void)? = nil) -> some View {
-        modifier(BoldTextModifier(rendersOnce: rendersOnce, didChange: didChange))
+    /// Makes interface fonts one weight heavier when the iPhone's Bold Text setting is on. Apply once at the app root, next to `japaneseTypesetting()`. `didUpdate` runs after the store takes the value, on first appearance and on every change, so the app can reload the widget timelines.
+    func honoursBoldText(didUpdate: (() -> Void)? = nil) -> some View {
+        modifier(BoldTextModifier(didUpdate: didUpdate))
+    }
+
+    /// The widget form of `honoursBoldText()`. Apply once at the widget root.
+    func honoursBoldTextInWidget() -> some View {
+        modifier(WidgetBoldTextModifier())
     }
 }
 
 private struct BoldTextModifier: ViewModifier {
-    let rendersOnce: Bool
-    let didChange: (() -> Void)?
+    let didUpdate: (() -> Void)?
 
     @Environment(\.legibilityWeight) private var legibilityWeight
 
     func body(content: Content) -> some View {
-        let _ = rendersOnce ? sync() : ()
         content
-            .onChange(of: legibilityWeight, initial: true) { old, new in
-                sync()
-                if old != new { didChange?() }
+            .onChange(of: legibilityWeight, initial: true) {
+                BoldTextStore.shared.update(isEnabled: legibilityWeight == .bold)
+                didUpdate?()
             }
     }
+}
 
-    private func sync() {
-        BoldTextStore.shared.update(isEnabled: legibilityWeight == .bold)
+private struct WidgetBoldTextModifier: ViewModifier {
+    @Environment(\.legibilityWeight) private var legibilityWeight
+
+    func body(content: Content) -> some View {
+        // WidgetKit draws an entry once into an archive and runs no `onChange` or `onAppear`, so this body is the only place the widget sees the setting before its views read the tokens. `update` does nothing when the value is unchanged.
+        let _ = BoldTextStore.shared.update(isEnabled: legibilityWeight == .bold)
+        content
     }
 }
