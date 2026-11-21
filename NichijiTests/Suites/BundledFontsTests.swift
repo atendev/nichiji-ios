@@ -10,7 +10,7 @@ struct BundledFontsTests {
     @Test("Every design-token face is registered", arguments: [
         "ShipporiMincho-Regular",
         "ZenKakuGothicNew-Regular",
-        "ZenKakuGothicNew-Medium",
+        "ZenKakuGothicNew-Medium"
     ])
     func faceIsRegistered(name: String) {
         #expect(UIFont(name: name, size: 16) != nil)
