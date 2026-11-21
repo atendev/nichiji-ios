@@ -1,6 +1,13 @@
+// MEASURE-PROBE (ticket 088, kept for ticket 095's re-measure).
+// Compiled only for DEBUG and Internal (TestFlight) builds; App Store Release builds exclude it.
+// REMOVE: after ticket 095 closes, delete this file, Nichiji/Views/Settings/MeasureSection.swift,
+// the `MeasureSection()` call in SettingsSheet.swift and the `WidgetMemoryProbe.record()` call in
+// NichijiWidget/DailyKanjiWidget.swift. Find every spot with: grep -rn "MEASURE-PROBE\|WidgetMemoryProbe\|MeasureSection" Nichiji NichijiWidget
+
+#if DEBUG || DEV_UNLOCK
 import SwiftUI
 
-/// Temporary measurement panel for ticket 088. Remove before merging to main.
+/// Temporary measurement panel (ticket 088).
 struct MeasureSection: View {
     @State private var widgetReport = ""
     @State private var indexReport = "Not run yet."
@@ -47,3 +54,4 @@ struct MeasureSection: View {
         }
     }
 }
+#endif

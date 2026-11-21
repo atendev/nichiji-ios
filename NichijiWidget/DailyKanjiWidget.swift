@@ -44,7 +44,9 @@ struct DailyKanjiProvider: TimelineProvider {
         KanjiFontStyleStore.shared.reload()
         Task {
             let timeline = await Self.plan().timeline()
-            WidgetMemoryProbe.record()
+            #if DEBUG || DEV_UNLOCK
+            WidgetMemoryProbe.record() // MEASURE-PROBE: see WidgetMemoryProbe.swift for removal
+            #endif
             completion(timeline)
         }
     }

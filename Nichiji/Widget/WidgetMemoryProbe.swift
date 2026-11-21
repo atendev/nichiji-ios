@@ -1,7 +1,14 @@
+// MEASURE-PROBE (ticket 088, kept for ticket 095's re-measure).
+// Compiled only for DEBUG and Internal (TestFlight) builds; App Store Release builds exclude it.
+// REMOVE: after ticket 095 closes, delete this file, Nichiji/Views/Settings/MeasureSection.swift,
+// the `MeasureSection()` call in SettingsSheet.swift and the `WidgetMemoryProbe.record()` call in
+// NichijiWidget/DailyKanjiWidget.swift. Find every spot with: grep -rn "MEASURE-PROBE\|WidgetMemoryProbe\|MeasureSection" Nichiji NichijiWidget
+
+#if DEBUG || DEV_UNLOCK
 import Darwin
 import Foundation
 
-/// Temporary measurement probe for ticket 088. Remove before merging to main.
+/// Temporary widget memory probe (ticket 088).
 enum WidgetMemoryProbe {
     private static let peakKey = "measure.widgetPeakMB"
     private static let lastKey = "measure.widgetLastMB"
@@ -39,3 +46,4 @@ enum WidgetMemoryProbe {
         )
     }
 }
+#endif
