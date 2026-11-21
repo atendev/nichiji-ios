@@ -35,7 +35,6 @@ struct DesignTokensTests {
         _ = Font.nichijiCallout
         _ = Font.nichijiCaption
         _ = Font.uiText(size: 16, weight: .regular)
-        // Check that bold weight is safely clamped to medium (<= 500).
         _ = Font.uiText(size: 16, weight: .bold)
     }
 

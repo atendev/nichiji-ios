@@ -36,3 +36,20 @@ Output: the code, the tests, a green CI run, the version bump and the new size t
 ## Resolution
 
 <Filled in at close: the decision and the reason for it.>
+
+## Handoff
+
+Branch `t3/font-style-setting-heavier-english`, SHA in the `wip:` commit just before this section's commit. Audit round 0 (no council yet). Tag `wfm-nichiji-v1-091-1795266250`. Swift is not compiled here; CI is the first compile.
+
+Done (wip commit):
+- Fonts: `Fonts/ZenKakuGothicNew-Regular.ttf` is now the large subset (2,093,000 B, `glyphs-shippori.txt`), Medium 70,072 B and new Bold 69,476 B use `glyphs-zen.txt`. Built with fontTools in `/tmp/wf091/venv` (flags per README). `project.yml` lists Bold in both `UIAppFonts`. `Fonts/README.md` rewritten. The font lacks 46 kanji: 俠俱剝卽吞塡巢彐徵戶揭摑擊晚曆步歷每涉淚渴溫焰狀疒瘦禱禸簞緣繡繫萊蔣虛蟬蠟辵醬錄鍊頰顚鷗黃𠮟.
+- `KanjiFontStyle` (serif default, gothic) and `kanjiFontStyle` key in `LearnerPreferences.swift`; `KanjiFontStyleStore` (`@Observable`, `shared`, `select`, `reload`) in `Models/`. Re-render works by Observation: tokens read `KanjiFontStyle.current` inside view bodies, so no root `id` and no lost navigation.
+- `TypographyTokens.swift` rewritten: `InterfaceFace(weight:)`, `KanjiFontToken`, `Font.kanji(_:style:)`, style-aware `kanjiDisplay`/`kanjiGuide`; Title/Heading Bold, Body/Callout Medium, Caption Regular; clamp removed. Four call sites went `.bold` (You tiles 32, Review due count 64, level-complete figure, scan sheet heading).
+- Settings: `KanjiStyleSettingsView.swift` (row, sub screen, shared cards). Onboarding: `KanjiStyleStepView`, `OnboardingStep.kanjiStyle` after Welcome, segments 7 to 8. Widget provider calls `KanjiFontStyleStore.shared.reload()`.
+
+Left, in order:
+1. Update `OnboardingFlowTests` (step test: 9 steps, 8 segments, `kanjiStyle` after `welcome`; rename "steps 1 to 7").
+2. Extend `BundledFontsTests`: Bold registered; Zen Regular maps 直骨角; the 46 missing kanji pinned (check against `BundledKanjiContentStore().indexEntries()` ids; 𠮟 is a surrogate pair); default style serif; `LearnerPreferencesSnapshot` round-trip with `kanjiFontStyle` (extend `SettingsPreferencesTests`); each token equals `Font.custom(style.postScriptName, ...)`; `InterfaceFace(weight:)` mapping; `KanjiFontStyleStore` select persists to a suite and `withObservationTracking` on `Font.kanjiHero` fires on `shared.select` (serialized suite, restore serif).
+3. `nichijiTypedBody` and `JapaneseTypesetting` use Regular, which now holds kanji; check they still work (Hiragino cascade stays).
+4. Docs: `docs/DESIGN.md` font paragraph (line ~265), `docs/CHANGELOG.md` entry v0.39.0 (minor bump, "Not tagged"), `PROGRESS.md`/`IMPLOG.md` if the workflow needs it. Size totals: Fonts 4.25 MB before, about 6.3 MB now, in app and widget; Dataset Shared 5.34 MB of 8 MB, app set 17.6 MB of 24 MB (datasets only); fonts add about 6.3 MB to each bundle, so the app is about 23.9 MB with fonts counted, the widget about 11.7 MB. Report these and that the gothic Zen file fits (no system-font fallback needed).
+5. Council audit (Claude seat only), decision report at `.plan/assets/091-build-the-font-style-setting-report.md` (unslop), commit, push, PR against `wayfinder/nichiji-v1-master` if the repo uses PRs, `wf-time.py close`, ticket resolution, delete this section.

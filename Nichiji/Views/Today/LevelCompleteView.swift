@@ -125,7 +125,7 @@ public struct LevelCompleteView: View {
     private func figureTile(_ figure: StatTile) -> some View {
         VStack(spacing: LayoutTokens.space4) {
             Text(figure.value)
-                .font(.uiText(size: 28, weight: .medium))
+                .font(.uiText(size: 28, weight: .bold))
                 .monospacedDigit()
                 .foregroundColor(.nichijiInk)
                 .lineLimit(1)

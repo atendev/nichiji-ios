@@ -24,10 +24,12 @@ struct DailyKanjiWidget: Widget {
 
 struct DailyKanjiProvider: TimelineProvider {
     func placeholder(in context: Context) -> DailyKanjiWidgetEntry {
-        .sample
+        KanjiFontStyleStore.shared.reload()
+        return .sample
     }
 
     func getSnapshot(in context: Context, completion: @escaping @Sendable (DailyKanjiWidgetEntry) -> Void) {
+        KanjiFontStyleStore.shared.reload()
         if context.isPreview {
             completion(.sample)
             return
@@ -38,6 +40,7 @@ struct DailyKanjiProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<DailyKanjiWidgetEntry>) -> Void) {
+        KanjiFontStyleStore.shared.reload()
         Task {
             completion(await Self.plan().timeline())
         }

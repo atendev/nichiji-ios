@@ -1,62 +1,107 @@
 import SwiftUI
 
+/*-------------------------------typefaces--------------------------------*/
+
+public extension KanjiFontStyle {
+    /// PostScript name of the bundled file that draws the big kanji in this style.
+    var postScriptName: String {
+        switch self {
+        case .serif: "ShipporiMincho-Regular"
+        case .gothic: "ZenKakuGothicNew-Regular"
+        }
+    }
+}
+
+/// The three bundled Zen Kaku Gothic New files for interface text. SwiftUI cannot change a custom font's weight, so the file is picked by weight.
+public enum InterfaceFace: String, CaseIterable, Sendable {
+    case regular = "ZenKakuGothicNew-Regular"
+    case medium = "ZenKakuGothicNew-Medium"
+    case bold = "ZenKakuGothicNew-Bold"
+
+    /// Medium stays Medium, Semibold and heavier use Bold, anything lighter uses Regular.
+    public init(weight: Font.Weight) {
+        switch weight {
+        case .medium: self = .medium
+        case .semibold, .bold, .heavy, .black: self = .bold
+        default: self = .regular
+        }
+    }
+}
+
+/// Size and Dynamic Type anchor of each big kanji display.
+public enum KanjiFontToken: CaseIterable, Sendable {
+    case hero
+    case heroCompact
+    case large
+    case widget
+    case word
+
+    var size: CGFloat {
+        switch self {
+        case .hero: 260
+        case .heroCompact: 120
+        case .large: 64
+        case .widget: 48
+        case .word: 18
+        }
+    }
+
+    var textStyle: Font.TextStyle {
+        switch self {
+        case .hero, .heroCompact: .largeTitle
+        case .large: .title
+        case .widget: .title2
+        case .word: .body
+        }
+    }
+}
+
 /*-------------------------------typography-------------------------------*/
 
 public extension Font {
-    // Kanji display fonts using Shippori Mincho with system serif fallback.
-    static var kanjiHero: Font {
-        .custom("ShipporiMincho-Regular", size: 260, relativeTo: .largeTitle)
+    // Big kanji displays follow the learner's kanji style. Kanji inside interface text keep the interface font.
+    static var kanjiHero: Font { kanji(.hero) }
+
+    static var kanjiHeroCompact: Font { kanji(.heroCompact) }
+
+    static var kanjiLarge: Font { kanji(.large) }
+
+    static var kanjiWidget: Font { kanji(.widget) }
+
+    static var kanjiWord: Font { kanji(.word) }
+
+    static func kanji(_ token: KanjiFontToken, style: KanjiFontStyle = .current) -> Font {
+        .custom(style.postScriptName, size: token.size, relativeTo: token.textStyle)
     }
 
-    static var kanjiHeroCompact: Font {
-        .custom("ShipporiMincho-Regular", size: 120, relativeTo: .largeTitle)
-    }
-
-    static var kanjiLarge: Font {
-        .custom("ShipporiMincho-Regular", size: 64, relativeTo: .title)
-    }
-
-    static var kanjiWidget: Font {
-        .custom("ShipporiMincho-Regular", size: 48, relativeTo: .title2)
-    }
-
-    static var kanjiWord: Font {
-        .custom("ShipporiMincho-Regular", size: 18, relativeTo: .body)
-    }
-
-    static func kanjiDisplay(size: CGFloat) -> Font {
-        .custom("ShipporiMincho-Regular", size: size, relativeTo: .title)
+    static func kanjiDisplay(size: CGFloat, style: KanjiFontStyle = .current) -> Font {
+        .custom(style.postScriptName, size: size, relativeTo: .title)
     }
 
     // Fixed size so the practice guide always fits its pad, whatever the Dynamic Type setting.
-    static func kanjiGuide(size: CGFloat) -> Font {
-        .custom("ShipporiMincho-Regular", fixedSize: size)
+    static func kanjiGuide(size: CGFloat, style: KanjiFontStyle = .current) -> Font {
+        .custom(style.postScriptName, fixedSize: size)
     }
 
-    // Interface typography using Zen Kaku Gothic New with weights strictly <= 500.
+    // Interface typography using Zen Kaku Gothic New: Bold for titles and headings, Medium for body and callout, Regular for captions.
     static var nichijiTitle: Font {
-        .custom("ZenKakuGothicNew-Medium", size: 28, relativeTo: .title)
-            .weight(.medium)
+        .custom(InterfaceFace.bold.rawValue, size: 28, relativeTo: .title)
     }
 
     static var nichijiHeading: Font {
-        .custom("ZenKakuGothicNew-Medium", size: 20, relativeTo: .headline)
-            .weight(.medium)
+        .custom(InterfaceFace.bold.rawValue, size: 20, relativeTo: .headline)
     }
 
     static var nichijiBody: Font {
-        .custom("ZenKakuGothicNew-Regular", size: 16, relativeTo: .body)
-            .weight(.regular)
+        .custom(InterfaceFace.medium.rawValue, size: 16, relativeTo: .body)
     }
 
     static var nichijiCallout: Font {
-        .custom("ZenKakuGothicNew-Regular", size: 14, relativeTo: .callout)
-            .weight(.regular)
+        .custom(InterfaceFace.medium.rawValue, size: 14, relativeTo: .callout)
     }
 
     static var nichijiCaption: Font {
-        .custom("ZenKakuGothicNew-Regular", size: 12, relativeTo: .caption)
-            .weight(.regular)
+        .custom(InterfaceFace.regular.rawValue, size: 12, relativeTo: .caption)
     }
 
     // Typed text in a UIKit-backed field takes its kanji fallback from the device language, so the cascade names a Japanese font.
@@ -65,9 +110,6 @@ public extension Font {
     }
 
     static func uiText(size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        // Enforce maximum weight of 500 (medium).
-        let safeWeight: Font.Weight = (weight == .bold || weight == .heavy || weight == .black) ? .medium : weight
-        return .custom("ZenKakuGothicNew-Regular", size: size, relativeTo: .body)
-            .weight(safeWeight)
+        .custom(InterfaceFace(weight: weight).rawValue, size: size, relativeTo: .body)
     }
 }

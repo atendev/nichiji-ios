@@ -20,7 +20,7 @@ struct StatTilesGrid: View {
     private func tileView(_ tile: StatTile) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(tile.value)
-                .font(.uiText(size: 32, weight: .medium))
+                .font(.uiText(size: 32, weight: .bold))
                 .monospacedDigit()
                 .foregroundColor(.nichijiInk)
                 .lineLimit(1)
