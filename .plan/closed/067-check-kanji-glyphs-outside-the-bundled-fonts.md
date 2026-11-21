@@ -3,7 +3,7 @@ id: "067"
 title: Check kanji glyphs outside the bundled fonts
 type: task
 mode: HITL
-status: open
+status: closed
 blocked_by: []
 claimed: false
 ---
@@ -25,3 +25,11 @@ From [Decide the Japanese localization](../closed/062-decide-the-japanese-locali
 Output: a pass or fix per surface, and the fix commit if any. The fix is agent work; the visual check needs a Mac with a simulator.
 
 ## Resolution
+
+Pass on every surface, after two fixes. The check ran on a phone with English as the only preferred language, on TestFlight builds from CI runs 44894835544 and 44898366184. The first pass ran with Japanese still in the phone's language list, which hides the bug, so it was repeated after removing it. 直, 骨 and 角 match the KanjiVG stroke diagrams on kanji detail, Practice and example words. Today, the Review tab and session, Dictionary browse, search results, the typed text in the search field, You, the home-screen widgets and the lock-screen widget all draw Japanese shapes. Sources has no Japanese text. Another app on the same phone (T3) draws the same three kanji with Chinese shapes, which is the bug the fix prevents.
+
+The fix has three parts. Shippori Mincho Regular and Zen Kaku Gothic New Regular and Medium are bundled as subset files in the app and the widget extension, and `UIAppFonts` registers them in both. A shared `japaneseTypesetting()` modifier tags system-font text as Japanese at the app root and the widget root, so a new view can't miss it. The one UIKit-backed field, the Dictionary search bar, uses `Font.nichijiTypedBody`, whose fallback list names Hiragino Sans, because a text field takes its kanji fallback from the device language. `BundledFontsTests` fails when a face is not registered, since `Font.custom` falls back to the system font without a word, and checks typed kanji fall back to Hiragino Sans.
+
+Notification banners are drawn by the system, so a Chinese shape there is a known limit, not a blocker. The Zen subset has no kanji, so adding a kanji to interface text goes through the system fallback. Council audit: round 3 APPROVE (claude 8) after gemini 8 and claude 7 in round 1; the user ran the claude seat alone because the other providers had no quota.
+
+Shipped as v0.38.1, untagged. [Decide the font style setting](../tickets/090-decide-the-font-style-setting.md) takes the user's feedback on the serif kanji and thin English text.

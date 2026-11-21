@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.38.1
+- Draw kanji with Japanese glyph shapes on a phone set to English. Shippori Mincho and Zen Kaku Gothic New (Regular and Medium) are now bundled as subset files in the app and the widget, and `UIAppFonts` registers them in both, so the design-token fonts no longer fall back to the system font. A shared `japaneseTypesetting()` modifier tags system-font text as Japanese at the app root and the widget root. The Dictionary search field's typed text uses a new `nichijiTypedBody` font whose fallback list names Hiragino Sans, since a UIKit-backed field takes its kanji fallback from the device language. `BundledFontsTests` checks each face is registered and that typed kanji fall back to Hiragino Sans. 直, 骨 and 角 were checked on a device. Not tagged
+
 ## v0.38.0
 - Collapse Dictionary levels and stop the browse list jumping back up. Each level header is now a button that hides or shows its kanji, with a chevron and Expanded or Collapsed for VoiceOver. The browse list is one flat lazy list of fixed-height rows instead of a lazy grid nested in a lazy stack, whose guessed heights made the scroll offset snap to the top. Not tagged
 

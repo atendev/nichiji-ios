@@ -59,6 +59,11 @@ public extension Font {
             .weight(.regular)
     }
 
+    // Typed text in a UIKit-backed field takes its kanji fallback from the device language, so the cascade names a Japanese font.
+    static var nichijiTypedBody: Font {
+        Font(UIFont.nichijiTypedBody as CTFont)
+    }
+
     static func uiText(size: CGFloat, weight: Font.Weight = .regular) -> Font {
         // Enforce maximum weight of 500 (medium).
         let safeWeight: Font.Weight = (weight == .bold || weight == .heavy || weight == .black) ? .medium : weight

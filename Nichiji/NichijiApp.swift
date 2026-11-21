@@ -97,6 +97,7 @@ struct NichijiApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .japaneseTypesetting()
                 .preferredColorScheme(preferredColorScheme)
                 .modelContainer(modelContainer)
                 .environment(\.serviceContainer, services)

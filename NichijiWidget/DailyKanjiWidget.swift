@@ -9,6 +9,7 @@ struct DailyKanjiWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: Self.kind, provider: DailyKanjiProvider()) { entry in
             DailyKanjiWidgetEntryView(entry: entry)
+                .japaneseTypesetting()
                 .containerBackground(for: .widget) {
                     Color.nichijiSurfaceRaised
                 }
