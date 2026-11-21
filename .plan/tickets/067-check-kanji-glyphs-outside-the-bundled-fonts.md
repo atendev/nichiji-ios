@@ -5,7 +5,7 @@ type: task
 mode: HITL
 status: open
 blocked_by: []
-claimed: false
+claimed: true
 ---
 
 ## Question
@@ -25,3 +25,17 @@ From [Decide the Japanese localization](../closed/062-decide-the-japanese-locali
 Output: a pass or fix per surface, and the fix commit if any. The fix is agent work; the visual check needs a Mac with a simulator.
 
 ## Resolution
+
+## Handoff
+
+Branch `feature/bundle-japanese-fonts`. Commits not on `main`: bundle fonts and typesetting modifier (`0126cc55`), lint comma (`bd2d20a3`), `UIAppFonts` colon (`8b45587e`), and a search-field fix (this session). The first TestFlight build passed the phone check on every surface except typed search text, which the user skipped. Council audit: round 1 gemini APPROVE 8, claude DISAPPROVE 7, gpt failed (no quota); the user said run the claude seat only from here. Both seats raised the unchecked typed search text, so it got a fix: `DictionarySearchBar` now uses `Font.nichijiTypedBody` (Zen Kaku Gothic New with a Hiragino Sans fallback list, `UIFont.nichijiTypedBody`), plus a `BundledFontsTests` case. CI and a new TestFlight build for it are the next step. Changelog entry v0.38.1 is written.
+
+Left, in order:
+1. Confirm CI is green on the fix, then the user checks typed 直, 骨 and 角 in the Dictionary search field on the new TestFlight build, English only. If a shape is wrong, the cascade does not reach the field: try an explicit `UITextField` wrapper.
+2. Run the claude seat once more (round 3, cap 5) with the CI result. Rebuttals the seat has not yet accepted: browse tiles use the same `KanjiGridTile` and `kanjiDisplay` font as the verified search results; 骨 example words use the same tokens as the verified 直 and 角 ones; the Zen subset has no kanji (`Fonts/glyphs-zen.txt`).
+3. Write the Resolution from this draft: pass on every surface checked on an English-only phone after bundling the fonts and adding the shared `japaneseTypesetting()` modifier at the app and widget roots; typed search text fixed with the Hiragino fallback list and checked on a device (or named unchecked); 骨 example words skipped by the user (same code path as 直 and 角); notification banners are a known limit. v0.38.1, untagged.
+4. Move this file to `closed/`, add one line to Decisions so far in `map.md`, update Frontier, delete this section. `wf-time.py` does not exist in the repo or `~/tools`, so the time close step was skipped.
+5. Ticket 090 (grilling): the user finds English text too thin (the You tab numbers), dislikes the serif kanji (Shippori Mincho) and wants a font style setting. Ask: kanji serif or gothic, text weight, where the setting lives, whether the widget follows it, what happens to the stroke guide in Practice. Note `Font.uiText` clamps weight to Medium and the interface fonts bundle only Regular and Medium.
+6. Commit gate: commit and merge to `main`, commit only, or neither. Tagging is the user's call.
+
+Read first: `.plan/map.md`, `Nichiji/DesignSystem/Tokens/TypographyTokens.swift`, `Nichiji/DesignSystem/Tokens/JapaneseTypesetting.swift`, `Fonts/README.md`.

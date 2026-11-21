@@ -17,7 +17,7 @@ struct DictionarySearchBar: View {
                 .accessibilityHidden(true)
 
             TextField(placeholder, text: $text)
-                .font(.nichijiBody)
+                .font(.nichijiTypedBody)
                 .foregroundColor(.nichijiInk)
                 .focused($isFocused)
                 .submitLabel(.search)

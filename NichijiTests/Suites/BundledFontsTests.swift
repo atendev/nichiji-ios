@@ -26,4 +26,11 @@ struct BundledFontsTests {
             #expect(CTFontGetGlyphsForCharacters(ctFont, &unit, &glyph, 1))
         }
     }
+
+    @Test("Typed search text falls back to Hiragino Sans for kanji the interface font lacks", arguments: ["直", "骨", "角"])
+    func typedBodyFallsBackToJapaneseFont(kanji: String) {
+        let ctFont = UIFont.nichijiTypedBody as CTFont
+        let fallback = CTFontCreateForString(ctFont, kanji as CFString, CFRange(location: 0, length: 1))
+        #expect((CTFontCopyPostScriptName(fallback) as String).hasPrefix("HiraginoSans"))
+    }
 }
