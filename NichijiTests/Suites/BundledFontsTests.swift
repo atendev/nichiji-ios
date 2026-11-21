@@ -67,6 +67,60 @@ struct BundledFontsTests {
         #expect(Font.nichijiCaption == Font.custom("ZenKakuGothicNew-Regular", size: 12, relativeTo: .caption))
     }
 
+    @Test("Bold Text moves each interface face one weight up and Bold stays Bold", arguments: [
+        (InterfaceFace.regular, InterfaceFace.medium),
+        (.medium, .bold),
+        (.bold, .bold)
+    ])
+    func boldTextStepsUp(face: InterfaceFace, expected: InterfaceFace) {
+        #expect(face.steppedUp == expected)
+        #expect(face.resolved(boldText: true) == expected)
+        #expect(face.resolved(boldText: false) == face)
+    }
+
+    @Test("Interface tokens step up one weight while Bold Text is on")
+    func interfaceTokensWithBoldText() {
+        let store = BoldTextStore.shared
+        let original = store.isEnabled
+        defer { store.update(isEnabled: original) }
+
+        store.update(isEnabled: false)
+        #expect(Font.nichijiCaption == Font.custom("ZenKakuGothicNew-Regular", size: 12, relativeTo: .caption))
+
+        store.update(isEnabled: true)
+        #expect(Font.nichijiTitle == Font.custom("ZenKakuGothicNew-Bold", size: 28, relativeTo: .title))
+        #expect(Font.nichijiHeading == Font.custom("ZenKakuGothicNew-Bold", size: 20, relativeTo: .headline))
+        #expect(Font.nichijiBody == Font.custom("ZenKakuGothicNew-Bold", size: 16, relativeTo: .body))
+        #expect(Font.nichijiCallout == Font.custom("ZenKakuGothicNew-Bold", size: 14, relativeTo: .callout))
+        #expect(Font.nichijiCaption == Font.custom("ZenKakuGothicNew-Medium", size: 12, relativeTo: .caption))
+        #expect(Font.uiText(size: 16, weight: .regular) == Font.custom("ZenKakuGothicNew-Medium", size: 16, relativeTo: .body))
+        #expect(Font.uiText(size: 16, weight: .medium) == Font.custom("ZenKakuGothicNew-Bold", size: 16, relativeTo: .body))
+        #expect(UIFont.nichijiTypedBody.fontName == "ZenKakuGothicNew-Medium")
+    }
+
+    @Test("Typed search text draws in Medium when Bold Text is on")
+    func typedBodyWithBoldText() {
+        #expect(UIFont.nichijiTypedBody(boldText: false).fontName == "ZenKakuGothicNew-Regular")
+        #expect(UIFont.nichijiTypedBody(boldText: true).fontName == "ZenKakuGothicNew-Medium")
+    }
+
+    @Test("Reading an interface token in a view body is tracked, so turning Bold Text on re-renders it")
+    func interfaceTokensAreObservable() {
+        let store = BoldTextStore.shared
+        let original = store.isEnabled
+        defer { store.update(isEnabled: original) }
+        store.update(isEnabled: false)
+
+        let flag = ChangeFlag()
+        withObservationTracking {
+            _ = Font.nichijiBody
+        } onChange: {
+            flag.set()
+        }
+        store.update(isEnabled: true)
+        #expect(flag.isSet)
+    }
+
     @Test("Each kanji token picks the font for its style", arguments: KanjiFontStyle.allCases)
     func kanjiTokensFollowStyle(style: KanjiFontStyle) {
         for token in KanjiFontToken.allCases {
@@ -133,5 +187,21 @@ struct KanjiFontStyleStoreTests {
         }
         store.select(.gothic)
         #expect(flag.isSet)
+    }
+}
+
+/*-------------------------------bold-text-store------------------------------*/
+
+@Suite("Bold text store Tests", .serialized)
+struct BoldTextStoreTests {
+    // Tests that touch `BoldTextStore.shared` live in `BundledFontsTests`, so one serialized suite owns the shared store.
+    @Test("Bold Text starts off and follows updates")
+    func updates() {
+        let store = BoldTextStore()
+        #expect(!store.isEnabled)
+        store.update(isEnabled: true)
+        #expect(store.isEnabled)
+        store.update(isEnabled: false)
+        #expect(!store.isEnabled)
     }
 }

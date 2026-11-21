@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.40.0
+- Honour the iPhone's Bold Text setting. With it on, every interface font steps one weight up in the app and the widgets: Regular to Medium, Medium to Bold, and Bold stays Bold because it is the heaviest bundled file. A root modifier, `honoursBoldText()`, copies the `legibilityWeight` environment value into a new `BoldTextStore`, and the font tokens read the store so views re-render when the setting changes. Typed search text steps from Regular to Medium. The big kanji fonts are unchanged. Not tagged
+
 ## v0.39.0
 - Add a kanji style setting and heavier English text. Settings gains a `Kanji style · Serif` row that opens a screen with a serif and a gothic card, each showing 直, and onboarding gains a step after Welcome with the same two cards (serif preselected). The style changes the big kanji displays, the Practice guide and the home screen and lock screen widgets; kanji inside interface text stay as they are. The choice lives in the App Group `UserDefaults` and the app reloads the widget timelines when it changes. Existing learners keep serif. Gothic draws in the system Japanese font (Hiragino Sans W3), not a bundled Zen Kaku Gothic New with kanji: that file adds about 2 MiB to the app and again to the widget, which puts the widget bundle at 11.1 MiB (5.1 MiB data, 6.0 MiB fonts) against the 8 MiB Shared budget. With the fallback the widget bundle is 9.18 MiB with fonts counted (9.12 MiB before this change, plus the Bold file); the budget check in `build.py` counts dataset files only. English text now picks its font file by weight, so the 32 pt and 64 pt numbers draw in a new `ZenKakuGothicNew-Bold` (69 KB) instead of Regular, and body and callout use Medium. The "weights at most 500" rule and its clamp are gone. Not tagged
 

@@ -26,6 +26,19 @@ public enum InterfaceFace: String, CaseIterable, Sendable {
         default: self = .regular
         }
     }
+
+    /// One weight up for Bold Text: Regular to Medium, Medium to Bold. Bold is the heaviest bundled file, so it stays Bold.
+    public var steppedUp: InterfaceFace {
+        switch self {
+        case .regular: .medium
+        case .medium, .bold: .bold
+        }
+    }
+
+    /// The face to draw with, one weight heavier when Bold Text is on.
+    public func resolved(boldText: Bool) -> InterfaceFace {
+        boldText ? steppedUp : self
+    }
 }
 
 /// Size and Dynamic Type anchor of each big kanji display.
@@ -83,25 +96,25 @@ public extension Font {
         .custom(style.postScriptName, fixedSize: size)
     }
 
-    // Interface typography using Zen Kaku Gothic New: Bold for titles and headings, Medium for body and callout, Regular for captions.
+    // Interface typography using Zen Kaku Gothic New: Bold for titles and headings, Medium for body and callout, Regular for captions. Bold Text moves each one weight up.
     static var nichijiTitle: Font {
-        .custom(InterfaceFace.bold.rawValue, size: 28, relativeTo: .title)
+        interface(.bold, size: 28, relativeTo: .title)
     }
 
     static var nichijiHeading: Font {
-        .custom(InterfaceFace.bold.rawValue, size: 20, relativeTo: .headline)
+        interface(.bold, size: 20, relativeTo: .headline)
     }
 
     static var nichijiBody: Font {
-        .custom(InterfaceFace.medium.rawValue, size: 16, relativeTo: .body)
+        interface(.medium, size: 16, relativeTo: .body)
     }
 
     static var nichijiCallout: Font {
-        .custom(InterfaceFace.medium.rawValue, size: 14, relativeTo: .callout)
+        interface(.medium, size: 14, relativeTo: .callout)
     }
 
     static var nichijiCaption: Font {
-        .custom(InterfaceFace.regular.rawValue, size: 12, relativeTo: .caption)
+        interface(.regular, size: 12, relativeTo: .caption)
     }
 
     // Typed text in a UIKit-backed field takes its kanji fallback from the device language, so the cascade names a Japanese font.
@@ -110,6 +123,11 @@ public extension Font {
     }
 
     static func uiText(size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .custom(InterfaceFace(weight: weight).rawValue, size: size, relativeTo: .body)
+        interface(InterfaceFace(weight: weight), size: size, relativeTo: .body)
+    }
+
+    // Reads the Bold Text store, so a view that uses an interface font re-renders when the setting changes.
+    static func interface(_ face: InterfaceFace, size: CGFloat, relativeTo textStyle: Font.TextStyle, boldText: Bool = BoldTextStore.shared.isEnabled) -> Font {
+        .custom(face.resolved(boldText: boldText).rawValue, size: size, relativeTo: textStyle)
     }
 }
