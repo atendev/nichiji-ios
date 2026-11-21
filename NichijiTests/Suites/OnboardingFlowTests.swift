@@ -69,7 +69,7 @@ struct OnboardingFlowTests {
         }
     }
 
-    @Test("Steps run in order, Welcome shows no progress, and steps 1 to 7 fill 1 to 7 segments")
+    @Test("Steps run in order, Welcome shows no progress, and steps 1 to 8 fill 1 to 8 segments")
     func testStepOrderAndProgressFill() throws {
         let fixture = try Fixture()
         defer { fixture.tearDown() }
@@ -88,7 +88,8 @@ struct OnboardingFlowTests {
         }
 
         #expect(visited == OnboardingStep.allCases)
-        #expect(OnboardingStep.allCases.count == 8)
+        #expect(OnboardingStep.allCases.count == 9)
+        #expect(OnboardingStep.kanjiStyle.rawValue == OnboardingStep.welcome.rawValue + 1)
         #expect(OnboardingStep.knownKanji.rawValue == OnboardingStep.levelSelection.rawValue + 1)
         flow.advance()
         #expect(flow.step == .ready)

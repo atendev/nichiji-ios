@@ -1030,3 +1030,24 @@ The user answered the merge question with two changes and asked for CI before as
 - **Unanticipated TODOs**: None.
 - **Test Results**: Not run. The host has no Swift toolchain or SwiftLint, so CI is the build, lint and test check.
 - **Audit**: See `.plan/assets/084-fit-library-and-cropped-photos-on-the-frozen-photo-report.md`.
+
+### Build the font style setting and heavier English text (v0.39.0)
+
+#### Requirements Report
+- **Success Criteria**:
+  1. The learner picks a serif or gothic kanji style in an onboarding step after Welcome and in a Settings row and sub screen. Serif is the default, including for learners who finished onboarding earlier.
+  2. The style changes `kanjiHero`, `kanjiHeroCompact`, `kanjiLarge`, `kanjiWidget`, `kanjiWord`, `kanjiDisplay(size:)` and `kanjiGuide(size:)`, and both widget families. Kanji in interface text stay as they are.
+  3. A style change re-renders the visible screens and reloads the widget timelines.
+  4. English text picks its font file by weight: Bold for titles, headings and big numbers, Medium for body and callout. The clamp is gone.
+  5. The size budgets (24 MiB app, 8 MiB Shared) are checked with the fonts counted, and gothic falls back to the system font if they fail.
+- **Scope Boundary**: In: the style enum, store and preference key, the token rewrite, the cards, the onboarding step, the widget reload, the Bold font, tests and docs. Out: Bold Text accessibility, the device check, any weight setting.
+- **Anticipated TODOs**: A device check of both styles, the widgets and the Bold files follows in its own ticket.
+- **Planned Tests**: `BundledFontsTests` (Bold registered, style to font, weight to file, every token per style), `KanjiFontStyleStoreTests` (default, persistence, observation), the preference round trip and the onboarding step order.
+- **Version**: MINOR, v0.38.1 to v0.39.0.
+
+#### Deviation Report
+- **Success Criteria**: Met as far as reading the code can check, with one change. With the fonts counted, the widget bundle is 5.09 MiB of data plus 6.02 MiB of fonts, 11.1 MiB against the 8 MiB Shared budget, so gothic falls back to Hiragino Sans W3 as the ticket says. The large Zen Kaku Gothic New Regular was dropped and the small interface subset restored. After the fallback the fonts are 4.09 MiB, so the widget bundle is 9.18 MiB (still over 8 MiB if fonts count) and the app set is 20.9 MiB (under 24 MiB). With the large Zen file they would be 11.1 MiB and 22.8 MiB.
+- **Scope Boundary**: Kept.
+- **Unanticipated TODOs**: The widget bundle was already over 8 MiB with fonts counted before this ticket (5.09 MiB data plus 4.2 MiB of fonts, 9.3 MiB). `tools/dataset/build.py` counts only the dataset files, so its budget check never saw it.
+- **Test Results**: Not run. The host has no Swift toolchain, so CI is the build, lint and test check.
+- **Audit**: See `.plan/assets/091-build-the-font-style-setting-report.md`.

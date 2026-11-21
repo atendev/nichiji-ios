@@ -38,7 +38,7 @@ public enum AppDeepLink: String, Equatable, Sendable {
     }
 }
 
-/// Ordered steps in the eight-screen onboarding flow.
+/// Ordered steps in the nine-screen onboarding flow.
 public enum OnboardingStep: Int, Codable, CaseIterable, Sendable {
     case welcome = 0
     case kanjiStyle = 1

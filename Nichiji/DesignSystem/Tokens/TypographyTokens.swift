@@ -3,11 +3,11 @@ import SwiftUI
 /*-------------------------------typefaces--------------------------------*/
 
 public extension KanjiFontStyle {
-    /// PostScript name of the bundled file that draws the big kanji in this style.
+    /// PostScript name of the font that draws the big kanji in this style. Serif is bundled; gothic is the system Japanese font, because a gothic file with every dataset kanji would blow the widget size budget.
     var postScriptName: String {
         switch self {
         case .serif: "ShipporiMincho-Regular"
-        case .gothic: "ZenKakuGothicNew-Regular"
+        case .gothic: "HiraginoSans-W3"
         }
     }
 }
