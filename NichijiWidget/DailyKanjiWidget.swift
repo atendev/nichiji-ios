@@ -43,7 +43,9 @@ struct DailyKanjiProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<DailyKanjiWidgetEntry>) -> Void) {
         KanjiFontStyleStore.shared.reload()
         Task {
-            completion(await Self.plan().timeline())
+            let timeline = await Self.plan().timeline()
+            WidgetMemoryProbe.record()
+            completion(timeline)
         }
     }
 

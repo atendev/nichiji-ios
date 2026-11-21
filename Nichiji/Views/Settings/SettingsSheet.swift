@@ -128,6 +128,8 @@ public struct SettingsSheet: View {
 
                     helpSection
 
+                    MeasureSection()
+
                     aboutSection
                 }
                 .padding(.horizontal, LayoutTokens.screenMarginCompact)
