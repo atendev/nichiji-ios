@@ -82,20 +82,30 @@ enum WidgetMemoryProbe {
         private var peakMB = 0.0
         private var peakAfter = ""
         private var timer: DispatchSourceTimer?
+        private var inFlight = 0
+        private var maxInFlight = 0
 
         func begin() {
             lock.lock()
-            timer?.cancel()
-            active = true
-            stages = []
-            peakMB = 0
-            peakAfter = "at start"
-            let source = DispatchSource.makeTimerSource(queue: DispatchQueue.global(qos: .userInitiated))
-            source.schedule(deadline: .now(), repeating: .milliseconds(2))
-            source.setEventHandler { [weak self] in self?.sample() }
-            timer = source
+            inFlight += 1
+            let isFirst = inFlight == 1
+            var source: DispatchSourceTimer?
+            if isFirst {
+                active = true
+                stages = []
+                peakMB = 0
+                peakAfter = "at start"
+                maxInFlight = 1
+                let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global(qos: .userInitiated))
+                timer.schedule(deadline: .now(), repeating: .milliseconds(2))
+                timer.setEventHandler { [weak self] in self?.sample() }
+                self.timer = timer
+                source = timer
+            } else {
+                maxInFlight = max(maxInFlight, inFlight)
+            }
             lock.unlock()
-            source.resume()
+            source?.resume()
             mark("start")
         }
 
@@ -120,6 +130,7 @@ enum WidgetMemoryProbe {
             peakAfter = "after \(stages.last?.name ?? "start")"
         }
 
+        /// Overlapping runs share one trace. The last one to finish saves it, with the most runs that overlapped.
         func finish() {
             mark("end")
             lock.lock()
@@ -127,12 +138,18 @@ enum WidgetMemoryProbe {
                 lock.unlock()
                 return
             }
+            inFlight -= 1
+            guard inFlight == 0 else {
+                lock.unlock()
+                Self.bumpRuns()
+                return
+            }
             active = false
             timer?.cancel()
             timer = nil
             let trace = stages.map { String(format: "%@ %.1f", $0.name, $0.mb) }.joined(separator: " > ")
             let peak = peakMB
-            let line = String(format: "peak %.1f MB %@ | ", peak, peakAfter) + trace
+            let line = String(format: "peak %.1f MB %@, %d overlapping | ", peak, peakAfter, maxInFlight) + trace
             lock.unlock()
 
             guard let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) else { return }
@@ -144,6 +161,11 @@ enum WidgetMemoryProbe {
             let resident = WidgetMemoryProbe.residentMB()
             defaults.set(max(defaults.double(forKey: WidgetMemoryProbe.residentPeakKey), resident), forKey: WidgetMemoryProbe.residentPeakKey)
             defaults.set(resident, forKey: WidgetMemoryProbe.residentLastKey)
+            Self.bumpRuns()
+        }
+
+        private static func bumpRuns() {
+            guard let defaults = UserDefaults(suiteName: AppStorageGroup.suiteName) else { return }
             defaults.set(defaults.integer(forKey: WidgetMemoryProbe.runsKey) + 1, forKey: WidgetMemoryProbe.runsKey)
         }
     }
