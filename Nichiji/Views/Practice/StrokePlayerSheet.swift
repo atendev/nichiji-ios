@@ -27,6 +27,7 @@ struct StrokePlayerSheet: View {
 
     @State private var playback: StrokePlayback
     private let paths: [Path]
+    private let markers: [StrokeMarker?]
 
     // Header, counter, controls, spacing and insets at the default text size. The stage gives up height before the controls leave the 0.7 detent.
     private static let fixedRowsHeight: CGFloat = 205
@@ -38,7 +39,9 @@ struct StrokePlayerSheet: View {
 
     init(target: PracticeTarget) {
         self.target = target
-        self.paths = target.strokePaths.map(StrokePathParser.path(from:))
+        let parsed = target.strokePaths.map(StrokePathParser.parse(_:))
+        self.paths = parsed.map(\.path)
+        self.markers = parsed.map(\.marker)
         _playback = State(initialValue: StrokePlayback(strokePaths: target.strokePaths))
     }
 
@@ -51,7 +54,7 @@ struct StrokePlayerSheet: View {
                     VStack(spacing: LayoutTokens.space12) {
                         if target.hasStrokeOrder {
                             let side = stageSide(in: proxy.size)
-                            StrokePlayerStageView(paths: paths, playback: playback)
+                            StrokePlayerStageView(paths: paths, markers: markers, playback: playback)
                                 .frame(width: side, height: side)
                                 .frame(maxWidth: .infinity)
 
@@ -207,11 +210,12 @@ private extension Duration {
 
 struct StrokePlayerStageView: View {
     let paths: [Path]
+    let markers: [StrokeMarker?]
     let playback: StrokePlayback
 
     var body: some View {
         Canvas { context, size in
-            StrokePlayerCanvas.draw(in: &context, size: size, paths: paths, playback: playback)
+            StrokePlayerCanvas.draw(in: &context, size: size, paths: paths, markers: markers, playback: playback)
         }
         .aspectRatio(1, contentMode: .fit)
         .background(Color.nichijiSurface)
@@ -231,7 +235,7 @@ enum StrokePlayerCanvas {
     private static let inset: CGFloat = 12
     private static let crosshairInsetRatio: CGFloat = 6 / 342
 
-    nonisolated static func draw(in context: inout GraphicsContext, size: CGSize, paths: [Path], playback: StrokePlayback) {
+    nonisolated static func draw(in context: inout GraphicsContext, size: CGSize, paths: [Path], markers: [StrokeMarker?], playback: StrokePlayback) {
         drawCrosshair(in: &context, size: size)
 
         let side = min(size.width, size.height) - 2 * inset
@@ -253,14 +257,16 @@ enum StrokePlayerCanvas {
         }
 
         if let current, playback.fraction(ofStroke: current) > 0 {
-            drawCurrentStroke(in: &context, index: current, path: paths[current], fraction: playback.fraction(ofStroke: current), style: style)
+            drawCurrentStroke(in: &context, marker: markers[current], path: paths[current], fraction: playback.fraction(ofStroke: current), style: style)
         }
     }
 
     /// The one place the player draws its current stroke, last so it sits above the others.
-    /// The context is already scaled to KanjiVG's 109-unit viewBox. The direction markers from ticket 099 (start dot and arrow) draw from here.
-    nonisolated static func drawCurrentStroke(in context: inout GraphicsContext, index: Int, path: Path, fraction: Double, style: StrokeStyle) {
+    /// The context is already scaled to KanjiVG's 109-unit viewBox. The start dot draws under the stroke and the arrow beside it, as on the card.
+    nonisolated static func drawCurrentStroke(in context: inout GraphicsContext, marker: StrokeMarker?, path: Path, fraction: Double, style: StrokeStyle) {
+        marker?.drawDot(in: context)
         context.stroke(trimmed(path, to: fraction), with: .color(.nichijiInk), style: style)
+        marker?.drawArrow(in: context)
     }
 
     private nonisolated static func trimmed(_ path: Path, to fraction: Double) -> Path {
