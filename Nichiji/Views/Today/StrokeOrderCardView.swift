@@ -72,9 +72,13 @@ public struct StrokeOrderCardView: View {
     }
 }
 
-private struct StrokeStepView: View {
+struct StrokeStepView: View {
     let paths: [Path]
     let step: Int
+
+    static func drawOrder(count: Int, step: Int) -> [Int] {
+        (0..<count).filter { $0 != step } + (0..<count).filter { $0 == step }
+    }
 
     var body: some View {
         Canvas { context, size in
@@ -83,9 +87,9 @@ private struct StrokeStepView: View {
             context.translateBy(x: (size.width - side) / 2, y: (size.height - side) / 2)
             context.scaleBy(x: scale, y: scale)
             let style = StrokeStyle(lineWidth: StrokePathParser.strokeWidth, lineCap: .round, lineJoin: .round)
-            for (index, path) in paths.enumerated() {
+            for index in Self.drawOrder(count: paths.count, step: step) {
                 let color: Color = index == step ? .nichijiInk : index < step ? .nichijiInkMuted : .nichijiHairline
-                context.stroke(path, with: .color(color), style: style)
+                context.stroke(paths[index], with: .color(color), style: style)
             }
         }
         .aspectRatio(1, contentMode: .fit)
