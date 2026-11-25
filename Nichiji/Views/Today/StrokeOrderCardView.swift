@@ -76,7 +76,7 @@ struct StrokeStepView: View {
     let paths: [Path]
     let step: Int
 
-    static func drawOrder(count: Int, step: Int) -> [Int] {
+    nonisolated static func drawOrder(count: Int, step: Int) -> [Int] {
         (0..<count).filter { $0 != step } + (0..<count).filter { $0 == step }
     }
 
