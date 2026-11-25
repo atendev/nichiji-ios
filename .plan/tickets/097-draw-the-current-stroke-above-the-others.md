@@ -18,4 +18,6 @@ Skills: `apple`, `unslop`. `StrokeStepView` in `Nichiji/Views/Today/StrokeOrderC
 
 ## Resolution
 
-<Filled in at close: the decision and the reason for it.>
+Yes. `StrokeStepView` now paints every other stroke first and the current stroke last, through `StrokeStepView.drawOrder(count:step:)`, so later hairline strokes no longer cover the ink stroke where they cross. Colours are unchanged, and the strokes are still KanjiVG vector paths, so only the drawing order moved. `StrokePathParserTests.currentStrokeDrawsLast` covers the order. Swift was not compiled and no kanji was checked by eye in light and dark mode; the master's batch build and a look at 十 and 木 still owe that. Report: `.plan/assets/097-draw-the-current-stroke-above-the-others-report.md`.
+
+Timing: wall 1m, active 1m, user 0s, wait 0s, blocked 0s | audit 38s (1 round) | tools 11 (2 subagent) | limits 0, compactions 0, handoffs 0 | ctx peak 64k | cost $0.38 sonnet-5-5 + $0.01 haiku-5-5
