@@ -9,24 +9,25 @@ public struct StrokeOrderCardView: View {
     public let strokeCount: Int
     public let strokePaths: [String]
     public let onPractice: (() -> Void)?
+    public let onPlay: (() -> Void)?
 
-    // Without `onPractice` the card hides its practice button, as it does inside the Practice sheet.
+    // Without `onPractice` the card hides its practice button, as it does inside the Practice sheet. `onPlay` works the same way.
     public init(
         strokeCount: Int = 0,
         strokePaths: [String] = [],
-        onPractice: (() -> Void)? = nil
+        onPractice: (() -> Void)? = nil,
+        onPlay: (() -> Void)? = nil
     ) {
         self.strokeCount = strokeCount
         self.strokePaths = strokePaths
         self.onPractice = onPractice
+        self.onPlay = onPlay
     }
 
     public var body: some View {
         KanjiCard {
             VStack(alignment: .leading, spacing: LayoutTokens.space12) {
-                Text("Stroke order")
-                    .font(.nichijiTitle)
-                    .foregroundColor(.nichijiInk)
+                StrokeOrderTitleRow(onPlay: strokePaths.isEmpty ? nil : onPlay)
 
                 Text("\(strokeCount) strokes")
                     .font(.nichijiCallout)

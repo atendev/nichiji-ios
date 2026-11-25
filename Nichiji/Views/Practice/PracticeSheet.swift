@@ -25,6 +25,7 @@ public struct PracticeSheet: View {
 
     @State private var pad = PracticePad()
     @State private var showsGuide = true
+    @State private var playerTarget: PracticeTarget?
 
     public init(target: PracticeTarget) {
         self.target = target
@@ -73,6 +74,7 @@ public struct PracticeSheet: View {
         .presentationDetents([.fraction(0.7), .large])
         .presentationDragIndicator(.visible)
         .presentationBackground(Color.nichijiSurfaceRaised)
+        .strokePlayerSheet(target: $playerTarget)
     }
 
     private var header: some View {
@@ -88,6 +90,16 @@ public struct PracticeSheet: View {
                 .foregroundColor(.nichijiInkMuted)
                 .lineLimit(1)
             Spacer(minLength: LayoutTokens.space8)
+            if target.hasStrokeOrder {
+                Button(action: { playerTarget = target }, label: {
+                    Image(systemName: "play.circle")
+                        .font(.system(size: 22))
+                })
+                .foregroundColor(.nichijiInk)
+                .minTouchTarget()
+                .accessibilityLabel("Play stroke order")
+                .accessibilityHint("Draws each stroke in order")
+            }
             Button("Done") {
                 dismiss()
             }
