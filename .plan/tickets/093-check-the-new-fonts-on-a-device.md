@@ -21,7 +21,7 @@ Check:
 - Both kanji styles, switched in Settings and chosen in onboarding, on Today, kanji detail, tiles, Review cards, Practice (guide and stroke diagram), the widgets (home and lock screen), and the search field.
 - 直, 骨 and 角 still match the stroke diagrams in both styles.
 - A fallback kanji from the 46 the gothic font lacks (for example 每 or 黃) in gothic draws in the system Japanese font and looks acceptable.
-- The new size totals are inside the budgets. Gothic ships as the system Japanese font (Hiragino Sans W3), not bundled Zen Kaku Gothic New, per the 091 resolution; judge how gothic looks as that fallback, and see [Decide whether the Shared size budget counts fonts](094-decide-whether-the-shared-size-budget-counts-fonts.md).
+- The new size totals are inside the budgets. Gothic ships as the system Japanese font (Hiragino Sans W3), not bundled Zen Kaku Gothic New, per the 091 resolution; judge how gothic looks as that fallback, and see [Decide whether the Shared size budget counts fonts](../closed/094-decide-whether-the-shared-size-budget-counts-fonts.md).
 - Bold Text ([Honour the iPhone's Bold Text setting](../closed/092-honour-the-bold-text-setting.md)): with Settings > Accessibility > Display & Text Size > Bold Text on, interface text steps one weight up in the app and the widgets. Toggle it with the app closed, then open the home screen: the widget should redraw bold. Dynamic Type still scales with the heavier faces, and the search field keeps its Zen face. The widget modifier (`WidgetBoldTextModifier`, sets the store while its body runs) has no unit test: two `ImageRenderer` attempts in CI never saw Bold Text turn on, so only a device can show the widget honours it.
 Output: a pass or a list of fixes.
 

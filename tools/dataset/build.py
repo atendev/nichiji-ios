@@ -21,6 +21,9 @@ import sources
 HERE = Path(__file__).parent
 ROOT = HERE.parent.parent
 ALLOWLIST = HERE / "strokecount-allowlist.json"
+FONTS = ROOT / "Fonts"
+# Both budgets count generated dataset files only, as a guard against accidental dataset growth.
+# Fonts and total bundle size are reported, not enforced; widget memory is the real limit.
 SHARED_BUDGET = 8 * 1024 * 1024
 APP_BUDGET = 24 * 1024 * 1024
 MAX_EXAMPLES = 3
@@ -334,9 +337,21 @@ def check_budgets(files: dict[str, str]) -> None:
     shared = sum(len(text.encode("utf-8")) for path, text in files.items() if path.startswith("Shared/"))
     total = sum(len(text.encode("utf-8")) for text in files.values())
     if shared > SHARED_BUDGET:
-        raise BuildError(f"widget set is {shared} bytes, over the {SHARED_BUDGET} byte budget")
+        raise BuildError(f"Shared dataset is {shared} bytes, over the {SHARED_BUDGET} byte budget")
     if total > APP_BUDGET:
-        raise BuildError(f"app set is {total} bytes, over the {APP_BUDGET} byte budget")
+        raise BuildError(f"app dataset is {total} bytes, over the {APP_BUDGET} byte budget")
+
+
+def bundle_report(files: dict[str, str], fonts_dir: Path = FONTS) -> str:
+    """One info line with the sizes the budgets leave out: bundled fonts plus the dataset."""
+    mib = 1024 * 1024
+    fonts = sum(path.stat().st_size for path in fonts_dir.glob("*.ttf")) if fonts_dir.is_dir() else 0
+    shared = sum(len(text.encode("utf-8")) for path, text in files.items() if path.startswith("Shared/"))
+    total = sum(len(text.encode("utf-8")) for text in files.values())
+    return (
+        f"with fonts ({fonts / mib:.2f} MiB): widget {(shared + fonts) / mib:.2f} MiB, "
+        f"app {(total + fonts) / mib:.2f} MiB (not budgeted)"
+    )
 
 
 def write(files: dict[str, str], out: Path) -> None:
@@ -384,6 +399,7 @@ def main() -> None:
         raise SystemExit(f"dataset: {error}")
     write(files, ROOT / "Dataset")
     print(f"wrote {len(files)} files to Dataset/", file=sys.stderr)
+    print(bundle_report(files), file=sys.stderr)
 
 
 if __name__ == "__main__":
