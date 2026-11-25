@@ -5,7 +5,7 @@ type: prototype
 mode: HITL
 status: open
 blocked_by: []
-claimed: false
+claimed: true
 ---
 
 ## Question
