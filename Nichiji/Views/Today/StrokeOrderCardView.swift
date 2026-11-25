@@ -9,24 +9,25 @@ public struct StrokeOrderCardView: View {
     public let strokeCount: Int
     public let strokePaths: [String]
     public let onPractice: (() -> Void)?
+    public let onPlay: (() -> Void)?
 
-    // Without `onPractice` the card hides its practice button, as it does inside the Practice sheet.
+    // Without `onPractice` the card hides its practice button, as it does inside the Practice sheet. `onPlay` works the same way.
     public init(
         strokeCount: Int = 0,
         strokePaths: [String] = [],
-        onPractice: (() -> Void)? = nil
+        onPractice: (() -> Void)? = nil,
+        onPlay: (() -> Void)? = nil
     ) {
         self.strokeCount = strokeCount
         self.strokePaths = strokePaths
         self.onPractice = onPractice
+        self.onPlay = onPlay
     }
 
     public var body: some View {
         KanjiCard {
             VStack(alignment: .leading, spacing: LayoutTokens.space12) {
-                Text("Stroke order")
-                    .font(.nichijiTitle)
-                    .foregroundColor(.nichijiInk)
+                StrokeOrderTitleRow(onPlay: strokePaths.isEmpty ? nil : onPlay)
 
                 Text("\(strokeCount) strokes")
                     .font(.nichijiCallout)
@@ -38,12 +39,13 @@ public struct StrokeOrderCardView: View {
                         .foregroundColor(.nichijiInkMuted)
                 }
 
-                let paths = strokePaths.map(StrokePathParser.path(from:))
+                let parsed = strokePaths.map(StrokePathParser.parse)
+                let paths = parsed.map { $0.path }
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: LayoutTokens.space8) {
                     ForEach(paths.indices, id: \.self) { index in
-                        StrokeStepView(paths: paths, step: index)
+                        StrokeStepView(paths: paths, step: index, marker: parsed[index].marker)
                             .accessibilityElement()
-                            .accessibilityLabel("Stroke \(index + 1) of \(paths.count)")
+                            .accessibilityLabel(StrokeMarker.accessibilityLabel(stroke: index + 1, of: paths.count, marker: parsed[index].marker))
                     }
                 }
 
@@ -72,9 +74,14 @@ public struct StrokeOrderCardView: View {
     }
 }
 
-private struct StrokeStepView: View {
+struct StrokeStepView: View {
     let paths: [Path]
     let step: Int
+    var marker: StrokeMarker?
+
+    nonisolated static func drawOrder(count: Int, step: Int) -> [Int] {
+        (0..<count).filter { $0 != step } + (0..<count).filter { $0 == step }
+    }
 
     var body: some View {
         Canvas { context, size in
@@ -83,10 +90,12 @@ private struct StrokeStepView: View {
             context.translateBy(x: (size.width - side) / 2, y: (size.height - side) / 2)
             context.scaleBy(x: scale, y: scale)
             let style = StrokeStyle(lineWidth: StrokePathParser.strokeWidth, lineCap: .round, lineJoin: .round)
-            for (index, path) in paths.enumerated() {
+            for index in Self.drawOrder(count: paths.count, step: step) {
+                if index == step { marker?.drawDot(in: context) }
                 let color: Color = index == step ? .nichijiInk : index < step ? .nichijiInkMuted : .nichijiHairline
-                context.stroke(path, with: .color(color), style: style)
+                context.stroke(paths[index], with: .color(color), style: style)
             }
+            marker?.drawArrow(in: context)
         }
         .aspectRatio(1, contentMode: .fit)
         .padding(LayoutTokens.space12)
@@ -107,9 +116,14 @@ struct StrokePathParser {
     static let strokeWidth: CGFloat = 4
 
     static func path(from data: String) -> Path {
+        parse(data).path
+    }
+
+    /// The path with its start point and starting direction, read from the path data and not from the `Path`.
+    static func parse(_ data: String) -> (path: Path, marker: StrokeMarker?) {
         var parser = StrokePathParser(tokens: tokenize(data))
         parser.run()
-        return parser.path
+        return (parser.path, StrokeMarker(start: parser.firstPoint, segments: parser.segments))
     }
 
     private enum Token {
@@ -123,6 +137,8 @@ struct StrokePathParser {
     private var current = CGPoint.zero
     private var subpathStart = CGPoint.zero
     private var lastControl: CGPoint?
+    private var firstPoint: CGPoint?
+    private var segments: [StrokeMarker.Segment] = []
 
     private init(tokens: [Token]) {
         self.tokens = tokens
@@ -173,6 +189,7 @@ struct StrokePathParser {
     private mutating func moveTo(relative: Bool) -> Bool {
         guard let end = point(relative: relative) else { return false }
         path.move(to: end)
+        firstPoint = firstPoint ?? end
         current = end
         subpathStart = end
         return true
@@ -190,6 +207,7 @@ struct StrokePathParser {
         }
         guard let end else { return false }
         path.addLine(to: end)
+        segments.append(.line(from: current, to: end))
         current = end
         return true
     }
@@ -197,6 +215,7 @@ struct StrokePathParser {
     private mutating func curve(control1: CGPoint?, relative: Bool) -> Bool {
         guard let control1, let control2 = point(relative: relative), let end = point(relative: relative) else { return false }
         path.addCurve(to: end, control1: control1, control2: control2)
+        segments.append(.curve(from: current, control1: control1, control2: control2, to: end))
         current = end
         lastControl = control2
         return true

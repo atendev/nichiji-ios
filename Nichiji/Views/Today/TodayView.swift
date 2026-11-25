@@ -51,6 +51,7 @@ public struct TodayView: View {
     @State private var reloadID = UUID()
     @State private var wasBackgrounded = false
     @State private var practiceTarget: PracticeTarget?
+    @State private var playerTarget: PracticeTarget?
     @State private var stage: StudyStage?
 
     private var poolPreferenceSignature: String {
@@ -93,6 +94,7 @@ public struct TodayView: View {
         }
         .background(Color.nichijiSurface.ignoresSafeArea())
         .practiceSheet(target: $practiceTarget)
+        .strokePlayerSheet(target: $playerTarget)
         .task(id: reloadID) {
             await loadToday()
         }
@@ -163,7 +165,8 @@ public struct TodayView: View {
                 StrokeOrderCardView(
                     strokeCount: kanji.strokeCount,
                     strokePaths: strokePaths,
-                    onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: strokePaths) }
+                    onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: strokePaths) },
+                    onPlay: { playerTarget = PracticeTarget(entry: kanji, strokePaths: strokePaths) }
                 )
 
                 ForgetItControl(kanjiID: kanji.id, stage: stage) {

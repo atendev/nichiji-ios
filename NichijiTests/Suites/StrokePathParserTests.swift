@@ -56,4 +56,12 @@ struct StrokePathParserTests {
             #expect(viewBox.contains(bounds))
         }
     }
+
+    @Test("The current stroke paints after every other stroke")
+    func currentStrokeDrawsLast() {
+        #expect(StrokeStepView.drawOrder(count: 4, step: 0) == [1, 2, 3, 0])
+        #expect(StrokeStepView.drawOrder(count: 4, step: 2) == [0, 1, 3, 2])
+        #expect(StrokeStepView.drawOrder(count: 4, step: 3) == [0, 1, 2, 3])
+        #expect(StrokeStepView.drawOrder(count: 1, step: 0) == [0])
+    }
 }

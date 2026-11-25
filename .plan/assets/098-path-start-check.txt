@@ -1,0 +1,233 @@
+files 6375, strokes 78775, dataset d != KanjiVG d in 0 files
+first tangent vs kvg:type: 78596 strokes checked, 2318 outside the expected range
+  ㇐  22896 strokes, 53 outside
+  ㇑  15588 strokes, 3 outside
+  ㇒  12108 strokes, 375 outside
+  ㇔   9638 strokes, 0 outside
+  ㇕   5246 strokes, 4 outside
+  ㇏   2665 strokes, 12 outside
+  ㇀   1821 strokes, 1758 outside
+  ㇆   1782 strokes, 6 outside
+  ㇇   1092 strokes, 0 outside
+  ㇟    905 strokes, 0 outside
+  ㇜    893 strokes, 26 outside
+  ㇚    845 strokes, 0 outside
+  ㇖    693 strokes, 0 outside
+  ㇄    342 strokes, 0 outside
+  ㇁    337 strokes, 0 outside
+  ㇛    314 strokes, 33 outside
+  ㇙    304 strokes, 0 outside
+  ㇂    227 strokes, 0 outside
+  ㇓    194 strokes, 48 outside
+  ㇈    191 strokes, 0 outside
+  ㇗    179 strokes, 0 outside
+  ㇋    149 strokes, 0 outside
+  ㇉    143 strokes, 0 outside
+  ㇞     39 strokes, 0 outside
+  ㇅      5 strokes, 0 outside
+stroke length in viewBox units: min 4.0, 5th pct 12.0, median 32.5
+arrow direction rules, strokes outside their kvg:type range:
+  first tangent             2318 outside; worst ㇀ 1758, ㇒ 375, ㇐ 53, ㇓ 48, ㇛ 33
+  chord at 6 units            24 outside; worst ㇀ 11, ㇒ 6, ㇕ 3, ㇐ 3, ㇑ 1
+  chord at 10 units           15 outside; worst ㇒ 6, ㇕ 3, ㇐ 3, ㇀ 2, ㇑ 1
+  chord at 15 units           16 outside; worst ㇒ 6, ㇕ 3, ㇐ 3, ㇀ 2, ㇑ 1
+  chord at 20% of length      26 outside; worst ㇀ 13, ㇒ 6, ㇕ 3, ㇐ 3, ㇑ 1
+chord at 10 units, strokes outside their range:
+  拜 s3 ㇒ start=(13.0, 65.6) heads -7 deg, end=(45.0, 54.9)
+  柊 s9 ㇀/㇏ start=(57.0, 82.0) heads 25 deg, end=(77.6, 95.2)
+  毋 s4 ㇒ start=(15.1, 50.8) heads 2 deg, end=(94.1, 49.0)
+  湃 s6 ㇒ start=(30.8, 67.1) heads -11 deg, end=(57.7, 57.2)
+  禱 s7 ㇐ start=(67.7, 10.0) heads 81 deg, end=(69.1, 26.3)
+  繁 s6 ㇒ start=(15.9, 39.8) heads -1 deg, end=(49.7, 34.3)
+  羸 s17 ㇐/㇒ start=(71.1, 51.6) heads 84 deg, end=(60.0, 97.2)
+  臺 s6 ㇑ start=(36.8, 43.6) heads -5 deg, end=(73.4, 40.7)
+  臺 s7 ㇕b start=(20.7, 49.4) heads 105 deg, end=(15.2, 65.5)
+  螽 s11 ㇀/㇏ start=(42.7, 81.7) heads 56 deg, end=(49.7, 94.0)
+  蟬 s9 ㇒ start=(52.7, 27.4) heads -7 deg, end=(66.8, 25.6)
+  輾 s15 ㇕ start=(60.4, 66.7) heads 86 deg, end=(75.6, 85.4)
+  邨 s1 ㇒ start=(10.1, 27.2) heads 1 deg, end=(53.0, 24.7)
+  鐶 s19 ㇕/㇑ start=(56.8, 78.3) heads 86 deg, end=(72.5, 83.5)
+  頃 s1 ㇐/㇒ start=(41.0, 33.0) heads 137 deg, end=(19.0, 46.5)
+chord at 10 units against any part of a composite label: 10 outside
+  拜 s3 ㇒ start=(13.0, 65.6) heads -7 deg, end=(45.0, 54.9)
+  毋 s4 ㇒ start=(15.1, 50.8) heads 2 deg, end=(94.1, 49.0)
+  湃 s6 ㇒ start=(30.8, 67.1) heads -11 deg, end=(57.7, 57.2)
+  禱 s7 ㇐ start=(67.7, 10.0) heads 81 deg, end=(69.1, 26.3)
+  繁 s6 ㇒ start=(15.9, 39.8) heads -1 deg, end=(49.7, 34.3)
+  臺 s6 ㇑ start=(36.8, 43.6) heads -5 deg, end=(73.4, 40.7)
+  臺 s7 ㇕b start=(20.7, 49.4) heads 105 deg, end=(15.2, 65.5)
+  蟬 s9 ㇒ start=(52.7, 27.4) heads -7 deg, end=(66.8, 25.6)
+  輾 s15 ㇕ start=(60.4, 66.7) heads 86 deg, end=(75.6, 85.4)
+  邨 s1 ㇒ start=(10.1, 27.2) heads 1 deg, end=(53.0, 24.7)
+first-tangent misses whose 10-unit chord is in range: 2311 of 2318; length of the first curve segment in those strokes: median 4.0 units, 90th pct 5.0
+endpoint check by stroke type (any label part): 78596 strokes checked, 37 fail
+  冦 s8 ㇔ start=(65.8, 34.1) end=(88.4, 31.4)
+  叡 s2 ㇔ start=(33.3, 21.0) end=(49.2, 18.4)
+  咨 s1 ㇔ start=(15.8, 20.7) end=(42.5, 19.0)
+  均 s6 ㇔ start=(55.2, 52.7) end=(69.9, 52.7)
+  寇 s9 ㇔ start=(67.6, 41.8) end=(88.4, 38.6)
+  嶷 s15 ㇔ start=(73.3, 71.6) end=(89.9, 69.8)
+  拜 s3 ㇒ start=(13.0, 65.6) end=(45.0, 54.9)
+  攴 s2 ㇔ start=(54.0, 26.8) end=(84.5, 24.0)
+  敍 s9 ㇔ start=(70.4, 27.2) end=(92.9, 24.5)
+  敲 s12 ㇔ start=(69.9, 29.3) end=(93.6, 26.7)
+  毋 s4 ㇒ start=(15.1, 50.8) end=(94.1, 49.0)
+  湃 s6 ㇒ start=(30.8, 67.1) end=(57.7, 57.2)
+  滷 s5 ㇔ start=(64.3, 24.6) end=(92.3, 22.2)
+  濬 s5 ㇔ start=(64.8, 18.5) end=(85.5, 16.0)
+  燿 s6 ㇔ start=(43.8, 25.0) end=(63.8, 24.5)
+  燿 s9 ㇔ start=(73.0, 24.2) end=(91.8, 23.2)
+  癡 s17 ㇔ start=(80.5, 71.1) end=(93.0, 69.5)
+  睿 s2 ㇔ start=(53.9, 16.0) end=(83.0, 14.5)
+  礙 s17 ㇔ start=(82.2, 65.3) end=(97.8, 64.2)
+  禱 s12 ㇔ start=(49.6, 54.1) end=(87.5, 51.6)
+  繁 s6 ㇒ start=(15.9, 39.8) end=(49.7, 34.3)
+  羸 s19 ㇔ start=(66.5, 71.8) end=(81.5, 70.5)
+  耀 s8 ㇔ start=(50.2, 28.0) end=(67.8, 25.8)
+  耀 s11 ㇔ start=(76.2, 26.2) end=(93.6, 24.4)
+  臺 s6 ㇑ start=(36.8, 43.6) end=(73.4, 40.7)
+  薤 s11 ㇀ start=(43.9, 65.4) end=(60.3, 65.7)
+  蟬 s9 ㇒ start=(52.7, 27.4) end=(66.8, 25.6)
+  襪 s16 ㇔ start=(56.4, 73.5) end=(70.8, 72.3)
+  誡 s11 ㇒ start=(59.8, 49.0) end=(60.9, 85.5)
+  豹 s10 ㇔ start=(58.2, 58.7) end=(75.8, 58.0)
+  這 s1 ㇔ start=(51.5, 16.3) end=(78.8, 14.7)
+  邨 s1 ㇒ start=(10.1, 27.2) end=(53.0, 24.7)
+  餐 s2 ㇔ start=(38.2, 16.6) end=(52.4, 14.7)
+  鹵 s2 ㇔ start=(54.2, 23.8) end=(92.0, 20.0)
+  鹸 s2 ㇔ start=(27.9, 25.7) end=(47.2, 23.8)
+  鹹 s2 ㇔ start=(24.9, 23.6) end=(44.2, 21.8)
+  鹽 s11 ㇔ start=(68.0, 26.8) end=(88.2, 24.8)
+generic check (end up-and-left of start): 0 strokes
+stroke-number label nearer start than end: 75630 of 78775
+failures listed: 5463
+  type ㇀    乖 s6 first tangent    32.5 deg
+  type ㇀    乘 s5 first tangent    29.9 deg
+  type ㇀/㇐  乳 s7 first tangent    27.9 deg
+  label nearer end 亂 s2 label=(10.5,31.5) start=(19.28, 27.14) end=(10.56, 39.71)
+  type ㇜    亂 s9 first tangent    42.4 deg
+  label nearer end 亂 s10 label=(41.75,58.95) start=(39.05, 54.39) end=(44.4, 60.99)
+  label nearer end 事 s2 label=(24.75,43.63) start=(30.51, 34.23) end=(34.36, 47.49)
+  type ㇀/㇐  些 s4 first tangent    43.6 deg
+  type ㇀    以 s2 first tangent    30.4 deg
+  type ㇀    似 s4 first tangent    24.8 deg
+
+animCJK comparison. Same way: KanjiVG's start-to-end vector is within 90 deg of animCJK's (a reversed path is about 180 deg off).
+Arrow: KanjiVG's 10-unit chord is within 45 deg of the same chord on animCJK's median, scaled to 109 units.
+  一: s1 ok
+  上: s1 ok, s2 ok, s3 ok
+  下: s1 ok, s2 ok, s3 ok
+  九: s1 ok, s2 ok
+  人: s1 ok, s2 ok
+  入: s1 ok, s2 ok
+  力: s1 ok, s2 ok
+  十: s1 ok, s2 ok
+  口: s1 ok, s2 ok, s3 ok
+  大: s1 ok, s2 same way 4/arrow 47 deg, s3 ok
+  子: s1 ok, s2 ok, s3 ok
+  小: s1 ok, s2 ok, s3 ok
+  山: s1 ok, s2 ok, s3 ok
+  川: s1 ok, s2 ok, s3 ok
+  心: s1 ok, s2 ok, s3 ok, s4 ok
+  手: s1 same way 1/arrow 68 deg, s2 ok, s3 ok, s4 ok
+  拜: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok
+  日: s1 ok, s2 ok, s3 ok, s4 ok
+  木: s1 ok, s2 ok, s3 ok, s4 ok
+  柊: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok
+  毋: s1 ok, s2 ok, s3 ok, s4 ok
+  水: s1 ok, s2 ok, s3 same way 22/arrow 55 deg, s4 ok
+  湃: s1 ok, s2 ok, s3 same way 0/arrow 50 deg, s4 same way 15/arrow 54 deg, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok
+  目: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok
+  禱: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 ok, s16 ok, s17 ok, s18 ok, s19 ok
+  繁: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 ok, s16 ok
+  羸: s1 same way 46/arrow 46 deg, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 ok, s16 ok, s17 ok, s18 ok, s19 ok
+  臺: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok
+  螽: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 ok, s16 ok, s17 ok
+  蟬: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 ok, s16 ok, s17 ok, s18 ok
+  輾: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 same way 4/arrow 49 deg, s16 ok, s17 ok
+  邨: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok
+  鐶: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok, s12 ok, s13 ok, s14 ok, s15 ok, s16 ok, s17 ok, s18 ok, s19 ok, s20 ok, s21 ok
+  頃: s1 ok, s2 ok, s3 ok, s4 ok, s5 ok, s6 ok, s7 ok, s8 ok, s9 ok, s10 ok, s11 ok
+animCJK comparison: 253 of 253 strokes run the same way, 246 of 253 arrows agree within 45 deg
+
+Hand check (start, first direction, end):
+一:
+  s1 ㇐    start ( 11.0, 54.2) heads E  end ( 96.9, 50.0)
+十:
+  s1 ㇐    start ( 11.9, 51.0) heads E  end ( 96.1, 46.1)
+  s2 ㇑    start ( 52.2, 11.6) heads SE end ( 54.2, 99.4)
+口:
+  s1 ㇑    start ( 22.2, 33.2) heads SE end ( 30.0, 83.0)
+  s2 ㇕b   start ( 25.3, 35.7) heads E  end ( 77.5, 73.8)
+  s3 ㇐b   start ( 30.2, 77.8) heads E  end ( 81.0, 74.5)
+木:
+  s1 ㇐    start ( 19.5, 39.9) heads E  end ( 87.1, 36.6)
+  s2 ㇑    start ( 51.8, 10.5) heads SE end ( 53.5, 98.5)
+  s3 ㇒    start ( 50.8, 39.5) heads S  end ( 15.8, 80.2)
+  s4 ㇏    start ( 54.5, 39.0) heads SE end ( 93.8, 79.2)
+人:
+  s1 ㇒    start ( 54.5, 20.0) heads S  end ( 16.5, 87.2)
+  s2 ㇏    start ( 46.0, 54.2) heads SE end ( 93.0, 89.5)
+大:
+  s1 ㇐    start ( 19.4, 48.2) heads E  end ( 84.5, 42.8)
+  s2 ㇒    start ( 49.5, 18.0) heads SE end ( 18.0, 91.8)
+  s3 ㇏    start ( 49.5, 46.0) heads SE end ( 94.0, 93.2)
+小:
+  s1 ㇚    start ( 54.7, 18.4) heads SE end ( 48.0, 84.3)
+  s2 ㇒    start ( 31.9, 47.7) heads S  end ( 16.8, 73.0)
+  s3 ㇔    start ( 81.0, 47.1) heads SE end ( 97.0, 72.0)
+山:
+  s1 ㇑a   start ( 52.5, 15.5) heads SE end ( 54.5, 80.5)
+  s2 ㇄a   start ( 21.5, 54.5) heads SE end ( 87.8, 79.0)
+  s3 ㇑    start ( 89.2, 49.0) heads SE end ( 87.8, 87.0)
+川:
+  s1 ㇒    start ( 27.2, 25.7) heads SE end ( 17.4, 84.2)
+  s2 ㇑    start ( 53.8, 23.6) heads SE end ( 55.0, 75.9)
+  s3 ㇑    start ( 85.6, 15.6) heads SE end ( 87.3, 94.6)
+水:
+  s1 ㇚    start ( 52.8, 15.1) heads SE end ( 45.2, 86.5)
+  s2 ㇇    start ( 17.5, 45.8) heads E  end ( 19.0, 74.8)
+  s3 ㇒    start ( 81.2, 27.5) heads S  end ( 57.2, 44.2)
+  s4 ㇏    start ( 57.0, 46.0) heads SE end ( 92.5, 77.0)
+子:
+  s1 ㇖    start ( 33.3, 19.0) heads E  end ( 54.3, 35.5)
+  s2 ㇁    start ( 52.5, 37.7) heads SE end ( 47.2, 91.3)
+  s3 ㇐    start ( 12.2, 51.5) heads E  end ( 96.4, 45.8)
+九:
+  s1 ㇒    start ( 41.9, 14.4) heads SE end ( 14.9, 88.2)
+  s2 ㇈    start ( 13.5, 45.8) heads E  end ( 97.7, 81.8)
+入:
+  s1 ㇒    start ( 54.8, 48.8) heads S  end ( 14.5, 88.0)
+  s2 ㇏    start ( 36.5, 20.0) heads E  end ( 94.8, 88.5)
+力:
+  s1 ㇆    start ( 21.5, 38.2) heads SE end ( 56.0, 89.0)
+  s2 ㇒    start ( 56.9, 13.7) heads S  end ( 13.4, 89.7)
+手:
+  s1 ㇒    start ( 61.5, 11.5) heads S  end ( 31.2, 26.2)
+  s2 ㇐    start ( 26.4, 42.9) heads E  end ( 78.6, 37.8)
+  s3 ㇐    start ( 13.3, 62.9) heads E  end ( 95.6, 56.6)
+  s4 ㇁    start ( 48.9, 23.6) heads SE end ( 47.9, 91.0)
+心:
+  s1 ㇔    start ( 16.9, 52.8) heads S  end ( 13.1, 75.8)
+  s2 ㇃    start ( 31.2, 49.2) heads S  end ( 87.5, 72.0)
+  s3 ㇔a   start ( 50.2, 26.0) heads S  end ( 59.0, 33.8)
+  s4 ㇔    start ( 85.5, 30.0) heads SE end ( 96.0, 44.0)
+日:
+  s1 ㇑    start ( 31.5, 24.5) heads SE end ( 33.2, 89.5)
+  s2 ㇕a   start ( 33.5, 26.0) heads E  end ( 79.0, 89.0)
+  s3 ㇐a   start ( 34.2, 55.2) heads E  end ( 78.3, 52.5)
+  s4 ㇐a   start ( 34.2, 86.5) heads E  end ( 78.0, 84.2)
+目:
+  s1 ㇑    start ( 29.8, 19.1) heads SE end ( 31.6, 93.1)
+  s2 ㇕a   start ( 32.5, 21.4) heads E  end ( 79.3, 92.0)
+  s3 ㇐a   start ( 33.0, 43.6) heads E  end ( 78.2, 39.5)
+  s4 ㇐a   start ( 32.9, 66.0) heads E  end ( 77.7, 62.6)
+  s5 ㇐a   start ( 33.0, 90.5) heads E  end ( 77.8, 88.0)
+上:
+  s1 ㇑a   start ( 52.3, 15.9) heads SE end ( 54.1, 85.6)
+  s2 ㇐b/㇔ start ( 58.0, 44.8) heads E  end ( 80.5, 41.8)
+  s3 ㇐    start ( 13.4, 88.3) heads E  end ( 95.8, 86.5)
+下:
+  s1 ㇐    start ( 13.2, 22.5) heads E  end ( 95.2, 19.8)
+  s2 ㇑    start ( 53.0, 23.2) heads SE end ( 54.2, 94.0)
+  s3 ㇔    start ( 67.8, 37.2) heads SE end ( 82.0, 52.1)

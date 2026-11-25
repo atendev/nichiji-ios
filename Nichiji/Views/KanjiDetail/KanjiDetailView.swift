@@ -45,6 +45,7 @@ struct KanjiDetailView: View {
     @State private var isDeclaredKnown = false
     @State private var errorMessage: String?
     @State private var practiceTarget: PracticeTarget?
+    @State private var playerTarget: PracticeTarget?
 
     var body: some View {
         Group {
@@ -68,6 +69,7 @@ struct KanjiDetailView: View {
         // The Dictionary root hides its bar; detail needs it back for the "Dictionary" back button.
         .toolbar(.visible, for: .navigationBar)
         .practiceSheet(target: $practiceTarget)
+        .strokePlayerSheet(target: $playerTarget)
         .task(id: kanjiID) {
             await load()
         }
@@ -108,7 +110,8 @@ struct KanjiDetailView: View {
                 StrokeOrderCardView(
                     strokeCount: kanji.strokeCount,
                     strokePaths: content.strokePaths,
-                    onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: content.strokePaths) }
+                    onPractice: { practiceTarget = PracticeTarget(entry: kanji, strokePaths: content.strokePaths) },
+                    onPlay: { playerTarget = PracticeTarget(entry: kanji, strokePaths: content.strokePaths) }
                 )
 
                 KnownKanjiControl(kanjiID: kanji.id, stage: stage, isDeclared: isDeclaredKnown) {
