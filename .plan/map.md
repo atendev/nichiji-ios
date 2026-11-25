@@ -23,6 +23,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 8. Release: App Store metadata, then the signed TestFlight build.
 9. Camera scan: rebuild photo lookup to the design in `docs/ui-reference/camera/`. Decide the open questions, then build the entry and viewfinder, kanji boxes, frozen photo and highlights, results sheet, Crop and Save. This stage comes before the release build (numbered later only because it came up later).
 10. Kanji beyond Jōyō: add the Jinmeiyō and Hyōgai levels to the dataset, then to the app.
+11. Stroke order: draw the current stroke on top, show stroke direction, then a stroke player that animates each stroke over a faint copy of the kanji.
 
 ## Decisions so far
 
@@ -112,5 +113,9 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
 - [Check the new fonts on a device](tickets/093-check-the-new-fonts-on-a-device.md) (task, HITL)
 - [Decide whether the Shared size budget counts fonts](tickets/094-decide-whether-the-shared-size-budget-counts-fonts.md) (grilling, HITL)
+- [Draw the current stroke above the others](tickets/097-draw-the-current-stroke-above-the-others.md) (task, AFK)
+- [Decide how stroke order shows direction](tickets/098-decide-how-stroke-order-shows-direction.md) (prototype, HITL)
+- [Design the stroke player](tickets/100-design-the-stroke-player.md) (grilling, HITL)
 
 Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the font device check (093). The camera scan stage is built; its device checks go with the release build.
+Blocked: [Show stroke direction in stroke order](tickets/099-show-stroke-direction-in-stroke-order.md) behind 098, and [Build the stroke player](tickets/101-build-the-stroke-player.md) behind 100.

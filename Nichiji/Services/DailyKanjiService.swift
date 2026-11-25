@@ -62,15 +62,25 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
     public func assignment(for day: String) async throws -> DailyAssignmentSnapshot? {
         // 1. Lazy rollover: transition past assigned rows to .missed
         _ = try await learnerStore.markPastAssignedAsMissed(before: day)
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("rollover") // MEASURE-PROBE
+        #endif
 
         // 2. Return existing assignment for day if already created
-        if let existing = try await learnerStore.assignment(for: day) {
+        let existingAssignment = try await learnerStore.assignment(for: day)
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("assignment-lookup") // MEASURE-PROBE
+        #endif
+        if let existing = existingAssignment {
             return existing
         }
 
         // 3. Resolve active unlearned pool
         let preferences = preferencesProvider()
         let pool = try await activePool(preferences: preferences)
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("pool") // MEASURE-PROBE
+        #endif
         guard !pool.isEmpty else {
             return nil // Quiet level complete
         }
@@ -90,7 +100,13 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
 
     public func activePool(preferences: LearnerPreferencesSnapshot) async throws -> [KanjiIndexEntry] {
         let nonNewIDs = try await learnerStore.nonNewKanjiIDs()
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("progress-ids") // MEASURE-PROBE
+        #endif
         let index = try contentStore.indexEntries()
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("index") // MEASURE-PROBE
+        #endif
         let candidateEntries: [KanjiIndexEntry]
 
         if preferences.isCustomPoolActive {
@@ -135,7 +151,13 @@ public final class DefaultDailyKanjiService: DailyKanjiService, Sendable {
             return nil
         }
 
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("assignment") // MEASURE-PROBE
+        #endif
         let kanji = try contentStore.entry(for: assignment.kanjiID)
+        #if DEBUG || DEV_UNLOCK
+        WidgetMemoryProbe.mark("record") // MEASURE-PROBE
+        #endif
         return DailyKanjiWidgetSnapshot(
             calendarDay: day,
             kanjiID: kanji.id,
