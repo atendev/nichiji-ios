@@ -1,5 +1,7 @@
 import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import build
 import jmdict
@@ -308,6 +310,16 @@ class GuardTests(unittest.TestCase):
             build.check_budgets({"Shared/a": "x" * (build.SHARED_BUDGET + 1)})
         with self.assertRaises(build.BuildError):
             build.check_budgets({"Shared/a": "x", "AppOnly/b": "y" * build.APP_BUDGET})
+
+
+    def test_bundle_report_adds_fonts_without_budgeting_them(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fonts = Path(directory)
+            (fonts / "a.ttf").write_bytes(b"x" * 1024 * 1024)
+            report = build.bundle_report({"Shared/a": "x", "AppOnly/b": "y"}, fonts)
+        self.assertIn("fonts (1.00 MiB)", report)
+        self.assertIn("widget 1.00 MiB", report)
+        self.assertIn("not budgeted", report)
 
 
 class RadicalTests(unittest.TestCase):

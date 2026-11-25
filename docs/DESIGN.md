@@ -79,7 +79,15 @@ substring; English matches only at word starts. Results come in a Kanji
 section and a Words section, ranked by match quality, then frequency. A word
 row opens a small "Which kanji?" sheet. The search index is built in memory
 the first time Dictionary opens, from the app-only `words.json` and
-`kanji-search.json`.
+`kanji-search.json`. It costs about 24 MB on a device (measured at +24.1 MB),
+which the app accepts. The soft target is about 25 MB of `phys_footprint`
+growth, measured on a device; the CI runner's figure understates it and stays a
+smoke check. Dictionary and the Known kanji picker each build their own copy.
+
+The size budgets in `tools/dataset/build.py` (8 MiB Shared, 24 MiB app) count
+generated dataset files only, as a guard against accidental dataset growth.
+Bundled fonts are reported but not budgeted. A widget's real limit is runtime
+memory, tracked separately.
 
 "Draw a kanji" and "Scan a kanji" sit side by side under the search bar and
 stack at accessibility text sizes. "Draw a kanji" needs Pro; locked, it opens the paywall. The "Draw to search" sheet has a pad,
