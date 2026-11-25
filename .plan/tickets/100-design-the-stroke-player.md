@@ -3,7 +3,7 @@ id: "100"
 title: Design the stroke player
 type: grilling
 mode: HITL
-status: open
+status: closed
 blocked_by: []
 claimed: true
 ---
@@ -82,3 +82,5 @@ The stroke player is in v1.0, built by [Build the stroke player](101-build-the-s
 **Scope.** This is in v1.0. The map's stroke order stage (11) includes the player, and 101 already sits on the map to build it. 034 predates the request and did not exclude it.
 
 Surfaced nothing new. 101 covers the build. The marker hand-off between 099 and 101 is a note for those two tickets, not a ticket of its own.
+
+Timing: wall 11m, active 11m, user 0s, wait 0s, blocked 0s | grill 2m, audit 8m (4 rounds), gate 31s | tools 46 (17 subagent) | limits 0, compactions 0, handoffs 0 | ctx peak 133k | cost $2.17 opus-5-5 + $0.06 haiku-5-5
