@@ -4,13 +4,13 @@ import Testing
 
 /*----------------------------playback-tests-----------------------------*/
 
+// Three strokes of 1 s each. A rest takes 0.35 s, or 0.8 s when the playback does not animate.
+private func make(strokes: Int = 3, duration: TimeInterval = 1) -> StrokePlayback {
+    StrokePlayback(durations: Array(repeating: duration, count: strokes))
+}
+
 @Suite("Stroke Playback Tests")
 struct StrokePlaybackTests {
-    // Three strokes of 1 s each. A rest takes 0.35 s, or 0.8 s when the playback does not animate.
-    private func make(strokes: Int = 3, duration: TimeInterval = 1) -> StrokePlayback {
-        StrokePlayback(durations: Array(repeating: duration, count: strokes))
-    }
-
     @Test("A new playback is idle with nothing drawn")
     func newPlaybackIsIdle() {
         let playback = make()
@@ -171,6 +171,10 @@ struct StrokePlaybackTests {
         #expect(playback.completed == 2)
     }
 
+}
+
+@Suite("Stroke Playback Step Tests")
+struct StrokePlaybackStepTests {
     @Test("Previous drops the current stroke and shows the one before whole")
     func previousStepsBack() {
         var playback = make()
