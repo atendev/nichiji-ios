@@ -41,15 +41,9 @@ struct DailyKanjiProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<DailyKanjiWidgetEntry>) -> Void) {
-        #if DEBUG || DEV_UNLOCK
-        WidgetMemoryProbe.begin() // MEASURE-PROBE: see WidgetMemoryProbe.swift for removal
-        #endif
         KanjiFontStyleStore.shared.reload()
         Task {
             let timeline = await Self.plan().timeline()
-            #if DEBUG || DEV_UNLOCK
-            WidgetMemoryProbe.record() // MEASURE-PROBE
-            #endif
             completion(timeline)
         }
     }
@@ -62,9 +56,6 @@ struct DailyKanjiProvider: TimelineProvider {
                 reloadDate: now.addingTimeInterval(DailyKanjiTimelineBuilder.retryInterval)
             )
         }
-        #if DEBUG || DEV_UNLOCK
-        WidgetMemoryProbe.mark("environment") // MEASURE-PROBE
-        #endif
         return await environment.timelineBuilder.build()
     }
 }
