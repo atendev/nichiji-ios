@@ -46,26 +46,27 @@ private struct OnboardingStepHost: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if flow.showsProgress {
-                HStack(spacing: LayoutTokens.space8) {
-                    Button {
-                        flow.goBack()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.nichijiInk)
-                    }
-                    .buttonStyle(.plain)
-                    .minTouchTarget()
-                    .accessibilityLabel("Back")
-
-                    OnboardingProgressBar(filledSegments: flow.progressFill)
+            // Welcome keeps the header's space so the pager's height never changes mid-slide, which made the first swipe diagonal.
+            HStack(spacing: LayoutTokens.space8) {
+                Button {
+                    flow.goBack()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.nichijiInk)
                 }
-                .padding(.leading, LayoutTokens.space8)
-                .padding(.trailing, LayoutTokens.screenMarginCompact)
-                .padding(.top, LayoutTokens.space8)
-                .transition(.opacity)
+                .buttonStyle(.plain)
+                .minTouchTarget()
+                .accessibilityLabel("Back")
+
+                OnboardingProgressBar(filledSegments: flow.progressFill)
             }
+            .padding(.leading, LayoutTokens.space8)
+            .padding(.trailing, LayoutTokens.screenMarginCompact)
+            .padding(.top, LayoutTokens.space8)
+            .opacity(flow.showsProgress ? 1 : 0)
+            .allowsHitTesting(flow.showsProgress)
+            .accessibilityHidden(!flow.showsProgress)
 
             stepPager
         }

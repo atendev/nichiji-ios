@@ -108,13 +108,13 @@ private struct KanjiStyleCard: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.nichijiVermilion)
-                        .frame(width: 20, height: 20)
-                        .accessibilityHidden(true)
-                }
+                // Always laid out so selecting a card does not narrow its text and rewrap it.
+                Image(systemName: "checkmark")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.nichijiVermilion)
+                    .frame(width: 20, height: 20)
+                    .opacity(isSelected ? 1 : 0)
+                    .accessibilityHidden(true)
             }
             .padding(.horizontal, LayoutTokens.space16)
             .padding(.vertical, LayoutTokens.space12)

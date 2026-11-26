@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.40.1
+- Fix four things from a device run. The first onboarding slide, Welcome to Kanji style, moved at an angle because the progress header was inserted mid-slide and shrank the pager; the header's space is now kept on Welcome, hidden. The Serif and Gothic cards no longer rewrap their text when picked, since the checkmark's space is always reserved. The Known kanji picker lists every level instead of only the learner's level and easier ones, as one flat lazy list of tile rows like Dictionary browse; `KnownKanjiScope` and its tests are gone. The stroke start dot is smaller (radius 2.75 viewBox units, from 4.5 with a 6-unit halo) and draws on top of the current stroke on the card and in the stroke player. Nothing was built or run on the Linux host; CI is the check. Not tagged
+
 ## v0.40.0
 - Honour the iPhone's Bold Text setting. With it on, every interface font steps one weight up in the app and the widgets: Regular to Medium, Medium to Bold, and Bold stays Bold because it is the heaviest bundled file. The font tokens read a new `BoldTextStore`, so views re-render when the setting changes. The app seeds the store at launch and `honoursBoldText()` keeps it in step with the `legibilityWeight` environment value. The widget root uses `honoursBoldTextInWidget()`, which sets the store while its body runs, because `onChange` cannot be relied on in a widget snapshot. The app saves the last Bold Text value it saw in the App Group `UserDefaults` and reloads the widget timelines when the value changes. A toggle made while the app was closed reaches the widgets at their next timeline render, or at the next app launch if that comes first. Typed search text steps from Regular to Medium. The big kanji fonts are unchanged. Nothing was built or run on the Linux host; the widget path needs a device check. Not tagged
 

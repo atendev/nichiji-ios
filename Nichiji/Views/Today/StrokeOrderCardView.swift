@@ -91,10 +91,10 @@ struct StrokeStepView: View {
             context.scaleBy(x: scale, y: scale)
             let style = StrokeStyle(lineWidth: StrokePathParser.strokeWidth, lineCap: .round, lineJoin: .round)
             for index in Self.drawOrder(count: paths.count, step: step) {
-                if index == step { marker?.drawDot(in: context) }
                 let color: Color = index == step ? .nichijiInk : index < step ? .nichijiInkMuted : .nichijiHairline
                 context.stroke(paths[index], with: .color(color), style: style)
             }
+            marker?.drawDot(in: context)
             marker?.drawArrow(in: context)
         }
         .aspectRatio(1, contentMode: .fit)

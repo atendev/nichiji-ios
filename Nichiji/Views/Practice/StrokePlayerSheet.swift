@@ -262,10 +262,10 @@ enum StrokePlayerCanvas {
     }
 
     /// The one place the player draws its current stroke, last so it sits above the others.
-    /// The context is already scaled to KanjiVG's 109-unit viewBox. The start dot draws under the stroke and the arrow beside it, as on the card.
+    /// The context is already scaled to KanjiVG's 109-unit viewBox. The start dot draws on top of the stroke and the arrow beside it, as on the card.
     nonisolated static func drawCurrentStroke(in context: inout GraphicsContext, marker: StrokeMarker?, path: Path, fraction: Double, style: StrokeStyle) {
-        marker?.drawDot(in: context)
         context.stroke(trimmed(path, to: fraction), with: .color(.nichijiInk), style: style)
+        marker?.drawDot(in: context)
         marker?.drawArrow(in: context)
     }
 
