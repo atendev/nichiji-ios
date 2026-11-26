@@ -128,10 +128,6 @@ public struct SettingsSheet: View {
 
                     helpSection
 
-                    #if DEBUG || DEV_UNLOCK
-                    MeasureSection() // MEASURE-PROBE: see MeasureSection.swift for removal
-                    #endif
-
                     aboutSection
                 }
                 .padding(.horizontal, LayoutTokens.screenMarginCompact)
