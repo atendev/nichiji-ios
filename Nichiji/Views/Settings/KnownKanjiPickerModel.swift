@@ -2,8 +2,8 @@ import Foundation
 
 /*--------------------------------model---------------------------------------*/
 
-/// Selection state behind the Known kanji picker. It starts from every kanji the learner already marked, so groups
-/// that are not on screen are never undeclared when the learner is done.
+/// Selection state behind the Known kanji picker. It starts from every kanji the learner already marked, so nothing
+/// marked earlier is undeclared when the learner is done.
 struct KnownKanjiPickerModel: Equatable {
     private(set) var sections: [KanjiBrowseSection]
     private(set) var selected: Set<String>
@@ -28,7 +28,7 @@ struct KnownKanjiPickerModel: Equatable {
         selected.contains(kanjiID)
     }
 
-    /// Everything marked, including kanji outside the groups on screen and ones picked from search results.
+    /// Everything marked, including ones picked from search results.
     var selectedCount: Int { selected.count }
 
     mutating func toggle(_ kanjiID: String) {
@@ -96,33 +96,5 @@ struct KnownKanjiPickerModel: Equatable {
         case .jlpt: JLPTLevel.allCases.first { $0.includes(entry) }?.badgeLabel ?? "No level"
         case .joyo: JoyoGrade.allCases.first { $0.includes(entry) }?.badgeLabel ?? "No level"
         }
-    }
-}
-
-/*------------------------------scope-----------------------------------------*/
-
-/// Which groups the picker lists before the learner types anything: the learner's level and every easier one.
-enum KnownKanjiScope {
-    /// A custom pool has no level of its own, so it lists every group. Harder levels are never listed.
-    static func sections(
-        from all: [KanjiBrowseSection],
-        preferences: LearnerPreferencesSnapshot
-    ) -> [KanjiBrowseSection] {
-        guard !preferences.isCustomPoolActive else { return all }
-        let ids: [String]
-        switch preferences.levelSystem {
-        case .jlpt:
-            ids = throughLevel(preferences.selectedJLPTLevel).map(\.rawValue)
-        case .joyo:
-            ids = throughLevel(preferences.selectedJoyoGrade).map(\.rawValue)
-        }
-        return all.filter { ids.contains($0.id) }
-    }
-
-    /// Both level enums list their cases easiest first.
-    private static func throughLevel<Level: CaseIterable & Equatable>(_ level: Level) -> [Level] {
-        let levels = Array(Level.allCases)
-        guard let index = levels.firstIndex(of: level) else { return levels }
-        return Array(levels[...index])
     }
 }

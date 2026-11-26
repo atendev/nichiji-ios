@@ -30,11 +30,13 @@ struct KnownKanjiPickerView: View {
             )
 
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: LayoutTokens.space24) {
+                // One flat lazy list of tile rows, as in Dictionary: every level is listed, which is thousands of cells.
+                LazyVStack(alignment: .leading, spacing: KanjiGridTile.spacing) {
                     Text("Turn on the kanji you already know. They skip your daily kanji and start in your flashcard reviews.")
                         .font(.nichijiBody)
                         .foregroundColor(.nichijiInkMuted)
                         .padding(.top, LayoutTokens.space8)
+                        .padding(.bottom, LayoutTokens.space24 - KanjiGridTile.spacing)
 
                     if let model {
                         content(model)
@@ -70,8 +72,17 @@ struct KnownKanjiPickerView: View {
         if isSearching {
             searchContent(model)
         } else {
-            ForEach(model.sections) { section in
-                sectionView(section, model: model)
+            let rows = KanjiBrowseGrouping.rows(from: model.sections, collapsed: [], columnCount: KanjiGridTile.columnCount)
+            ForEach(rows) { row in
+                switch row {
+                case .header(let section, _, let isFirst):
+                    sectionHeader(section, model: model)
+                        .padding(.top, isFirst ? 0 : LayoutTokens.space24 - KanjiGridTile.spacing)
+                case .tiles(_, let entries):
+                    tileRow(entries) { entry in
+                        kanjiCell(entry.id, meaning: entry.primaryMeaning, levelLabel: nil, model: model)
+                    }
+                }
             }
         }
     }
@@ -90,8 +101,9 @@ struct KnownKanjiPickerView: View {
                 .font(.nichijiCallout)
                 .foregroundColor(.nichijiInkMuted)
         } else {
-            LazyVGrid(columns: KanjiGridTile.columns, spacing: KanjiGridTile.spacing) {
-                ForEach(results) { entry in
+            let columns = KanjiGridTile.columnCount
+            ForEach(Array(stride(from: 0, to: results.count, by: columns)), id: \.self) { start in
+                tileRow(Array(results[start..<min(start + columns, results.count)])) { entry in
                     kanjiCell(
                         entry.id,
                         meaning: entry.primaryMeaning,
@@ -103,23 +115,32 @@ struct KnownKanjiPickerView: View {
         }
     }
 
-    private func sectionView(_ section: KanjiBrowseSection, model: KnownKanjiPickerModel) -> some View {
+    private func sectionHeader(_ section: KanjiBrowseSection, model: KnownKanjiPickerModel) -> some View {
         let isAllSelected = model.isAllSelected(in: section)
 
-        return VStack(alignment: .leading, spacing: LayoutTokens.space12) {
-            KnownKanjiGroupHeader(
-                title: section.title,
-                detail: "\(section.countLabel) · \(model.selectedCount(in: section)) known",
-                showsButton: model.showsGroupButton(for: section),
-                isAllSelected: isAllSelected
-            ) {
-                self.model?.setAll(in: section, selected: !isAllSelected)
-            }
+        return KnownKanjiGroupHeader(
+            title: section.title,
+            detail: "\(section.countLabel) · \(model.selectedCount(in: section)) known",
+            showsButton: model.showsGroupButton(for: section),
+            isAllSelected: isAllSelected
+        ) {
+            self.model?.setAll(in: section, selected: !isAllSelected)
+        }
+    }
 
-            LazyVGrid(columns: KanjiGridTile.columns, spacing: KanjiGridTile.spacing) {
-                ForEach(section.entries) { entry in
-                    kanjiCell(entry.id, meaning: entry.primaryMeaning, levelLabel: nil, model: model)
-                }
+    /// A short last row keeps its cells at full-row width by padding with empty columns.
+    private func tileRow<Cell: View>(
+        _ entries: [KanjiIndexEntry],
+        @ViewBuilder cell: @escaping (KanjiIndexEntry) -> Cell
+    ) -> some View {
+        HStack(alignment: .top, spacing: KanjiGridTile.spacing) {
+            ForEach(entries) { entry in
+                cell(entry)
+                    .frame(maxWidth: .infinity)
+            }
+            ForEach(entries.count..<KanjiGridTile.columnCount, id: \.self) { _ in
+                Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: 0)
             }
         }
     }
@@ -171,7 +192,7 @@ struct KnownKanjiPickerView: View {
                 let studied = try await services?.learnerStore.nonNewKanjiIDs() ?? []
                 system = loadedSystem
                 model = KnownKanjiPickerModel(
-                    sections: KnownKanjiScope.sections(from: all, preferences: preferences),
+                    sections: all,
                     declared: declared,
                     studied: studied
                 )

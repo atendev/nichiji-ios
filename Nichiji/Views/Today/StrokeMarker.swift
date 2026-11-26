@@ -20,8 +20,8 @@ struct StrokeMarker: Equatable, Sendable {
     static let chordLength: CGFloat = 10
     static let curveSamples = 64
 
-    static let dotRadius: CGFloat = 4.5
-    static let haloRadius: CGFloat = 6
+    /// Just wider than the 4-unit stroke, so the dot reads as a cap on its start.
+    static let dotRadius: CGFloat = 2.75
     static let arrowShaft: CGFloat = 11
     static let arrowArm: CGFloat = 4
     static let arrowArmAngle: CGFloat = 0.75
@@ -115,9 +115,8 @@ extension StrokeMarker {
         return path
     }
 
-    /// Draws a sunken halo and the vermilion dot. The caller draws the current stroke after it.
+    /// Draws the vermilion dot. The caller draws it after the current stroke so it sits on top.
     func drawDot(in context: GraphicsContext) {
-        context.fill(dotPath(radius: Self.haloRadius), with: .color(.nichijiSurfaceSunken))
         context.fill(dotPath(radius: Self.dotRadius), with: .color(.nichijiVermilion))
     }
 
