@@ -27,6 +27,7 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 
 ## Decisions so far
 
+- [Check the new fonts on a device](closed/093-check-the-new-fonts-on-a-device.md): Pass, no fixes. On the 5520004b TestFlight build, every check passed: English weights, both kanji styles on every surface, the Hiragino fallback for gothic, and Bold Text in the app and widgets. Size totals are inside the budgets (Shared 5.09 of 8 MiB, app 16.80 of 24 MiB, fonts 4.09 MiB not budgeted).
 - [Bring the widget peak memory under 30 MB](closed/095-bring-the-widget-peak-memory-under-30-mb.md): No fix needed. The 30 MB target applies to `phys_footprint`, which peaked at 11.7 MB over 123 device runs; the 35.6 MB figure is resident size, which the system limit does not count. The memory probe is removed.
 - [Decide what to do about the search index memory](closed/096-decide-what-to-do-about-the-search-index-memory.md): Accept the +24.1 MB; the index is app-only and the app's memory limit is far above a widget's. The 20 MB figure becomes a soft target of about 25 MB of `phys_footprint` growth measured on a device, and the CI runner figure stays a smoke check. Dictionary and the Known kanji picker each build their own copy (about 48 MB with both open); no sharing ticket, and that is the lead if a device shows memory warnings.
 - [Decide whether the Shared size budget counts fonts](closed/094-decide-whether-the-shared-size-budget-counts-fonts.md): The 8 MiB Shared and 24 MiB app budgets count dataset files only, as a guard against accidental dataset growth; widget memory is the real limit ([Bring the widget peak memory under 30 MB](closed/095-bring-the-widget-peak-memory-under-30-mb.md)). `build.py` now prints a non-failing "with fonts" line (widget 9.18 MiB, app 20.90 MiB). Gothic keeps the Hiragino Sans fallback for v1.0 with no Zen build ticket; revisit only if the font device check shows it looks bad.
@@ -117,6 +118,4 @@ Work runs in this order. Ticket numbers follow it, so the runner's "first fronti
 ## Frontier
 
 - [Collect handwriting drawings from other learners](tickets/072-collect-handwriting-drawings-from-other-learners.md) (task, HITL)
-- [Check the new fonts on a device](tickets/093-check-the-new-fonts-on-a-device.md) (task, HITL)
-
-Blocked: [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md), behind the font device check (093). The camera scan stage is built; its device checks go with the release build.
+- [Prepare the v1.0 release build](tickets/054-prepare-the-v1-release-build.md) (task, HITL). The camera scan stage is built; its device checks go with the release build.
