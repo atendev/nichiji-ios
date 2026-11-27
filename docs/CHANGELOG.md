@@ -4,6 +4,9 @@ All notable changes, ordered newest-first. Every commit gets a version bump.
 
 ---
 
+## v0.40.2
+- Collapse groups in the Known kanji picker, now that it lists every level. Each group header has a chevron button that hides or shows its kanji, with Expanded or Collapsed for VoiceOver, as in Dictionary. Select all stays a separate button beside it. Groups start expanded and the collapsed set is not saved. Onboarding's Known kanji step uses the same picker and gets the same headers. Nothing was built or run on the Linux host; CI is the check. Not tagged
+
 ## v0.40.1
 - Fix four things from a device run. The first onboarding slide, Welcome to Kanji style, moved at an angle because the progress header was inserted mid-slide and shrank the pager; the header's space is now kept on Welcome, hidden. The Serif and Gothic cards no longer rewrap their text when picked, since the checkmark's space is always reserved. The Known kanji picker lists every level instead of only the learner's level and easier ones, as one flat lazy list of tile rows like Dictionary browse; `KnownKanjiScope` and its tests are gone. The stroke start dot is smaller (radius 2.75 viewBox units, from 4.5 with a 6-unit halo) and draws on top of the current stroke on the card and in the stroke player. Nothing was built or run on the Linux host; CI is the check. Not tagged
 
