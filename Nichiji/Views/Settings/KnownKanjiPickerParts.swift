@@ -47,27 +47,46 @@ struct KnownKanjiCell: View {
 
 /*-------------------------------group-header-----------------------------*/
 
-/// Group title with its known count and, when the group has kanji to mark, a Select all / Clear all button.
+/// Group title with its known count, a chevron that collapses the group and, when the group has kanji to mark,
+/// a Select all / Clear all button.
 struct KnownKanjiGroupHeader: View {
     let title: String
     let detail: String
+    let isCollapsed: Bool
     let showsButton: Bool
     let isAllSelected: Bool
+    let onToggleCollapsed: () -> Void
     let onToggleAll: () -> Void
 
     var body: some View {
         HStack(alignment: .center, spacing: LayoutTokens.space12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.nichijiHeading)
-                    .foregroundColor(.nichijiInk)
+            Button(action: onToggleCollapsed) {
+                HStack(alignment: .center, spacing: LayoutTokens.space12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .font(.nichijiHeading)
+                            .foregroundColor(.nichijiInk)
 
-                Text(detail)
-                    .font(.nichijiCaption)
-                    .foregroundColor(.nichijiInkMuted)
+                        Text(detail)
+                            .font(.nichijiCaption)
+                            .foregroundColor(.nichijiInkMuted)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.nichijiInkMuted)
+                        .rotationEffect(.degrees(isCollapsed ? 0 : 90))
+                }
+                .frame(minHeight: LayoutTokens.minHitTarget)
+                .contentShape(Rectangle())
             }
-
-            Spacer()
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityValue(isCollapsed ? "Collapsed" : "Expanded")
+            .accessibilityHint(isCollapsed ? "Shows the kanji in this group" : "Hides the kanji in this group")
 
             if showsButton {
                 Button(action: onToggleAll) {

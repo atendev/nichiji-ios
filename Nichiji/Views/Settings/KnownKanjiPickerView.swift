@@ -6,9 +6,11 @@ import SwiftUI
 struct KnownKanjiPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.serviceContainer) private var services
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var model: KnownKanjiPickerModel?
     @State private var system: LevelSystem = .jlpt
+    @State private var collapsedSectionIDs: Set<String> = []
     @State private var query = ""
     @State private var searchIndex: DictionarySearchIndex?
     @State private var results: [KanjiIndexEntry] = []
@@ -72,11 +74,15 @@ struct KnownKanjiPickerView: View {
         if isSearching {
             searchContent(model)
         } else {
-            let rows = KanjiBrowseGrouping.rows(from: model.sections, collapsed: [], columnCount: KanjiGridTile.columnCount)
+            let rows = KanjiBrowseGrouping.rows(
+                from: model.sections,
+                collapsed: collapsedSectionIDs,
+                columnCount: KanjiGridTile.columnCount
+            )
             ForEach(rows) { row in
                 switch row {
-                case .header(let section, _, let isFirst):
-                    sectionHeader(section, model: model)
+                case .header(let section, let isCollapsed, let isFirst):
+                    sectionHeader(section, isCollapsed: isCollapsed, model: model)
                         .padding(.top, isFirst ? 0 : LayoutTokens.space24 - KanjiGridTile.spacing)
                 case .tiles(_, let entries):
                     tileRow(entries) { entry in
@@ -115,16 +121,31 @@ struct KnownKanjiPickerView: View {
         }
     }
 
-    private func sectionHeader(_ section: KanjiBrowseSection, model: KnownKanjiPickerModel) -> some View {
+    private func sectionHeader(
+        _ section: KanjiBrowseSection,
+        isCollapsed: Bool,
+        model: KnownKanjiPickerModel
+    ) -> some View {
         let isAllSelected = model.isAllSelected(in: section)
 
         return KnownKanjiGroupHeader(
             title: section.title,
             detail: "\(section.countLabel) · \(model.selectedCount(in: section)) known",
+            isCollapsed: isCollapsed,
             showsButton: model.showsGroupButton(for: section),
-            isAllSelected: isAllSelected
-        ) {
-            self.model?.setAll(in: section, selected: !isAllSelected)
+            isAllSelected: isAllSelected,
+            onToggleCollapsed: { toggleCollapsed(section.id) },
+            onToggleAll: { self.model?.setAll(in: section, selected: !isAllSelected) }
+        )
+    }
+
+    private func toggleCollapsed(_ sectionID: String) {
+        withAnimation(reduceMotion ? nil : .spring(response: 0.25, dampingFraction: 0.85)) {
+            if collapsedSectionIDs.contains(sectionID) {
+                collapsedSectionIDs.remove(sectionID)
+            } else {
+                collapsedSectionIDs.insert(sectionID)
+            }
         }
     }
 
